@@ -1,38 +1,32 @@
 import 'dart:collection';
 
+import 'package:get/get.dart';
+import 'package:solviolin/model/reservation.dart';
+import 'package:solviolin/util/controller.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 final kToday = DateTime.now();
 final kFirstDay = DateTime(kToday.year, kToday.month - 6, 1);
 final kLastDay = DateTime(kToday.year, kToday.month + 7, 0);
 
-class Event {
-  final String title;
+LinkedHashMap<DateTime, List<Reservation>> getEvents() =>
+    LinkedHashMap<DateTime, List<Reservation>>(
+      equals: isSameDay,
+      hashCode: getHashCode,
+    )..addAll(getEventSource());
 
-  const Event(this.title);
+Map<DateTime, List<Reservation>> getEventSource() =>
+    Get.put(MyReservationController()).reservations.groupBy((reservation) {
+      DateTime date = reservation.startDate;
+      return DateTime(date.year, date.month, date.day);
+    });
 
-  @override
-  String toString() => title;
+extension _Iterables<E> on Iterable<E> {
+  Map<K, List<E>> groupBy<K>(K Function(E) keyFunction) => fold(
+      <K, List<E>>{},
+      (Map<K, List<E>> map, E element) =>
+          map..putIfAbsent(keyFunction(element), () => <E>[]).add(element));
 }
-
-final kEvents = LinkedHashMap<DateTime, List<Event>>(
-  equals: isSameDay,
-  hashCode: getHashCode,
-)..addAll(_kEventSource);
-
-final _kEventSource = Map.fromIterable(
-  List.generate(50, (index) => index),
-  key: (item) => DateTime.utc(kFirstDay.year, kFirstDay.month, item * 5),
-  value: (item) => List.generate(
-    item % 4 + 1,
-    (index) => Event('Event $item | ${index + 1}'),
-  ),
-)..addAll({
-    kToday: [
-      Event('Today\'s Event 1'),
-      Event('Today\'s Event 2'),
-    ],
-  });
 
 int getHashCode(DateTime key) {
   return key.day * 1000000 + key.month * 10000 + key.year;

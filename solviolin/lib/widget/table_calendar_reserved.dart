@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-// import 'package:intl/intl.dart';
 import 'package:solviolin/util/controller.dart';
 import 'package:solviolin/util/data_table_calendar.dart';
 import 'package:table_calendar/table_calendar.dart';
@@ -20,7 +19,7 @@ class CalendarReserved extends StatefulWidget {
 }
 
 class _CalendarReservedState extends State<CalendarReserved> {
-  DateTime _focusedDay = DateTime.now();
+  DateTime _focusedDay = kToday;
   late DateTime _selectedDay;
 
   @override
@@ -51,10 +50,18 @@ class _CalendarReservedState extends State<CalendarReserved> {
             //     DateFormat.yMMMMd(locale).format(date),
           ),
           calendarStyle: CalendarStyle(
+            canMarkersOverflow: false,
+            markerSizeScale: 1,
+            markersAlignment: Alignment.center,
+            markerDecoration: const BoxDecoration(
+              color: const Color(0xFF263238),
+              shape: BoxShape.rectangle,
+            ),
             weekendTextStyle: TextStyle(
               color: Colors.red,
             ),
           ),
+          eventLoader: (day) => getEvents()[day] ?? [],
           selectedDayPredicate: (day) {
             return isSameDay(_selectedDay, day);
           },

@@ -40,4 +40,7 @@ class Reservation {
 
   @override
   int get hashCode => this.id;
+
+  @override
+  String toString() => "${this.branchName} ${this.userID}\'s Reservation";
 }
