@@ -8,9 +8,12 @@ import 'package:solviolin/page/history_page.dart';
 import 'package:solviolin/page/loading_page.dart';
 import 'package:solviolin/page/login_page.dart';
 import 'package:solviolin/page/main_page.dart';
+import 'package:solviolin/page/metronome_page.dart';
 import 'package:solviolin/page/payment_page.dart';
 import 'package:solviolin/page/qrcode_scan_page.dart';
 import 'package:solviolin/page/settings_page.dart';
+import 'package:solviolin/page/test_page.dart';
+import 'package:solviolin/util/controller.dart';
 
 void main() {
   LicenseRegistry.addLicense(() async* {
@@ -42,6 +45,7 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
+    Get.put(DataController());
     return GetMaterialApp(
       title: "SolViolin",
       theme: ThemeData(
@@ -65,9 +69,11 @@ class _MyAppState extends State<MyApp> {
         GetPage(name: "/history", page: () => HistoryPage()),
         GetPage(name: "/scan", page: () => QRCodeScanPage()),
         GetPage(name: "/payment", page: () => PaymentPage()),
+        GetPage(name: "/settings", page: () => SettingsPage()),
+        GetPage(name: "/metronome", page: () => MetronomePage()),
         GetPage(
-          name: "/settings",
-          page: () => SettingsPage(),
+          name: "/test",
+          page: () => TestPage(),
           transition: Transition.zoom,
         ),
       ],

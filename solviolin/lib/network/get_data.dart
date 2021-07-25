@@ -1,15 +1,20 @@
 import 'package:dio/dio.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart'
+    hide Options;
 import 'package:get/get.dart' hide Response;
 import 'package:pretty_dio_logger/pretty_dio_logger.dart';
+import 'package:solviolin/model/control.dart';
 import 'package:solviolin/model/regular_schedule.dart';
 import 'package:solviolin/model/reservation.dart';
 import 'package:solviolin/model/teacher.dart';
+import 'package:solviolin/model/term.dart';
 import 'package:solviolin/model/user.dart';
+import 'package:solviolin/util/controller.dart';
 
 class Client {
   final Dio dio = Dio();
   final storage = FlutterSecureStorage();
+  DataController _controller = Get.find<DataController>();
 
   Client() {
     dio.options.connectTimeout = 3000;
@@ -18,7 +23,7 @@ class Client {
 
     // not to get breakpoints at dioError
     dio.options.followRedirects = false;
-    dio.options.validateStatus = (status) => status! < 500;
+    dio.options.validateStatus = (status) => status! < 600;
 
     dio.interceptors.add(InterceptorsWrapper(
       onRequest: (options, handler) async {
@@ -29,23 +34,37 @@ class Client {
         return handler.next(options);
       },
       onResponse: (response, handler) async {
-        if (response.statusCode == 400) {
-          print("정보를 불러올 수 없습니다.\n다시 확인해 주세요!");
-          Get.defaultDialog(
-            title: "정보를 불러올 수 없습니다.\n다시 확인해 주세요!",
-          );
-        } else if (response.statusCode == 401) {
-          bool containsAccess = await storage.containsKey(key: "accessToken");
-          bool containsRefresh = await storage.containsKey(key: "refreshToken");
-          if (!containsAccess && !containsRefresh) {
-            print("dialog: login failed");
-          } else if (!containsAccess && containsRefresh) {
-            print("dialog: refreshToken expired");
-          } else if (containsAccess && containsRefresh) {
-            print("do refresh");
-            refresh();
-          } else {
-            print("containsAccess && !containsRefresh => bug?");
+        if (response.statusCode == 200 || response.statusCode == 201) {
+          _controller.isComplete.add(true);
+        } else {
+          _controller.isComplete.add(false);
+          if (response.statusCode == 400) {
+            _controller.cacheMessage("not proper request body.");
+            Get.defaultDialog(
+              title: "정보를 불러올 수 없습니다.\n다시 확인해 주세요!",
+            );
+          } else if (response.statusCode == 401) {
+            bool _containsAccess =
+                await storage.containsKey(key: "accessToken");
+            bool _containsRefresh =
+                await storage.containsKey(key: "refreshToken");
+            if (!_containsAccess && !_containsRefresh) {
+              _controller.cacheMessage("아이디 또는 비밀번호가 일치하지 않습니다.");
+            } else if (!_containsAccess && _containsRefresh) {
+              _controller.cacheMessage("인증이 만료되었습니다. 자동으로 로그아웃 됩니다.");
+              Get.offAllNamed("/login");
+              logout();
+            } else if (_containsAccess && _containsRefresh) {
+              _controller.isAllComplete
+                  .add(await _controller.checkComplete(true));
+              refresh();
+              retry(response.requestOptions);
+            } else {
+              _controller
+                  .cacheMessage("containsAccess && !containsRefresh => ??");
+            }
+          } else if (response.statusCode == 404) {
+            _controller.cacheMessage("정보가 존재하지 않습니다.\n다시 확인해 주세요!");
           }
         }
         return handler.next(response);
@@ -58,27 +77,22 @@ class Client {
     dio.interceptors.add(PrettyDioLogger(
       requestHeader: true,
       requestBody: true,
-      responseHeader: true,
     ));
   }
 
-  Future<User> login(String userID, String userPassword) async {
+  Future<dynamic> login(String userID, String userPassword) async {
     Response response = await dio.post("/auth/login", data: {
       "userID": userID,
       "userPassword": userPassword,
     });
     if (response.statusCode == 201) {
-      User user = User.fromJson(response.data);
-      await storage.write(key: "accessToken", value: user.accessToken);
-      await storage.write(key: "refreshToken", value: user.refreshToken);
-      return user;
-    } else if (response.statusCode == 401) {
-      print("아이디 패스워드 틀림");
-    } else if (response.statusCode == 404) {
-      print("유저 존재하지 않음");
+      await storage.write(
+          key: "accessToken", value: response.data["access_token"]);
+      await storage.write(
+          key: "refreshToken", value: response.data["refresh_token"]);
+      return User.fromJson(response.data);
     }
-    print("LoadingFail");
-    return Future.value(null);
+    return null;
   }
 
   Future<bool> isLoggedIn() async {
@@ -89,6 +103,7 @@ class Client {
     String? refreshToken = await storage.read(key: "refreshToken");
     if (refreshToken != null) {
       await storage.delete(key: "accessToken");
+      _controller.isComplete = [];
       Response response = await dio.post("/auth/refresh", data: {
         "refreshToken": refreshToken,
       });
@@ -96,37 +111,76 @@ class Client {
         String? accessToken = response.data["access_token"];
         await storage.write(key: "accessToken", value: accessToken);
         dio.options.headers["Authorization"] = "Bearer $accessToken";
-      } else if (response.statusCode == 401) {
-        logout();
       }
     }
+  }
+
+  Future<Response<dynamic>> retry(RequestOptions requestOptions) async {
+    Options options = Options(
+      method: requestOptions.method,
+      headers: requestOptions.headers,
+    );
+    return dio.request<dynamic>(
+      requestOptions.path,
+      data: requestOptions.data,
+      queryParameters: requestOptions.queryParameters,
+      options: options,
+    );
   }
 
   Future<void> logout() async {
     await storage.deleteAll();
     dio.options.headers.remove("Authorization");
+    _controller.isComplete = [];
   }
 
-  Future<User> getProfile() async {
+  Future<dynamic> getProfile() async {
     if (await isLoggedIn()) {
       Response response = await dio.get("/auth/profile");
-      if (response.statusCode == 201) {
-        User user = User.fromJson(response.data);
-        await storage.write(key: "accessToken", value: user.accessToken);
-        await storage.write(key: "refreshToken", value: user.refreshToken);
-        return user;
-      } else if (response.statusCode == 401) {
-        await storage.deleteAll();
-        print("token is invalid");
-      } else if (response.statusCode == 404) {
-        print("유저 존재하지 않음");
+      if (response.statusCode == 200) {
+        return User.fromJson(response.data);
       }
     }
-    print("로그인에 실패했습니다");
-    return Future.value(null);
+    return null;
   }
 
-  Future<List<Reservation>> getReservations(
+  Future<dynamic> getRegularSchedules() async {
+    if (await isLoggedIn()) {
+      Response response = await dio.get("/regular-schedule");
+      if (response.statusCode == 200) {
+        List<RegularSchedule> regularSchedules = [];
+        for (int i = 0; i < response.data.length; i++) {
+          regularSchedules.add(RegularSchedule.fromJson(response.data[i]));
+        }
+        return regularSchedules;
+      }
+    }
+    return null;
+  }
+
+  Future<dynamic> getTeachers({String? teacherID, String? branchName}) async {
+    if (await isLoggedIn()) {
+      Map<String, dynamic> queries = {};
+      if (teacherID != null) {
+        queries["teacherID"] = teacherID;
+      }
+      if (branchName != null) {
+        queries["branchName"] = branchName;
+      }
+      Response response =
+          await dio.get("/teacher/search", queryParameters: queries);
+      if (response.statusCode == 200) {
+        List<Teacher> teachers = [];
+        for (int i = 0; i < response.data.length; i++) {
+          teachers.add(Teacher.fromJson(response.data[i]));
+        }
+        return teachers;
+      }
+    }
+    return null;
+  }
+
+  Future<dynamic> getReservations(
     String branchName, {
     String? teacherID,
     DateTime? startDate,
@@ -134,7 +188,6 @@ class Client {
     String? userID,
   }) async {
     if (await isLoggedIn()) {
-      List<Reservation> reservations = [];
       Map<String, dynamic> queries = {"branchName": branchName};
       if (teacherID != null) {
         queries["teacherID"] = teacherID;
@@ -151,29 +204,117 @@ class Client {
       Response response =
           await dio.get("/reservation", queryParameters: queries);
       if (response.statusCode == 200) {
-        var result = response.data;
-        for (int i = 0; i < result.length; i++) {
-          reservations.add(Reservation.fromJson(result[i]));
+        List<Reservation> reservations = [];
+        for (int i = 0; i < response.data.length; i++) {
+          reservations.add(Reservation.fromJson(response.data[i]));
         }
         return reservations;
       }
     }
-    print("LoadingFail");
-    return Future.value(null);
+    return null;
   }
 
-  Future<RegularSchedule> getRegularSchedule() async {
+  Future<void> reserveRegularReservation({
+    required String teacherID,
+    required String branchName,
+    required DateTime startDate,
+    required DateTime endDate,
+    required String userID,
+  }) async {
     if (await isLoggedIn()) {
-      Response response = await dio.get("/regular-schedule");
-      if (response.statusCode == 201) {
-        return RegularSchedule.fromJson(response.data);
+      Response response = await dio.post("/reservation/regular", data: {
+        "teacherID": teacherID,
+        "branchName": branchName,
+        "startDate": startDate.toIso8601String(),
+        "endDate": endDate.toIso8601String(),
+        "userID": userID,
+      });
+      if (response.statusCode == 409) {
+        _controller.cacheMessage("해당 시간에 이미 수업이 존재합니다. 창을 새로고침 해주세요.");
       }
     }
-    print("LoadingFail");
-    return Future.value(null);
   }
 
-  Future<Teacher> getTeacher({String? teacherID, String? branchName}) async {
+  Future<void> cancelReservation(Reservation reservation, String id) async {
+    if (await isLoggedIn()) {
+      Response response =
+          await dio.patch("/reservation/user/cancel/$id", data: {
+        "id": id,
+      });
+      if (response.statusCode == 403) {
+        _controller.cacheMessage("다른 수강생의 수업을 취소할 수 없습니다.");
+      } else if (response.statusCode == 405) {
+        _controller.cacheMessage("이번 학기에 더 이상 수업을 취소할 수 없습니다.");
+      }
+    }
+  }
+
+  Future<void> makeUpReservation({
+    required String teacherID,
+    required String branchName,
+    required DateTime startDate,
+    required DateTime endDate,
+    required String userID,
+  }) async {
+    if (await isLoggedIn()) {
+      Response response = await dio.post("/reservation/user", data: {
+        "teacherID": teacherID,
+        "branchName": branchName,
+        "startDate": startDate.toIso8601String(),
+        "endDate": endDate.toIso8601String(),
+        "userID": userID,
+      });
+      if (response.statusCode == 409) {
+        _controller.cacheMessage("해당 시간에 이미 수업이 존재합니다. 창을 새로고침 해주세요.");
+      } else if (response.statusCode == 412) {
+        _controller.cacheMessage("해당 시간에는 수업을 예약할 수 없습니다.");
+      }
+    }
+  }
+
+  Future<void> extendReservation(Reservation reservation, String id) async {
+    if (await isLoggedIn()) {
+      Response response =
+          await dio.patch("/reservation/user/extend/$id", data: {
+        "id": id,
+      });
+      if (response.statusCode == 403) {
+        _controller.cacheMessage("다른 수강생의 수업을 연장할 수 없습니다.");
+      } else if (response.statusCode == 409) {
+        _controller.cacheMessage("해당 시간에 이미 수업이 존재합니다. 창을 새로고침 해주세요.");
+      }
+    }
+  }
+
+  Future<dynamic> getTerms() async {
+    if (await isLoggedIn()) {
+      Response response = await dio.get("/term");
+      if (response.statusCode == 200) {
+        List<Term> terms = [];
+        for (int i = 0; i < response.data.length; i++) {
+          terms.add(Term.fromJson(response.data[i]));
+        }
+        return terms;
+      }
+    }
+    return null;
+  }
+
+  Future<dynamic> getCurrentTerm() async {
+    if (await isLoggedIn()) {
+      Response response = await dio.get("/term/cur");
+      if (response.statusCode == 200) {
+        List<Term> currentTerms = [];
+        for (int i = 0; i < response.data.length; i++) {
+          currentTerms.add(Term.fromJson(response.data[i]));
+        }
+        return currentTerms;
+      }
+    }
+    return null;
+  }
+
+  Future<dynamic> getControls({String? teacherID, String? branchName}) async {
     if (await isLoggedIn()) {
       Map<String, dynamic> queries = {};
       if (teacherID != null) {
@@ -182,13 +323,45 @@ class Client {
       if (branchName != null) {
         queries["branchName"] = branchName;
       }
-      Response response =
-          await dio.get("/teacher/search", queryParameters: queries);
-      if (response.statusCode == 201) {
-        return Teacher.fromJson(response.data);
+      Response response = await dio.get("/control", queryParameters: queries);
+      if (response.statusCode == 200) {
+        List<Control> controls = [];
+        for (int i = 0; i < response.data.length; i++) {
+          controls.add(Control.fromJson(response.data[i]));
+        }
+        return controls;
       }
     }
-    print("LoadingFail");
-    return Future.value(null);
+    return null;
+  }
+
+  Future<void> checkIn(String branchCode) async {
+    if (await isLoggedIn()) {
+      await dio.post("/check-in", data: {
+        "branchCode": branchCode,
+      });
+    }
+  }
+
+  //
+
+  Future<void> registerTeacher() async {
+    if (await isLoggedIn()) {
+      await dio.post("/teacher", data: {
+        "teacherID": "teacher2",
+        "teacherBranch": "잠실",
+        "workDow": 3,
+        "startTime": "10:00",
+        "endTime": "16:30",
+      });
+    }
+  }
+
+  Future<void> updateUserInformation() async {
+    if (await isLoggedIn()) {
+      await dio.patch("/user/sleep1", data: {
+        "userBranch": "잠실",
+      });
+    }
   }
 }

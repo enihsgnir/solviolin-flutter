@@ -1,3 +1,5 @@
+import 'package:solviolin/util/format.dart';
+
 class Term {
   int id;
   DateTime termStart;
@@ -12,8 +14,8 @@ class Term {
   factory Term.fromJson(Map<String, dynamic> json) {
     return Term(
       id: json["id"],
-      termStart: DateTime.parse(json["termStart"]),
-      termEnd: DateTime.parse(json["termEnd"]),
+      termStart: parseDateOnly(json["termStart"]),
+      termEnd: parseDateOnly(json["termEnd"]),
     );
   }
 }

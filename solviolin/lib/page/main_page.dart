@@ -26,27 +26,28 @@ class _MainPageState extends State<MainPage> {
   @override
   Widget build(BuildContext context) {
     // final double _statusBarHeight = MediaQuery.of(context).padding.top;
-    // final double _navigationBarHeight = MediaQuery.of(context).padding.bottom;
-    // print(_navigationBarHeight); // 48.0
-    // print(MediaQuery.of(context).padding.top); //62.2
-    // print(MediaQuery.of(context).padding.left); // 0.0
-    // print(MediaQuery.of(context).padding.right); // 0.0
 
+    final _deviceWidth = MediaQuery.of(context).size.width -
+        (MediaQuery.of(context).padding.left +
+            MediaQuery.of(context).padding.right);
+    final _deviceHeight = MediaQuery.of(context).size.height -
+        (MediaQuery.of(context).padding.top +
+            MediaQuery.of(context).padding.bottom);
     return Scaffold(
       body: SafeArea(
         child: SlidingUpPanel(
-          minHeight: 500,
-          maxHeight: 850,
+          minHeight: _deviceHeight * 0.44,
+          maxHeight: _deviceHeight * 0.84,
           backdropEnabled: true,
           panel: Column(
             children: [
               Container(
-                width: MediaQuery.of(context).size.width,
-                height: 20,
+                width: _deviceWidth,
+                height: _deviceHeight * 0.02,
                 color: Colors.black54,
                 child: Icon(
                   CupertinoIcons.chevron_compact_down,
-                  size: 20,
+                  size: _deviceHeight * 0.02,
                 ),
               ),
               SfTimeslotReserved(stream: _streamController.stream),

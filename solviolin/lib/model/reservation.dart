@@ -1,3 +1,5 @@
+import 'package:solviolin/util/format.dart';
+
 class Reservation {
   int id;
   DateTime startDate;
@@ -24,8 +26,8 @@ class Reservation {
   factory Reservation.fromJson(Map<String, dynamic> json) {
     return Reservation(
       id: json["id"],
-      startDate: DateTime.parse(json["startDate"]),
-      endDate: DateTime.parse(json["endDate"]),
+      startDate: parseDateTime(json["startDate"]),
+      endDate: parseDateTime(json["endDate"]),
       bookingStatus: json["bookingStatus"],
       extendedMin: json["extendedMin"],
       userID: json["userID"],

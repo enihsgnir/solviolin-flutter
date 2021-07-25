@@ -1,7 +1,9 @@
+import 'package:solviolin/util/format.dart';
+
 class RegularSchedule {
   int id;
-  String startTime;
-  String endTime;
+  Duration startTime;
+  Duration endTime;
   int dow;
   DateTime startDate;
   DateTime endDate;
@@ -26,11 +28,11 @@ class RegularSchedule {
   factory RegularSchedule.fromJson(Map<String, dynamic> json) {
     return RegularSchedule(
       id: json["id"],
-      startTime: json["startTime"],
-      endTime: json["endTime"],
+      startTime: parseTimeOnly(json["startTime"]),
+      endTime: parseTimeOnly(json["endTime"]),
       dow: json["dow"],
-      startDate: DateTime.parse(json["startDate"]),
-      endDate: DateTime.parse(json["endDate"]),
+      startDate: parseDateOnly(json["startDate"]),
+      endDate: parseDateOnly(json["endDate"]),
       userID: json["userID"],
       teacherID: json["teacherID"],
       branchName: json["branchName"],

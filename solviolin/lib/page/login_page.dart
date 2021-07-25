@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:solviolin/network/get_data.dart';
 import 'package:solviolin/util/controller.dart';
-import 'package:solviolin/util/data_user_base.dart';
+import 'package:solviolin/util/data_source.dart';
+import 'package:solviolin/util/notification.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
@@ -14,7 +15,6 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   TextEditingController _idController = TextEditingController();
   TextEditingController _pwController = TextEditingController();
-  // bool _isLoading = false;
 
   @override
   void dispose() {
@@ -25,8 +25,12 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
+    final _deviceHeight = MediaQuery.of(context).size.height -
+        (MediaQuery.of(context).padding.top +
+            MediaQuery.of(context).padding.bottom);
+    final _textHeight = _deviceHeight / MediaQuery.of(context).textScaleFactor;
     Client client = Get.put(Client());
-    UserController _userController = Get.put(UserController());
+    DataController _controller = Get.find<DataController>();
     return Scaffold(
       body: SafeArea(
         child: Column(
@@ -80,13 +84,14 @@ class _LoginPageState extends State<LoginPage> {
                   width: double.infinity,
                   child: TextButton(
                     onPressed: () async {
-                      setState(() {
-                        // _isLoading = true;
-                      });
-                      _userController.updateData(await client.login(
+                      _controller.updateUser(await client.login(
                           _idController.text, _pwController.text));
-                      getUserBaseData();
-                      Get.offAllNamed("/main");
+                      await getUserBaseData(context);
+                      await _controller.checkAllComplete()
+                          ? Get.offAllNamed("/main")
+                          : showErrorMessage(context);
+
+                      // Get.offAllNamed("/test");
                     },
                     style: TextButton.styleFrom(
                       backgroundColor: const Color.fromRGBO(96, 128, 104, 50),

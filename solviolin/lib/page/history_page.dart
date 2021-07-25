@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:solviolin/util/controller.dart';
+import 'package:solviolin/util/format.dart';
 
 class HistoryPage extends StatefulWidget {
   const HistoryPage({Key? key}) : super(key: key);
@@ -21,7 +22,7 @@ class _HistoryPageState extends State<HistoryPage>
 
   @override
   Widget build(BuildContext context) {
-    Get.put(RegularScheduleController());
+    Get.find<DataController>();
     return Scaffold(
       // appBar: AppBar(
       //   leading: IconButton(
@@ -32,11 +33,11 @@ class _HistoryPageState extends State<HistoryPage>
       //   ),
       // ),
       body: SafeArea(
-        child: ListView(
-          children: [
-            GetBuilder<RegularScheduleController>(
-              builder: (controller) {
-                return Container(
+        child: GetBuilder<DataController>(
+          builder: (controller) {
+            return ListView(
+              children: [
+                Container(
                   height: 100,
                   color: Colors.amber,
                   child: Column(
@@ -46,102 +47,86 @@ class _HistoryPageState extends State<HistoryPage>
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceAround,
                         children: [
-                          Text(_dowToString(controller.regularSchedule.dow)),
+                          Text(dowToString(controller.regularSchedules[0].dow)),
                           // Text(
-                          //     "${DateFormat.Hm().format(regularScheduleTest.startTime)}"
-                          //     "~${DateFormat.Hm().format(regularScheduleTest.endTime)}"),
-                          Text(controller.regularSchedule.branchName),
+                          //     "${timeToString(regularScheduleTest.startTime)}"
+                          //     "~${timeToString(regularScheduleTest.endTime)}"),
+                          Text(controller.regularSchedules[0].branchName),
                         ],
                       ),
-                      Text(controller.regularSchedule.teacherID),
+                      Text(controller.regularSchedules[0].teacherID),
                     ],
                   ),
-                );
-              },
-            ),
-            Container(
-              child: TabBar(
-                controller: _tabController,
-                tabs: [
-                  Tab(text: "지난 달"),
-                  Tab(text: "이번 달"),
-                ],
-              ),
-            ),
-            Container(
-              height: MediaQuery.of(context).size.height,
-              color: Colors.grey,
-              child: TabBarView(
-                controller: _tabController,
-                children: [
-                  ListView(),
-                  ListView.builder(
-                    itemBuilder: (context, index) {
-                      return Container(
-                        height: 100,
-                        decoration: BoxDecoration(
-                          color: Colors.blue.shade200,
-                          border: Border(
-                            left: BorderSide(
-                              color: Colors.black45,
-                            ),
-                            bottom: BorderSide(
-                              color: Colors.black,
-                              width: 2,
-                            ),
-                          ),
-                        ),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            // Text(
-                            //     "${DateFormat.yMMMMd().format(regularScheduleTest.startTime)}"
-                            //     " ${DateFormat.Hm().format(regularScheduleTest.startTime)}"
-                            //     "~${DateFormat.Hm().format(regularScheduleTest.endTime)}"),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceAround,
-                              children: [
-                                // Text(regularScheduleTest.branchName),
-                                // Text(regularScheduleTest.teacherID),
-                              ],
-                            ),
-                            Text(
-                              "(BookingStatus)",
-                              style: TextStyle(
-                                color: Colors.red,
+                ),
+                Container(
+                  child: TabBar(
+                    controller: _tabController,
+                    tabs: [
+                      Tab(text: "지난 달"),
+                      Tab(text: "이번 달"),
+                    ],
+                  ),
+                ),
+                Container(
+                  height: MediaQuery.of(context).size.height,
+                  color: Colors.grey,
+                  child: TabBarView(
+                    controller: _tabController,
+                    children: [
+                      ListView(),
+                      ListView.builder(
+                        itemBuilder: (context, index) {
+                          return Container(
+                            height: 100,
+                            decoration: BoxDecoration(
+                              color: Colors.blue.shade200,
+                              border: Border(
+                                left: BorderSide(
+                                  color: Colors.black45,
+                                ),
+                                bottom: BorderSide(
+                                  color: Colors.black,
+                                  width: 2,
+                                ),
                               ),
                             ),
-                          ],
-                        ),
-                      );
-                    },
-                    // itemCount: reservationListTest.length,
-                    itemCount: 1,
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                // Text(
+                                //     "${dateToString(regularScheduleTest.startTime)}"
+                                //     " ${timeToString(regularScheduleTest.startTime)}"
+                                //     "~${timeToString(regularScheduleTest.endTime)}",
+                                // ),
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceAround,
+                                  children: [
+                                    // Text(regularScheduleTest.branchName),
+                                    // Text(regularScheduleTest.teacherID),
+                                  ],
+                                ),
+                                Text(
+                                  "(BookingStatus)",
+                                  style: TextStyle(
+                                    color: Colors.red,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        },
+                        // itemCount: reservationListTest.length,
+                        itemCount: 1,
+                      ),
+                    ],
                   ),
-                ],
-              ),
-            ),
-          ],
+                ),
+              ],
+            );
+          },
         ),
       ),
     );
   }
-
-  String _dowToString(int dow) {
-    Map<int, String> dayData = {
-      0: "일",
-      1: "월",
-      2: "화",
-      3: "수",
-      4: "목",
-      5: "금",
-      6: "토",
-    };
-
-    return dayData[dow]!;
-  }
-
-  // String _dateToString(DateTime dateTime) {
-  //   return "";
-  // }
 }

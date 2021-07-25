@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:solviolin/network/get_data.dart';
 import 'package:solviolin/util/controller.dart';
-import 'package:solviolin/util/data_user_base.dart';
 
 class LoadingPage extends StatefulWidget {
   const LoadingPage({Key? key}) : super(key: key);
@@ -51,9 +50,8 @@ class _LoadingPageState extends State<LoadingPage> {
   Future<void> _checkUser() async {
     Client client = Get.put(Client());
     if (await client.isLoggedIn()) {
-      UserController _userController = Get.put(UserController());
-      _userController.updateData(await client.getProfile());
-      getUserBaseData();
+      Get.find<DataController>().updateUser(await client.getProfile());
+      // getUserBaseData();
       Get.offAllNamed("/main");
     } else {
       Get.offAllNamed("/login");

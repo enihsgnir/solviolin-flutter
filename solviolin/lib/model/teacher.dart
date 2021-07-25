@@ -1,10 +1,12 @@
+import 'package:solviolin/util/format.dart';
+
 class Teacher {
   int id;
   String teacherID;
   String branchName;
   int workDow;
-  DateTime startTime;
-  DateTime endTime;
+  Duration startTime;
+  Duration endTime;
 
   Teacher({
     required this.id,
@@ -21,8 +23,8 @@ class Teacher {
       teacherID: json["teacherID"],
       branchName: json["branchName"],
       workDow: json["workDow"],
-      startTime: DateTime.parse(json["startTime"]),
-      endTime: DateTime.parse(json["endTime"]),
+      startTime: parseTimeOnly(json["startTime"]),
+      endTime: parseTimeOnly(json["endTime"]),
     );
   }
 }

@@ -11,8 +11,6 @@ class User {
   int isPaid;
   int status;
   String? color;
-  String accessToken;
-  String refreshToken;
 
   User({
     required this.userID,
@@ -27,8 +25,6 @@ class User {
     required this.isPaid,
     required this.status,
     this.color,
-    required this.accessToken,
-    required this.refreshToken,
   });
 
   factory User.fromJson(Map<String, dynamic> json) {
@@ -45,8 +41,6 @@ class User {
       isPaid: json["isPaid"],
       status: json["status"],
       color: json["color"],
-      accessToken: json["access_token"],
-      refreshToken: json["refresh_token"],
     );
   }
 }

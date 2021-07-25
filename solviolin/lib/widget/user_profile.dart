@@ -13,8 +13,11 @@ class UserProfile extends StatefulWidget {
 class _UserProfileState extends State<UserProfile> {
   @override
   Widget build(BuildContext context) {
-    double _deviceHeight = MediaQuery.of(context).size.height;
-    Get.put(UserController());
+    final _deviceHeight = MediaQuery.of(context).size.height -
+        (MediaQuery.of(context).padding.top +
+            MediaQuery.of(context).padding.bottom);
+    final _textHeight = _deviceHeight / MediaQuery.of(context).textScaleFactor;
+    Get.find<DataController>();
     return Container(
       height: _deviceHeight * 0.07,
       decoration: BoxDecoration(
@@ -31,13 +34,13 @@ class _UserProfileState extends State<UserProfile> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  GetBuilder<UserController>(
+                  GetBuilder<DataController>(
                     builder: (controller) {
                       return Text(
                         "${controller.user.userName}님",
                         style: TextStyle(
                           color: Colors.white,
-                          fontSize: 30,
+                          fontSize: _textHeight * 0.035,
                           fontWeight: FontWeight.bold,
                         ),
                       );
@@ -51,6 +54,7 @@ class _UserProfileState extends State<UserProfile> {
                       "내 예약 이력 조회",
                       style: TextStyle(
                         color: Colors.blueGrey,
+                        fontSize: _textHeight * 0.015,
                         decoration: TextDecoration.underline,
                       ),
                     ),
@@ -65,26 +69,47 @@ class _UserProfileState extends State<UserProfile> {
                 onTap: () {
                   Get.toNamed("/scan");
                 },
-                child: Icon(Icons.qr_code_scanner_outlined),
+                child: Icon(
+                  Icons.qr_code_scanner_outlined,
+                  size: _deviceHeight * 0.04,
+                ),
               ),
               InkWell(
                 onTap: () {
                   Get.toNamed("/payment");
                 },
-                child: Icon(Icons.payment_outlined),
+                child: Icon(
+                  Icons.payment_outlined,
+                  size: _deviceHeight * 0.04,
+                ),
               ),
               InkWell(
                 onTap: () {
-                  Get.toNamed("settings");
+                  Get.toNamed("/settings");
                 },
-                child: Icon(Icons.settings_outlined),
+                child: Icon(
+                  Icons.settings_outlined,
+                  size: _deviceHeight * 0.04,
+                ),
+              ),
+              InkWell(
+                onTap: () {
+                  Get.toNamed("/metronome");
+                },
+                child: Icon(
+                  CupertinoIcons.metronome,
+                  size: _deviceHeight * 0.04,
+                ),
               ),
               InkWell(
                 onTap: () {},
-                child: Icon(CupertinoIcons.metronome),
+                child: Icon(
+                  Icons.logout_outlined,
+                  size: _deviceHeight * 0.04,
+                ),
               ),
             ],
-          )
+          ),
         ],
       ),
     );

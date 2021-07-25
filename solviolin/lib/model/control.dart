@@ -1,3 +1,5 @@
+import 'package:solviolin/util/format.dart';
+
 class Control {
   int id;
   DateTime controlStart;
@@ -18,8 +20,8 @@ class Control {
   factory Control.fromJson(Map<String, dynamic> json) {
     return Control(
       id: json["id"],
-      controlStart: DateTime.parse(json["controlStart"]),
-      controlEnd: DateTime.parse(json["controlEnd"]),
+      controlStart: parseDateTime(json["controlStart"]),
+      controlEnd: parseDateTime(json["controlEnd"]),
       teacherID: json["teacherID"],
       branchName: json["branchName"],
       status: json["status"],

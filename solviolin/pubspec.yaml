@@ -35,6 +35,8 @@ dependencies:
     path: ../packages/table_calendar_3.0.1_ver_solviolin/
   syncfusion_flutter_calendar:
     path: ../packages/syncfusion_flutter_calendar_19.2.46_ver_solviolin/
+  flutter_week_view: ^1.1.0
+  qr_code_scanner: ^0.5.2
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
