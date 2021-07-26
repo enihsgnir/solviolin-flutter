@@ -86,9 +86,9 @@ class _LoginPageState extends State<LoginPage> {
                     onPressed: () async {
                       _controller.updateUser(await client.login(
                           _idController.text, _pwController.text));
-                      await getUserBaseData(context);
+                      await getUserBaseData();
                       await _controller.checkAllComplete()
-                          ? Get.offAllNamed("/main")
+                          ? await Get.offAllNamed("/main")
                           : showErrorMessage(context);
 
                       // Get.offAllNamed("/test");
@@ -103,7 +103,7 @@ class _LoginPageState extends State<LoginPage> {
                       "로그인",
                       style: TextStyle(
                         color: const Color.fromRGBO(203, 173, 204, 80),
-                        fontSize: 15,
+                        fontSize: _textHeight * 0.02,
                         fontWeight: FontWeight.bold,
                       ),
                     ),

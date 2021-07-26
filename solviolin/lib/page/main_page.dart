@@ -3,8 +3,8 @@ import 'dart:async';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
-import 'package:solviolin/widget/table_calendar_reserved.dart';
-import 'package:solviolin/widget/sf_timeslot_reserved.dart';
+import 'package:solviolin/widget/calendar_reserved.dart';
+import 'package:solviolin/widget/timeslot_reserved.dart';
 import 'package:solviolin/widget/user_profile.dart';
 
 class MainPage extends StatefulWidget {
@@ -25,8 +25,6 @@ class _MainPageState extends State<MainPage> {
 
   @override
   Widget build(BuildContext context) {
-    // final double _statusBarHeight = MediaQuery.of(context).padding.top;
-
     final _deviceWidth = MediaQuery.of(context).size.width -
         (MediaQuery.of(context).padding.left +
             MediaQuery.of(context).padding.right);
@@ -39,24 +37,25 @@ class _MainPageState extends State<MainPage> {
           minHeight: _deviceHeight * 0.44,
           maxHeight: _deviceHeight * 0.84,
           backdropEnabled: true,
+          color: Theme.of(context).backgroundColor,
           panel: Column(
             children: [
               Container(
                 width: _deviceWidth,
                 height: _deviceHeight * 0.02,
-                color: Colors.black54,
+                color: Colors.black87,
                 child: Icon(
                   CupertinoIcons.chevron_compact_down,
                   size: _deviceHeight * 0.02,
                 ),
               ),
-              SfTimeslotReserved(stream: _streamController.stream),
+              TimeslotReserved(stream: _streamController.stream),
             ],
           ),
           body: Column(
             children: [
               Container(
-                padding: EdgeInsets.fromLTRB(5, 5, 5, 0),
+                padding: EdgeInsets.fromLTRB(5, _deviceHeight * 0.005, 5, 0),
                 child: UserProfile(),
               ),
               Container(

@@ -31,11 +31,12 @@ dependencies:
   dio: ^4.0.0
   pretty_dio_logger: ^1.1.1
   sliding_up_panel: ^2.0.0+1
-  table_calendar:
-    path: ../packages/table_calendar_3.0.1_ver_solviolin/
-  syncfusion_flutter_calendar:
-    path: ../packages/syncfusion_flutter_calendar_19.2.46_ver_solviolin/
-  flutter_week_view: ^1.1.0
+  # table_calendar:
+  #   path: ../packages/table_calendar_3.0.1_ver_solviolin/
+  table_calendar: ^3.0.1
+  # syncfusion_flutter_calendar:
+  #   path: ../packages/syncfusion_flutter_calendar_19.2.46_ver_solviolin/
+  syncfusion_flutter_calendar: ^19.2.48
   qr_code_scanner: ^0.5.2
 
   # The following adds the Cupertino Icons font to your application.

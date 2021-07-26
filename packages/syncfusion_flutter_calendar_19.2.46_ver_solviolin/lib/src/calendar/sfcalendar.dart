@@ -2088,7 +2088,7 @@ class _SfCalendarState extends State<SfCalendar>
     // default height for the widget when the widget placed inside a infinity
     // height widget
     // @modified
-    _minHeight = MediaQuery.of(context).size.height * 0.7;
+    _minHeight = MediaQuery.of(context).size.height * 0.8;
     final SfCalendarThemeData calendarThemeData = SfCalendarTheme.of(context);
     final ThemeData themeData = Theme.of(context);
     _calendarTheme = calendarThemeData.copyWith(

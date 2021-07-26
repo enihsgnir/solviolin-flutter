@@ -112,13 +112,6 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
-  flutter_week_view:
-    dependency: "direct main"
-    description:
-      name: flutter_week_view
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "1.1.0"
   get:
     dependency: "direct main"
     description:
@@ -309,10 +302,10 @@ packages:
   syncfusion_flutter_calendar:
     dependency: "direct main"
     description:
-      path: "../packages/syncfusion_flutter_calendar_19.2.46_ver_solviolin"
-      relative: true
-    source: path
-    version: "19.2.46"
+      name: syncfusion_flutter_calendar
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "19.2.48"
   syncfusion_flutter_core:
     dependency: transitive
     description:
@@ -330,9 +323,9 @@ packages:
   table_calendar:
     dependency: "direct main"
     description:
-      path: "../packages/table_calendar_3.0.1_ver_solviolin"
-      relative: true
-    source: path
+      name: table_calendar
+      url: "https://pub.dartlang.org"
+    source: hosted
     version: "3.0.1"
   term_glyph:
     dependency: transitive

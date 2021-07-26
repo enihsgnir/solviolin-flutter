@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:solviolin/network/get_data.dart';
 import 'package:solviolin/util/controller.dart';
-import 'package:solviolin/util/notification.dart';
 
 class TestPage extends StatefulWidget {
   const TestPage({Key? key}) : super(key: key);
@@ -33,24 +32,6 @@ class _TestPageState extends State<TestPage> {
                     style: TextStyle(fontSize: 40),
                   ),
                 ),
-                // TextButton(
-                //   onPressed: () async {
-                //     await client.registerTeacher();
-                //   },
-                //   child: Text(
-                //     "Register Teacher",
-                //     style: TextStyle(fontSize: 40),
-                //   ),
-                // ),
-                // TextButton(
-                //   onPressed: () async {
-                //     await client.updateUserInformation();
-                //   },
-                //   child: Text(
-                //     "Change Info",
-                //     style: TextStyle(fontSize: 40),
-                //   ),
-                // ),
                 TextButton(
                   onPressed: () async {
                     await client.getTeachers(
@@ -63,7 +44,11 @@ class _TestPageState extends State<TestPage> {
                 ),
                 TextButton(
                   onPressed: () async {
-                    await client.getReservations("잠실", userID: "sleep");
+                    await client.getReservations(
+                      branchName: "잠실",
+                      userID: "sleep",
+                      bookingStatus: [-3, -2, -1, 0, 1, 2, 3],
+                    );
                   },
                   child: Text(
                     "Get Reservation '잠실' 'sleep'",
@@ -103,15 +88,6 @@ class _TestPageState extends State<TestPage> {
                   },
                   child: Text(
                     "Refresh",
-                    style: TextStyle(fontSize: 40),
-                  ),
-                ),
-                TextButton(
-                  onPressed: () async {
-                    modalCancelOrExtend(context);
-                  },
-                  child: Text(
-                    "Dialog",
                     style: TextStyle(fontSize: 40),
                   ),
                 ),

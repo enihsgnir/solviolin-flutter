@@ -1,6 +1,7 @@
 import 'dart:collection';
 
 import 'package:get/get.dart';
+import 'package:solviolin/model/control.dart';
 import 'package:solviolin/model/regular_schedule.dart';
 import 'package:solviolin/model/reservation.dart';
 import 'package:solviolin/model/teacher.dart';
@@ -11,13 +12,14 @@ class DataController extends GetxController {
   List<bool> isAllComplete = [];
   LinkedHashSet<String> messages = LinkedHashSet();
   late User user;
-  late List<RegularSchedule> regularSchedules;
-  late List<Teacher> teachers;
-  late List<Reservation> myReservations;
-  late List<Reservation> teacherReservations;
-  late List<Reservation> myValidReservations;
-  late List<Reservation> teacherOnlyValidReservations;
-  late List<Reservation> myCurrentValidReservations;
+  List<RegularSchedule> regularSchedules = [];
+  List<Teacher> teachers = [];
+  List<Reservation> myValidReservations = [];
+  List<Reservation> teacherOnlyValidReservations = [];
+  List<Reservation> myThisMonthReservations = [];
+  List<Reservation> myLastMonthReservations = [];
+  List<Control> openControls = [];
+  List<Control> closeControls = [];
 
   Future<bool> checkComplete([bool isRefreshed = false]) async {
     bool result = isRefreshed
@@ -36,17 +38,17 @@ class DataController extends GetxController {
     return !result;
   }
 
-  void cacheMessage(String data) {
+  Future<void> cacheMessage(String data) async {
     messages.add(data);
     update();
   }
 
-  void resetMessages() {
+  Future<void> resetMessages() async {
     messages = LinkedHashSet();
     update();
   }
 
-  void updateUser(dynamic data) {
+  Future<void> updateUser(dynamic data) async {
     if (data is User) {
       user = data;
     } else if (data == null) {
@@ -55,56 +57,75 @@ class DataController extends GetxController {
     update();
   }
 
-  void updateRegularSchedules(dynamic data) {
-    if (data is List<RegularSchedule>) {
+  Future<void> updateRegularSchedules(List<RegularSchedule> data) async {
+    if (data.length == 0) {
+      // do nothing
+    } else {
       regularSchedules = data;
-    } else if (data == null) {
-      // do nothing
     }
     update();
   }
 
-  void updateTeachers(dynamic data) {
-    if (data is List<Teacher>) {
+  Future<void> updateTeachers(List<Teacher> data) async {
+    if (data.length == 0) {
+      // do nothing
+    } else {
       teachers = data;
-    } else if (data == null) {
-      // do nothing
     }
     update();
   }
 
-  void updateMyReservations(dynamic data) {
-    if (data is List<Reservation>) {
-      myReservations = data;
-    } else if (data == null) {
+  Future<void> updateMyValidReservations(List<Reservation> data) async {
+    if (data.length == 0) {
       // do nothing
-    }
-    update();
-  }
-
-  void updateTeacherReservations(dynamic data) {
-    if (data is List<Reservation>) {
-      teacherReservations = data;
-    } else if (data == null) {
-      // do nothing
-    }
-    update();
-  }
-
-  void updateMyValidReservations(dynamic data) {
-    if (data is List<Reservation>) {
+    } else {
       myValidReservations = data;
-    } else if (data == null) {
-      // do nothing
     }
     update();
   }
 
-  void updateTeacherOnlyValidReservations(dynamic data) {
-    if (data is List<Reservation>) {
-      teacherOnlyValidReservations = data;
-    } else if (data == null) {
+  Future<void> updateTeacherOnlyValidReservations(
+      List<Reservation> data) async {
+    if (data.length == 0) {
       // do nothing
+    } else {
+      teacherOnlyValidReservations = data;
+    }
+    update();
+  }
+
+  Future<void> updateMyThisMonthReservations(List<Reservation> data) async {
+    if (data.length == 0) {
+      // do nothing
+    } else {
+      myThisMonthReservations = data;
+    }
+    update();
+  }
+
+  Future<void> updateMyLastMonthReservations(List<Reservation> data) async {
+    if (data.length == 0) {
+      // do nothing
+    } else {
+      myLastMonthReservations = data;
+    }
+    update();
+  }
+
+  Future<void> updateOpenControls(List<Control> data) async {
+    if (data.length == 0) {
+      // do nothing
+    } else {
+      openControls = data;
+    }
+    update();
+  }
+
+  Future<void> updateCloseControls(List<Control> data) async {
+    if (data.length == 0) {
+      // do nothing
+    } else {
+      closeControls = data;
     }
     update();
   }

@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:solviolin/network/get_data.dart';
 import 'package:solviolin/util/controller.dart';
 
 class UserProfile extends StatefulWidget {
@@ -34,29 +35,21 @@ class _UserProfileState extends State<UserProfile> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  GetBuilder<DataController>(
-                    builder: (controller) {
-                      return Text(
-                        "${controller.user.userName}님",
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: _textHeight * 0.035,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      );
-                    },
-                  ),
                   InkWell(
                     onTap: () {
                       Get.toNamed("/history");
                     },
-                    child: Text(
-                      "내 예약 이력 조회",
-                      style: TextStyle(
-                        color: Colors.blueGrey,
-                        fontSize: _textHeight * 0.015,
-                        decoration: TextDecoration.underline,
-                      ),
+                    child: GetBuilder<DataController>(
+                      builder: (controller) {
+                        return Text(
+                          "${controller.user.userName}님",
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: _textHeight * 0.045,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        );
+                      },
                     ),
                   ),
                 ],
@@ -67,28 +60,19 @@ class _UserProfileState extends State<UserProfile> {
             children: [
               InkWell(
                 onTap: () {
+                  Get.toNamed("/history");
+                },
+                child: Icon(
+                  CupertinoIcons.person_crop_circle_fill,
+                  size: _deviceHeight * 0.04,
+                ),
+              ),
+              InkWell(
+                onTap: () {
                   Get.toNamed("/scan");
                 },
                 child: Icon(
                   Icons.qr_code_scanner_outlined,
-                  size: _deviceHeight * 0.04,
-                ),
-              ),
-              InkWell(
-                onTap: () {
-                  Get.toNamed("/payment");
-                },
-                child: Icon(
-                  Icons.payment_outlined,
-                  size: _deviceHeight * 0.04,
-                ),
-              ),
-              InkWell(
-                onTap: () {
-                  Get.toNamed("/settings");
-                },
-                child: Icon(
-                  Icons.settings_outlined,
                   size: _deviceHeight * 0.04,
                 ),
               ),
@@ -102,7 +86,10 @@ class _UserProfileState extends State<UserProfile> {
                 ),
               ),
               InkWell(
-                onTap: () {},
+                onTap: () {
+                  Get.put(Client()).logout();
+                  Get.offAllNamed("/login");
+                },
                 child: Icon(
                   Icons.logout_outlined,
                   size: _deviceHeight * 0.04,

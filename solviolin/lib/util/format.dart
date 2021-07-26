@@ -13,6 +13,21 @@ String dowToString(int dow) {
   return _days[dow]!;
 }
 
+String dowToRRuleString(int dow) {
+  Map<int, String> _days = {
+    0: "SU",
+    1: "MO",
+    2: "TU",
+    3: "WE",
+    4: "TH",
+    5: "FR",
+    6: "SA",
+    7: "SU",
+  };
+
+  return _days[dow]!;
+}
+
 Duration parseTimeOnly(String time) {
   List<String> _times = time.split(":");
   int _hours = int.parse(_times[0]);
@@ -22,17 +37,17 @@ Duration parseTimeOnly(String time) {
 }
 
 String timeToString(Duration time) {
-  String _twoDigits(int n) {
-    if (n < 10) {
-      return "0$n";
-    }
-    return "$n";
-  }
-
   String _twoDigitMinutes =
-      _twoDigits(time.inMinutes.remainder(Duration.minutesPerHour));
+      twoDigits(time.inMinutes.remainder(Duration.minutesPerHour));
 
   return "${time.inHours}:$_twoDigitMinutes";
+}
+
+String twoDigits(int n) {
+  if (n < 10) {
+    return "0$n";
+  }
+  return "$n";
 }
 
 DateTime parseDateOnly(String date) {
@@ -48,7 +63,22 @@ DateTime parseDateTime(String dateTime) {
       _dateTime.hour, _dateTime.month);
 }
 
-String dateToString(DateTime date) => "${date.year}/${date.month}/${date.day}";
+String dateToString(DateTime date) =>
+    "${date.year}/${twoDigits(date.month)}/${twoDigits(date.day)}";
 
 String dateTimeToTimeString(DateTime dateTime) =>
-    "${dateTime.hour}:${dateTime.minute}";
+    "${twoDigits(dateTime.hour)}:${twoDigits(dateTime.minute)}";
+
+String bookingStatusToString(int bookingStatus) {
+  Map<int, String> _status = {
+    0: "기본",
+    1: "보강",
+    2: "취소",
+    3: "연장",
+    -1: "보강(관리자)",
+    -2: "취소(관리자)",
+    -3: "연장(관리자)",
+  };
+
+  return _status[bookingStatus]!;
+}

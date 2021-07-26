@@ -59,6 +59,7 @@ class Client {
                   .add(await _controller.checkComplete(true));
               refresh();
               retry(response.requestOptions);
+              // response.statusCode = 200;
             } else {
               _controller
                   .cacheMessage("containsAccess && !containsRefresh => ??");
@@ -70,7 +71,7 @@ class Client {
         return handler.next(response);
       },
       onError: (error, handler) {
-        print(error);
+        _controller.cacheMessage(error.message);
         return handler.next(error);
       },
     ));
@@ -144,21 +145,22 @@ class Client {
     return null;
   }
 
-  Future<dynamic> getRegularSchedules() async {
+  Future<List<RegularSchedule>> getRegularSchedules() async {
+    List<RegularSchedule> regularSchedules = [];
     if (await isLoggedIn()) {
       Response response = await dio.get("/regular-schedule");
       if (response.statusCode == 200) {
-        List<RegularSchedule> regularSchedules = [];
         for (int i = 0; i < response.data.length; i++) {
           regularSchedules.add(RegularSchedule.fromJson(response.data[i]));
         }
-        return regularSchedules;
       }
     }
-    return null;
+    return regularSchedules;
   }
 
-  Future<dynamic> getTeachers({String? teacherID, String? branchName}) async {
+  Future<List<Teacher>> getTeachers(
+      {String? teacherID, String? branchName}) async {
+    List<Teacher> teachers = [];
     if (await isLoggedIn()) {
       Map<String, dynamic> queries = {};
       if (teacherID != null) {
@@ -170,48 +172,39 @@ class Client {
       Response response =
           await dio.get("/teacher/search", queryParameters: queries);
       if (response.statusCode == 200) {
-        List<Teacher> teachers = [];
         for (int i = 0; i < response.data.length; i++) {
           teachers.add(Teacher.fromJson(response.data[i]));
         }
-        return teachers;
       }
     }
-    return null;
+    return teachers;
   }
 
-  Future<dynamic> getReservations(
-    String branchName, {
+  Future<List<Reservation>> getReservations({
+    required String branchName,
     String? teacherID,
     DateTime? startDate,
     DateTime? endDate,
     String? userID,
+    required List<int> bookingStatus,
   }) async {
+    List<Reservation> reservations = [];
     if (await isLoggedIn()) {
-      Map<String, dynamic> queries = {"branchName": branchName};
-      if (teacherID != null) {
-        queries["teacherID"] = teacherID;
-      }
-      if (startDate != null) {
-        queries["startDate"] = startDate.toIso8601String();
-      }
-      if (endDate != null) {
-        queries["endDate"] = endDate.toIso8601String();
-      }
-      if (userID != null) {
-        queries["userID"] = userID;
-      }
-      Response response =
-          await dio.get("/reservation", queryParameters: queries);
-      if (response.statusCode == 200) {
-        List<Reservation> reservations = [];
+      Response response = await dio.post("/reservation/search", data: {
+        "branchName": branchName,
+        "teacherID": teacherID,
+        "startDate": startDate?.toIso8601String(),
+        "endDate": endDate?.toIso8601String(),
+        "userID": userID,
+        "bookingStatus": bookingStatus,
+      });
+      if (response.statusCode == 201) {
         for (int i = 0; i < response.data.length; i++) {
           reservations.add(Reservation.fromJson(response.data[i]));
         }
-        return reservations;
       }
     }
-    return null;
+    return reservations;
   }
 
   Future<void> reserveRegularReservation({
@@ -235,7 +228,7 @@ class Client {
     }
   }
 
-  Future<void> cancelReservation(Reservation reservation, String id) async {
+  Future<void> cancelReservation(String id) async {
     if (await isLoggedIn()) {
       Response response =
           await dio.patch("/reservation/user/cancel/$id", data: {
@@ -272,7 +265,7 @@ class Client {
     }
   }
 
-  Future<void> extendReservation(Reservation reservation, String id) async {
+  Future<void> extendReservation(String id) async {
     if (await isLoggedIn()) {
       Response response =
           await dio.patch("/reservation/user/extend/$id", data: {
@@ -286,35 +279,35 @@ class Client {
     }
   }
 
-  Future<dynamic> getTerms() async {
+  Future<List<Term>> getTerms() async {
+    List<Term> terms = [];
     if (await isLoggedIn()) {
       Response response = await dio.get("/term");
       if (response.statusCode == 200) {
-        List<Term> terms = [];
         for (int i = 0; i < response.data.length; i++) {
           terms.add(Term.fromJson(response.data[i]));
         }
-        return terms;
       }
     }
-    return null;
+    return terms;
   }
 
-  Future<dynamic> getCurrentTerm() async {
+  Future<List<Term>> getCurrentTerm() async {
+    List<Term> currentTerms = [];
     if (await isLoggedIn()) {
       Response response = await dio.get("/term/cur");
       if (response.statusCode == 200) {
-        List<Term> currentTerms = [];
         for (int i = 0; i < response.data.length; i++) {
           currentTerms.add(Term.fromJson(response.data[i]));
         }
-        return currentTerms;
       }
     }
-    return null;
+    return currentTerms;
   }
 
-  Future<dynamic> getControls({String? teacherID, String? branchName}) async {
+  Future<List<Control>> getControls(
+      {String? teacherID, String? branchName}) async {
+    List<Control> controls = [];
     if (await isLoggedIn()) {
       Map<String, dynamic> queries = {};
       if (teacherID != null) {
@@ -325,14 +318,12 @@ class Client {
       }
       Response response = await dio.get("/control", queryParameters: queries);
       if (response.statusCode == 200) {
-        List<Control> controls = [];
         for (int i = 0; i < response.data.length; i++) {
           controls.add(Control.fromJson(response.data[i]));
         }
-        return controls;
       }
     }
-    return null;
+    return controls;
   }
 
   Future<void> checkIn(String branchCode) async {

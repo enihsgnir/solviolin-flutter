@@ -9,9 +9,7 @@ import 'package:solviolin/page/loading_page.dart';
 import 'package:solviolin/page/login_page.dart';
 import 'package:solviolin/page/main_page.dart';
 import 'package:solviolin/page/metronome_page.dart';
-import 'package:solviolin/page/payment_page.dart';
 import 'package:solviolin/page/qrcode_scan_page.dart';
-import 'package:solviolin/page/settings_page.dart';
 import 'package:solviolin/page/test_page.dart';
 import 'package:solviolin/util/controller.dart';
 
@@ -68,8 +66,6 @@ class _MyAppState extends State<MyApp> {
         GetPage(name: "/main", page: () => MainPage()),
         GetPage(name: "/history", page: () => HistoryPage()),
         GetPage(name: "/scan", page: () => QRCodeScanPage()),
-        GetPage(name: "/payment", page: () => PaymentPage()),
-        GetPage(name: "/settings", page: () => SettingsPage()),
         GetPage(name: "/metronome", page: () => MetronomePage()),
         GetPage(
           name: "/test",

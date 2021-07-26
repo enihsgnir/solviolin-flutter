@@ -2,7 +2,11 @@ import 'dart:collection';
 
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
+import 'package:solviolin/model/reservation.dart';
+import 'package:solviolin/network/get_data.dart';
 import 'package:solviolin/util/controller.dart';
+import 'package:solviolin/util/data_source.dart';
+import 'package:solviolin/util/format.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
 
 Future<void> showErrorMessage(BuildContext context) async {
@@ -37,67 +41,71 @@ Future<void> showErrorMessage(BuildContext context) async {
 
 Future<void> modalReserve(
     BuildContext context, CalendarTapDetails details) async {
-  int hour = details.date!.hour;
-  int minute = details.date!.minute ~/ 30 * 30;
+  Client client = Get.put(Client());
+  DataController _controller = Get.find<DataController>();
+  DateTime _start = details.date!;
+  int _startHour = _start.hour;
+  int _startMinute = _start.minute ~/ 30 * 30;
+  DateTime _startDate =
+      DateTime(_start.year, _start.month, _start.day, _startHour, _startMinute);
+  DateTime _end = _startDate.add(Duration(minutes: 30));
+  int _endHour = _end.hour;
+  int _endMinute = _end.minute;
+
   return showCupertinoModalPopup(
     context: context,
-    builder: (context) => SizedBox(
-      height: 300,
-      child: CupertinoActionSheet(
-        title: Text("$hour:$minute"),
-        message: const Text("Wanna Reserve?"),
-        actions: [
-          CupertinoActionSheetAction(
-            onPressed: () {
-              print("Reserve");
-            },
-            child: const Text("Reserve"),
-          )
-        ],
-        cancelButton: CupertinoActionSheetAction(
-          onPressed: () {
-            Get.back();
+    builder: (context) => CupertinoActionSheet(
+      title: Text("${twoDigits(_startHour)}:${twoDigits(_startMinute)}"
+          " ~ ${twoDigits(_endHour)}:${twoDigits(_endMinute)}"),
+      message: const Text("예약 하시겠습니까?"),
+      actions: [
+        CupertinoActionSheetAction(
+          onPressed: () async {
+            await client.makeUpReservation(
+              teacherID: _controller.teachers[0].teacherID,
+              branchName: _controller.regularSchedules[0].branchName,
+              startDate: _startDate,
+              endDate: _startDate.add(_controller.regularSchedules[0].endTime -
+                  _controller.regularSchedules[0].startTime),
+              userID: _controller.user.userID,
+            );
           },
-          isDefaultAction: true,
-          child: const Text("Close"),
+          child: const Text("예약"),
         ),
+      ],
+      cancelButton: CupertinoActionSheetAction(
+        onPressed: () {
+          Get.back();
+        },
+        isDefaultAction: true,
+        child: const Text("닫기"),
       ),
     ),
   );
 }
 
-Future<void> modalReserveMk2(BuildContext context) async {
-  return showCupertinoModalPopup(
-    context: context,
-    builder: (context) => CupertinoDatePicker(
-      mode: CupertinoDatePickerMode.time,
-      onDateTimeChanged: (time) {},
-      initialDateTime: DateTime.now(),
-      minuteInterval: 15,
-    ),
-  );
-}
-
-Future<void> modalCancelOrExtend(BuildContext context) async {
+Future<void> modalCancelOrExtend(
+    BuildContext context, CalendarTapDetails details) async {
+  Client client = Get.put(Client());
+  List<Reservation> reservations = details.appointments as List<Reservation>;
   return showCupertinoModalPopup(
     context: context,
     builder: (context) => CupertinoActionSheet(
-      title: const Text("Choose Options"),
-      message: const Text("Your options are "),
       actions: [
         CupertinoActionSheetAction(
-          onPressed: () {
-            print("Cancel");
-            // Navigator.of(context).pop("Cancel");
+          onPressed: () async {
+            await client.cancelReservation("${reservations[0].id}");
+            getUserBaseData();
           },
           isDestructiveAction: true,
-          child: const Text("Cancel"),
+          child: const Text("예약 취소"),
         ),
         CupertinoActionSheetAction(
-          onPressed: () {
-            print("Extend");
+          onPressed: () async {
+            await client.extendReservation("${reservations[0].id}");
+            getUserBaseData();
           },
-          child: const Text("Extend"),
+          child: const Text("예약 연장"),
         )
       ],
       cancelButton: CupertinoActionSheetAction(
@@ -105,7 +113,7 @@ Future<void> modalCancelOrExtend(BuildContext context) async {
           Get.back();
         },
         isDefaultAction: true,
-        child: const Text("Close"),
+        child: const Text("닫기"),
       ),
     ),
   );
