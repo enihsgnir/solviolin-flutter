@@ -17,10 +17,6 @@ class ReservationHistory extends StatefulWidget {
 class _ReservationHistoryState extends State<ReservationHistory> {
   @override
   Widget build(BuildContext context) {
-    final _deviceWidth = MediaQuery.of(context).size.width -
-        (MediaQuery.of(context).padding.left +
-            MediaQuery.of(context).padding.right);
-
     return ListView.builder(
       itemBuilder: (context, index) {
         return Container(
@@ -45,43 +41,38 @@ class _ReservationHistoryState extends State<ReservationHistory> {
                 " ${dateTimeToTimeString(widget.reservations[index].startDate)}"
                 "~${dateTimeToTimeString(widget.reservations[index].endDate)}",
                 style: TextStyle(
+                  fontSize: 28,
                   decoration:
                       widget.reservations[index].bookingStatus.abs() == 2
                           ? TextDecoration.lineThrough
                           : null,
                 ),
               ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  Text(
-                    widget.reservations[index].branchName,
-                    style: TextStyle(
-                      decoration:
-                          widget.reservations[index].bookingStatus.abs() == 2
-                              ? TextDecoration.lineThrough
-                              : null,
-                    ),
-                  ),
-                  Text(
-                    widget.reservations[index].teacherID,
-                    style: TextStyle(
-                      decoration:
-                          widget.reservations[index].bookingStatus.abs() == 2
-                              ? TextDecoration.lineThrough
-                              : null,
-                    ),
-                  ),
-                ],
+              DefaultTextStyle(
+                style: TextStyle(
+                  fontSize: 28,
+                  decoration:
+                      widget.reservations[index].bookingStatus.abs() == 2
+                          ? TextDecoration.lineThrough
+                          : null,
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    Text(widget.reservations[index].branchName),
+                    Text(widget.reservations[index].teacherID),
+                  ],
+                ),
               ),
               Container(
-                width: _deviceWidth,
+                width: double.infinity,
                 alignment: Alignment.centerRight,
                 child: Text(
                   bookingStatusToString(
                       widget.reservations[index].bookingStatus),
                   style: TextStyle(
                     color: Colors.red,
+                    fontSize: 24,
                   ),
                 ),
               ),

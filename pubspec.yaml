@@ -26,13 +26,13 @@ dependencies:
   flutter_localizations:
     sdk: flutter
   google_fonts: ^2.1.0
-  flutter_secure_storage: ^4.2.0
-  get: ^4.1.4
+  flutter_secure_storage: ^4.2.1
+  get: ^4.3.0
   dio: ^4.0.0
-  pretty_dio_logger: ^1.1.1
+  pretty_dio_logger: ^1.2.0-beta-1
   sliding_up_panel: ^2.0.0+1
   table_calendar: ^3.0.1
-  syncfusion_flutter_calendar: ^19.2.48
+  syncfusion_flutter_calendar: ^19.2.49
   qr_code_scanner: ^0.5.2
   quiver: ^3.0.1
   assets_audio_player: ^3.0.3+6

@@ -15,16 +15,16 @@ final kToday = DateTime.now();
 final kFirstDay = DateTime(kToday.year, kToday.month - 6, 1);
 final kLastDay = DateTime(kToday.year, kToday.month + 7, 0);
 
-Future<void> getUserBaseData() async {
+Future<void> getUserBasedData() async {
   Client client = Get.put(Client());
   DataController _controller = Get.find<DataController>();
 
-  await _controller.updateUser(await client.getProfile());
+  _controller.updateUser(await client.getProfile());
 
-  await _controller.updateRegularSchedules(await client.getRegularSchedules()
+  _controller.updateRegularSchedules(await client.getRegularSchedules()
     ..sort((a, b) => a.startTime.compareTo(b.startTime)));
 
-  await _controller.updateTeachers(await client.getTeachers(
+  _controller.updateTeachers(await client.getTeachers(
     teacherID: _controller.regularSchedules[0].teacherID,
     branchName: _controller.user.branchName,
   )
@@ -38,7 +38,7 @@ Future<void> getUserBaseData() async {
     bookingStatus: [-3, -1, 0, 1, 3],
   )
     ..sort((a, b) => a.startDate.compareTo(b.startDate));
-  await _controller.updateMyValidReservations(_myValidReservations);
+  _controller.updateMyValidReservations(_myValidReservations);
 
   List<Reservation> _teacherValidReservations = await client.getReservations(
     branchName: "잠실",
@@ -53,10 +53,9 @@ Future<void> getUserBaseData() async {
       .difference(_myValidReservations.toSet())
       .toList()
         ..sort((a, b) => a.startDate.compareTo(b.startDate));
-  await _controller
-      .updateTeacherOnlyValidReservations(_teacherOnlyValidReservations);
+  _controller.updateTeacherOnlyValidReservations(_teacherOnlyValidReservations);
 
-  await _controller.updateMyThisMonthReservations(await client.getReservations(
+  _controller.updateMyThisMonthReservations(await client.getReservations(
     branchName: "잠실",
     startDate: DateTime(kToday.year, kToday.month, 1),
     endDate: DateTime(kToday.year, kToday.month + 1, 0, 23, 59, 59),
@@ -65,7 +64,7 @@ Future<void> getUserBaseData() async {
   )
     ..sort((a, b) => a.startDate.compareTo(b.startDate)));
 
-  await _controller.updateMyLastMonthReservations(await client.getReservations(
+  _controller.updateMyLastMonthReservations(await client.getReservations(
     branchName: "잠실",
     startDate: DateTime(kToday.year, kToday.month - 1, 1),
     endDate: DateTime(kToday.year, kToday.month, 0, 23, 59, 59),
@@ -88,8 +87,8 @@ Future<void> getUserBaseData() async {
       _closeControls.add(_controls[i]);
     }
   }
-  await _controller.updateOpenControls(_openControls);
-  await _controller.updateCloseControls(_closeControls);
+  _controller.updateOpenControls(_openControls);
+  _controller.updateCloseControls(_closeControls);
 }
 
 //CalendarReserved DataSource
@@ -159,18 +158,18 @@ class ReservationDataSource extends CalendarDataSource {
 
 List<TimeRegion> getTimeRegions() {
   DataController _controller = Get.find<DataController>();
-  List<Reservation> _teacherOnlyValidReservations =
+  List<Reservation> teacherOnlyValidReservations =
       _controller.teacherOnlyValidReservations;
-  List<Teacher> _teachers = _controller.teachers;
-  List<Control> _closeControls = _controller.closeControls;
+  List<Teacher> teachers = _controller.teachers;
+  List<Control> closeControls = _controller.closeControls;
 
   List<TimeRegion> regions = []
     ..addAll(List<TimeRegion>.generate(
-      _teacherOnlyValidReservations.length,
+      teacherOnlyValidReservations.length,
       (index) => TimeRegion(
-        startTime: _teacherOnlyValidReservations[index].startDate,
-        endTime: _teacherOnlyValidReservations[index].endDate.add(Duration(
-            minutes: _teacherOnlyValidReservations[index].extendedMin)),
+        startTime: teacherOnlyValidReservations[index].startDate,
+        endTime: teacherOnlyValidReservations[index].endDate.add(
+            Duration(minutes: teacherOnlyValidReservations[index].extendedMin)),
         text: "선생님 스케줄",
         color: Colors.red.withOpacity(0.5),
         enablePointerInteraction: false,
@@ -178,17 +177,17 @@ List<TimeRegion> getTimeRegions() {
       ),
     ))
     ..addAll(List<TimeRegion>.generate(
-      _teachers.length,
+      teachers.length,
       (index) {
-        DateTime _startTime = kFirstDay
-            .add(Duration(days: getFirstWeekday(_teachers[index].workDow)));
+        DateTime startTime = kFirstDay
+            .add(Duration(days: getFirstWeekday(teachers[index].workDow)));
 
         return TimeRegion(
-          startTime: _startTime.add(_teachers[index].endTime),
-          endTime: _startTime.add(Duration(days: 1)),
+          startTime: startTime.add(teachers[index].endTime),
+          endTime: startTime.add(Duration(days: 1)),
           text: "수업 시간 외",
           recurrenceRule:
-              "FREQ=WEEKLY;INTERVAL=1;BYDAY=${dowToRRuleString(_teachers[index].workDow)}",
+              "FREQ=WEEKLY;INTERVAL=1;BYDAY=${dowToRRuleString(teachers[index].workDow)}",
           color: Colors.black.withOpacity(0.5),
           enablePointerInteraction: false,
           textStyle: TextStyle(),
@@ -196,17 +195,17 @@ List<TimeRegion> getTimeRegions() {
       },
     ))
     ..addAll(List<TimeRegion>.generate(
-      _teachers.length,
+      teachers.length,
       (index) {
-        DateTime _startTime = kFirstDay
-            .add(Duration(days: getFirstWeekday(_teachers[index].workDow)));
+        DateTime startTime = kFirstDay
+            .add(Duration(days: getFirstWeekday(teachers[index].workDow)));
 
         return TimeRegion(
-          startTime: _startTime,
-          endTime: _startTime.add(_teachers[index].startTime),
+          startTime: startTime,
+          endTime: startTime.add(teachers[index].startTime),
           text: "수업 시간 외",
           recurrenceRule:
-              "FREQ=WEEKLY;INTERVAL=1;BYDAY=${dowToRRuleString(_teachers[index].workDow)}",
+              "FREQ=WEEKLY;INTERVAL=1;BYDAY=${dowToRRuleString(teachers[index].workDow)}",
           color: Colors.black.withOpacity(0.5),
           enablePointerInteraction: false,
           textStyle: TextStyle(),
@@ -214,10 +213,10 @@ List<TimeRegion> getTimeRegions() {
       },
     ))
     ..addAll(List<TimeRegion>.generate(
-      _closeControls.length,
+      closeControls.length,
       (index) => TimeRegion(
-        startTime: _closeControls[index].controlStart,
-        endTime: _closeControls[index].controlEnd,
+        startTime: closeControls[index].controlStart,
+        endTime: closeControls[index].controlEnd,
         text: "예약 불가",
         color: Colors.brown.withOpacity(0.5),
         enablePointerInteraction: false,

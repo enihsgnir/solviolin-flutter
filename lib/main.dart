@@ -44,6 +44,7 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     Get.put(DataController());
+
     return GetMaterialApp(
       title: "SolViolin",
       theme: ThemeData(
@@ -60,7 +61,7 @@ class _MyAppState extends State<MyApp> {
         GlobalCupertinoLocalizations.delegate,
       ],
       // initialRoute: "/loading",
-      initialRoute: "/metronome",
+      initialRoute: "/test",
       getPages: [
         GetPage(name: "/loading", page: () => LoadingPage()),
         GetPage(name: "/login", page: () => LoginPage()),

@@ -13,22 +13,21 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  TextEditingController _idController = TextEditingController();
-  TextEditingController _pwController = TextEditingController();
+  TextEditingController idController = TextEditingController();
+  TextEditingController pwController = TextEditingController();
 
   @override
   void dispose() {
-    _idController.dispose();
-    _pwController.dispose();
+    idController.dispose();
+    pwController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final _deviceHeight = MediaQuery.of(context).size.height -
-        (MediaQuery.of(context).padding.top +
-            MediaQuery.of(context).padding.bottom);
-    final _textHeight = _deviceHeight / MediaQuery.of(context).textScaleFactor;
+    final deviceWidth = MediaQuery.of(context).size.width;
+    final deviceHeight = MediaQuery.of(context).size.height;
+
     Client client = Get.put(Client());
     DataController _controller = Get.find<DataController>();
 
@@ -39,8 +38,8 @@ class _LoginPageState extends State<LoginPage> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Container(
-              height: 150.0,
-              width: 150.0,
+              width: deviceHeight * 0.3,
+              height: deviceHeight * 0.3,
               decoration: BoxDecoration(
                 image: DecorationImage(
                   image: AssetImage("assets/solviolin_logo.png"),
@@ -52,11 +51,24 @@ class _LoginPageState extends State<LoginPage> {
             Container(
               padding: const EdgeInsets.fromLTRB(8, 30, 8, 8),
               child: TextFormField(
-                controller: _idController,
+                controller: idController,
                 decoration: InputDecoration(
-                  border: OutlineInputBorder(),
                   labelText: "아이디",
-                  hintText: "아이디",
+                  labelStyle: TextStyle(color: Theme.of(context).accentColor),
+                  border: OutlineInputBorder(
+                    borderSide: BorderSide(
+                      color: Theme.of(context).accentColor,
+                    ),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderSide: BorderSide(
+                      color: Theme.of(context).accentColor,
+                    ),
+                  ),
+                ),
+                style: TextStyle(
+                  color: Theme.of(context).accentColor,
+                  fontSize: 60,
                 ),
                 validator: (value) {
                   return (value == null) ? "아이디를 입력해주세요" : null;
@@ -66,12 +78,26 @@ class _LoginPageState extends State<LoginPage> {
             Container(
               padding: const EdgeInsets.all(8),
               child: TextFormField(
-                controller: _pwController,
+                controller: pwController,
                 decoration: InputDecoration(
-                  border: OutlineInputBorder(),
                   labelText: "비밀번호",
-                  hintText: "비밀번호",
+                  labelStyle: TextStyle(color: Theme.of(context).accentColor),
+                  border: OutlineInputBorder(
+                    borderSide: BorderSide(
+                      color: Theme.of(context).accentColor,
+                    ),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderSide: BorderSide(
+                      color: Theme.of(context).accentColor,
+                    ),
+                  ),
                 ),
+                style: TextStyle(
+                  color: Theme.of(context).accentColor,
+                  fontSize: 60,
+                ),
+                obscureText: true,
                 validator: (value) {
                   return (value == null) ? "비밀번호를 입력해주세요" : null;
                 },
@@ -80,19 +106,22 @@ class _LoginPageState extends State<LoginPage> {
             Container(
               padding: const EdgeInsets.all(8),
               child: Container(
-                height: 45,
+                height: deviceHeight * 0.05,
                 child: Container(
                   width: double.infinity,
                   child: TextButton(
                     onPressed: () async {
-                      _controller.updateUser(await client.login(
-                          _idController.text, _pwController.text));
-                      await getUserBaseData();
-                      await _controller.checkAllComplete()
-                          ? await Get.offAllNamed("/main")
-                          : showErrorMessage(context);
+                      try {
+                        _controller.updateUser(await client.login(
+                            idController.text, pwController.text));
+                        await getUserBasedData();
+                        Get.offAllNamed("/main");
 
-                      // Get.offAllNamed("/test");
+                        //await Get.offAllNamed("/test");
+                      } catch (e) {
+                        Get.offAllNamed("/login");
+                        showErrorMessage(context, e.toString());
+                      }
                     },
                     style: TextButton.styleFrom(
                       backgroundColor: const Color.fromRGBO(96, 128, 104, 50),
@@ -100,11 +129,11 @@ class _LoginPageState extends State<LoginPage> {
                         borderRadius: BorderRadius.circular(30),
                       ),
                     ),
-                    child: Text(
+                    child: const Text(
                       "로그인",
                       style: TextStyle(
                         color: const Color.fromRGBO(203, 173, 204, 80),
-                        fontSize: _textHeight * 0.02,
+                        fontSize: 60,
                         fontWeight: FontWeight.bold,
                       ),
                     ),

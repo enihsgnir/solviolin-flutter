@@ -1,7 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:solviolin/network/get_data.dart';
 import 'package:solviolin/util/controller.dart';
 
 class UserProfile extends StatefulWidget {
@@ -14,14 +13,13 @@ class UserProfile extends StatefulWidget {
 class _UserProfileState extends State<UserProfile> {
   @override
   Widget build(BuildContext context) {
-    final _deviceHeight = MediaQuery.of(context).size.height -
-        (MediaQuery.of(context).padding.top +
-            MediaQuery.of(context).padding.bottom);
-    final _textHeight = _deviceHeight / MediaQuery.of(context).textScaleFactor;
+    final deviceWidth = MediaQuery.of(context).size.width;
+    final deviceHeight = MediaQuery.of(context).size.height;
+
     Get.find<DataController>();
 
     return Container(
-      height: _deviceHeight * 0.07,
+      height: deviceHeight * 0.07,
       decoration: BoxDecoration(
         color: Colors.white60,
         borderRadius: BorderRadius.circular(15),
@@ -46,7 +44,7 @@ class _UserProfileState extends State<UserProfile> {
                           "${controller.user.userName}님",
                           style: TextStyle(
                             color: Colors.white,
-                            fontSize: _textHeight * 0.045,
+                            fontSize: 60,
                             fontWeight: FontWeight.bold,
                           ),
                         );
@@ -59,43 +57,55 @@ class _UserProfileState extends State<UserProfile> {
           ),
           Row(
             children: [
-              InkWell(
-                onTap: () {
-                  Get.toNamed("/history");
-                },
-                child: Icon(
-                  CupertinoIcons.person_crop_circle_fill,
-                  size: _deviceHeight * 0.04,
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8),
+                child: InkWell(
+                  onTap: () {
+                    Get.toNamed("/history");
+                  },
+                  child: Icon(
+                    CupertinoIcons.person_crop_circle_fill,
+                    size: deviceHeight * 0.04,
+                  ),
                 ),
               ),
-              InkWell(
-                onTap: () {
-                  Get.toNamed("/scan");
-                },
-                child: Icon(
-                  Icons.qr_code_scanner_outlined,
-                  size: _deviceHeight * 0.04,
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8),
+                child: InkWell(
+                  onTap: () {
+                    Get.toNamed("/scan");
+                  },
+                  child: Icon(
+                    Icons.qr_code_scanner_outlined,
+                    size: deviceHeight * 0.04,
+                  ),
                 ),
               ),
-              InkWell(
-                onTap: () {
-                  Get.toNamed("/metronome");
-                },
-                child: Icon(
-                  CupertinoIcons.metronome,
-                  size: _deviceHeight * 0.04,
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8),
+                child: InkWell(
+                  onTap: () {
+                    Get.toNamed("/metronome");
+                  },
+                  child: Icon(
+                    CupertinoIcons.metronome,
+                    size: deviceHeight * 0.04,
+                  ),
                 ),
               ),
-              InkWell(
-                onTap: () {
-                  Get.put(Client()).logout();
-                  Get.offAllNamed("/login");
-                },
-                child: Icon(
-                  Icons.logout_outlined,
-                  size: _deviceHeight * 0.04,
-                ),
-              ),
+              // Container(
+              //   padding: const EdgeInsets.symmetric(horizontal: 8),
+              //   child: InkWell(
+              //     onTap: () {
+              //       Get.put(Client()).logout();
+              //       Get.offAllNamed("/login");
+              //     },
+              //     child: Icon(
+              //       Icons.logout_outlined,
+              //       size: deviceHeight * 0.04,
+              //     ),
+              //   ),
+              // ),
             ],
           ),
         ],

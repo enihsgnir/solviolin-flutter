@@ -32,24 +32,24 @@ class _TimeslotReservedState extends State<TimeslotReserved> {
 
   @override
   Widget build(BuildContext context) {
-    final _deviceHeight = MediaQuery.of(context).size.height -
-        (MediaQuery.of(context).padding.top +
-            MediaQuery.of(context).padding.bottom);
-    final _textHeight = _deviceHeight / MediaQuery.of(context).textScaleFactor;
+    final deviceWidth = MediaQuery.of(context).size.width;
+    final deviceHeight = MediaQuery.of(context).size.height;
+
     Get.find<DataController>();
-    DateTime _minDate =
+
+    DateTime minDate =
         DateTime(_selectedDay.year, _selectedDay.month, _selectedDay.day);
-    DateTime _maxDate =
-        _minDate.add(Duration(hours: 23, minutes: 59, seconds: 59));
+    DateTime maxDate =
+        minDate.add(Duration(hours: 23, minutes: 59, seconds: 59));
 
     return GetBuilder<DataController>(
       builder: (controller) {
         return Container(
-          height: _deviceHeight * 0.8,
+          height: deviceHeight * 0.8,
           child: SfCalendar(
             view: CalendarView.day,
-            minDate: _minDate,
-            maxDate: _maxDate,
+            minDate: minDate,
+            maxDate: maxDate,
             headerHeight: 0,
             viewHeaderHeight: 0,
             // timeZone: "Korea Standard Time",
@@ -64,10 +64,10 @@ class _TimeslotReservedState extends State<TimeslotReserved> {
               endHour: 22.5,
               timeFormat: "HH:mm",
               timeInterval: const Duration(minutes: 30),
-              timeIntervalHeight: _deviceHeight * 0.05,
+              timeIntervalHeight: deviceHeight * 0.05,
               timeTextStyle: TextStyle(
                 color: Colors.greenAccent,
-                fontSize: _textHeight * 0.015,
+                fontSize: 36,
                 fontStyle: FontStyle.italic,
                 fontWeight: FontWeight.w700,
               ),

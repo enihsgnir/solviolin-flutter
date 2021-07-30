@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
 import 'package:solviolin/network/get_data.dart';
+import 'package:solviolin/util/notification.dart';
 
 class QRCodeScanPage extends StatefulWidget {
   const QRCodeScanPage({Key? key}) : super(key: key);
@@ -15,21 +16,21 @@ class QRCodeScanPage extends StatefulWidget {
 class _QRCodeScanPageState extends State<QRCodeScanPage> {
   final GlobalKey qrKey = GlobalKey(debugLabel: "QR");
   Barcode? result;
-  QRViewController? controller;
+  QRViewController? qrController;
 
   @override
   void reassemble() async {
     super.reassemble();
     if (Platform.isAndroid) {
-      await controller!.pauseCamera();
+      await qrController!.pauseCamera();
     } else if (Platform.isIOS) {
-      controller!.resumeCamera();
+      qrController!.resumeCamera();
     }
   }
 
   @override
   void dispose() {
-    controller?.dispose();
+    qrController?.dispose();
     super.dispose();
   }
 
@@ -42,12 +43,16 @@ class _QRCodeScanPageState extends State<QRCodeScanPage> {
           QRView(
             key: qrKey,
             onQRViewCreated: (controller) {
-              this.controller = controller;
+              // this.qrController = controller;
               controller.scannedDataStream.listen((scanData) {
                 setState(() async {
                   result = scanData;
-                  await Get.put(Client()).checkIn(result!.code);
-                  Get.back();
+                  try {
+                    await Get.put(Client()).checkIn(result!.code);
+                    Get.back();
+                  } catch (e) {
+                    showErrorMessage(context, e.toString());
+                  }
                 });
               });
             },
@@ -84,11 +89,11 @@ class _QRCodeScanPageState extends State<QRCodeScanPage> {
                 children: [
                   IconButton(
                     onPressed: () async {
-                      await controller?.toggleFlash();
+                      await qrController?.toggleFlash();
                       // setState(() {});
                     },
                     icon: FutureBuilder<bool?>(
-                      future: controller?.getFlashStatus(),
+                      future: qrController?.getFlashStatus(),
                       builder: (context, snapshot) => snapshot.data != null
                           ? Icon(
                               snapshot.data! ? Icons.flash_on : Icons.flash_off)
@@ -97,11 +102,11 @@ class _QRCodeScanPageState extends State<QRCodeScanPage> {
                   ),
                   IconButton(
                     onPressed: () async {
-                      await controller?.flipCamera();
+                      await qrController?.flipCamera();
                       // setState(() {});
                     },
                     icon: FutureBuilder(
-                      future: controller?.getCameraInfo(),
+                      future: qrController?.getCameraInfo(),
                       builder: (context, snapshot) => snapshot.data != null
                           ? Icon(Icons.switch_camera)
                           : Container(),

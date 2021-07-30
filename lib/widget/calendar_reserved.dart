@@ -30,10 +30,9 @@ class _CalendarReservedState extends State<CalendarReserved> {
 
   @override
   Widget build(BuildContext context) {
-    final _deviceHeight = MediaQuery.of(context).size.height -
-        (MediaQuery.of(context).padding.top +
-            MediaQuery.of(context).padding.bottom);
-    final _textHeight = _deviceHeight / MediaQuery.of(context).textScaleFactor;
+    final deviceWidth = MediaQuery.of(context).size.width;
+    final deviceHeight = MediaQuery.of(context).size.height;
+
     Get.find<DataController>();
 
     return GetBuilder<DataController>(
@@ -47,33 +46,33 @@ class _CalendarReservedState extends State<CalendarReserved> {
           availableCalendarFormats: const {CalendarFormat.month: "Month"},
           pageJumpingEnabled: true,
           sixWeekMonthsEnforced: true,
-          rowHeight: _deviceHeight * 0.065,
-          daysOfWeekHeight: _deviceHeight * 0.02,
+          rowHeight: deviceHeight * 0.065,
+          daysOfWeekHeight: deviceHeight * 0.02,
           headerStyle: HeaderStyle(
             titleCentered: true,
             titleTextStyle: TextStyle(
               color: Theme.of(context).accentColor,
-              fontSize: _textHeight * 0.02,
+              fontSize: 48,
               fontWeight: FontWeight.bold,
             ),
             leftChevronIcon: Icon(
               Icons.chevron_left,
-              size: _deviceHeight * 0.0225,
+              size: deviceHeight * 0.0225,
             ),
             rightChevronIcon: Icon(
               Icons.chevron_right,
-              size: _deviceHeight * 0.0225,
+              size: deviceHeight * 0.0225,
             ),
           ),
           daysOfWeekStyle: DaysOfWeekStyle(
             weekdayStyle: TextStyle(
               color: const Color(0xFF4F4F4F),
-              fontSize: _textHeight * 0.018,
+              fontSize: 48,
               fontWeight: FontWeight.w800,
             ),
             weekendStyle: TextStyle(
               color: Colors.red,
-              fontSize: _textHeight * 0.018,
+              fontSize: 48,
               fontWeight: FontWeight.w800,
             ),
           ),
@@ -87,25 +86,25 @@ class _CalendarReservedState extends State<CalendarReserved> {
             ),
             todayTextStyle: TextStyle(
               color: const Color(0xFFFAFAFA),
-              fontSize: _textHeight * 0.02,
+              fontSize: 48,
               fontWeight: FontWeight.w700,
             ),
             selectedTextStyle: TextStyle(
               color: const Color(0xFFFAFAFA),
-              fontSize: _textHeight * 0.02,
+              fontSize: 48,
               fontWeight: FontWeight.w700,
             ),
             outsideTextStyle: TextStyle(
               color: const Color(0xFFAEAEAE),
-              fontSize: _textHeight * 0.014,
+              fontSize: 48,
             ),
             disabledTextStyle: TextStyle(
               color: const Color(0xFFBFBFBF),
-              fontSize: _textHeight * 0.014,
+              fontSize: 48,
             ),
             holidayTextStyle: TextStyle(
               color: const Color(0xFF5C6BC0),
-              fontSize: _textHeight * 0.02,
+              fontSize: 48,
               fontWeight: FontWeight.w700,
             ),
             holidayDecoration: BoxDecoration(
@@ -115,12 +114,12 @@ class _CalendarReservedState extends State<CalendarReserved> {
             ),
             weekendTextStyle: TextStyle(
               color: Colors.red,
-              fontSize: _textHeight * 0.02,
+              fontSize: 48,
               fontWeight: FontWeight.w700,
             ),
             defaultTextStyle: TextStyle(
               color: Colors.white70,
-              fontSize: _textHeight * 0.02,
+              fontSize: 48,
               fontWeight: FontWeight.w700,
             ),
           ),
