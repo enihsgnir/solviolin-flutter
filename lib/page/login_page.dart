@@ -25,7 +25,6 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
-    final deviceWidth = MediaQuery.of(context).size.width;
     final deviceHeight = MediaQuery.of(context).size.height;
 
     Client client = Get.put(Client());
@@ -38,8 +37,8 @@ class _LoginPageState extends State<LoginPage> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Container(
-              width: deviceHeight * 0.3,
-              height: deviceHeight * 0.3,
+              width: deviceHeight * 0.16,
+              height: deviceHeight * 0.16,
               decoration: BoxDecoration(
                 image: DecorationImage(
                   image: AssetImage("assets/solviolin_logo.png"),
@@ -68,7 +67,7 @@ class _LoginPageState extends State<LoginPage> {
                 ),
                 style: TextStyle(
                   color: Theme.of(context).accentColor,
-                  fontSize: 60,
+                  fontSize: 22,
                 ),
                 validator: (value) {
                   return (value == null) ? "아이디를 입력해주세요" : null;
@@ -95,7 +94,7 @@ class _LoginPageState extends State<LoginPage> {
                 ),
                 style: TextStyle(
                   color: Theme.of(context).accentColor,
-                  fontSize: 60,
+                  fontSize: 22,
                 ),
                 obscureText: true,
                 validator: (value) {
@@ -133,7 +132,7 @@ class _LoginPageState extends State<LoginPage> {
                       "로그인",
                       style: TextStyle(
                         color: const Color.fromRGBO(203, 173, 204, 80),
-                        fontSize: 60,
+                        fontSize: 24,
                         fontWeight: FontWeight.bold,
                       ),
                     ),

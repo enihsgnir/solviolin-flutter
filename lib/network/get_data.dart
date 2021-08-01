@@ -19,7 +19,7 @@ class Client {
     dio.options.receiveTimeout = 3000;
     dio.options.baseUrl = "http://3.36.254.21";
 
-    // not to get breakpoints at dioError
+    // not to get breakpoints at error
     dio.options.followRedirects = false;
     dio.options.validateStatus = (status) => status! < 600;
 
@@ -284,7 +284,7 @@ class Client {
     throw "학기 정보를 불러올 수 없습니다.";
   }
 
-  Future<List<Term>> getCurrentTerm() async {
+  Future<List<Term>> getCurrentTerms() async {
     if (await isLoggedIn()) {
       Response response = await dio.get("/term/cur");
       if (response.statusCode == 200) {

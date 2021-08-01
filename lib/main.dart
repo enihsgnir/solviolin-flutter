@@ -60,8 +60,8 @@ class _MyAppState extends State<MyApp> {
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,
       ],
-      // initialRoute: "/loading",
-      initialRoute: "/test",
+      initialRoute: "/loading",
+      // initialRoute: "/test",
       getPages: [
         GetPage(name: "/loading", page: () => LoadingPage()),
         GetPage(name: "/login", page: () => LoginPage()),

@@ -32,7 +32,6 @@ class _TimeslotReservedState extends State<TimeslotReserved> {
 
   @override
   Widget build(BuildContext context) {
-    final deviceWidth = MediaQuery.of(context).size.width;
     final deviceHeight = MediaQuery.of(context).size.height;
 
     Get.find<DataController>();
@@ -67,7 +66,7 @@ class _TimeslotReservedState extends State<TimeslotReserved> {
               timeIntervalHeight: deviceHeight * 0.05,
               timeTextStyle: TextStyle(
                 color: Colors.greenAccent,
-                fontSize: 36,
+                fontSize: 16,
                 fontStyle: FontStyle.italic,
                 fontWeight: FontWeight.w700,
               ),

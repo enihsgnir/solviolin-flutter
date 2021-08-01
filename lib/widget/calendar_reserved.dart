@@ -30,7 +30,6 @@ class _CalendarReservedState extends State<CalendarReserved> {
 
   @override
   Widget build(BuildContext context) {
-    final deviceWidth = MediaQuery.of(context).size.width;
     final deviceHeight = MediaQuery.of(context).size.height;
 
     Get.find<DataController>();
@@ -46,13 +45,13 @@ class _CalendarReservedState extends State<CalendarReserved> {
           availableCalendarFormats: const {CalendarFormat.month: "Month"},
           pageJumpingEnabled: true,
           sixWeekMonthsEnforced: true,
-          rowHeight: deviceHeight * 0.065,
+          rowHeight: 72,
           daysOfWeekHeight: deviceHeight * 0.02,
           headerStyle: HeaderStyle(
             titleCentered: true,
             titleTextStyle: TextStyle(
               color: Theme.of(context).accentColor,
-              fontSize: 48,
+              fontSize: 36,
               fontWeight: FontWeight.bold,
             ),
             leftChevronIcon: Icon(
@@ -67,12 +66,12 @@ class _CalendarReservedState extends State<CalendarReserved> {
           daysOfWeekStyle: DaysOfWeekStyle(
             weekdayStyle: TextStyle(
               color: const Color(0xFF4F4F4F),
-              fontSize: 48,
+              fontSize: 24,
               fontWeight: FontWeight.w800,
             ),
             weekendStyle: TextStyle(
               color: Colors.red,
-              fontSize: 48,
+              fontSize: 24,
               fontWeight: FontWeight.w800,
             ),
           ),
@@ -86,25 +85,25 @@ class _CalendarReservedState extends State<CalendarReserved> {
             ),
             todayTextStyle: TextStyle(
               color: const Color(0xFFFAFAFA),
-              fontSize: 48,
+              fontSize: 24,
               fontWeight: FontWeight.w700,
             ),
             selectedTextStyle: TextStyle(
               color: const Color(0xFFFAFAFA),
-              fontSize: 48,
+              fontSize: 24,
               fontWeight: FontWeight.w700,
             ),
             outsideTextStyle: TextStyle(
               color: const Color(0xFFAEAEAE),
-              fontSize: 48,
+              fontSize: 20,
             ),
             disabledTextStyle: TextStyle(
               color: const Color(0xFFBFBFBF),
-              fontSize: 48,
+              fontSize: 20,
             ),
             holidayTextStyle: TextStyle(
               color: const Color(0xFF5C6BC0),
-              fontSize: 48,
+              fontSize: 24,
               fontWeight: FontWeight.w700,
             ),
             holidayDecoration: BoxDecoration(
@@ -114,12 +113,12 @@ class _CalendarReservedState extends State<CalendarReserved> {
             ),
             weekendTextStyle: TextStyle(
               color: Colors.red,
-              fontSize: 48,
+              fontSize: 24,
               fontWeight: FontWeight.w700,
             ),
             defaultTextStyle: TextStyle(
               color: Colors.white70,
-              fontSize: 48,
+              fontSize: 24,
               fontWeight: FontWeight.w700,
             ),
           ),

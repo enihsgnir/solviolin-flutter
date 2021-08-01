@@ -55,7 +55,7 @@ DateTime parseDateTime(String dateTime) {
   DateTime _dateTime = DateTime.parse(dateTime);
 
   return DateTime(_dateTime.year, _dateTime.month, _dateTime.day,
-      _dateTime.hour, _dateTime.month);
+      _dateTime.hour, _dateTime.minute);
 }
 
 String dateToString(DateTime date) =>

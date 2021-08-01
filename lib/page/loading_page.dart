@@ -29,7 +29,6 @@ class _LoadingPageState extends State<LoadingPage> {
 
   @override
   Widget build(BuildContext context) {
-    final deviceWidth = MediaQuery.of(context).size.width;
     final deviceHeight = MediaQuery.of(context).size.height;
 
     return Scaffold(
@@ -39,11 +38,11 @@ class _LoadingPageState extends State<LoadingPage> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Container(
-                height: deviceHeight * 0.3,
-                width: deviceHeight * 0.3,
+                height: deviceHeight * 0.16,
+                width: deviceHeight * 0.16,
                 decoration: BoxDecoration(
                   image: DecorationImage(
-                    image: AssetImage("assets/solviolin_logo.png"),
+                    image: const AssetImage("assets/solviolin_logo.png"),
                     fit: BoxFit.fill,
                   ),
                   shape: BoxShape.circle,
@@ -54,8 +53,8 @@ class _LoadingPageState extends State<LoadingPage> {
                 child: Text(
                   "솔바이올린",
                   style: TextStyle(
-                    color: Theme.of(context).accentColor,
-                    fontSize: 120,
+                    color: Colors.white,
+                    fontSize: 48,
                   ),
                 ),
               ),

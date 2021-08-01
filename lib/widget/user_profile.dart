@@ -13,45 +13,38 @@ class UserProfile extends StatefulWidget {
 class _UserProfileState extends State<UserProfile> {
   @override
   Widget build(BuildContext context) {
-    final deviceWidth = MediaQuery.of(context).size.width;
     final deviceHeight = MediaQuery.of(context).size.height;
 
     Get.find<DataController>();
 
     return Container(
-      height: deviceHeight * 0.07,
+      height: deviceHeight * 0.08,
       decoration: BoxDecoration(
-        color: Colors.white60,
+        color: const Color.fromRGBO(1, 50, 32, 1),
         borderRadius: BorderRadius.circular(15),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
           Row(
-            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  InkWell(
-                    onTap: () {
-                      Get.toNamed("/history");
-                    },
-                    child: GetBuilder<DataController>(
-                      builder: (controller) {
-                        return Text(
-                          "${controller.user.userName}님",
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 60,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        );
-                      },
-                    ),
-                  ),
-                ],
+              InkWell(
+                onTap: () {
+                  Get.toNamed("/history");
+                },
+                child: GetBuilder<DataController>(
+                  builder: (controller) {
+                    return Text(
+                      "${controller.user.userName}님",
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 48,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    );
+                  },
+                ),
               ),
             ],
           ),
