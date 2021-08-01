@@ -164,6 +164,27 @@ class Client {
     throw "내 선생님 정보를 불러올 수 없습니다.";
   }
 
+  Future<List<DateTime>> getAvailableTimes({
+    required String branchName,
+    required String teacherID,
+    required DateTime startDate,
+  }) async {
+    if (await isLoggedIn()) {
+      Response response = await dio.post("/reservation/available", data: {
+        "branchName": branchName,
+        "teacherID": teacherID,
+        "startDate": startDate.toIso8601String(),
+      });
+      if (response.statusCode == 201) {
+        return List<DateTime>.generate(
+          response.data.length,
+          (index) => response.data[index],
+        );
+      }
+    }
+    throw "예약 가능한 시간대를 불러올 수 없습니다.";
+  }
+
   Future<List<Reservation>> getReservations({
     required String branchName,
     String? teacherID,
@@ -185,27 +206,6 @@ class Client {
         return List<Reservation>.generate(
           response.data.length,
           (index) => Reservation.fromJson(response.data[index]),
-        );
-      }
-    }
-    throw "예약 목록을 불러올 수 없습니다.";
-  }
-
-  Future<List<DateTime>> getAvailable({
-    required String branchName,
-    required String teacherID,
-    required DateTime startDate,
-  }) async {
-    if (await isLoggedIn()) {
-      Response response = await dio.post("/reservation/available", data: {
-        "branchName": branchName,
-        "teacherID": teacherID,
-        "startDate": startDate.toIso8601String(),
-      });
-      if (response.statusCode == 201) {
-        return List<DateTime>.generate(
-          response.data.length,
-          (index) => response.data[index],
         );
       }
     }
@@ -292,6 +292,17 @@ class Client {
     }
   }
 
+  Future<void> checkIn(String branchCode) async {
+    if (await isLoggedIn()) {
+      Response response = await dio.post("/check-in", data: {
+        "branchCode": branchCode,
+      });
+      if (response.statusCode != 200 && response.statusCode != 201) {
+        throw "QR 코드 인증에 실패했습니다.";
+      }
+    }
+  }
+
   Future<List<Term>> getTerms() async {
     if (await isLoggedIn()) {
       Response response = await dio.get("/term");
@@ -341,16 +352,5 @@ class Client {
       }
     }
     return [];
-  }
-
-  Future<void> checkIn(String branchCode) async {
-    if (await isLoggedIn()) {
-      Response response = await dio.post("/check-in", data: {
-        "branchCode": branchCode,
-      });
-      if (response.statusCode != 200 && response.statusCode != 201) {
-        throw "QR 코드 인증에 실패했습니다.";
-      }
-    }
   }
 }

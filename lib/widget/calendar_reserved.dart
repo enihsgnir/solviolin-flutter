@@ -1,18 +1,12 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 import 'package:solviolin/util/controller.dart';
 import 'package:solviolin/util/data_source.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 class CalendarReserved extends StatefulWidget {
-  final StreamController<DateTime> streamController;
-
-  const CalendarReserved({
-    Key? key,
-    required this.streamController,
-  }) : super(key: key);
+  const CalendarReserved({Key? key}) : super(key: key);
 
   @override
   _CalendarReservedState createState() => _CalendarReservedState();
@@ -38,60 +32,62 @@ class _CalendarReservedState extends State<CalendarReserved> {
       builder: (controller) {
         return TableCalendar(
           focusedDay: _focusedDay,
-          firstDay: kFirstDay,
-          lastDay: kLastDay,
-          locale: "ko-KR",
+          firstDay: DateTime(kToday.year, kToday.month - 6, 1),
+          lastDay: DateTime(kToday.year, kToday.month + 7, 0),
           weekendDays: const [DateTime.sunday],
           availableCalendarFormats: const {CalendarFormat.month: "Month"},
           pageJumpingEnabled: true,
           sixWeekMonthsEnforced: true,
           rowHeight: 72,
-          daysOfWeekHeight: deviceHeight * 0.02,
+          daysOfWeekHeight: 24,
           headerStyle: HeaderStyle(
             titleCentered: true,
+            titleTextFormatter: (date, locale) =>
+                DateFormat.yMMM().format(date),
             titleTextStyle: TextStyle(
               color: Theme.of(context).accentColor,
-              fontSize: 36,
+              fontSize: 32,
               fontWeight: FontWeight.bold,
             ),
             leftChevronIcon: Icon(
               Icons.chevron_left,
-              size: deviceHeight * 0.0225,
+              size: 32,
             ),
             rightChevronIcon: Icon(
               Icons.chevron_right,
-              size: deviceHeight * 0.0225,
+              size: 32,
             ),
           ),
           daysOfWeekStyle: DaysOfWeekStyle(
+            dowTextFormatter: (date, locale) =>
+                DateFormat.E(locale).format(date)[0],
             weekdayStyle: TextStyle(
               color: const Color(0xFF4F4F4F),
-              fontSize: 24,
-              fontWeight: FontWeight.w800,
+              fontSize: 20,
             ),
             weekendStyle: TextStyle(
               color: Colors.red,
-              fontSize: 24,
-              fontWeight: FontWeight.w800,
+              fontSize: 20,
             ),
           ),
           calendarStyle: CalendarStyle(
-            canMarkersOverflow: false,
-            markerSizeScale: 1.5,
-            markersAlignment: Alignment.center,
-            markerDecoration: const BoxDecoration(
-              color: const Color(0xFF263238),
-              shape: BoxShape.rectangle,
-            ),
             todayTextStyle: TextStyle(
-              color: const Color(0xFFFAFAFA),
+              color: kToday.weekday == 7 ? const Color(0xFFFAFAFA) : Colors.red,
               fontSize: 24,
-              fontWeight: FontWeight.w700,
             ),
+            todayDecoration: BoxDecoration(
+                color:
+                    kToday.weekday == 7 ? Colors.red : const Color(0xFFFAFAFA),
+                shape: BoxShape.circle),
             selectedTextStyle: TextStyle(
-              color: const Color(0xFFFAFAFA),
+              color: _selectedDay.weekday == 7
+                  ? Colors.red
+                  : const Color(0xFFFAFAFA),
               fontSize: 24,
-              fontWeight: FontWeight.w700,
+            ),
+            selectedDecoration: BoxDecoration(
+              color: const Color.fromRGBO(227, 214, 208, 0.15),
+              shape: BoxShape.circle,
             ),
             outsideTextStyle: TextStyle(
               color: const Color(0xFFAEAEAE),
@@ -102,9 +98,8 @@ class _CalendarReservedState extends State<CalendarReserved> {
               fontSize: 20,
             ),
             holidayTextStyle: TextStyle(
-              color: const Color(0xFF5C6BC0),
+              color: Colors.white,
               fontSize: 24,
-              fontWeight: FontWeight.w700,
             ),
             holidayDecoration: BoxDecoration(
               color: const Color.fromRGBO(96, 128, 104, 100),
@@ -113,28 +108,31 @@ class _CalendarReservedState extends State<CalendarReserved> {
             weekendTextStyle: TextStyle(
               color: Colors.red,
               fontSize: 24,
-              fontWeight: FontWeight.w700,
             ),
             defaultTextStyle: TextStyle(
               color: Colors.white70,
               fontSize: 24,
-              fontWeight: FontWeight.w700,
             ),
           ),
           selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
           holidayPredicate: (day) => getEvents().containsKey(day),
-          onDaySelected: (selectedDay, focusedDay) {
+          onDaySelected: (selectedDay, focusedDay) async {
             if (!isSameDay(_selectedDay, selectedDay)) {
               setState(() {
                 _selectedDay = selectedDay;
                 _focusedDay = focusedDay;
               });
-              // await client.getGrid...
-              widget.streamController.add(_selectedDay);
             }
+            await getSelectedDayData(selectedDay);
+
+            controller.updateSelectedDay(selectedDay);
+            controller.updateFocusedDay(focusedDay);
           },
-          onPageChanged: (focusedDay) {
+          onPageChanged: (focusedDay) async {
             _focusedDay = focusedDay;
+            await getChangedPageData(focusedDay);
+
+            controller.updateFocusedDay(focusedDay);
           },
         );
       },

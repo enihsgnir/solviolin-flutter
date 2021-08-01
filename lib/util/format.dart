@@ -1,13 +1,13 @@
 String dowToString(int dow) {
   Map<int, String> days = {
-    0: "일",
-    1: "월",
-    2: "화",
-    3: "수",
-    4: "목",
-    5: "금",
-    6: "토",
-    7: "일",
+    0: "SUN",
+    1: "MON",
+    2: "TUE",
+    3: "WED",
+    4: "THU",
+    5: "FRI",
+    6: "SAT",
+    7: "SUN",
   };
 
   return days[dow]!;
@@ -66,13 +66,13 @@ String dateTimeToTimeString(DateTime dateTime) =>
 
 String bookingStatusToString(int bookingStatus) {
   Map<int, String> status = {
-    0: "기본",
-    1: "보강",
-    2: "취소",
-    3: "연장",
-    -1: "보강(관리자)",
-    -2: "취소(관리자)",
-    -3: "연장(관리자)",
+    0: "Original",
+    1: "MadeUp",
+    2: "Canceled",
+    3: "Extended",
+    -1: "MadeUp(by Admin)",
+    -2: "Canceled(by Admin)",
+    -3: "Extended(by Admin)",
   };
 
   return status[bookingStatus]!;

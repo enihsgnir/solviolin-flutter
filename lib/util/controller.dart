@@ -1,5 +1,4 @@
 import 'package:get/get.dart';
-import 'package:solviolin/model/control.dart';
 import 'package:solviolin/model/regular_schedule.dart';
 import 'package:solviolin/model/reservation.dart';
 import 'package:solviolin/model/teacher.dart';
@@ -9,13 +8,12 @@ class DataController extends GetxController {
   late User user;
   late List<RegularSchedule> regularSchedules;
   late List<Teacher> teachers;
+  late List<DateTime> availabaleTimes;
   late List<Reservation> myValidReservations;
-  late List<Reservation> teacherOnlyValidReservations;
-  late List<Reservation> myThisMonthReservations;
-  late List<Reservation> myLastMonthReservations;
-  late List<Control> openControls;
-  late List<Control> closeControls;
-  late List<DateTime> availabales;
+  late DateTime selectedDay;
+  late DateTime focusedDay;
+  late List<Reservation> thisMonthReservations;
+  late List<Reservation> lastMonthReservations;
 
   void updateUser(User data) {
     user = data;
@@ -32,38 +30,33 @@ class DataController extends GetxController {
     update();
   }
 
+  void updateAvailableTimes(List<DateTime> data) {
+    availabaleTimes = data;
+    update();
+  }
+
   void updateMyValidReservations(List<Reservation> data) {
     myValidReservations = data;
     update();
   }
 
-  void updateTeacherOnlyValidReservations(List<Reservation> data) {
-    teacherOnlyValidReservations = data;
+  void updateSelectedDay(DateTime data) {
+    selectedDay = data;
     update();
   }
 
-  void updateMyThisMonthReservations(List<Reservation> data) {
-    myThisMonthReservations = data;
+  void updateFocusedDay(DateTime data) {
+    focusedDay = data;
     update();
   }
 
-  void updateMyLastMonthReservations(List<Reservation> data) {
-    myLastMonthReservations = data;
+  void updateThisMonthReservations(List<Reservation> data) {
+    thisMonthReservations = data;
     update();
   }
 
-  void updateOpenControls(List<Control> data) {
-    openControls = data;
-    update();
-  }
-
-  void updateCloseControls(List<Control> data) {
-    closeControls = data;
-    update();
-  }
-
-  void updateAvailables(List<DateTime> data) {
-    availabales = data;
+  void updateLastMonthReservations(List<Reservation> data) {
+    lastMonthReservations = data;
     update();
   }
 }

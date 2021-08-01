@@ -18,6 +18,8 @@ class ReservationHistory extends StatefulWidget {
 class _ReservationHistoryState extends State<ReservationHistory> {
   @override
   Widget build(BuildContext context) {
+    final deviceWidth = MediaQuery.of(context).size.width;
+
     return ListView.builder(
       itemBuilder: (context, index) {
         return Slidable(
@@ -25,31 +27,25 @@ class _ReservationHistoryState extends State<ReservationHistory> {
           actions: [
             IconSlideAction(
               caption: "Cancel",
-              color: Colors.red,
+              color: Theme.of(context).scaffoldBackgroundColor,
               icon: Icons.remove,
               onTap: () {},
             ),
             IconSlideAction(
               caption: "Extend",
-              color: Colors.blue,
+              color: Theme.of(context).scaffoldBackgroundColor,
               icon: Icons.add,
               onTap: () {},
             ),
           ],
           actionExtentRatio: 1 / 5,
           child: Container(
-            height: 100,
+            margin: EdgeInsets.all(5),
+            height: deviceWidth * 0.24,
             decoration: BoxDecoration(
-              color: Theme.of(context).backgroundColor,
-              border: Border(
-                left: BorderSide(
-                  color: Colors.black45,
-                ),
-                bottom: BorderSide(
-                  color: Colors.black,
-                  width: 2,
-                ),
-              ),
+              color: Theme.of(context).scaffoldBackgroundColor,
+              border: Border.all(color: Colors.grey),
+              borderRadius: BorderRadius.circular(15),
             ),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -59,6 +55,7 @@ class _ReservationHistoryState extends State<ReservationHistory> {
                   " ${dateTimeToTimeString(widget.reservations[index].startDate)}"
                   "~${dateTimeToTimeString(widget.reservations[index].endDate)}",
                   style: TextStyle(
+                    color: Colors.white,
                     fontSize: 28,
                     decoration:
                         widget.reservations[index].bookingStatus.abs() == 2
@@ -82,17 +79,24 @@ class _ReservationHistoryState extends State<ReservationHistory> {
                     ],
                   ),
                 ),
-                Container(
-                  width: double.infinity,
-                  alignment: Alignment.centerRight,
-                  child: Text(
-                    bookingStatusToString(
-                        widget.reservations[index].bookingStatus),
-                    style: TextStyle(
-                      color: Colors.red,
-                      fontSize: 24,
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    Container(
+                      width: deviceWidth * 0.5,
+                      height: deviceWidth * 0.05,
                     ),
-                  ),
+                    Container(
+                      child: Text(
+                        bookingStatusToString(
+                            widget.reservations[index].bookingStatus),
+                        style: TextStyle(
+                          color: Colors.red,
+                          fontSize: 24,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),

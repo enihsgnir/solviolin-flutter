@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
@@ -37,6 +38,16 @@ class _QRCodeScanPageState extends State<QRCodeScanPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        leading: IconButton(
+          onPressed: () {
+            Get.back();
+          },
+          icon: Icon(CupertinoIcons.arrow_left, size: 28),
+        ),
+        title: Text("코드스캔", style: TextStyle(fontSize: 28)),
+        backgroundColor: Colors.transparent,
+      ),
       body: Stack(
         alignment: Alignment.center,
         children: [
@@ -72,8 +83,10 @@ class _QRCodeScanPageState extends State<QRCodeScanPage> {
                 color: Colors.white24,
                 borderRadius: BorderRadius.circular(8),
               ),
-              child: Text(result != null ? "Complete!" : "Scan a code"),
-              // "Barcode Type: ${describeEnum(result!.format)} Data: ${result!.code}"
+              child: Text(
+                result != null ? "Complete!" : "Scan a code",
+                style: TextStyle(fontSize: 28),
+              ),
             ),
           ),
           Positioned(

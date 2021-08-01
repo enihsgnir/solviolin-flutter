@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:solviolin/widget/calendar_reserved.dart';
@@ -14,31 +12,31 @@ class MainPage extends StatefulWidget {
 }
 
 class _MainPageState extends State<MainPage> {
-  StreamController<DateTime> streamController = StreamController<DateTime>();
-
-  @override
-  void dispose() {
-    streamController.close();
-    super.dispose();
-  }
-
   @override
   Widget build(BuildContext context) {
-    final deviceHeight = MediaQuery.of(context).size.height;
-
     return Scaffold(
       body: SafeArea(
         child: Column(
           children: [
             Container(
-              padding: EdgeInsets.fromLTRB(5, deviceHeight * 0.005, 5, 0),
+              padding: EdgeInsets.fromLTRB(5, 10, 5, 0),
               child: UserProfile(),
             ),
             Container(
-              padding: EdgeInsets.symmetric(horizontal: 5),
-              child: CalendarReserved(streamController: streamController),
+              margin: EdgeInsets.all(5),
+              color: Colors.grey,
+              height: 0.5,
             ),
-            ReservationGrid(stream: streamController.stream),
+            Container(
+              padding: EdgeInsets.symmetric(horizontal: 5),
+              child: CalendarReserved(),
+            ),
+            Container(
+              margin: EdgeInsets.all(5),
+              color: Colors.grey,
+              height: 0.5,
+            ),
+            ReservationGrid(),
           ],
         ),
       ),

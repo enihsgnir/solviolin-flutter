@@ -55,6 +55,8 @@ class _MyAppState extends State<MyApp> {
         brightness: Brightness.dark,
         primaryColor: Colors.black,
         accentColor: Colors.white,
+        highlightColor: Colors.transparent,
+        splashColor: Colors.transparent,
         textTheme:
             GoogleFonts.nanumGothicTextTheme(Theme.of(context).textTheme),
       ),

@@ -1,7 +1,7 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:solviolin/model/regular_schedule.dart';
-import 'package:solviolin/model/reservation.dart';
 import 'package:solviolin/util/controller.dart';
 import 'package:solviolin/util/format.dart';
 import 'package:solviolin/widget/reservation_history.dart';
@@ -28,23 +28,28 @@ class _HistoryPageState extends State<HistoryPage>
     Get.find<DataController>();
 
     return Scaffold(
+      appBar: AppBar(
+        leading: IconButton(
+          onPressed: () {
+            Get.back();
+          },
+          icon: Icon(CupertinoIcons.arrow_left, size: 28),
+        ),
+        title: Text("내 예약", style: TextStyle(fontSize: 28)),
+        backgroundColor: Colors.transparent,
+      ),
       body: SafeArea(
         child: GetBuilder<DataController>(
           builder: (controller) {
             List<RegularSchedule> regularSchedules =
                 controller.regularSchedules;
-            List<Reservation> thisReservations =
-                controller.myThisMonthReservations;
-            List<Reservation> lastReservations =
-                controller.myLastMonthReservations;
 
             return ListView(
               children: [
                 DefaultTextStyle(
                   style: TextStyle(fontSize: 30),
                   child: Container(
-                    height: 100,
-                    color: Colors.amber,
+                    height: 160,
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -63,27 +68,43 @@ class _HistoryPageState extends State<HistoryPage>
                     ),
                   ),
                 ),
-                DefaultTextStyle(
-                  style: TextStyle(fontSize: 32),
-                  child: Container(
-                    child: TabBar(
-                      controller: tabController,
-                      tabs: [
-                        Tab(text: "지난 달"),
-                        Tab(text: "이번 달"),
-                      ],
-                    ),
+                Container(
+                  margin: EdgeInsets.all(5),
+                  color: Colors.grey,
+                  height: 0.5,
+                ),
+                Container(
+                  alignment: Alignment.centerLeft,
+                  child: TabBar(
+                    tabs: [
+                      Tab(
+                          child: Text(
+                        "지난 달",
+                        style: TextStyle(fontSize: 28),
+                      )),
+                      Tab(
+                          child: Text(
+                        "이번 달",
+                        style: TextStyle(fontSize: 28),
+                      )),
+                    ],
+                    controller: tabController,
+                    isScrollable: true,
+                    enableFeedback: false,
                   ),
                 ),
                 Container(
                   height: MediaQuery.of(context).size.height,
-                  color: Colors.grey,
                   child: TabBarView(
-                    controller: tabController,
                     children: [
-                      ReservationHistory(reservations: lastReservations),
-                      ReservationHistory(reservations: thisReservations),
+                      ReservationHistory(
+                        reservations: controller.lastMonthReservations,
+                      ),
+                      ReservationHistory(
+                        reservations: controller.thisMonthReservations,
+                      ),
                     ],
+                    controller: tabController,
                   ),
                 ),
               ],
