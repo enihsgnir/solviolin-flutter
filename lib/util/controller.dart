@@ -15,6 +15,7 @@ class DataController extends GetxController {
   late List<Reservation> myLastMonthReservations;
   late List<Control> openControls;
   late List<Control> closeControls;
+  late List<DateTime> availabales;
 
   void updateUser(User data) {
     user = data;
@@ -58,6 +59,11 @@ class DataController extends GetxController {
 
   void updateCloseControls(List<Control> data) {
     closeControls = data;
+    update();
+  }
+
+  void updateAvailables(List<DateTime> data) {
+    availabales = data;
     update();
   }
 }

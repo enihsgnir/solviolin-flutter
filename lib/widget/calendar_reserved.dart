@@ -107,9 +107,8 @@ class _CalendarReservedState extends State<CalendarReserved> {
               fontWeight: FontWeight.w700,
             ),
             holidayDecoration: BoxDecoration(
-              border: const Border.fromBorderSide(
-                const BorderSide(color: const Color(0xFF9FA8DA), width: 1.4),
-              ),
+              color: const Color.fromRGBO(96, 128, 104, 100),
+              shape: BoxShape.circle,
             ),
             weekendTextStyle: TextStyle(
               color: Colors.red,
@@ -130,6 +129,7 @@ class _CalendarReservedState extends State<CalendarReserved> {
                 _selectedDay = selectedDay;
                 _focusedDay = focusedDay;
               });
+              // await client.getGrid...
               widget.streamController.add(_selectedDay);
             }
           },

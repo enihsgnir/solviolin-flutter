@@ -191,6 +191,27 @@ class Client {
     throw "예약 목록을 불러올 수 없습니다.";
   }
 
+  Future<List<DateTime>> getAvailable({
+    required String branchName,
+    required String teacherID,
+    required DateTime startDate,
+  }) async {
+    if (await isLoggedIn()) {
+      Response response = await dio.post("/reservation/available", data: {
+        "branchName": branchName,
+        "teacherID": teacherID,
+        "startDate": startDate.toIso8601String(),
+      });
+      if (response.statusCode == 201) {
+        return List<DateTime>.generate(
+          response.data.length,
+          (index) => response.data[index],
+        );
+      }
+    }
+    throw "예약 목록을 불러올 수 없습니다.";
+  }
+
   Future<void> reserveRegularReservation({
     required String teacherID,
     required String branchName,
@@ -297,18 +318,22 @@ class Client {
     throw "현재 학기 정보를 불러올 수 없습니다.";
   }
 
-  Future<List<Control>> getControls(
-      {String? teacherID, String? branchName}) async {
+  Future<List<Control>> getControls({
+    required String branchName,
+    String? teacherID,
+    DateTime? startDate,
+    DateTime? endDate,
+    int? status,
+  }) async {
     if (await isLoggedIn()) {
-      Map<String, dynamic> queries = {};
-      if (teacherID != null) {
-        queries["teacherID"] = teacherID;
-      }
-      if (branchName != null) {
-        queries["branchName"] = branchName;
-      }
-      Response response = await dio.get("/control", queryParameters: queries);
-      if (response.statusCode == 200) {
+      Response response = await dio.post("/control/search", data: {
+        "branchName": branchName,
+        "teacherID": teacherID,
+        "startDate": startDate?.toIso8601String(),
+        "endDate": endDate?.toIso8601String(),
+        "status": status,
+      });
+      if (response.statusCode == 201) {
         return List<Control>.generate(
           response.data.length,
           (index) => Control.fromJson(response.data[index]),

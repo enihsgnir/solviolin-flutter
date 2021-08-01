@@ -1,8 +1,9 @@
 import 'dart:async';
 
-import 'package:assets_audio_player/assets_audio_player.dart';
+import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:quiver/async.dart';
 
 class MetronomePage extends StatefulWidget {
@@ -13,6 +14,10 @@ class MetronomePage extends StatefulWidget {
 }
 
 class _MetronomePageState extends State<MetronomePage> {
+  late Metronome metronome;
+  StreamSubscription<DateTime>? subscription;
+  bool isPlaying = false;
+
   static int _index = 21;
   List<int> tempos = []
     ..addAll(List.generate(10, (index) => 40 + 2 * index))
@@ -21,22 +26,20 @@ class _MetronomePageState extends State<MetronomePage> {
     ..addAll(List.generate(4, (index) => 120 + 6 * index))
     ..addAll(List.generate(9, (index) => 144 + 8 * index));
 
-  late Metronome metronome;
-  bool isPlaying = false;
-  StreamSubscription<DateTime>? subscription;
-  final assetsAudioPlayer = AssetsAudioPlayer();
+  final player = Get.put(AudioCache());
 
   @override
   void initState() {
     super.initState();
     metronome = Metronome.epoch(
         Duration(microseconds: (60 * 1000 * 1000 / tempos[_index]).round()));
-    assetsAudioPlayer.open(Audio("assets/metronome_sound_sample.mp3"));
+    player.load("metronome_sound_sample.mp3");
   }
 
   @override
   void dispose() {
     subscription?.cancel();
+    player.clearAll();
     super.dispose();
   }
 
@@ -154,7 +157,8 @@ class _MetronomePageState extends State<MetronomePage> {
         isPlaying = false;
         // _backgroundColor = Colors.red;
       } else {
-        subscription = metronome.listen((event) => assetsAudioPlayer.play());
+        subscription = metronome
+            .listen((event) => player.play("metronome_sound_sample.mp3"));
         // _subscription = _metronome
         //     .listen((event) => SystemSound.play(SystemSoundType.click));
         isPlaying = true;

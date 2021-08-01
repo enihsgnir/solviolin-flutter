@@ -46,14 +46,17 @@ class _MyAppState extends State<MyApp> {
     Get.put(DataController());
 
     return GetMaterialApp(
+      builder: (context, child) => MediaQuery(
+        data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
+        child: child!,
+      ),
       title: "SolViolin",
       theme: ThemeData(
         brightness: Brightness.dark,
         primaryColor: Colors.black,
         accentColor: Colors.white,
-        textTheme: GoogleFonts.nanumGothicTextTheme(
-          Theme.of(context).textTheme,
-        ),
+        textTheme:
+            GoogleFonts.nanumGothicTextTheme(Theme.of(context).textTheme),
       ),
       localizationsDelegates: [
         GlobalMaterialLocalizations.delegate,
