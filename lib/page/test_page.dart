@@ -1,7 +1,7 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:solviolin/network/get_data.dart';
-import 'package:solviolin/util/controller.dart';
+import 'package:solviolin/util/notification.dart';
 
 class TestPage extends StatefulWidget {
   const TestPage({Key? key}) : super(key: key);
@@ -13,8 +13,6 @@ class TestPage extends StatefulWidget {
 class _TestPageState extends State<TestPage> {
   @override
   Widget build(BuildContext context) {
-    Client client = Get.put(Client());
-
     return Scaffold(
       body: SafeArea(
         child: Container(
@@ -35,86 +33,15 @@ class _TestPageState extends State<TestPage> {
               ),
               TextButton(
                 onPressed: () async {
-                  await client.getTeachers(
-                      teacherID: "teacher2", branchName: "잠실");
+                  try {
+                    throw "해당 시간에 이미 수업이 존재합니다. 다시 시도해 주세요.";
+                  } catch (e) {
+                    showErrorMessage(context, e.toString());
+                  }
                 },
                 child: Text(
-                  "Get Teacher 'teacher2' '잠실'",
+                  "Show Error Message",
                   style: TextStyle(fontSize: 40),
-                ),
-              ),
-              TextButton(
-                onPressed: () async {
-                  await client.getReservations(
-                    branchName: "잠실",
-                    userID: "sleep",
-                    bookingStatus: [-3, -2, -1, 0, 1, 2, 3],
-                  );
-                },
-                child: Text(
-                  "Get Reservation '잠실' 'sleep'",
-                  style: TextStyle(fontSize: 40),
-                ),
-              ),
-              TextButton(
-                onPressed: () async {
-                  await client.getProfile();
-                },
-                child: Text(
-                  "Get Profile",
-                  style: TextStyle(fontSize: 40),
-                ),
-              ),
-              TextButton(
-                onPressed: () async {
-                  await client.getRegularSchedules();
-                },
-                child: Text(
-                  "Get Regular",
-                  style: TextStyle(fontSize: 40),
-                ),
-              ),
-              TextButton(
-                onPressed: () {
-                  print(Get.find<DataController>().user.branchName);
-                },
-                child: Text(
-                  "Print",
-                  style: TextStyle(fontSize: 40),
-                ),
-              ),
-              TextButton(
-                onPressed: () async {
-                  await client.refresh();
-                },
-                child: Text(
-                  "Refresh",
-                  style: TextStyle(fontSize: 40),
-                ),
-              ),
-              TextButton(
-                onPressed: () {
-                  print(MediaQuery.of(context).size.height);
-                  print(MediaQuery.of(context).size.width);
-                  print(MediaQuery.of(context).padding);
-                  print(MediaQuery.of(context).viewPadding);
-                  print(MediaQuery.of(context).viewInsets);
-                  print(MediaQuery.of(context).devicePixelRatio);
-                  print(MediaQuery.of(context).textScaleFactor);
-                },
-                child: Text(
-                  "Print",
-                  style: TextStyle(fontSize: 20),
-                ),
-              ),
-              TextField(),
-              TextButton(
-                onPressed: () {
-                  Get.toNamed("/metronome");
-                },
-                child: Text(
-                  "Metronome",
-                  style: TextStyle(fontSize: 20),
                 ),
               ),
             ],

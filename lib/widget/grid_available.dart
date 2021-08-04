@@ -4,21 +4,21 @@ import 'package:solviolin/util/controller.dart';
 import 'package:solviolin/util/format.dart';
 import 'package:solviolin/util/notification.dart';
 
-class ReservationGrid extends StatefulWidget {
-  const ReservationGrid({Key? key}) : super(key: key);
+class GridAvailable extends StatefulWidget {
+  const GridAvailable({Key? key}) : super(key: key);
 
   @override
-  _ReservationGridState createState() => _ReservationGridState();
+  _GridAvailableState createState() => _GridAvailableState();
 }
 
-class _ReservationGridState extends State<ReservationGrid> {
+class _GridAvailableState extends State<GridAvailable> {
   @override
   Widget build(BuildContext context) {
     Get.find<DataController>();
 
     return GetBuilder<DataController>(
       builder: (controller) {
-        return controller.availabaleTimes.length == 0
+        return controller.availabaleSpots.length == 0
             ? Center(
                 child: Container(
                   padding: const EdgeInsets.only(top: 40),
@@ -40,7 +40,7 @@ class _ReservationGridState extends State<ReservationGrid> {
                 shrinkWrap: true,
                 crossAxisCount: 4,
                 children: List<InkWell>.generate(
-                  controller.availabaleTimes.length,
+                  controller.availabaleSpots.length,
                   (index) => InkWell(
                     child: Container(
                       decoration: BoxDecoration(
@@ -48,12 +48,12 @@ class _ReservationGridState extends State<ReservationGrid> {
                         borderRadius: BorderRadius.circular(15),
                       ),
                       child: Text(
-                        "${dateTimeToTimeString(controller.availabaleTimes[index])}",
+                        "${dateTimeToTimeString(controller.availabaleSpots[index])}",
                         style: TextStyle(color: Colors.white, fontSize: 22),
                       ),
                     ),
                     onTap: () {
-                      modalReserve(context, controller.availabaleTimes[index]);
+                      modalReserve(context, controller.availabaleSpots[index]);
                     },
                     enableFeedback: false,
                   ),

@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:solviolin/network/get_data.dart';
-import 'package:solviolin/util/controller.dart';
 import 'package:solviolin/util/data_source.dart';
+import 'package:solviolin/util/network.dart';
 import 'package:solviolin/util/notification.dart';
 
 class LoadingPage extends StatefulWidget {
@@ -16,8 +15,8 @@ class _LoadingPageState extends State<LoadingPage> {
   @override
   void initState() {
     super.initState();
-    Future.delayed(Duration(seconds: 2), () async {
-      await deleteTokenForTest();
+    Future.delayed(Duration(seconds: 1), () async {
+      // await deleteTokenForTest();
       try {
         await checkUser();
       } catch (e) {
@@ -68,7 +67,6 @@ class _LoadingPageState extends State<LoadingPage> {
   Future<void> checkUser() async {
     Client client = Get.put(Client());
     if (await client.isLoggedIn()) {
-      Get.find<DataController>().updateUser(await client.getProfile());
       await getUserBasedData();
       Get.offAllNamed("/main");
     } else {

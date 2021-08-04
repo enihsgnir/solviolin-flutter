@@ -34,7 +34,7 @@ class _UserProfileState extends State<UserProfile> {
                   padding: const EdgeInsets.only(left: 24),
                   child: InkWell(
                     onTap: () async {
-                      await getReservationHistoryData();
+                      await getReservedHistoryData();
                       Get.toNamed("/history");
                     },
                     child: GetBuilder<DataController>(
@@ -62,7 +62,7 @@ class _UserProfileState extends State<UserProfile> {
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   child: InkWell(
                     onTap: () async {
-                      await getReservationHistoryData();
+                      await getReservedHistoryData();
                       Get.toNamed("/history");
                     },
                     child: Icon(

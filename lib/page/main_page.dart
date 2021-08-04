@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:solviolin/widget/calendar_reserved.dart';
-import 'package:solviolin/widget/reservation_grid.dart';
+import 'package:solviolin/widget/grid_available.dart';
 import 'package:solviolin/widget/user_profile.dart';
 
 class MainPage extends StatefulWidget {
@@ -36,7 +36,7 @@ class _MainPageState extends State<MainPage> {
               color: Colors.grey,
               height: 0.5,
             ),
-            ReservationGrid(),
+            GridAvailable(),
           ],
         ),
       ),

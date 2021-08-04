@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:solviolin/network/get_data.dart';
 import 'package:solviolin/util/controller.dart';
 import 'package:solviolin/util/data_source.dart';
+import 'package:solviolin/util/network.dart';
 import 'package:solviolin/util/notification.dart';
 
 class LoginPage extends StatefulWidget {
@@ -26,9 +26,6 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     final deviceHeight = MediaQuery.of(context).size.height;
-
-    Client client = Get.put(Client());
-    DataController _controller = Get.find<DataController>();
 
     return Scaffold(
       body: SafeArea(
@@ -111,12 +108,11 @@ class _LoginPageState extends State<LoginPage> {
                   child: TextButton(
                     onPressed: () async {
                       try {
-                        _controller.updateUser(await client.login(
-                            idController.text, pwController.text));
-                        await getUserBasedData();
+                        Get.find<DataController>().updateUser(
+                            await Get.put(Client())
+                                .login(idController.text, pwController.text));
+                        await getUserBasedData(isLoggedIn: false);
                         Get.offAllNamed("/main");
-
-                        //await Get.offAllNamed("/test");
                       } catch (e) {
                         Get.offAllNamed("/login");
                         showErrorMessage(context, e.toString());

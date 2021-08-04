@@ -3,16 +3,14 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart'
     hide Options;
 import 'package:get/get.dart' hide Response;
 import 'package:pretty_dio_logger/pretty_dio_logger.dart';
-import 'package:solviolin/model/control.dart';
+import 'package:solviolin/model/change.dart';
 import 'package:solviolin/model/regular_schedule.dart';
 import 'package:solviolin/model/reservation.dart';
-import 'package:solviolin/model/teacher.dart';
-import 'package:solviolin/model/term.dart';
 import 'package:solviolin/model/user.dart';
 
 class Client {
   final Dio dio = Dio();
-  final storage = FlutterSecureStorage();
+  final storage = Get.put(FlutterSecureStorage());
 
   Client() {
     dio.options.connectTimeout = 3000;
@@ -23,10 +21,6 @@ class Client {
     dio.options.followRedirects = false;
     dio.options.validateStatus = (status) => status! < 600;
 
-    dio.interceptors.add(PrettyDioLogger(
-      requestHeader: true,
-      requestBody: true,
-    ));
     dio.interceptors.add(InterceptorsWrapper(
       onRequest: (options, handler) async {
         if (await isLoggedIn()) {
@@ -40,7 +34,7 @@ class Client {
         bool containsRefresh = await storage.containsKey(key: "refreshToken");
         if (response.statusCode == 400) {
           handler.next(response);
-          throw "정보가 올바르지 않습니다.\n다시 확인해 주세요!";
+          throw "정보가 올바르지 않습니다.";
         } else if (response.statusCode == 401) {
           if (!containsAccess && !containsRefresh) {
             handler.next(response);
@@ -49,14 +43,14 @@ class Client {
             Get.offAllNamed("/login");
             await logout();
             handler.next(response);
-            throw "인증이 만료되었습니다.\n자동으로 로그아웃 됩니다.";
+            throw "인증이 만료되었습니다. 자동으로 로그아웃 됩니다.";
           } else if (containsAccess && containsRefresh) {
             await refresh();
-            await retry(response.requestOptions);
+            return handler.next(await retry(response.requestOptions));
           }
         } else if (response.statusCode == 404) {
           handler.next(response);
-          throw "정보를 불러올 수 없습니다.\n다시 확인해 주세요!";
+          throw "정보를 불러올 수 없습니다.";
         }
 
         return handler.next(response);
@@ -66,6 +60,7 @@ class Client {
         throw error.message;
       },
     ));
+    dio.interceptors.add(PrettyDioLogger(request: false));
   }
 
   Future<User> login(String userID, String userPassword) async {
@@ -142,29 +137,7 @@ class Client {
     throw "내 정규 일정을 불러올 수 없습니다.";
   }
 
-  Future<List<Teacher>> getTeachers(
-      {String? teacherID, String? branchName}) async {
-    if (await isLoggedIn()) {
-      Map<String, dynamic> queries = {};
-      if (teacherID != null) {
-        queries["teacherID"] = teacherID;
-      }
-      if (branchName != null) {
-        queries["branchName"] = branchName;
-      }
-      Response response =
-          await dio.get("/teacher/search", queryParameters: queries);
-      if (response.statusCode == 200) {
-        return List<Teacher>.generate(
-          response.data.length,
-          (index) => Teacher.fromJson(response.data[index]),
-        );
-      }
-    }
-    throw "내 선생님 정보를 불러올 수 없습니다.";
-  }
-
-  Future<List<DateTime>> getAvailableTimes({
+  Future<List<DateTime>> getAvailableSpots({
     required String branchName,
     required String teacherID,
     required DateTime startDate,
@@ -209,10 +182,29 @@ class Client {
         );
       }
     }
-    throw "예약 목록을 불러올 수 없습니다.";
+    throw "예약 내역을 불러올 수 없습니다.";
   }
 
-  Future<void> reserveRegularReservation({
+  Future<List<Change>> getChanges({
+    String range = "both",
+    String? userID,
+  }) async {
+    if (await isLoggedIn()) {
+      Response response = await dio.post("/reservation/changes", data: {
+        "range": range,
+        "userID": userID,
+      });
+      if (response.statusCode == 201) {
+        return List<Change>.generate(
+          response.data.length,
+          (index) => Change.fromJson(response.data[index]),
+        );
+      }
+    }
+    throw "변경 내역을 불러올 수 없습니다.";
+  }
+
+  Future<void> makeUpReservation({
     required String teacherID,
     required String branchName,
     required DateTime startDate,
@@ -220,7 +212,7 @@ class Client {
     required String userID,
   }) async {
     if (await isLoggedIn()) {
-      Response response = await dio.post("/reservation/regular", data: {
+      Response response = await dio.post("/reservation/user", data: {
         "teacherID": teacherID,
         "branchName": branchName,
         "startDate": startDate.toIso8601String(),
@@ -228,9 +220,11 @@ class Client {
         "userID": userID,
       });
       if (response.statusCode == 409) {
-        throw "해당 시간에 이미 수업이 존재합니다.\n창을 새로고침 해주세요.";
+        throw "해당 시간에 이미 수업이 존재합니다. 다시 시도해 주세요.";
+      } else if (response.statusCode == 412) {
+        throw "해당 시간에는 수업을 예약할 수 없습니다.";
       } else if (response.statusCode != 200 && response.statusCode != 201) {
-        throw "정규 예약에 실패했습니다.";
+        throw "보강 예약에 실패했습니다.";
       }
     }
   }
@@ -251,31 +245,6 @@ class Client {
     }
   }
 
-  Future<void> makeUpReservation({
-    required String teacherID,
-    required String branchName,
-    required DateTime startDate,
-    required DateTime endDate,
-    required String userID,
-  }) async {
-    if (await isLoggedIn()) {
-      Response response = await dio.post("/reservation/user", data: {
-        "teacherID": teacherID,
-        "branchName": branchName,
-        "startDate": startDate.toIso8601String(),
-        "endDate": endDate.toIso8601String(),
-        "userID": userID,
-      });
-      if (response.statusCode == 409) {
-        throw "해당 시간에 이미 수업이 존재합니다.\n창을 새로고침 해주세요.";
-      } else if (response.statusCode == 412) {
-        throw "해당 시간에는 수업을 예약할 수 없습니다.";
-      } else if (response.statusCode != 200 && response.statusCode != 201) {
-        throw "보강 예약에 실패했습니다.";
-      }
-    }
-  }
-
   Future<void> extendReservation(String id) async {
     if (await isLoggedIn()) {
       Response response =
@@ -285,7 +254,7 @@ class Client {
       if (response.statusCode == 403) {
         throw "다른 수강생의 수업을 연장할 수 없습니다.";
       } else if (response.statusCode == 409) {
-        throw "해당 시간에 이미 수업이 존재합니다.\n창을 새로고침 해주세요.";
+        throw "해당 시간에 이미 수업이 존재합니다. 다시 시도해 주세요.";
       } else if (response.statusCode != 200 && response.statusCode != 201) {
         throw "수업 연장에 실패했습니다.";
       }
@@ -301,56 +270,5 @@ class Client {
         throw "QR 코드 인증에 실패했습니다.";
       }
     }
-  }
-
-  Future<List<Term>> getTerms() async {
-    if (await isLoggedIn()) {
-      Response response = await dio.get("/term");
-      if (response.statusCode == 200) {
-        return List<Term>.generate(
-          response.data.length,
-          (index) => Term.fromJson(response.data[index]),
-        );
-      }
-    }
-    throw "학기 정보를 불러올 수 없습니다.";
-  }
-
-  Future<List<Term>> getCurrentTerms() async {
-    if (await isLoggedIn()) {
-      Response response = await dio.get("/term/cur");
-      if (response.statusCode == 200) {
-        return List<Term>.generate(
-          response.data.length,
-          (index) => Term.fromJson(response.data[index]),
-        );
-      }
-    }
-    throw "현재 학기 정보를 불러올 수 없습니다.";
-  }
-
-  Future<List<Control>> getControls({
-    required String branchName,
-    String? teacherID,
-    DateTime? startDate,
-    DateTime? endDate,
-    int? status,
-  }) async {
-    if (await isLoggedIn()) {
-      Response response = await dio.post("/control/search", data: {
-        "branchName": branchName,
-        "teacherID": teacherID,
-        "startDate": startDate?.toIso8601String(),
-        "endDate": endDate?.toIso8601String(),
-        "status": status,
-      });
-      if (response.statusCode == 201) {
-        return List<Control>.generate(
-          response.data.length,
-          (index) => Control.fromJson(response.data[index]),
-        );
-      }
-    }
-    return [];
   }
 }

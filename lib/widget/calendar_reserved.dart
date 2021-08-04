@@ -24,8 +24,6 @@ class _CalendarReservedState extends State<CalendarReserved> {
 
   @override
   Widget build(BuildContext context) {
-    final deviceHeight = MediaQuery.of(context).size.height;
-
     Get.find<DataController>();
 
     return GetBuilder<DataController>(

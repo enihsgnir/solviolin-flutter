@@ -3,19 +3,19 @@ import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:solviolin/model/reservation.dart';
 import 'package:solviolin/util/format.dart';
 
-class ReservationHistory extends StatefulWidget {
+class HistoryReserved extends StatefulWidget {
   final List<Reservation> reservations;
 
-  const ReservationHistory({
+  const HistoryReserved({
     Key? key,
     required this.reservations,
   }) : super(key: key);
 
   @override
-  _ReservationHistoryState createState() => _ReservationHistoryState();
+  _HistoryReservedState createState() => _HistoryReservedState();
 }
 
-class _ReservationHistoryState extends State<ReservationHistory> {
+class _HistoryReservedState extends State<HistoryReserved> {
   @override
   Widget build(BuildContext context) {
     final deviceWidth = MediaQuery.of(context).size.width;
@@ -24,7 +24,7 @@ class _ReservationHistoryState extends State<ReservationHistory> {
       itemBuilder: (context, index) {
         return Slidable(
           actionPane: SlidableScrollActionPane(),
-          actions: [
+          secondaryActions: [
             IconSlideAction(
               caption: "Cancel",
               color: Theme.of(context).scaffoldBackgroundColor,

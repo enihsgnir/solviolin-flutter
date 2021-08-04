@@ -4,7 +4,7 @@ import 'package:get/get.dart';
 import 'package:solviolin/model/regular_schedule.dart';
 import 'package:solviolin/util/controller.dart';
 import 'package:solviolin/util/format.dart';
-import 'package:solviolin/widget/reservation_history.dart';
+import 'package:solviolin/widget/history_reserved.dart';
 
 class HistoryPage extends StatefulWidget {
   const HistoryPage({Key? key}) : super(key: key);
@@ -33,7 +33,7 @@ class _HistoryPageState extends State<HistoryPage>
           onPressed: () {
             Get.back();
           },
-          icon: Icon(CupertinoIcons.arrow_left, size: 28),
+          icon: Icon(CupertinoIcons.chevron_left, size: 28),
         ),
         title: Text("내 예약", style: TextStyle(fontSize: 28)),
         backgroundColor: Colors.transparent,
@@ -97,10 +97,10 @@ class _HistoryPageState extends State<HistoryPage>
                   height: MediaQuery.of(context).size.height,
                   child: TabBarView(
                     children: [
-                      ReservationHistory(
+                      HistoryReserved(
                         reservations: controller.lastMonthReservations,
                       ),
-                      ReservationHistory(
+                      HistoryReserved(
                         reservations: controller.thisMonthReservations,
                       ),
                     ],

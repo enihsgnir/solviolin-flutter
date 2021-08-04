@@ -13,21 +13,6 @@ String dowToString(int dow) {
   return days[dow]!;
 }
 
-String dowToRRuleString(int dow) {
-  Map<int, String> days = {
-    0: "SU",
-    1: "MO",
-    2: "TU",
-    3: "WE",
-    4: "TH",
-    5: "FR",
-    6: "SA",
-    7: "SU",
-  };
-
-  return days[dow]!;
-}
-
 Duration parseTimeOnly(String time) {
   List<String> times = time.split(":");
   int hours = int.parse(times[0]);

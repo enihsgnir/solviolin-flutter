@@ -4,7 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
-import 'package:solviolin/network/get_data.dart';
+import 'package:solviolin/util/network.dart';
 import 'package:solviolin/util/notification.dart';
 
 class QRCodeScanPage extends StatefulWidget {
@@ -43,7 +43,7 @@ class _QRCodeScanPageState extends State<QRCodeScanPage> {
           onPressed: () {
             Get.back();
           },
-          icon: Icon(CupertinoIcons.arrow_left, size: 28),
+          icon: Icon(CupertinoIcons.chevron_left, size: 28),
         ),
         title: Text("코드스캔", style: TextStyle(fontSize: 28)),
         backgroundColor: Colors.transparent,

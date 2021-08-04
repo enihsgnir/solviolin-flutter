@@ -1,17 +1,18 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:solviolin/network/get_data.dart';
 import 'package:solviolin/util/controller.dart';
 import 'package:solviolin/util/data_source.dart';
 import 'package:solviolin/util/format.dart';
+import 'package:solviolin/util/network.dart';
 
 Future showErrorMessage(BuildContext context, String message) {
   return showCupertinoDialog(
     context: context,
     builder: (context) {
       return CupertinoAlertDialog(
-        title: const Text("오류가 발생했습니다!", style: TextStyle(fontSize: 24)),
-        content: Text(message, style: TextStyle(fontSize: 24)),
+        title: const Text("Error", style: TextStyle(fontSize: 32)),
+        content: Text(message, style: TextStyle(fontSize: 20)),
         actions: [
           CupertinoDialogAction(
             onPressed: () {
@@ -42,8 +43,8 @@ Future modalReserve(BuildContext context, DateTime time) {
           onPressed: () async {
             try {
               await client.makeUpReservation(
-                teacherID: _controller.teachers[0].teacherID,
-                branchName: _controller.regularSchedules[0].branchName,
+                teacherID: _controller.regularSchedules[0].teacherID,
+                branchName: _controller.user.branchName,
                 startDate: time,
                 endDate: time.add(_controller.regularSchedules[0].endTime -
                     _controller.regularSchedules[0].startTime),
@@ -51,11 +52,16 @@ Future modalReserve(BuildContext context, DateTime time) {
               );
               try {
                 await getUserBasedData();
+                await getSelectedDayData(_controller.selectedDay);
+                await getChangedPageData(_controller.focusedDay);
               } catch (e) {
                 Get.offAllNamed("/login");
                 showErrorMessage(context, e.toString());
               }
             } catch (e) {
+              await getUserBasedData();
+              await getSelectedDayData(_controller.selectedDay);
+              await getChangedPageData(_controller.focusedDay);
               Get.back();
               showErrorMessage(context, e.toString());
             }

@@ -10,6 +10,7 @@ class Reservation {
   String teacherID;
   String branchName;
   int? regularID;
+  int isControlled;
 
   Reservation({
     required this.id,
@@ -21,6 +22,7 @@ class Reservation {
     required this.teacherID,
     required this.branchName,
     this.regularID,
+    required this.isControlled,
   });
 
   factory Reservation.fromJson(Map<String, dynamic> json) {
@@ -34,15 +36,7 @@ class Reservation {
       teacherID: json["teacherID"],
       branchName: json["branchName"],
       regularID: json["regularID"],
+      isControlled: json["isControlled"],
     );
   }
-
-  @override
-  bool operator ==(Object other) => other is Reservation && other.id == this.id;
-
-  @override
-  int get hashCode => this.id;
-
-  @override
-  String toString() => "${this.branchName} ${this.userID}\'s Reservation";
 }

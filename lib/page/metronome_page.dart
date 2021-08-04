@@ -54,7 +54,7 @@ class _MetronomePageState extends State<MetronomePage> {
           onPressed: () {
             Get.back();
           },
-          icon: Icon(CupertinoIcons.arrow_left, size: 28),
+          icon: Icon(CupertinoIcons.chevron_left, size: 28),
         ),
         title: Text("메트로놈", style: TextStyle(fontSize: 28)),
         backgroundColor: Colors.transparent,
@@ -97,7 +97,7 @@ class _MetronomePageState extends State<MetronomePage> {
                       size: deviceWidth * 0.1,
                     ),
                   ),
-                  onTap: () => count(false),
+                  onTap: () => count(isIncreasing: false),
                   enableFeedback: false,
                 ),
               ),
@@ -134,7 +134,7 @@ class _MetronomePageState extends State<MetronomePage> {
                       size: deviceWidth * 0.1,
                     ),
                   ),
-                  onTap: () => count(true),
+                  onTap: () => count(isIncreasing: true),
                   enableFeedback: false,
                 ),
               ),
@@ -176,16 +176,16 @@ class _MetronomePageState extends State<MetronomePage> {
     });
   }
 
-  void count(bool sign) {
+  void count({required bool isIncreasing}) {
     setState(() {
       if (isPlaying) {
         subscription?.cancel();
         isPlaying = false;
       }
 
-      if (sign == true && _index < tempos.length - 1) {
+      if (isIncreasing == true && _index < tempos.length - 1) {
         _index++;
-      } else if (sign == false && _index > 0) {
+      } else if (isIncreasing == false && _index > 0) {
         _index--;
       }
       metronome = Metronome.epoch(
