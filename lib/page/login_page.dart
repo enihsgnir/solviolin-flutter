@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:solviolin/util/controller.dart';
 import 'package:solviolin/util/data_source.dart';
@@ -25,74 +26,57 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
-    final deviceHeight = MediaQuery.of(context).size.height;
-
     return Scaffold(
       body: SafeArea(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Container(
-              width: deviceHeight * 0.16,
-              height: deviceHeight * 0.16,
-              decoration: BoxDecoration(
-                image: DecorationImage(
-                  image: AssetImage("assets/solviolin_logo.png"),
+              width: 180.r,
+              height: 180.r,
+              decoration: const BoxDecoration(
+                image: const DecorationImage(
+                  image: const AssetImage("assets/solviolin_logo.png"),
                   fit: BoxFit.fill,
                 ),
                 shape: BoxShape.circle,
               ),
             ),
-            Container(
+            Padding(
               padding: const EdgeInsets.fromLTRB(8, 30, 8, 8),
               child: TextFormField(
                 controller: idController,
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   labelText: "아이디",
-                  labelStyle: TextStyle(color: Theme.of(context).accentColor),
-                  border: OutlineInputBorder(
-                    borderSide: BorderSide(
-                      color: Theme.of(context).accentColor,
-                    ),
+                  labelStyle: const TextStyle(color: Colors.white),
+                  border: const OutlineInputBorder(
+                    borderSide: const BorderSide(color: Colors.white),
                   ),
-                  focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(
-                      color: Theme.of(context).accentColor,
-                    ),
+                  focusedBorder: const OutlineInputBorder(
+                    borderSide: const BorderSide(color: Colors.white),
                   ),
                 ),
-                style: TextStyle(
-                  color: Theme.of(context).accentColor,
-                  fontSize: 22,
-                ),
+                style: TextStyle(color: Colors.white, fontSize: 20.sp),
                 validator: (value) {
                   return (value == null) ? "아이디를 입력해주세요" : null;
                 },
               ),
             ),
-            Container(
+            Padding(
               padding: const EdgeInsets.all(8),
               child: TextFormField(
                 controller: pwController,
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   labelText: "비밀번호",
-                  labelStyle: TextStyle(color: Theme.of(context).accentColor),
-                  border: OutlineInputBorder(
-                    borderSide: BorderSide(
-                      color: Theme.of(context).accentColor,
-                    ),
+                  labelStyle: const TextStyle(color: Colors.white),
+                  border: const OutlineInputBorder(
+                    borderSide: const BorderSide(color: Colors.white),
                   ),
-                  focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(
-                      color: Theme.of(context).accentColor,
-                    ),
+                  focusedBorder: const OutlineInputBorder(
+                    borderSide: const BorderSide(color: Colors.white),
                   ),
                 ),
-                style: TextStyle(
-                  color: Theme.of(context).accentColor,
-                  fontSize: 22,
-                ),
+                style: TextStyle(color: Colors.white, fontSize: 20.sp),
                 obscureText: true,
                 validator: (value) {
                   return (value == null) ? "비밀번호를 입력해주세요" : null;
@@ -100,38 +84,37 @@ class _LoginPageState extends State<LoginPage> {
               ),
             ),
             Container(
-              padding: const EdgeInsets.all(8),
-              child: Container(
-                height: deviceHeight * 0.05,
-                child: Container(
-                  width: double.infinity,
-                  child: TextButton(
-                    onPressed: () async {
-                      try {
-                        Get.find<DataController>().updateUser(
-                            await Get.put(Client())
-                                .login(idController.text, pwController.text));
-                        await getUserBasedData(isLoggedIn: false);
-                        Get.offAllNamed("/main");
-                      } catch (e) {
-                        Get.offAllNamed("/login");
-                        showErrorMessage(context, e.toString());
-                      }
-                    },
-                    style: TextButton.styleFrom(
-                      backgroundColor: const Color.fromRGBO(96, 128, 104, 50),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(30),
-                      ),
-                    ),
-                    child: const Text(
-                      "로그인",
-                      style: TextStyle(
-                        color: const Color.fromRGBO(203, 173, 204, 80),
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
+              width: double.infinity,
+              height: 60.h,
+              margin: const EdgeInsets.all(16),
+              child: TextButton(
+                onPressed: () async {
+                  Client client = Get.put(Client());
+                  DataController controller = Get.find<DataController>();
+
+                  try {
+                    controller.updateUser(await client.login(
+                        idController.text, pwController.text));
+                    await getInitialData(isLoggedIn: false);
+                    Get.offAllNamed("/main");
+                  } catch (e) {
+                    await client.logout();
+                    Get.offAllNamed("/login");
+                    showErrorMessage(context, e.toString());
+                  }
+                },
+                style: TextButton.styleFrom(
+                  backgroundColor: const Color.fromRGBO(96, 128, 104, 100),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(30.r),
+                  ),
+                ),
+                child: Text(
+                  "로그인",
+                  style: TextStyle(
+                    color: const Color.fromRGBO(203, 173, 204, 80),
+                    fontSize: 24.sp,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
               ),

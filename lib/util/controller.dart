@@ -2,18 +2,22 @@ import 'package:get/get.dart';
 import 'package:solviolin/model/change.dart';
 import 'package:solviolin/model/regular_schedule.dart';
 import 'package:solviolin/model/reservation.dart';
+import 'package:solviolin/model/term.dart';
 import 'package:solviolin/model/user.dart';
+import 'package:solviolin/util/constant.dart';
 
 class DataController extends GetxController {
   late User user;
   late List<RegularSchedule> regularSchedules;
   late List<DateTime> availabaleSpots;
   late List<Reservation> myValidReservations;
-  late DateTime selectedDay;
+  late List<Term> currentTerms;
+  DateTime selectedDay = kToday;
   late DateTime focusedDay;
   late List<Reservation> thisMonthReservations;
   late List<Reservation> lastMonthReservations;
   late List<Change> changes;
+  int currentPage = 0;
 
   void updateUser(User data) {
     user = data;
@@ -35,13 +39,14 @@ class DataController extends GetxController {
     update();
   }
 
-  void updateSelectedDay(DateTime data) {
-    selectedDay = data;
+  void updateCurrentTerms(List<Term> data) {
+    currentTerms = data;
     update();
   }
 
-  void updateFocusedDay(DateTime data) {
-    focusedDay = data;
+  void updateDays(DateTime selectedData, DateTime focusedData) {
+    selectedDay = selectedData;
+    focusedDay = focusedData;
     update();
   }
 
@@ -57,6 +62,16 @@ class DataController extends GetxController {
 
   void updateChanges(List<Change> data) {
     changes = data;
+    update();
+  }
+
+  void updateCurrentPage(int data) {
+    currentPage = data;
+    update();
+  }
+
+  void resetCurrentPage() {
+    currentPage = 0;
     update();
   }
 }

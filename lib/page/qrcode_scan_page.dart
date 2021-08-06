@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
 import 'package:solviolin/util/network.dart';
@@ -43,9 +44,9 @@ class _QRCodeScanPageState extends State<QRCodeScanPage> {
           onPressed: () {
             Get.back();
           },
-          icon: Icon(CupertinoIcons.chevron_left, size: 28),
+          icon: Icon(CupertinoIcons.chevron_left, size: 28.r),
         ),
-        title: Text("코드스캔", style: TextStyle(fontSize: 28)),
+        title: Text("코드스캔", style: TextStyle(fontSize: 28.sp)),
         backgroundColor: Colors.transparent,
       ),
       body: Stack(
@@ -54,7 +55,7 @@ class _QRCodeScanPageState extends State<QRCodeScanPage> {
           QRView(
             key: qrKey,
             onQRViewCreated: (controller) {
-              // this.qrController = controller;
+              qrController = controller;
               controller.scannedDataStream.listen((scanData) {
                 setState(() async {
                   result = scanData;
@@ -68,15 +69,15 @@ class _QRCodeScanPageState extends State<QRCodeScanPage> {
               });
             },
             overlay: QrScannerOverlayShape(
-              borderColor: Theme.of(context).accentColor,
+              borderColor: Colors.white,
               borderWidth: 10,
               borderRadius: 10,
               borderLength: 20,
-              cutOutSize: MediaQuery.of(context).size.width * 0.8,
+              cutOutSize: 0.8.sw,
             ),
           ),
           Positioned(
-            bottom: 10,
+            bottom: 10.h,
             child: Container(
               padding: EdgeInsets.all(12),
               decoration: BoxDecoration(
@@ -90,42 +91,25 @@ class _QRCodeScanPageState extends State<QRCodeScanPage> {
             ),
           ),
           Positioned(
-            top: 10,
+            top: 10.h,
             child: Container(
               padding: EdgeInsets.symmetric(horizontal: 16),
               decoration: BoxDecoration(
                 color: Colors.white24,
                 borderRadius: BorderRadius.circular(8),
               ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  IconButton(
-                    onPressed: () async {
-                      await qrController?.toggleFlash();
-                      // setState(() {});
-                    },
-                    icon: FutureBuilder<bool?>(
-                      future: qrController?.getFlashStatus(),
-                      builder: (context, snapshot) => snapshot.data != null
-                          ? Icon(
-                              snapshot.data! ? Icons.flash_on : Icons.flash_off)
-                          : Container(),
-                    ),
-                  ),
-                  IconButton(
-                    onPressed: () async {
-                      await qrController?.flipCamera();
-                      // setState(() {});
-                    },
-                    icon: FutureBuilder(
-                      future: qrController?.getCameraInfo(),
-                      builder: (context, snapshot) => snapshot.data != null
-                          ? Icon(Icons.switch_camera)
-                          : Container(),
-                    ),
-                  ),
-                ],
+              child: IconButton(
+                onPressed: () {
+                  setState(() async {
+                    await qrController?.toggleFlash();
+                  });
+                },
+                icon: FutureBuilder<bool?>(
+                  future: qrController?.getFlashStatus(),
+                  builder: (context, snapshot) => snapshot.data != null
+                      ? Icon(snapshot.data! ? Icons.flash_on : Icons.flash_off)
+                      : Container(),
+                ),
               ),
             ),
           ),

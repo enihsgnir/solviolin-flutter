@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:solviolin/util/data_source.dart';
 import 'package:solviolin/util/network.dart';
@@ -12,14 +13,18 @@ class LoadingPage extends StatefulWidget {
 }
 
 class _LoadingPageState extends State<LoadingPage> {
+  Client client = Get.put(Client());
+
   @override
   void initState() {
     super.initState();
-    Future.delayed(Duration(seconds: 1), () async {
-      // await deleteTokenForTest();
+    Future.delayed(const Duration(seconds: 1), () async {
+      // await client.logout(); // for test
+
       try {
         await checkUser();
       } catch (e) {
+        await client.logout();
         Get.offAllNamed("/login");
         showErrorMessage(context, e.toString());
       }
@@ -28,8 +33,6 @@ class _LoadingPageState extends State<LoadingPage> {
 
   @override
   Widget build(BuildContext context) {
-    final deviceHeight = MediaQuery.of(context).size.height;
-
     return Scaffold(
       body: SafeArea(
         child: Center(
@@ -37,10 +40,10 @@ class _LoadingPageState extends State<LoadingPage> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Container(
-                height: deviceHeight * 0.16,
-                width: deviceHeight * 0.16,
-                decoration: BoxDecoration(
-                  image: DecorationImage(
+                height: 180.r,
+                width: 180.r,
+                decoration: const BoxDecoration(
+                  image: const DecorationImage(
                     image: const AssetImage("assets/solviolin_logo.png"),
                     fit: BoxFit.fill,
                   ),
@@ -48,13 +51,10 @@ class _LoadingPageState extends State<LoadingPage> {
                 ),
               ),
               Container(
-                padding: EdgeInsets.only(top: 30),
+                padding: const EdgeInsets.only(top: 30),
                 child: Text(
                   "솔바이올린",
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 48,
-                  ),
+                  style: TextStyle(color: Colors.white, fontSize: 40.sp),
                 ),
               ),
             ],
@@ -65,16 +65,12 @@ class _LoadingPageState extends State<LoadingPage> {
   }
 
   Future<void> checkUser() async {
-    Client client = Get.put(Client());
     if (await client.isLoggedIn()) {
-      await getUserBasedData();
+      await getInitialData();
       Get.offAllNamed("/main");
     } else {
+      await client.logout();
       Get.offAllNamed("/login");
     }
-  }
-
-  Future<void> deleteTokenForTest() async {
-    await Get.put(Client()).storage.deleteAll();
   }
 }

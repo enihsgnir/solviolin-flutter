@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:solviolin/page/history_page.dart';
@@ -10,7 +11,6 @@ import 'package:solviolin/page/login_page.dart';
 import 'package:solviolin/page/main_page.dart';
 import 'package:solviolin/page/metronome_page.dart';
 import 'package:solviolin/page/qrcode_scan_page.dart';
-import 'package:solviolin/page/test_page.dart';
 import 'package:solviolin/util/controller.dart';
 
 void main() {
@@ -45,42 +45,41 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     Get.put(DataController());
 
-    return GetMaterialApp(
-      builder: (context, child) => MediaQuery(
-        data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
-        child: child!,
-      ),
-      title: "SolViolin",
-      theme: ThemeData(
-        brightness: Brightness.dark,
-        primaryColor: Colors.black,
-        accentColor: Colors.white,
-        highlightColor: Colors.transparent,
-        splashColor: Colors.transparent,
-        textTheme:
-            GoogleFonts.nanumGothicTextTheme(Theme.of(context).textTheme),
-      ),
-      localizationsDelegates: [
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      initialRoute: "/loading",
-      // initialRoute: "/test",
-      getPages: [
-        GetPage(name: "/loading", page: () => LoadingPage()),
-        GetPage(name: "/login", page: () => LoginPage()),
-        GetPage(name: "/main", page: () => MainPage()),
-        GetPage(name: "/history", page: () => HistoryPage()),
-        GetPage(name: "/scan", page: () => QRCodeScanPage()),
-        GetPage(name: "/metronome", page: () => MetronomePage()),
-        GetPage(
-          name: "/test",
-          page: () => TestPage(),
-          transition: Transition.zoom,
-        ),
-      ],
-      debugShowCheckedModeBanner: false,
+    return ScreenUtilInit(
+      designSize: Size(540, 1152),
+      builder: () {
+        return GetMaterialApp(
+          builder: (context, child) => MediaQuery(
+            data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
+            child: child!,
+          ),
+          title: "SolViolin",
+          theme: ThemeData(
+            brightness: Brightness.dark,
+            primaryColor: Colors.black,
+            accentColor: Colors.white,
+            highlightColor: Colors.transparent,
+            splashColor: Colors.transparent,
+            textTheme:
+                GoogleFonts.nanumGothicTextTheme(Theme.of(context).textTheme),
+          ),
+          localizationsDelegates: [
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          initialRoute: "/loading",
+          getPages: [
+            GetPage(name: "/loading", page: () => LoadingPage()),
+            GetPage(name: "/login", page: () => LoginPage()),
+            GetPage(name: "/main", page: () => MainPage()),
+            GetPage(name: "/history", page: () => HistoryPage()),
+            GetPage(name: "/scan", page: () => QRCodeScanPage()),
+            GetPage(name: "/metronome", page: () => MetronomePage()),
+          ],
+          debugShowCheckedModeBanner: false,
+        );
+      },
     );
   }
 }

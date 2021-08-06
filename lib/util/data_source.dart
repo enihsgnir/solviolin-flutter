@@ -2,18 +2,17 @@ import 'dart:collection';
 
 import 'package:get/get.dart';
 import 'package:solviolin/model/reservation.dart';
+import 'package:solviolin/util/constant.dart';
 import 'package:solviolin/util/controller.dart';
 import 'package:solviolin/util/network.dart';
 import 'package:table_calendar/table_calendar.dart';
 
-final kToday = DateTime.now();
-
-Future<void> getUserBasedData({bool isLoggedIn = true}) async {
+Future<void> getInitialData({bool isLoggedIn = true}) async {
   Client client = Get.put(Client());
   DataController controller = Get.find<DataController>();
 
-  final first = DateTime(kToday.year, kToday.month, 1);
-  final last = DateTime(kToday.year, kToday.month + 1, 0);
+  final DateTime first = DateTime(kToday.year, kToday.month, 1);
+  final DateTime last = DateTime(kToday.year, kToday.month + 1, 0);
 
   if (isLoggedIn == true) {
     controller.updateUser(await client.getProfile());
@@ -40,6 +39,25 @@ Future<void> getUserBasedData({bool isLoggedIn = true}) async {
     bookingStatus: [-3, -1, 0, 1, 3],
   )
     ..sort((a, b) => a.startDate.compareTo(b.startDate)));
+
+  controller.updateCurrentTerms(await client.getCurrentTerms()
+    ..sort((a, b) => a.termStart.compareTo(b.termStart)));
+}
+
+Future<void> getUserBasedData() async {
+  Client client = Get.put(Client());
+  DataController controller = Get.find<DataController>();
+
+  controller.updateUser(await client.getProfile());
+
+  controller.updateRegularSchedules(await client.getRegularSchedules()
+    ..sort((a, b) {
+      int primary = a.dow.compareTo(b.dow);
+      return primary != 0 ? primary : a.startTime.compareTo(b.startTime);
+    }));
+
+  controller.updateCurrentTerms(await client.getCurrentTerms()
+    ..sort((a, b) => a.termStart.compareTo(b.termStart)));
 }
 
 Future<void> getSelectedDayData(DateTime selectedDay) async {
@@ -58,8 +76,8 @@ Future<void> getChangedPageData(DateTime focusedDay) async {
   Client client = Get.put(Client());
   DataController controller = Get.find<DataController>();
 
-  final first = DateTime(focusedDay.year, focusedDay.month, 1);
-  final last = DateTime(focusedDay.year, focusedDay.month + 1, 0);
+  final DateTime first = DateTime(focusedDay.year, focusedDay.month, 1);
+  final DateTime last = DateTime(focusedDay.year, focusedDay.month + 1, 0);
 
   controller.updateMyValidReservations(await client.getReservations(
     branchName: controller.user.branchName,
@@ -127,13 +145,3 @@ Map<DateTime, List<Reservation>> getEventSource() =>
 
 int getHashCode(DateTime key) =>
     key.day * 1000000 + key.month * 10000 + key.year;
-
-
-// int getFirstWeekday(int workDow) {
-//   int weekday = kFirstDay.weekday;
-//   if (weekday == 7) {
-//     weekday = 0;
-//   }
-
-//   return weekday <= workDow ? workDow - weekday : 7 - (workDow - weekday);
-// }

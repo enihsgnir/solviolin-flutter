@@ -49,6 +49,11 @@ String dateToString(DateTime date) =>
 String dateTimeToTimeString(DateTime dateTime) =>
     "${twoDigits(dateTime.hour)}:${twoDigits(dateTime.minute)}";
 
+// yyMMddString
+String dateTimeToString(DateTime dateTime) =>
+    "${dateTime.year % 100}/${twoDigits(dateTime.month)}/${twoDigits(dateTime.day)}" +
+    " ${twoDigits(dateTime.hour)}:${twoDigits(dateTime.minute)}";
+
 String bookingStatusToString(int bookingStatus) {
   Map<int, String> status = {
     0: "Original",

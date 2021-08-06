@@ -6,11 +6,13 @@ import 'package:pretty_dio_logger/pretty_dio_logger.dart';
 import 'package:solviolin/model/change.dart';
 import 'package:solviolin/model/regular_schedule.dart';
 import 'package:solviolin/model/reservation.dart';
+import 'package:solviolin/model/term.dart';
 import 'package:solviolin/model/user.dart';
+import 'package:solviolin/util/format.dart';
 
 class Client {
   final Dio dio = Dio();
-  final storage = Get.put(FlutterSecureStorage());
+  final FlutterSecureStorage storage = Get.put(FlutterSecureStorage());
 
   Client() {
     dio.options.connectTimeout = 3000;
@@ -21,6 +23,7 @@ class Client {
     dio.options.followRedirects = false;
     dio.options.validateStatus = (status) => status! < 600;
 
+    dio.interceptors.add(PrettyDioLogger(request: false));
     dio.interceptors.add(InterceptorsWrapper(
       onRequest: (options, handler) async {
         if (await isLoggedIn()) {
@@ -32,50 +35,41 @@ class Client {
       onResponse: (response, handler) async {
         bool containsAccess = await storage.containsKey(key: "accessToken");
         bool containsRefresh = await storage.containsKey(key: "refreshToken");
+
         if (response.statusCode == 400) {
-          handler.next(response);
-          throw "정보가 올바르지 않습니다.";
+          return handler.reject(NetworkException(
+            message: "정보가 올바르지 않습니다.",
+            options: response.requestOptions,
+          ));
         } else if (response.statusCode == 401) {
           if (!containsAccess && !containsRefresh) {
-            handler.next(response);
-            throw "아이디 또는 비밀번호가 일치하지 않습니다.";
+            return handler.reject(NetworkException(
+              message: "아이디 또는 비밀번호가 일치하지 않습니다.",
+              options: response.requestOptions,
+            ));
           } else if (!containsAccess && containsRefresh) {
             Get.offAllNamed("/login");
             await logout();
-            handler.next(response);
-            throw "인증이 만료되었습니다. 자동으로 로그아웃 됩니다.";
+
+            return handler.reject(NetworkException(
+              message: "인증이 만료되었습니다. 자동으로 로그아웃 됩니다.",
+              options: response.requestOptions,
+            ));
           } else if (containsAccess && containsRefresh) {
             await refresh();
             return handler.next(await retry(response.requestOptions));
           }
         } else if (response.statusCode == 404) {
-          handler.next(response);
-          throw "정보를 불러올 수 없습니다.";
+          return handler.reject(NetworkException(
+            message: "정보를 불러올 수 없습니다.",
+            options: response.requestOptions,
+          ));
         }
 
         return handler.next(response);
       },
-      onError: (error, handler) {
-        handler.next(error);
-        throw error.message;
-      },
+      onError: (error, handler) => handler.next(error),
     ));
-    dio.interceptors.add(PrettyDioLogger(request: false));
-  }
-
-  Future<User> login(String userID, String userPassword) async {
-    Response response = await dio.post("/auth/login", data: {
-      "userID": userID,
-      "userPassword": userPassword,
-    });
-    if (response.statusCode == 201) {
-      await storage.write(
-          key: "accessToken", value: response.data["access_token"]);
-      await storage.write(
-          key: "refreshToken", value: response.data["refresh_token"]);
-      return User.fromJson(response.data);
-    }
-    throw "내 정보를 불러올 수 없습니다.";
   }
 
   Future<bool> isLoggedIn() async {
@@ -90,7 +84,7 @@ class Client {
         "refreshToken": refreshToken,
       });
       if (response.statusCode == 201) {
-        String? accessToken = response.data["access_token"];
+        String accessToken = response.data["access_token"];
         await storage.write(key: "accessToken", value: accessToken);
         dio.options.headers["Authorization"] = "Bearer $accessToken";
       }
@@ -112,6 +106,21 @@ class Client {
   Future<void> logout() async {
     await storage.deleteAll();
     dio.options.headers.remove("Authorization");
+  }
+
+  Future<User> login(String userID, String userPassword) async {
+    Response response = await dio.post("/auth/login", data: {
+      "userID": userID,
+      "userPassword": userPassword,
+    });
+    if (response.statusCode == 201) {
+      await storage.write(
+          key: "accessToken", value: response.data["access_token"]);
+      await storage.write(
+          key: "refreshToken", value: response.data["refresh_token"]);
+      return User.fromJson(response.data);
+    }
+    throw "내 정보를 불러올 수 없습니다.";
   }
 
   Future<User> getProfile() async {
@@ -151,7 +160,7 @@ class Client {
       if (response.statusCode == 201) {
         return List<DateTime>.generate(
           response.data.length,
-          (index) => response.data[index],
+          (index) => parseDateTime(response.data[index]),
         );
       }
     }
@@ -185,14 +194,10 @@ class Client {
     throw "예약 내역을 불러올 수 없습니다.";
   }
 
-  Future<List<Change>> getChanges({
-    String range = "both",
-    String? userID,
-  }) async {
+  Future<List<Change>> getChanges({String range = "both"}) async {
     if (await isLoggedIn()) {
       Response response = await dio.post("/reservation/changes", data: {
         "range": range,
-        "userID": userID,
       });
       if (response.statusCode == 201) {
         return List<Change>.generate(
@@ -202,6 +207,19 @@ class Client {
       }
     }
     throw "변경 내역을 불러올 수 없습니다.";
+  }
+
+  Future<List<Term>> getCurrentTerms() async {
+    if (await isLoggedIn()) {
+      Response response = await dio.get("/term");
+      if (response.statusCode == 200) {
+        return List<Term>.generate(
+          response.data.length,
+          (index) => Term.fromJson(response.data[index]),
+        );
+      }
+    }
+    throw "현재 학기 정보를 불러올 수 없습니다.";
   }
 
   Future<void> makeUpReservation({
@@ -271,4 +289,20 @@ class Client {
       }
     }
   }
+}
+
+class NetworkException extends DioError {
+  String message;
+  RequestOptions options;
+
+  NetworkException({
+    required this.message,
+    required this.options,
+  }) : super(
+          requestOptions: options,
+          type: DioErrorType.response,
+        );
+
+  @override
+  String toString() => message;
 }

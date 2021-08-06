@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:quiver/async.dart';
 
@@ -26,7 +27,7 @@ class _MetronomePageState extends State<MetronomePage> {
     ..addAll(List.generate(4, (index) => 120 + 6 * index))
     ..addAll(List.generate(9, (index) => 144 + 8 * index));
 
-  final player = Get.put(AudioCache());
+  final AudioCache player = Get.put(AudioCache());
 
   @override
   void initState() {
@@ -45,35 +46,32 @@ class _MetronomePageState extends State<MetronomePage> {
 
   @override
   Widget build(BuildContext context) {
-    final deviceWidth = MediaQuery.of(context).size.width;
-    final deviceHeight = MediaQuery.of(context).size.height;
-
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
           onPressed: () {
             Get.back();
           },
-          icon: Icon(CupertinoIcons.chevron_left, size: 28),
+          icon: Icon(CupertinoIcons.chevron_left, size: 28.r),
         ),
-        title: Text("메트로놈", style: TextStyle(fontSize: 28)),
+        title: Text("메트로놈", style: TextStyle(fontSize: 28.sp)),
         backgroundColor: Colors.transparent,
       ),
       body: Column(
         children: [
           Container(
-            height: deviceHeight * 0.15,
+            height: 172.h,
           ),
           Container(
             padding: const EdgeInsets.all(16),
             alignment: Alignment.center,
-            width: deviceWidth * 0.4,
-            height: deviceWidth * 0.2,
+            width: 216.r,
+            height: 108.r,
             child: Text(
               "Tempo",
               style: TextStyle(
                 color: Colors.white,
-                fontSize: deviceWidth * 0.1,
+                fontSize: 54.sp,
               ),
             ),
           ),
@@ -89,12 +87,12 @@ class _MetronomePageState extends State<MetronomePage> {
                       color: const Color.fromRGBO(96, 128, 104, 100),
                       shape: BoxShape.circle,
                     ),
-                    width: deviceWidth * 0.15,
-                    height: deviceWidth * 0.15,
+                    width: 81.r,
+                    height: 81.r,
                     child: Icon(
                       Icons.remove,
                       color: Colors.white,
-                      size: deviceWidth * 0.1,
+                      size: 54.r,
                     ),
                   ),
                   onTap: () => count(isIncreasing: false),
@@ -103,14 +101,14 @@ class _MetronomePageState extends State<MetronomePage> {
               ),
               Container(
                 alignment: Alignment.center,
-                width: deviceWidth * 0.4,
-                height: deviceWidth * 0.3,
+                width: 216.r,
+                height: 162.r,
                 child: InkWell(
                   child: Text(
                     "${tempos[_index]}",
                     style: TextStyle(
                       color: Colors.white,
-                      fontSize: deviceWidth * 0.2,
+                      fontSize: 108.sp,
                     ),
                   ),
                   onTap: select,
@@ -126,12 +124,12 @@ class _MetronomePageState extends State<MetronomePage> {
                       color: const Color.fromRGBO(96, 128, 104, 100),
                       shape: BoxShape.circle,
                     ),
-                    width: deviceWidth * 0.15,
-                    height: deviceWidth * 0.15,
+                    width: 81.r,
+                    height: 81.r,
                     child: Icon(
                       Icons.add,
                       color: Colors.white,
-                      size: deviceWidth * 0.1,
+                      size: 54.r,
                     ),
                   ),
                   onTap: () => count(isIncreasing: true),
@@ -145,13 +143,13 @@ class _MetronomePageState extends State<MetronomePage> {
             child: InkWell(
               child: Container(
                 alignment: Alignment.center,
-                width: deviceWidth * 0.4,
-                height: deviceWidth * 0.4,
+                width: 216.r,
+                height: 216.r,
                 child: Icon(
                   isPlaying
                       ? Icons.pause_circle_outline_rounded
                       : Icons.play_circle_outline_rounded,
-                  size: deviceWidth * 0.3,
+                  size: 162.r,
                 ),
               ),
               onTap: play,
@@ -197,13 +195,11 @@ class _MetronomePageState extends State<MetronomePage> {
     return showModalBottomSheet(
       context: context,
       builder: (context) {
-        final deviceHeight = MediaQuery.of(context).size.height;
-
         return Container(
-          height: deviceHeight * 0.35,
+          height: 400.h,
           child: CupertinoPicker(
             scrollController: FixedExtentScrollController(initialItem: _index),
-            itemExtent: deviceHeight * 0.046,
+            itemExtent: 52.h,
             onSelectedItemChanged: (index) => setState(() {
               if (isPlaying) {
                 subscription?.cancel();
@@ -221,7 +217,7 @@ class _MetronomePageState extends State<MetronomePage> {
                   "${tempos[index]}",
                   style: TextStyle(
                     color: Colors.white,
-                    fontSize: deviceHeight * 0.032,
+                    fontSize: 36.sp,
                   ),
                 ),
               ),

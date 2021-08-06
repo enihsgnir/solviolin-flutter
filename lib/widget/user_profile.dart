@@ -1,8 +1,10 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:solviolin/util/controller.dart';
 import 'package:solviolin/util/data_source.dart';
+import 'package:solviolin/util/notification.dart';
 
 class UserProfile extends StatefulWidget {
   const UserProfile({Key? key}) : super(key: key);
@@ -14,15 +16,13 @@ class UserProfile extends StatefulWidget {
 class _UserProfileState extends State<UserProfile> {
   @override
   Widget build(BuildContext context) {
-    final deviceHeight = MediaQuery.of(context).size.height;
-
     Get.find<DataController>();
 
     return Container(
-      height: deviceHeight * 0.09,
+      height: 100.h,
       decoration: BoxDecoration(
         color: const Color.fromRGBO(1, 50, 32, 1),
-        borderRadius: BorderRadius.circular(15),
+        borderRadius: BorderRadius.circular(15.r),
       ),
       child: Row(
         children: [
@@ -34,16 +34,20 @@ class _UserProfileState extends State<UserProfile> {
                   padding: const EdgeInsets.only(left: 24),
                   child: InkWell(
                     onTap: () async {
-                      await getReservedHistoryData();
-                      Get.toNamed("/history");
+                      try {
+                        await getReservedHistoryData();
+                        Get.toNamed("/history");
+                      } catch (e) {
+                        showErrorMessage(context, e.toString());
+                      }
                     },
                     child: GetBuilder<DataController>(
                       builder: (controller) {
                         return Text(
-                          "${controller.user.userName}님",
+                          "${controller.user.userID}님",
                           style: TextStyle(
                             color: Colors.white,
-                            fontSize: 40,
+                            fontSize: 40.sp,
                             fontWeight: FontWeight.bold,
                           ),
                         );
@@ -58,40 +62,44 @@ class _UserProfileState extends State<UserProfile> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 16.w),
                   child: InkWell(
                     onTap: () async {
-                      await getReservedHistoryData();
-                      Get.toNamed("/history");
+                      try {
+                        await getReservedHistoryData();
+                        Get.toNamed("/history");
+                      } catch (e) {
+                        showErrorMessage(context, e.toString());
+                      }
                     },
                     child: Icon(
                       CupertinoIcons.person_crop_circle_fill,
-                      size: 48,
+                      size: 48.r,
                     ),
                   ),
                 ),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 16.w),
                   child: InkWell(
                     onTap: () {
                       Get.toNamed("/scan");
                     },
                     child: Icon(
                       Icons.qr_code_scanner_outlined,
-                      size: 48,
+                      size: 48.r,
                     ),
                   ),
                 ),
-                Container(
-                  padding: const EdgeInsets.only(left: 16, right: 24),
+                Padding(
+                  padding: EdgeInsets.only(left: 16.w, right: 24),
                   child: InkWell(
                     onTap: () {
                       Get.toNamed("/metronome");
                     },
                     child: Icon(
                       CupertinoIcons.metronome,
-                      size: 48,
+                      size: 48.r,
                     ),
                   ),
                 ),

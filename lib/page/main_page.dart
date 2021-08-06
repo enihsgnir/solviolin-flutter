@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:solviolin/widget/calendar_reserved.dart';
 import 'package:solviolin/widget/grid_available.dart';
+import 'package:solviolin/widget/my_reservation.dart';
 import 'package:solviolin/widget/user_profile.dart';
 
 class MainPage extends StatefulWidget {
@@ -18,24 +19,25 @@ class _MainPageState extends State<MainPage> {
       body: SafeArea(
         child: Column(
           children: [
-            Container(
-              padding: EdgeInsets.fromLTRB(5, 10, 5, 0),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(8, 16, 8, 0),
               child: UserProfile(),
             ),
             Container(
-              margin: EdgeInsets.all(5),
+              margin: const EdgeInsets.fromLTRB(8, 8, 8, 0),
               color: Colors.grey,
               height: 0.5,
             ),
-            Container(
-              padding: EdgeInsets.symmetric(horizontal: 5),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8),
               child: CalendarReserved(),
             ),
             Container(
-              margin: EdgeInsets.all(5),
+              margin: const EdgeInsets.all(8),
               color: Colors.grey,
               height: 0.5,
             ),
+            MyReservation(),
             GridAvailable(),
           ],
         ),

@@ -6,7 +6,6 @@ class User {
   String branchName;
   int userCredit;
   String? token;
-  int isPaid;
   int status;
   String? color;
 
@@ -18,7 +17,6 @@ class User {
     required this.branchName,
     required this.userCredit,
     this.token,
-    required this.isPaid,
     required this.status,
     this.color,
   });
@@ -32,7 +30,6 @@ class User {
       branchName: json["branchName"],
       userCredit: json["userCredit"],
       token: json["token"],
-      isPaid: json["isPaid"],
       status: json["status"],
       color: json["color"],
     );
