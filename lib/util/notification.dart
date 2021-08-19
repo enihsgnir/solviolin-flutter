@@ -1,5 +1,4 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:solviolin/model/reservation.dart';
@@ -103,12 +102,12 @@ Future showModalCancel(BuildContext context, Reservation reservation) {
             " ~ ${dateTimeToTimeString(reservation.endDate)}",
         style: TextStyle(fontSize: 24.sp),
       ),
-      message: Text("예약을 취소 하시겠습니까?", style: TextStyle(fontSize: 24.sp)),
+      message: Text("수업을 취소 하시겠습니까?", style: TextStyle(fontSize: 24.sp)),
       actions: [
         CupertinoActionSheetAction(
           onPressed: () async {
             try {
-              await client.cancelReservation("${reservation.id}");
+              await client.cancelReservation(reservation.id);
               try {
                 await getUserBasedData();
                 await getSelectedDayData(controller.selectedDay);
@@ -124,7 +123,7 @@ Future showModalCancel(BuildContext context, Reservation reservation) {
             }
           },
           isDestructiveAction: true,
-          child: Text("예약 취소", style: TextStyle(fontSize: 24.sp)),
+          child: Text("수업 취소", style: TextStyle(fontSize: 24.sp)),
         ),
       ],
       cancelButton: CupertinoActionSheetAction(
@@ -150,12 +149,12 @@ Future showModalExtend(BuildContext context, Reservation reservation) {
             " ~ ${dateTimeToTimeString(reservation.endDate.add(Duration(minutes: 15)))}",
         style: TextStyle(fontSize: 24.sp),
       ),
-      message: Text("예약을 15분 연장 하시겠습니까?", style: TextStyle(fontSize: 24.sp)),
+      message: Text("수업을 15분 연장 하시겠습니까?", style: TextStyle(fontSize: 24.sp)),
       actions: [
         CupertinoActionSheetAction(
           onPressed: () async {
             try {
-              await client.extendReservation("${reservation.id}");
+              await client.extendReservation(reservation.id);
               try {
                 await getUserBasedData();
                 await getSelectedDayData(controller.selectedDay);
@@ -170,7 +169,7 @@ Future showModalExtend(BuildContext context, Reservation reservation) {
               showErrorMessage(context, e.toString());
             }
           },
-          child: Text("예약 연장", style: TextStyle(fontSize: 24.sp)),
+          child: Text("수업 연장", style: TextStyle(fontSize: 24.sp)),
         ),
       ],
       cancelButton: CupertinoActionSheetAction(

@@ -33,12 +33,10 @@ class _MyAppState extends State<MyApp> {
   void initState() {
     super.initState();
     // SystemChrome.setEnabledSystemUIOverlays([SystemUiOverlay.top]);
-    SystemChrome.setSystemUIOverlayStyle(
-      SystemUiOverlayStyle(
-        statusBarColor: Colors.transparent,
-        // systemNavigationBarColor: Colors.transparent,
-      ),
-    );
+    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+      statusBarColor: Colors.transparent,
+      // systemNavigationBarColor: Colors.transparent,
+    ));
   }
 
   @override

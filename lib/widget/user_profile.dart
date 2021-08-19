@@ -28,7 +28,6 @@ class _UserProfileState extends State<UserProfile> {
         children: [
           Flexible(
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.start,
               children: [
                 Container(
                   padding: const EdgeInsets.only(left: 24),

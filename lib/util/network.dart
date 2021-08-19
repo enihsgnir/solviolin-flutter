@@ -176,14 +176,17 @@ class Client {
     required List<int> bookingStatus,
   }) async {
     if (await isLoggedIn()) {
-      Response response = await dio.post("/reservation/search", data: {
-        "branchName": branchName,
-        "teacherID": teacherID,
-        "startDate": startDate?.toIso8601String(),
-        "endDate": endDate?.toIso8601String(),
-        "userID": userID,
-        "bookingStatus": bookingStatus,
-      });
+      Response response = await dio.post(
+        "/reservation/search",
+        data: {
+          "branchName": branchName,
+          "teacherID": teacherID,
+          "startDate": startDate?.toIso8601String(),
+          "endDate": endDate?.toIso8601String(),
+          "userID": userID,
+          "bookingStatus": bookingStatus,
+        }..removeWhere((key, value) => value == null),
+      );
       if (response.statusCode == 201) {
         return List<Reservation>.generate(
           response.data.length,
@@ -209,7 +212,7 @@ class Client {
     throw "변경 내역을 불러올 수 없습니다.";
   }
 
-  Future<List<Term>> getCurrentTerms() async {
+  Future<List<Term>> getCurrentTerm() async {
     if (await isLoggedIn()) {
       Response response = await dio.get("/term");
       if (response.statusCode == 200) {
@@ -247,28 +250,22 @@ class Client {
     }
   }
 
-  Future<void> cancelReservation(String id) async {
+  Future<void> cancelReservation(int id) async {
     if (await isLoggedIn()) {
-      Response response =
-          await dio.patch("/reservation/user/cancel/$id", data: {
-        "id": id,
-      });
+      Response response = await dio.patch("/reservation/user/cancel/$id");
       if (response.statusCode == 403) {
         throw "다른 수강생의 수업을 취소할 수 없습니다.";
       } else if (response.statusCode == 405) {
         throw "이번 학기에 더 이상 수업을 취소할 수 없습니다.";
       } else if (response.statusCode != 200 && response.statusCode != 201) {
-        throw "예약 취소에 실패했습니다.";
+        throw "수업 취소에 실패했습니다.";
       }
     }
   }
 
-  Future<void> extendReservation(String id) async {
+  Future<void> extendReservation(int id) async {
     if (await isLoggedIn()) {
-      Response response =
-          await dio.patch("/reservation/user/extend/$id", data: {
-        "id": id,
-      });
+      Response response = await dio.patch("/reservation/user/extend/$id");
       if (response.statusCode == 403) {
         throw "다른 수강생의 수업을 연장할 수 없습니다.";
       } else if (response.statusCode == 409) {

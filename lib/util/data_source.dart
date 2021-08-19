@@ -35,12 +35,12 @@ Future<void> getInitialData({bool isLoggedIn = true}) async {
     branchName: controller.user.branchName,
     startDate: first,
     endDate: last.add(Duration(hours: 23, minutes: 59, seconds: 59)),
-    userID: "sleep",
+    userID: controller.user.userID,
     bookingStatus: [-3, -1, 0, 1, 3],
   )
     ..sort((a, b) => a.startDate.compareTo(b.startDate)));
 
-  controller.updateCurrentTerms(await client.getCurrentTerms()
+  controller.updateCurrentTerm(await client.getCurrentTerm()
     ..sort((a, b) => a.termStart.compareTo(b.termStart)));
 }
 
@@ -56,7 +56,7 @@ Future<void> getUserBasedData() async {
       return primary != 0 ? primary : a.startTime.compareTo(b.startTime);
     }));
 
-  controller.updateCurrentTerms(await client.getCurrentTerms()
+  controller.updateCurrentTerm(await client.getCurrentTerm()
     ..sort((a, b) => a.termStart.compareTo(b.termStart)));
 }
 
@@ -83,7 +83,7 @@ Future<void> getChangedPageData(DateTime focusedDay) async {
     branchName: controller.user.branchName,
     startDate: first,
     endDate: last.add(Duration(hours: 23, minutes: 59, seconds: 59)),
-    userID: "sleep",
+    userID: controller.user.userID,
     bookingStatus: [-3, -1, 0, 1, 3],
   )
     ..sort((a, b) => a.startDate.compareTo(b.startDate)));
@@ -97,7 +97,7 @@ Future<void> getReservedHistoryData() async {
     branchName: controller.user.branchName,
     startDate: DateTime(kToday.year, kToday.month, 1),
     endDate: DateTime(kToday.year, kToday.month + 1, 0, 23, 59, 59),
-    userID: "sleep",
+    userID: controller.user.userID,
     bookingStatus: [-3, -2, -1, 0, 1, 2, 3],
   )
     ..sort((a, b) => a.startDate.compareTo(b.startDate)));
@@ -106,7 +106,7 @@ Future<void> getReservedHistoryData() async {
     branchName: controller.user.branchName,
     startDate: DateTime(kToday.year, kToday.month - 1, 1),
     endDate: DateTime(kToday.year, kToday.month, 0, 23, 59, 59),
-    userID: "sleep",
+    userID: controller.user.userID,
     bookingStatus: [-3, -2, -1, 0, 1, 2, 3],
   )
     ..sort((a, b) => a.startDate.compareTo(b.startDate)));

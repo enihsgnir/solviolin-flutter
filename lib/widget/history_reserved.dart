@@ -9,9 +9,9 @@ import 'package:solviolin/util/notification.dart';
 class HistoryReserved extends StatefulWidget {
   final List<Reservation> reservations;
 
-  const HistoryReserved({
+  const HistoryReserved(
+    this.reservations, {
     Key? key,
-    required this.reservations,
   }) : super(key: key);
 
   @override
@@ -26,6 +26,7 @@ class _HistoryReservedState extends State<HistoryReserved> {
       itemBuilder: (context, index) {
         return Slidable(
           actionPane: SlidableScrollActionPane(),
+          actionExtentRatio: 1 / 5,
           secondaryActions: [
             SlideAction(
               child: Row(
@@ -96,7 +97,6 @@ class _HistoryReservedState extends State<HistoryReserved> {
               ),
             ),
           ],
-          actionExtentRatio: 1 / 5,
           child: Container(
             decoration: BoxDecoration(
               color: Theme.of(context).scaffoldBackgroundColor,

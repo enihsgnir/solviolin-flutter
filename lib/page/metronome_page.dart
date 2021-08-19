@@ -95,7 +95,7 @@ class _MetronomePageState extends State<MetronomePage> {
                       size: 54.r,
                     ),
                   ),
-                  onTap: () => count(isIncreasing: false),
+                  onTap: () => count(CountType.decrease),
                   enableFeedback: false,
                 ),
               ),
@@ -132,7 +132,7 @@ class _MetronomePageState extends State<MetronomePage> {
                       size: 54.r,
                     ),
                   ),
-                  onTap: () => count(isIncreasing: true),
+                  onTap: () => count(CountType.increase),
                   enableFeedback: false,
                 ),
               ),
@@ -174,16 +174,16 @@ class _MetronomePageState extends State<MetronomePage> {
     });
   }
 
-  void count({required bool isIncreasing}) {
+  void count(CountType type) {
     setState(() {
       if (isPlaying) {
         subscription?.cancel();
         isPlaying = false;
       }
 
-      if (isIncreasing == true && _index < tempos.length - 1) {
+      if (type == CountType.increase && _index < tempos.length - 1) {
         _index++;
-      } else if (isIncreasing == false && _index > 0) {
+      } else if (type == CountType.decrease && _index > 0) {
         _index--;
       }
       metronome = Metronome.epoch(
@@ -200,15 +200,17 @@ class _MetronomePageState extends State<MetronomePage> {
           child: CupertinoPicker(
             scrollController: FixedExtentScrollController(initialItem: _index),
             itemExtent: 52.h,
-            onSelectedItemChanged: (index) => setState(() {
-              if (isPlaying) {
-                subscription?.cancel();
-                isPlaying = false;
-              }
-              _index = index;
-              metronome = Metronome.epoch(Duration(
-                  microseconds: (60 * 1000 * 1000 / tempos[_index]).round()));
-            }),
+            onSelectedItemChanged: (index) {
+              setState(() {
+                if (isPlaying) {
+                  subscription?.cancel();
+                  isPlaying = false;
+                }
+                _index = index;
+                metronome = Metronome.epoch(Duration(
+                    microseconds: (60 * 1000 * 1000 / tempos[_index]).round()));
+              });
+            },
             children: List<Container>.generate(
               tempos.length,
               (index) => Container(
@@ -227,4 +229,9 @@ class _MetronomePageState extends State<MetronomePage> {
       },
     );
   }
+}
+
+enum CountType {
+  increase,
+  decrease,
 }

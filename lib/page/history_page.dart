@@ -45,8 +45,7 @@ class _HistoryPageState extends State<HistoryPage>
       body: SafeArea(
         child: GetBuilder<DataController>(
           builder: (controller) {
-            List<RegularSchedule> regularSchedules =
-                controller.regularSchedules;
+            List<RegularSchedule> regulars = controller.regularSchedules;
 
             return ListView(
               physics: const NeverScrollableScrollPhysics(),
@@ -64,7 +63,7 @@ class _HistoryPageState extends State<HistoryPage>
                             currentPage = page;
                           });
                         },
-                        itemCount: regularSchedules.length,
+                        itemCount: regulars.length,
                         itemBuilder: (context, index) {
                           return DefaultTextStyle(
                             style: TextStyle(fontSize: 28.sp),
@@ -89,13 +88,13 @@ class _HistoryPageState extends State<HistoryPage>
                                     child: const Text("내 수업"),
                                   ),
                                   Text(
-                                    regularSchedules[index].teacherID +
-                                        " / ${regularSchedules[index].branchName}",
+                                    regulars[index].teacherID +
+                                        " / ${regulars[index].branchName}",
                                   ),
                                   Text(
-                                    "${dowToString(regularSchedules[index].dow)}" +
-                                        " / ${timeToString(regularSchedules[index].startTime)}" +
-                                        " ~ ${timeToString(regularSchedules[index].endTime)}",
+                                    "${dowToString(regulars[index].dow)}" +
+                                        " / ${timeToString(regulars[index].startTime)}" +
+                                        " ~ ${timeToString(regulars[index].endTime)}",
                                   ),
                                 ],
                               ),
@@ -113,7 +112,7 @@ class _HistoryPageState extends State<HistoryPage>
                             mainAxisSize: MainAxisSize.min,
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: List<Widget>.generate(
-                              regularSchedules.length,
+                              regulars.length,
                               (index) => index == currentPage
                                   ? indicator(isActive: true)
                                   : indicator(isActive: false),
@@ -156,15 +155,13 @@ class _HistoryPageState extends State<HistoryPage>
                     children: [
                       Padding(
                         padding: const EdgeInsets.only(top: 4),
-                        child: HistoryReserved(
-                          reservations: controller.lastMonthReservations,
-                        ),
+                        child:
+                            HistoryReserved(controller.lastMonthReservations),
                       ),
                       Padding(
                         padding: const EdgeInsets.only(top: 4),
-                        child: HistoryReserved(
-                          reservations: controller.thisMonthReservations,
-                        ),
+                        child:
+                            HistoryReserved(controller.thisMonthReservations),
                       ),
                       Padding(
                         padding: const EdgeInsets.only(top: 4),

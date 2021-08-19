@@ -11,7 +11,7 @@ class DataController extends GetxController {
   late List<RegularSchedule> regularSchedules;
   late List<DateTime> availabaleSpots;
   late List<Reservation> myValidReservations;
-  late List<Term> currentTerms;
+  late List<Term> currentTerm;
   DateTime selectedDay = kToday;
   late DateTime focusedDay;
   late List<Reservation> thisMonthReservations;
@@ -39,8 +39,8 @@ class DataController extends GetxController {
     update();
   }
 
-  void updateCurrentTerms(List<Term> data) {
-    currentTerms = data;
+  void updateCurrentTerm(List<Term> data) {
+    currentTerm = data;
     update();
   }
 
