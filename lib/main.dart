@@ -8,10 +8,11 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:solviolin_admin/util/controller.dart';
 import 'package:solviolin_admin/util/network.dart';
 import 'package:solviolin_admin/view/control/control_page.dart';
+import 'package:solviolin_admin/view/for_teacher_profile.dart/main_for_teacher_page.dart';
+import 'package:solviolin_admin/view/for_teacher_profile.dart/menu_for_teacher_page.dart';
 import 'package:solviolin_admin/view/ledger/ledger_page.dart';
 import 'package:solviolin_admin/view/loading_page.dart';
 import 'package:solviolin_admin/view/login_page.dart';
-import 'package:solviolin_admin/view/main/day_view.dart';
 import 'package:solviolin_admin/view/main/main_page.dart';
 import 'package:solviolin_admin/view/menu_page.dart';
 import 'package:solviolin_admin/view/teacher/teacher_page.dart';
@@ -38,6 +39,8 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
+  DataController _controller = Get.put(DataController());
+
   @override
   void initState() {
     super.initState();
@@ -47,14 +50,22 @@ class _MyAppState extends State<MyApp> {
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _controller.updateRatio(MediaQuery.of(context).size.height / 1152);
+  }
+
+  @override
   Widget build(BuildContext context) {
     Get.put(FlutterSecureStorage());
     Get.put(Client());
-    Get.put(DataController());
 
     return GetMaterialApp(
       builder: (context, child) => MediaQuery(
-        data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
+        data: MediaQuery.of(context).copyWith(
+          devicePixelRatio: 2,
+          textScaleFactor: 1.0,
+        ),
         child: child!,
       ),
       title: "SolViolin_Admin",
@@ -76,15 +87,16 @@ class _MyAppState extends State<MyApp> {
       getPages: [
         GetPage(name: "/loading", page: () => LoadingPage()),
         GetPage(name: "/login", page: () => LoginPage()),
-        GetPage(name: "/main", page: () => MainPage()),
-        GetPage(name: "/main/day", page: () => DayView()),
         GetPage(name: "/menu", page: () => MenuPage()),
+        GetPage(name: "/main", page: () => MainPage()),
         GetPage(name: "/user", page: () => UserPage()),
         GetPage(name: "/user/detail", page: () => UserDetailPage()),
         GetPage(name: "/control", page: () => ControlPage()),
         GetPage(name: "/term", page: () => TermPage()),
         GetPage(name: "/teacher", page: () => TeacherPage()),
         GetPage(name: "/ledger", page: () => LedgerPage()),
+        GetPage(name: "/menu-teacher", page: () => MenuForTeacherPage()),
+        GetPage(name: "/main-teacher", page: () => MainForTeacherPage()),
       ],
       debugShowCheckedModeBanner: false,
     );

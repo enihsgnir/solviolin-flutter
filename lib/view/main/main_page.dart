@@ -24,6 +24,8 @@ class _MainPageState extends State<MainPage> {
   TextEditingController teacher = TextEditingController();
   BranchController branch = Get.put(BranchController());
 
+  SearchController search = Get.find<SearchController>(tag: "Main");
+
   @override
   void initState() {
     super.initState();
@@ -76,12 +78,22 @@ class _MainPageState extends State<MainPage> {
                               Padding(
                                 padding:
                                     const EdgeInsets.fromLTRB(12, 12, 12, 0),
-                                child: input("수강생", user, "이름을 입력하세요!"),
+                                child: input(
+                                  "수강생",
+                                  user,
+                                  "이름을 입력하세요!",
+                                  true,
+                                ),
                               ),
                               Padding(
                                 padding:
                                     const EdgeInsets.fromLTRB(12, 12, 12, 0),
-                                child: input("강사", teacher, "강사명을 입력하세요!"),
+                                child: input(
+                                  "강사",
+                                  teacher,
+                                  "강사명을 입력하세요!",
+                                  true,
+                                ),
                               ),
                               Padding(
                                 padding:
@@ -109,7 +121,10 @@ class _MainPageState extends State<MainPage> {
                             ),
                             ElevatedButton(
                               onPressed: branch.branchName == null
-                                  ? null
+                                  ? () {
+                                      showErrorMessage(
+                                          context, "필수 입력값을 확인하세요!");
+                                    }
                                   : () async {
                                       try {
                                         await getReservationData(
@@ -121,7 +136,7 @@ class _MainPageState extends State<MainPage> {
                                               : teacher.text,
                                         );
                                         Get.back();
-                                        print(_controller.reservations);
+                                        search.isSearched = true;
                                       } catch (e) {
                                         showErrorMessage(context, e.toString());
                                       }

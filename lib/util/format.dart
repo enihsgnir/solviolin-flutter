@@ -55,12 +55,6 @@ String bookingStatusToString(int bookingStatus) {
   return status[bookingStatus]!;
 }
 
-Duration convertDateTimeToDuration(DateTime dateTime) =>
-    Duration(hours: dateTime.hour, minutes: dateTime.minute);
-
-DateTime trimDateTime(DateTime dateTime) => DateTime(dateTime.year,
-    dateTime.month, dateTime.day, dateTime.hour, dateTime.minute);
-
 String controlStatusToString(int status) {
   Map<int, String> _status = {
     0: "Open",

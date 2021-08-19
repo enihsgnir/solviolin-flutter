@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:solviolin_admin/util/controller.dart';
 import 'package:solviolin_admin/util/data_source.dart';
 import 'package:solviolin_admin/widget/selection.dart';
 import 'package:solviolin_admin/widget/single_reusable.dart';
@@ -18,6 +19,8 @@ class _ControlSearchState extends State<ControlSearch> {
   DateTimeController start = Get.put(DateTimeController(), tag: "Start");
   DateTimeController end = Get.put(DateTimeController(), tag: "End");
   CheckController _status = Get.put(CheckController());
+
+  SearchController search = Get.find<SearchController>();
 
   @override
   void dispose() {
@@ -76,17 +79,28 @@ class _ControlSearchState extends State<ControlSearch> {
                     primary: const Color.fromRGBO(96, 128, 104, 100),
                   ),
                   onPressed: branch.branchName == null
-                      ? null
+                      ? () {
+                          showErrorMessage(context, "필수 입력값을 확인하세요!");
+                        }
                       : () async {
                           try {
                             String teacherID = teacher.text;
+
+                            search.text1 = branch.branchName!;
+                            search.text2 = teacherID == "" ? null : teacherID;
+                            search.dateTime1 = start.dateTime;
+                            search.dateTime2 = end.dateTime;
+                            search.number1 = _status.result;
+
                             await getControlsData(
-                              branchName: branch.branchName!,
-                              teacherID: teacherID == "" ? null : teacherID,
-                              startDate: start.dateTime,
-                              endDate: end.dateTime,
-                              status: _status.result,
+                              branchName: search.text1!,
+                              teacherID: search.text2,
+                              startDate: search.dateTime1,
+                              endDate: search.dateTime2,
+                              status: search.number1,
                             );
+
+                            search.isSearched = true;
                           } catch (e) {
                             showErrorMessage(context, e.toString());
                           }

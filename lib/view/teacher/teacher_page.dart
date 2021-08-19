@@ -67,7 +67,12 @@ class _TeacherPageState extends State<TeacherPage> {
                     children: [
                       Padding(
                         padding: const EdgeInsets.fromLTRB(12, 12, 12, 0),
-                        child: input("강사", teacher, "강사명을 입력하세요!"),
+                        child: input(
+                          "강사",
+                          teacher,
+                          "강사명을 입력하세요!",
+                          true,
+                        ),
                       ),
                       Padding(
                         padding: const EdgeInsets.fromLTRB(12, 12, 12, 0),
@@ -109,7 +114,9 @@ class _TeacherPageState extends State<TeacherPage> {
                               workDow.workDow == null ||
                               start.time == null ||
                               end.time == null
-                          ? null
+                          ? () {
+                              showErrorMessage(context, "필수 입력값을 확인하세요!");
+                            }
                           : () async {
                               try {
                                 await client.registerTeacher(

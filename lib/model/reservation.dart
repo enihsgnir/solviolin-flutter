@@ -7,11 +7,8 @@ class Reservation {
   DateTime endDate;
   int bookingStatus;
   int extendedMin;
-  String userID;
   String teacherID;
   String branchName;
-  int? regularID;
-  int isControlled;
   Color? color;
 
   Reservation({
@@ -20,11 +17,8 @@ class Reservation {
     required this.endDate,
     required this.bookingStatus,
     required this.extendedMin,
-    required this.userID,
     required this.teacherID,
     required this.branchName,
-    this.regularID,
-    required this.isControlled,
     this.color,
   });
 
@@ -35,11 +29,8 @@ class Reservation {
       endDate: parseDateTime(json["endDate"]),
       bookingStatus: json["bookingStatus"],
       extendedMin: json["extendedMin"],
-      userID: json["userID"],
       teacherID: json["teacherID"],
       branchName: json["branchName"],
-      regularID: json["regularID"],
-      isControlled: json["isControlled"],
       color: Color(int.parse(
         "FF" + json["teacher"]["color"].substring(1),
         radix: 16,

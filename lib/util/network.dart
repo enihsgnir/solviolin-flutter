@@ -5,7 +5,6 @@ import 'package:get/get.dart' hide Response;
 import 'package:intl/intl.dart';
 import 'package:pretty_dio_logger/pretty_dio_logger.dart';
 import 'package:solviolin_admin/model/admin_profile.dart';
-import 'package:solviolin_admin/model/branch.dart';
 import 'package:solviolin_admin/model/change.dart';
 import 'package:solviolin_admin/model/control.dart';
 import 'package:solviolin_admin/model/ledger.dart';
@@ -133,14 +132,14 @@ class Client {
       "userPassword": userPassword,
     });
     if (response.statusCode == 201) {
-      if (response.data["userType"] == 2) {
+      if (response.data["userType"] != 0) {
         await storage.write(
             key: "accessToken", value: response.data["access_token"]);
         await storage.write(
             key: "refreshToken", value: response.data["refresh_token"]);
         return AdminProfile.fromJson(response.data);
       } else {
-        throw "관리자만 로그인할 수 있습니다.";
+        throw "수강생은 로그인할 수 없습니다.";
       }
     }
     throw "내 정보를 불러올 수 없습니다.";
@@ -150,10 +149,10 @@ class Client {
     if (await isLoggedIn()) {
       Response response = await dio.get("/auth/profile");
       if (response.statusCode == 200) {
-        if (response.data["userType"] == 2) {
+        if (response.data["userType"] != 0) {
           return AdminProfile.fromJson(response.data);
         } else {
-          throw "관리자만 로그인할 수 있습니다.";
+          throw "수강생은 로그인할 수 없습니다.";
         }
       }
     }
@@ -245,21 +244,6 @@ class Client {
     }
   }
 
-  Future<void> resetUserPassword({
-    required String userID,
-    required String userPassword,
-  }) async {
-    if (await isLoggedIn()) {
-      Response response = await dio.patch("/user/reset", data: {
-        "userID": userID,
-        "userPassword": userPassword,
-      });
-      if (response.statusCode != 200 && response.statusCode != 201) {
-        throw "해당 유저 비밀번호 초기화에 실패했습니다.";
-      }
-    }
-  }
-
   Future<void> registerTerm({
     required DateTime termStart,
     required DateTime termEnd,
@@ -334,15 +318,6 @@ class Client {
           "branchName": branchName,
         }..removeWhere((key, value) => value == null),
       );
-      if (response.statusCode != 200 && response.statusCode != 201) {
-        throw "선생님 스케줄 삭제에 실패했습니다.";
-      }
-    }
-  }
-
-  Future<void> deleteTeacherWithID(int id) async {
-    if (await isLoggedIn()) {
-      Response response = await dio.delete("/teacher/$id");
       if (response.statusCode != 200 && response.statusCode != 201) {
         throw "선생님 스케줄 삭제에 실패했습니다.";
       }
@@ -451,30 +426,6 @@ class Client {
       Response response = await dio.delete("/control/$id");
       if (response.statusCode != 200 && response.statusCode != 201) {
         throw "컨트롤 삭제에 실패했습니다.";
-      }
-    }
-  }
-
-  Future<void> modifyControl(
-    int id, {
-    required String teacherID,
-    required String branchName,
-    required DateTime controlStart,
-    required DateTime controlEnd,
-    required int status,
-    required int cancelInClose,
-  }) async {
-    if (await isLoggedIn()) {
-      Response response = await dio.put("/control/$id", data: {
-        "teacherID": teacherID,
-        "branchName": branchName,
-        "controlStart": controlStart.toIso8601String(),
-        "controlEnd": controlEnd.toIso8601String(),
-        "status": status,
-        "cancelInClose": cancelInClose,
-      });
-      if (response.statusCode != 200 && response.statusCode != 201) {
-        throw "컨트롤 수정에 실패했습니다.";
       }
     }
   }
@@ -630,42 +581,6 @@ class Client {
     throw "예약 내역을 불러올 수 없습니다.";
   }
 
-  Future<List<DateTime>> getAvailableSpots({
-    required String branchName,
-    required String teacherID,
-    required DateTime startDate,
-  }) async {
-    if (await isLoggedIn()) {
-      Response response = await dio.post("/reservation/available", data: {
-        "branchName": branchName,
-        "teacherID": teacherID,
-        "startDate": startDate.toIso8601String(),
-      });
-      if (response.statusCode == 201) {
-        return List<DateTime>.generate(
-          response.data.length,
-          (index) => parseDateTime(response.data[index]),
-        );
-      }
-    }
-    throw "예약 가능한 시간대를 불러올 수 없습니다.";
-  }
-
-  Future<List<Change>> getChanges({String range = "both"}) async {
-    if (await isLoggedIn()) {
-      Response response = await dio.post("/reservation/changes", data: {
-        "range": range,
-      });
-      if (response.statusCode == 201) {
-        return List<Change>.generate(
-          response.data.length,
-          (index) => Change.fromJson(response.data[index]),
-        );
-      }
-    }
-    throw "변경 내역을 불러올 수 없습니다.";
-  }
-
   Future<List<Change>> getChangesWithID(
     String userID, {
     String range = "both",
@@ -682,25 +597,6 @@ class Client {
       }
     }
     throw "변경 내역을 불러올 수 없습니다.";
-  }
-
-  Future<void> manageSalary({
-    required String branchName,
-    required int termID,
-    required int dayTimeCost,
-    required int nightTimeCost,
-  }) async {
-    if (await isLoggedIn()) {
-      Response response = await dio.post("/reservation/salary", data: {
-        "branchName": branchName,
-        "termID": termID,
-        "dayTimeCost": dayTimeCost,
-        "nightTimeCost": nightTimeCost,
-      });
-      if (response.statusCode != 200 && response.statusCode != 201) {
-        throw "선생님 급여 계산에 실패했습니다.";
-      }
-    }
   }
 
   Future<void> reserveRegularReservation({
@@ -779,28 +675,6 @@ class Client {
     }
   }
 
-  Future<void> deleteRegularSchedule(int id) async {
-    if (await isLoggedIn()) {
-      Response response = await dio.delete("/regular-schedule/$id");
-      if (response.statusCode != 200 && response.statusCode != 201) {
-        throw "정규 예약 삭제에 실패했습니다.";
-      }
-    }
-  }
-
-  Future<List<RegularSchedule>> getRegularSchedules() async {
-    if (await isLoggedIn()) {
-      Response response = await dio.get("/regular-schedule");
-      if (response.statusCode == 200) {
-        return List<RegularSchedule>.generate(
-          response.data.length,
-          (index) => RegularSchedule.fromJson(response.data[index]),
-        );
-      }
-    }
-    throw "내 정규 일정을 불러올 수 없습니다.";
-  }
-
   Future<List<RegularSchedule>> getRegularSchedulesByAdmin(
       String userID) async {
     if (await isLoggedIn()) {
@@ -826,13 +700,13 @@ class Client {
     }
   }
 
-  Future<List<Branch>> getBranches() async {
+  Future<List<String>> getBranches() async {
     if (await isLoggedIn()) {
       Response response = await dio.get("/branch");
       if (response.statusCode == 200) {
-        return List<Branch>.generate(
+        return List<String>.generate(
           response.data.length,
-          (index) => Branch.fromJson(response.data[index]),
+          (index) => response.data[index]["branchName"],
         );
       }
     }
@@ -877,15 +751,6 @@ class Client {
       }
     }
     throw "매출 정보를 불러올 수 없습니다.";
-  }
-
-  Future<void> deleteLedger(int id) async {
-    if (await isLoggedIn()) {
-      Response response = await dio.delete("/ledger/$id");
-      if (response.statusCode != 200 && response.statusCode != 201) {
-        throw "매출 삭제에 실패했습니다.";
-      }
-    }
   }
 
   Future<String> getTotalLedger({

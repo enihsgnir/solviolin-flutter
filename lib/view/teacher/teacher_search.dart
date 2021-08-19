@@ -52,7 +52,9 @@ class _TeacherSearchState extends State<TeacherSearch> {
                     primary: const Color.fromRGBO(96, 128, 104, 100),
                   ),
                   onPressed: branch.branchName == null
-                      ? null
+                      ? () {
+                          showErrorMessage(context, "필수 입력값을 확인하세요!");
+                        }
                       : () async {
                           try {
                             String teacherID = teacher.text;

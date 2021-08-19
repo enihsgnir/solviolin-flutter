@@ -82,19 +82,24 @@ class _UserPageState extends State<UserPage> {
                   children: [
                     Padding(
                       padding: const EdgeInsets.fromLTRB(12, 12, 12, 0),
-                      child: input("아이디", id, "아이디를 입력하세요!"),
+                      child: input("아이디", id, "아이디를 입력하세요!", true),
                     ),
                     Padding(
                       padding: const EdgeInsets.fromLTRB(12, 12, 12, 0),
-                      child: input("비밀번호", pw, "비밀번호를 입력하세요!"),
+                      child: input("비밀번호", pw, "비밀번호를 입력하세요!", true),
                     ),
                     Padding(
                       padding: const EdgeInsets.fromLTRB(12, 12, 12, 0),
-                      child: input("이름", name, "이름을 입력하세요!"),
+                      child: input("이름", name, "이름을 입력하세요!", true),
                     ),
                     Padding(
                       padding: const EdgeInsets.fromLTRB(12, 12, 12, 0),
-                      child: input("전화번호", phone, "전화번호를 입력하세요!"),
+                      child: input(
+                        "전화번호",
+                        phone,
+                        "전화번호를 입력하세요!",
+                        true,
+                      ),
                     ),
                     Padding(
                       padding: const EdgeInsets.fromLTRB(12, 12, 12, 0),
@@ -199,7 +204,9 @@ class _UserPageState extends State<UserPage> {
                             name.text == "" ||
                             phone.text == "" ||
                             branch.branchName == null
-                        ? null
+                        ? () {
+                            showErrorMessage(context, "필수 입력값을 확인하세요!");
+                          }
                         : () async {
                             try {
                               await client.registerUser(

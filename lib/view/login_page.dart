@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:solviolin_admin/util/controller.dart';
 import 'package:solviolin_admin/util/data_source.dart';
 import 'package:solviolin_admin/widget/single_reusable.dart';
 
@@ -11,6 +12,8 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
+  DataController _controller = Get.find<DataController>();
+
   TextEditingController idController = TextEditingController();
   TextEditingController pwController = TextEditingController();
 
@@ -89,7 +92,9 @@ class _LoginPageState extends State<LoginPage> {
                 child: TextButton(
                   onPressed:
                       idController.text.isEmpty || pwController.text.isEmpty
-                          ? null
+                          ? () {
+                              // showErrorMessage(context, "필수 입력값을 확인하세요!");
+                            }
                           : () async {
                               try {
                                 await getInitialData(
@@ -97,7 +102,12 @@ class _LoginPageState extends State<LoginPage> {
                                   userID: idController.text,
                                   userPassword: pwController.text,
                                 );
-                                Get.offAllNamed("/menu");
+                                Get.put(DataController());
+                                if (_controller.profile.userType == 2) {
+                                  Get.offAllNamed("/menu");
+                                } else if (_controller.profile.userType == 1) {
+                                  Get.offAllNamed("/menu-teacher");
+                                }
                               } catch (e) {
                                 await logoutAndDeleteData();
                                 Get.offAllNamed("/login");

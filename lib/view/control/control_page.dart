@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:solviolin_admin/util/controller.dart';
+import 'package:solviolin_admin/util/data_source.dart';
 import 'package:solviolin_admin/util/network.dart';
 import 'package:solviolin_admin/view/control/control_list.dart';
 import 'package:solviolin_admin/view/control/control_search.dart';
@@ -22,6 +24,8 @@ class _ControlPageState extends State<ControlPage> {
   DateTimeController end = Get.put(DateTimeController(), tag: "EndRegister");
   CheckController _status = Get.put(CheckController());
   bool cancelInClose = false;
+
+  SearchController search = Get.put(SearchController());
 
   @override
   void dispose() {
@@ -68,7 +72,12 @@ class _ControlPageState extends State<ControlPage> {
                     children: [
                       Padding(
                         padding: const EdgeInsets.fromLTRB(12, 12, 12, 0),
-                        child: input("강사", teacher, "강사명을 입력하세요!"),
+                        child: input(
+                          "강사",
+                          teacher,
+                          "강사명을 입력하세요!",
+                          true,
+                        ),
                       ),
                       Padding(
                         padding: const EdgeInsets.fromLTRB(12, 12, 12, 0),
@@ -143,7 +152,9 @@ class _ControlPageState extends State<ControlPage> {
                               branch.branchName == null ||
                               start.dateTime == null ||
                               end.dateTime == null
-                          ? null
+                          ? () {
+                              showErrorMessage(context, "필수 입력값을 확인하세요!");
+                            }
                           : () async {
                               try {
                                 await client.registerControl(
@@ -154,6 +165,16 @@ class _ControlPageState extends State<ControlPage> {
                                   status: _status.result!,
                                   cancelInClose: cancelInClose ? 1 : 0,
                                 );
+
+                                if (search.isSearched) {
+                                  await getControlsData(
+                                    branchName: search.text1!,
+                                    teacherID: search.text2,
+                                    startDate: search.dateTime1,
+                                    endDate: search.dateTime2,
+                                    status: search.number1,
+                                  );
+                                }
                               } catch (e) {
                                 showErrorMessage(context, e.toString());
                               }

@@ -16,7 +16,11 @@ class BranchController extends GetxController {
   }
 }
 
-Widget branchDropdown([String? tag, String? validator]) {
+Widget branchDropdown([
+  String? tag,
+  String? validator,
+  bool isMandatory = false,
+]) {
   Get.find<BranchController>(tag: tag);
 
   return GetBuilder<BranchController>(
@@ -26,11 +30,26 @@ Widget branchDropdown([String? tag, String? validator]) {
         children: [
           Container(
             width: 110,
-            child: Text(
-              "지점명",
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 20,
+            child: RichText(
+              text: TextSpan(
+                children: [
+                  TextSpan(
+                    text: "지점명",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 20,
+                    ),
+                  ),
+                  TextSpan(
+                    text: isMandatory ? " *" : "",
+                    style: TextStyle(
+                      fontWeight: FontWeight.w500,
+                      fontSize: 12,
+                      backgroundColor: Colors.transparent,
+                      color: Colors.red,
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
@@ -64,7 +83,7 @@ Widget branchDropdown([String? tag, String? validator]) {
               },
               items: List<String>.generate(
                 _controller.branches.length,
-                (index) => _controller.branches[index].branchName,
+                (index) => _controller.branches[index],
               )
                   .map<DropdownMenuItem<String>>(
                       (value) => DropdownMenuItem<String>(
@@ -89,7 +108,7 @@ class WorkDowController extends GetxController {
   }
 }
 
-Widget workDowDropdown([String? validator]) {
+Widget workDowDropdown([String? validator, bool isMandatory = false]) {
   Get.find<WorkDowController>();
 
   return GetBuilder<WorkDowController>(
@@ -98,11 +117,26 @@ Widget workDowDropdown([String? validator]) {
         children: [
           Container(
             width: 110,
-            child: Text(
-              "요일",
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 20,
+            child: RichText(
+              text: TextSpan(
+                children: [
+                  TextSpan(
+                    text: "요일",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 20,
+                    ),
+                  ),
+                  TextSpan(
+                    text: isMandatory ? " *" : "",
+                    style: TextStyle(
+                      fontWeight: FontWeight.w500,
+                      fontSize: 12,
+                      backgroundColor: Colors.transparent,
+                      color: Colors.red,
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
@@ -156,7 +190,7 @@ class TermController extends GetxController {
   }
 }
 
-Widget termDropdown([String? validator]) {
+Widget termDropdown([String? validator, bool isMandatory = false]) {
   Get.find<TermController>();
 
   return GetBuilder<TermController>(
@@ -165,11 +199,26 @@ Widget termDropdown([String? validator]) {
         children: [
           Container(
             width: 110,
-            child: Text(
-              "학기",
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 20,
+            child: RichText(
+              text: TextSpan(
+                children: [
+                  TextSpan(
+                    text: "학기",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 20,
+                    ),
+                  ),
+                  TextSpan(
+                    text: isMandatory ? " *" : "",
+                    style: TextStyle(
+                      fontWeight: FontWeight.w500,
+                      fontSize: 12,
+                      backgroundColor: Colors.transparent,
+                      color: Colors.red,
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
@@ -233,6 +282,7 @@ Widget check({
   required String trueName,
   required String falseName,
   bool reverse = false,
+  bool isMandatory = false,
 }) {
   Get.find<CheckController>(tag: tag);
 
@@ -248,11 +298,26 @@ Widget check({
             children: [
               Container(
                 width: 120,
-                child: Text(
-                  item,
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 20,
+                child: RichText(
+                  text: TextSpan(
+                    children: [
+                      TextSpan(
+                        text: item,
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 20,
+                        ),
+                      ),
+                      TextSpan(
+                        text: isMandatory ? " *" : "",
+                        style: TextStyle(
+                          fontWeight: FontWeight.w500,
+                          fontSize: 12,
+                          backgroundColor: Colors.transparent,
+                          color: Colors.red,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ),
@@ -335,7 +400,12 @@ class DateTimeController extends GetxController {
   }
 }
 
-Widget pickDateTime(BuildContext context, String item, [String? tag]) {
+Widget pickDateTime(
+  BuildContext context,
+  String item, [
+  String? tag,
+  bool isMandatory = false,
+]) {
   Get.find<DateTimeController>(tag: tag);
 
   final DateTime initialDate = DateTime.now();
@@ -350,11 +420,26 @@ Widget pickDateTime(BuildContext context, String item, [String? tag]) {
         children: [
           Container(
             width: 110,
-            child: Text(
-              item,
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 20,
+            child: RichText(
+              text: TextSpan(
+                children: [
+                  TextSpan(
+                    text: item,
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 20,
+                    ),
+                  ),
+                  TextSpan(
+                    text: isMandatory ? " *" : "",
+                    style: TextStyle(
+                      fontWeight: FontWeight.w500,
+                      fontSize: 12,
+                      backgroundColor: Colors.transparent,
+                      color: Colors.red,
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
@@ -408,7 +493,12 @@ Widget pickDateTime(BuildContext context, String item, [String? tag]) {
   );
 }
 
-Widget pickDate(BuildContext context, String item, [String? tag]) {
+Widget pickDate(
+  BuildContext context,
+  String item, [
+  String? tag,
+  bool isMandatory = false,
+]) {
   Get.find<DateTimeController>(tag: tag);
 
   final DateTime initialDate = DateTime.now();
@@ -421,11 +511,26 @@ Widget pickDate(BuildContext context, String item, [String? tag]) {
         children: [
           Container(
             width: 110,
-            child: Text(
-              item,
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 20,
+            child: RichText(
+              text: TextSpan(
+                children: [
+                  TextSpan(
+                    text: item,
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 20,
+                    ),
+                  ),
+                  TextSpan(
+                    text: isMandatory ? " *" : "",
+                    style: TextStyle(
+                      fontWeight: FontWeight.w500,
+                      fontSize: 12,
+                      backgroundColor: Colors.transparent,
+                      color: Colors.red,
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
@@ -466,7 +571,12 @@ Widget pickDate(BuildContext context, String item, [String? tag]) {
   );
 }
 
-Widget pickTime(BuildContext context, String item, [String? tag]) {
+Widget pickTime(
+  BuildContext context,
+  String item, [
+  String? tag,
+  bool isMandatory = false,
+]) {
   Get.find<DateTimeController>(tag: tag);
 
   final TimeOfDay initialTime = TimeOfDay.now();
@@ -479,11 +589,26 @@ Widget pickTime(BuildContext context, String item, [String? tag]) {
         children: [
           Container(
             width: 110,
-            child: Text(
-              item,
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 20,
+            child: RichText(
+              text: TextSpan(
+                children: [
+                  TextSpan(
+                    text: item,
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 20,
+                    ),
+                  ),
+                  TextSpan(
+                    text: isMandatory ? " *" : "",
+                    style: TextStyle(
+                      fontWeight: FontWeight.w500,
+                      fontSize: 12,
+                      backgroundColor: Colors.transparent,
+                      color: Colors.red,
+                    ),
+                  ),
+                ],
               ),
             ),
           ),

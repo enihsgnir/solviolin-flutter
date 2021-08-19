@@ -1,6 +1,5 @@
 import 'package:get/get.dart';
 import 'package:solviolin_admin/model/admin_profile.dart';
-import 'package:solviolin_admin/model/branch.dart';
 import 'package:solviolin_admin/model/change.dart';
 import 'package:solviolin_admin/model/control.dart';
 import 'package:solviolin_admin/model/ledger.dart';
@@ -12,8 +11,10 @@ import 'package:solviolin_admin/model/user.dart';
 import 'package:solviolin_admin/util/data_source.dart';
 
 class DataController extends GetxController {
+  late final double ratio;
+
   late AdminProfile profile;
-  late List<Branch> branches;
+  late List<String> branches;
   late List<Term> currentTerm;
   List<Reservation> reservations = [];
   ReservationDataSource? reservationDataSource;
@@ -30,12 +31,17 @@ class DataController extends GetxController {
   List<Ledger> ledgers = [];
   late String totalLeger;
 
+  void updateRatio(double data) {
+    ratio = data;
+    update();
+  }
+
   void updateProfile(AdminProfile data) {
     profile = data;
     update();
   }
 
-  void updateBranches(List<Branch> data) {
+  void updateBranches(List<String> data) {
     branches = data;
     update();
   }
@@ -115,4 +121,23 @@ class DataController extends GetxController {
     totalLeger = data;
     update();
   }
+}
+
+class SearchController extends GetxController {
+  bool isSearched = false;
+
+  String? text1;
+  String? text2;
+  String? text3;
+  String? text4;
+  String? text5;
+
+  DateTime? dateTime1;
+  DateTime? dateTime2;
+
+  Duration? time1;
+  Duration? time2;
+
+  int? number1;
+  int? number2;
 }

@@ -5,7 +5,10 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:solviolin_admin/model/control.dart';
 import 'package:solviolin_admin/util/controller.dart';
+import 'package:solviolin_admin/util/data_source.dart';
 import 'package:solviolin_admin/util/format.dart';
+import 'package:solviolin_admin/util/network.dart';
+import 'package:solviolin_admin/widget/single_reusable.dart';
 
 class ControlList extends StatefulWidget {
   const ControlList({Key? key}) : super(key: key);
@@ -17,7 +20,9 @@ class ControlList extends StatefulWidget {
 class _ControlListState extends State<ControlList> {
   @override
   Widget build(BuildContext context) {
+    Client client = Get.find<Client>();
     Get.find<DataController>();
+    SearchController search = Get.find<SearchController>();
 
     return GetBuilder<DataController>(
       builder: (controller) {
@@ -45,7 +50,20 @@ class _ControlListState extends State<ControlList> {
                         )
                       ],
                     ),
-                    onTap: () async {},
+                    onTap: () async {
+                      try {
+                        await client.deleteControl(control.id);
+                        await getControlsData(
+                          branchName: search.text1!,
+                          teacherID: search.text2,
+                          startDate: search.dateTime1,
+                          endDate: search.dateTime2,
+                          status: search.number1,
+                        );
+                      } catch (e) {
+                        showErrorMessage(context, e.toString());
+                      }
+                    },
                   ),
                 ),
               ],

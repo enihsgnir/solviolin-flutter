@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:solviolin_admin/util/controller.dart';
 import 'package:solviolin_admin/util/data_source.dart';
 import 'package:solviolin_admin/util/network.dart';
 import 'package:solviolin_admin/widget/single_reusable.dart';
@@ -13,6 +14,7 @@ class LoadingPage extends StatefulWidget {
 
 class _LoadingPageState extends State<LoadingPage> {
   Client client = Get.put(Client());
+  DataController _controller = Get.find<DataController>();
 
   @override
   void initState() {
@@ -66,7 +68,11 @@ class _LoadingPageState extends State<LoadingPage> {
   Future<void> checkUser() async {
     if (await client.isLoggedIn()) {
       await getInitialData();
-      Get.offAllNamed("/menu");
+      if (_controller.profile.userType == 2) {
+        Get.offAllNamed("/menu");
+      } else if (_controller.profile.userType == 1) {
+        Get.offAllNamed("/menu-teacher");
+      }
     } else {
       await client.logout();
       Get.offAllNamed("/login");

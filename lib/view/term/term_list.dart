@@ -101,7 +101,10 @@ class _TermListState extends State<TermList> {
                                 ElevatedButton(
                                   onPressed:
                                       start.date == null || end.date == null
-                                          ? null
+                                          ? () {
+                                              showErrorMessage(
+                                                  context, "필수 입력값을 확인하세요!");
+                                            }
                                           : () async {
                                               try {
                                                 await client.modifyTerm(

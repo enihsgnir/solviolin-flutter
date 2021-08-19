@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:solviolin_admin/util/controller.dart';
 import 'package:solviolin_admin/util/network.dart';
 import 'package:solviolin_admin/widget/single_reusable.dart';
 
@@ -23,6 +24,12 @@ class _MenuPageState extends State<MenuPage> {
 
   @override
   Widget build(BuildContext context) {
+    Get.put(SearchController(), tag: "Main");
+    Get.put(SearchController(), tag: "User");
+    Get.put(SearchController(), tag: "Control");
+    Get.put(SearchController(), tag: "Teacher");
+    Get.put(SearchController(), tag: "Ledger");
+
     return Scaffold(
       body: SafeArea(
         child: Center(
@@ -89,7 +96,12 @@ class _MenuPageState extends State<MenuPage> {
           ),
           content: Padding(
             padding: const EdgeInsets.fromLTRB(12, 12, 12, 0),
-            child: input("지점", branch, "지점명을 입력하세요!"),
+            child: input(
+              "지점",
+              branch,
+              "지점명을 입력하세요!",
+              true,
+            ),
           ),
           actions: [
             OutlinedButton(
@@ -109,7 +121,9 @@ class _MenuPageState extends State<MenuPage> {
             ),
             ElevatedButton(
               onPressed: branch.text == ""
-                  ? null
+                  ? () {
+                      showErrorMessage(context, "필수 입력값을 확인하세요!");
+                    }
                   : () async {
                       try {
                         await client.registerBranch(branch.text);

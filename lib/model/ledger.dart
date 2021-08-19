@@ -1,7 +1,6 @@
 import 'package:solviolin_admin/util/format.dart';
 
 class Ledger {
-  int id;
   int amount;
   String userID;
   int termID;
@@ -9,7 +8,6 @@ class Ledger {
   DateTime paidAt;
 
   Ledger({
-    required this.id,
     required this.amount,
     required this.userID,
     required this.termID,
@@ -19,7 +17,6 @@ class Ledger {
 
   factory Ledger.fromJson(Map<String, dynamic> json) {
     return Ledger(
-      id: json["id"],
       amount: json["amount"],
       userID: json["userID"],
       termID: json["termID"],

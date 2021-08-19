@@ -54,7 +54,9 @@ class _LedgerSearchState extends State<LedgerSearch> {
                     primary: const Color.fromRGBO(96, 128, 104, 100),
                   ),
                   onPressed: branch.branchName == null || term.termID == null
-                      ? null
+                      ? () {
+                          showErrorMessage(context, "필수 입력값을 확인하세요!");
+                        }
                       : () async {
                           try {
                             await getTotalLedgerData(
@@ -138,7 +140,9 @@ class _LedgerSearchState extends State<LedgerSearch> {
                   onPressed: branch.branchName == null ||
                           term.termID == null ||
                           user.text == ""
-                      ? null
+                      ? () {
+                          showErrorMessage(context, "필수 입력값을 확인하세요!");
+                        }
                       : () async {
                           try {
                             await getLedgersData(

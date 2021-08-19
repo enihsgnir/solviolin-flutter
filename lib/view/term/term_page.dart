@@ -102,7 +102,9 @@ class _TermPageState extends State<TermPage> {
             ),
             ElevatedButton(
               onPressed: start.date == null || end.date == null
-                  ? null
+                  ? () {
+                      showErrorMessage(context, "필수 입력값을 확인하세요!");
+                    }
                   : () async {
                       try {
                         await client.registerTerm(
@@ -190,7 +192,9 @@ class _TermPageState extends State<TermPage> {
             ),
             ElevatedButton(
               onPressed: branch.branchName == null
-                  ? null
+                  ? () {
+                      showErrorMessage(context, "필수 입력값을 확인하세요!");
+                    }
                   : () async {
                       try {
                         await client
@@ -229,7 +233,7 @@ class _TermPageState extends State<TermPage> {
           ),
           content: Padding(
             padding: const EdgeInsets.fromLTRB(12, 12, 12, 0),
-            child: input("이름", user, "이름을 입력하세요!"),
+            child: input("이름", user, "이름을 입력하세요!", true),
           ),
           actions: [
             OutlinedButton(
@@ -249,7 +253,9 @@ class _TermPageState extends State<TermPage> {
             ),
             ElevatedButton(
               onPressed: user.text == ""
-                  ? null
+                  ? () {
+                      showErrorMessage(context, "필수 입력값을 확인하세요!");
+                    }
                   : () async {
                       try {
                         await client.extendAllCoursesOfUser(user.text);

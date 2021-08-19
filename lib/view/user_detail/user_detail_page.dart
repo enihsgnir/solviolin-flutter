@@ -163,7 +163,11 @@ class _UserDetailPageState extends State<UserDetailPage>
                                                       ElevatedButton(
                                                         onPressed:
                                                             end.dateTime == null
-                                                                ? null
+                                                                ? () {
+                                                                    showErrorMessage(
+                                                                        context,
+                                                                        "필수 입력값을 확인하세요!");
+                                                                  }
                                                                 : () async {
                                                                     try {
                                                                       await client
@@ -387,7 +391,7 @@ class _UserDetailPageState extends State<UserDetailPage>
             children: [
               Padding(
                 padding: const EdgeInsets.fromLTRB(12, 12, 12, 0),
-                child: input("금액", amount, "금액을 입력하세요!"),
+                child: input("금액", amount, "금액을 입력하세요!", true),
               ),
               Padding(
                 padding: const EdgeInsets.fromLTRB(12, 12, 12, 0),
@@ -419,7 +423,9 @@ class _UserDetailPageState extends State<UserDetailPage>
               onPressed: amount.text == "" ||
                       expend.branchName == null ||
                       term.termID == null
-                  ? null
+                  ? () {
+                      showErrorMessage(context, "필수 입력값을 확인하세요!");
+                    }
                   : () async {
                       try {
                         await client.registerLedger(
@@ -470,7 +476,7 @@ class _UserDetailPageState extends State<UserDetailPage>
               ),
               Padding(
                 padding: const EdgeInsets.fromLTRB(12, 12, 12, 0),
-                child: input("전화번호", phone, "번호를 입력하세요!"),
+                child: input("전화번호", phone, "번호를 입력하세요!", true),
               ),
               Container(
                 alignment: Alignment.centerLeft,
@@ -484,11 +490,11 @@ class _UserDetailPageState extends State<UserDetailPage>
               ),
               Padding(
                 padding: const EdgeInsets.fromLTRB(12, 12, 12, 0),
-                child: input("크레딧", credit, "크레딧을 입력하세요!"),
+                child: input("크레딧", credit, "크레딧을 입력하세요!", true),
               ),
               Padding(
                 padding: const EdgeInsets.fromLTRB(12, 12, 12, 0),
-                child: input("이름", name, "이름을 입력하세요!"),
+                child: input("이름", name, "이름을 입력하세요!", true),
               ),
             ],
           ),
@@ -514,7 +520,9 @@ class _UserDetailPageState extends State<UserDetailPage>
                       status.result == null ||
                       credit.text == "" ||
                       name.text == ""
-                  ? null
+                  ? () {
+                      showErrorMessage(context, "필수 입력값을 확인하세요!");
+                    }
                   : () async {
                       try {
                         await client.updateUserInformation(

@@ -36,17 +36,36 @@ PreferredSizeWidget appBar(String title, {List<Widget>? actions}) {
   );
 }
 
-Widget input(String item, TextEditingController controller,
-    [String? validator]) {
+Widget input(
+  String item,
+  TextEditingController controller, [
+  String? validator,
+  bool isMandatory = false,
+]) {
   return Row(
     children: [
       Container(
         width: 110,
-        child: Text(
-          item,
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 20,
+        child: RichText(
+          text: TextSpan(
+            children: [
+              TextSpan(
+                text: item,
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 20,
+                ),
+              ),
+              TextSpan(
+                text: isMandatory ? " *" : "",
+                style: TextStyle(
+                  fontWeight: FontWeight.w500,
+                  fontSize: 12,
+                  backgroundColor: Colors.transparent,
+                  color: Colors.red,
+                ),
+              ),
+            ],
           ),
         ),
       ),

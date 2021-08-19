@@ -10,6 +10,12 @@ import 'package:syncfusion_flutter_calendar/calendar.dart';
 Client _client = Get.put(Client());
 DataController _controller = Get.find<DataController>();
 
+extension on num {
+  // num get a => Platform.isIOS ? this / 2 : this;
+
+  // num get b => this * _controller.ratio;
+}
+
 Future<void> logoutAndDeleteData() async {
   await _client.logout();
 }
@@ -33,7 +39,7 @@ Future<void> getInitialData({
     ..sort((a, b) => b.termStart.compareTo(a.termStart)));
 
   _controller.updateBranches(await _client.getBranches()
-    ..sort((a, b) => a.branchName.compareTo(b.branchName)));
+    ..sort((a, b) => a.compareTo(b)));
 }
 
 Future<void> getReservationData({
@@ -180,11 +186,6 @@ Future<void> getControlsData({
     ..sort((a, b) => a.controlStart.compareTo(b.controlStart)));
 }
 
-Future<void> getTermsData(int take) async {
-  _controller.updateTerms(await _client.getTerms(take)
-    ..sort((a, b) => a.termStart.compareTo(b.termStart)));
-}
-
 Future<void> getTeachersData({
   String? teacherID,
   String? branchName,
@@ -220,6 +221,7 @@ Future<void> getLedgersData({
     }));
 }
 
+// Implement with FutureBuilder not GetBuilder
 Future<void> getTotalLedgerData({
   required String branchName,
   required int termID,
