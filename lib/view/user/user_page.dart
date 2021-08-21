@@ -1,11 +1,12 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:solviolin_admin/util/controller.dart';
+import 'package:solviolin_admin/util/data_source.dart';
 import 'package:solviolin_admin/util/network.dart';
 import 'package:solviolin_admin/view/user/user_list.dart';
 import 'package:solviolin_admin/view/user/user_search.dart';
 import 'package:solviolin_admin/widget/single_reusable.dart';
-import 'package:solviolin_admin/widget/selection.dart';
 
 class UserPage extends StatefulWidget {
   const UserPage({Key? key}) : super(key: key);
@@ -16,6 +17,7 @@ class UserPage extends StatefulWidget {
 
 class _UserPageState extends State<UserPage> {
   Client client = Get.find<Client>();
+
   TextEditingController id = TextEditingController();
   TextEditingController pw = TextEditingController();
   TextEditingController name = TextEditingController();
@@ -23,6 +25,8 @@ class _UserPageState extends State<UserPage> {
   BranchController branch = Get.put(BranchController(), tag: "Register");
 
   UserType type = UserType.student;
+
+  SearchController search = Get.find<SearchController>(tag: "User");
 
   @override
   void dispose() {
@@ -43,7 +47,7 @@ class _UserPageState extends State<UserPage> {
           child: Column(
             children: [
               Padding(
-                padding: const EdgeInsets.all(8),
+                padding: EdgeInsets.all(8.r),
                 child: UserSearch(),
               ),
               Expanded(
@@ -53,7 +57,7 @@ class _UserPageState extends State<UserPage> {
           ),
         ),
         floatingActionButton: FloatingActionButton(
-          child: Icon(Icons.add),
+          child: Icon(Icons.add, size: 36.r),
           onPressed: _showUserRegister,
         ),
       ),
@@ -74,52 +78,47 @@ class _UserPageState extends State<UserPage> {
                   "유저 신규 등록",
                   style: TextStyle(
                     color: Colors.white,
-                    fontSize: 28,
+                    fontSize: 28.r,
                   ),
                 ),
                 content: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Padding(
-                      padding: const EdgeInsets.fromLTRB(12, 12, 12, 0),
-                      child: input("아이디", id, "아이디를 입력하세요!", true),
+                      padding: EdgeInsets.fromLTRB(12.r, 12.r, 12.r, 0),
+                      child: input("아이디", id, "아이디를 입력하세요!"),
                     ),
                     Padding(
-                      padding: const EdgeInsets.fromLTRB(12, 12, 12, 0),
-                      child: input("비밀번호", pw, "비밀번호를 입력하세요!", true),
+                      padding: EdgeInsets.fromLTRB(12.r, 12.r, 12.r, 0),
+                      child: input("비밀번호", pw, "비밀번호를 입력하세요!"),
                     ),
                     Padding(
-                      padding: const EdgeInsets.fromLTRB(12, 12, 12, 0),
-                      child: input("이름", name, "이름을 입력하세요!", true),
+                      padding: EdgeInsets.fromLTRB(12.r, 12.r, 12.r, 0),
+                      child: input("이름", name, "이름을 입력하세요!"),
                     ),
                     Padding(
-                      padding: const EdgeInsets.fromLTRB(12, 12, 12, 0),
-                      child: input(
-                        "전화번호",
-                        phone,
-                        "전화번호를 입력하세요!",
-                        true,
-                      ),
+                      padding: EdgeInsets.fromLTRB(12.r, 12.r, 12.r, 0),
+                      child: input("전화번호", phone, "전화번호를 입력하세요!"),
                     ),
                     Padding(
-                      padding: const EdgeInsets.fromLTRB(12, 12, 12, 0),
+                      padding: EdgeInsets.fromLTRB(12.r, 12.r, 12.r, 0),
                       child: DefaultTextStyle(
                         style: TextStyle(
                           color: Colors.white,
-                          fontSize: 20,
+                          fontSize: 20.r,
                         ),
                         child: Row(
                           children: [
                             Container(
                               width: 110,
-                              child: Text("구분"),
+                              child: label("구분", true),
                             ),
                             Container(
-                              width: 220,
+                              width: 220.r,
                               child: Row(
                                 children: [
                                   Container(
-                                    padding: const EdgeInsets.all(8),
+                                    padding: EdgeInsets.all(8.r),
                                     child: Column(
                                       children: [
                                         Text("수강생"),
@@ -136,7 +135,7 @@ class _UserPageState extends State<UserPage> {
                                     ),
                                   ),
                                   Container(
-                                    padding: const EdgeInsets.all(8),
+                                    padding: EdgeInsets.all(8.r),
                                     child: Column(
                                       children: [
                                         Text("강사"),
@@ -153,7 +152,7 @@ class _UserPageState extends State<UserPage> {
                                     ),
                                   ),
                                   Container(
-                                    padding: const EdgeInsets.all(8),
+                                    padding: EdgeInsets.all(8.r),
                                     child: Column(
                                       children: [
                                         Text("관리자"),
@@ -177,8 +176,8 @@ class _UserPageState extends State<UserPage> {
                       ),
                     ),
                     Padding(
-                      padding: const EdgeInsets.fromLTRB(12, 12, 12, 0),
-                      child: branchDropdown("Register"),
+                      padding: EdgeInsets.fromLTRB(12.r, 12.r, 12.r, 0),
+                      child: branchDropdown("Register", "지점을 선택하세요!"),
                     ),
                   ],
                 ),
@@ -188,47 +187,42 @@ class _UserPageState extends State<UserPage> {
                       Get.back();
                     },
                     style: OutlinedButton.styleFrom(
-                      padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
+                      padding: EdgeInsets.fromLTRB(16.r, 12.r, 16.r, 12.r),
                     ),
                     child: Text(
                       "취소",
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 20,
-                      ),
+                      style: TextStyle(color: Colors.white, fontSize: 20.r),
                     ),
                   ),
                   ElevatedButton(
-                    onPressed: id.text == "" ||
-                            pw.text == "" ||
-                            name.text == "" ||
-                            phone.text == "" ||
-                            branch.branchName == null
-                        ? () {
-                            showErrorMessage(context, "필수 입력값을 확인하세요!");
-                          }
-                        : () async {
-                            try {
-                              await client.registerUser(
-                                userID: id.text,
-                                userPassword: pw.text,
-                                userName: name.text,
-                                userPhone: phone.text,
-                                userType: _parseUserType(type),
-                                userBranch: branch.branchName!,
-                              );
-                            } catch (e) {
-                              showErrorMessage(context, e.toString());
-                            }
-                          },
+                    onPressed: () async {
+                      try {
+                        await client.registerUser(
+                          userID: id.text,
+                          userPassword: pw.text,
+                          userName: name.text,
+                          userPhone: phone.text,
+                          userType: _parseUserType(type),
+                          userBranch: branch.branchName!,
+                        );
+
+                        if (search.isSearched) {
+                          await getUsersData(
+                            branchName: search.text1,
+                            userID: search.text2,
+                            isPaid: search.number1,
+                            status: search.number2,
+                          );
+                        }
+                      } catch (e) {
+                        showErrorMessage(context, e.toString());
+                      }
+                    },
                     style: ElevatedButton.styleFrom(
-                      primary: const Color.fromRGBO(96, 128, 104, 100),
-                      padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
+                      primary: symbolColor,
+                      padding: EdgeInsets.fromLTRB(16.r, 12.r, 16.r, 12.r),
                     ),
-                    child: Text(
-                      "등록",
-                      style: TextStyle(fontSize: 20),
-                    ),
+                    child: Text("등록", style: TextStyle(fontSize: 20.r)),
                   ),
                 ],
               ),
@@ -238,20 +232,20 @@ class _UserPageState extends State<UserPage> {
       },
     );
   }
+
+  int _parseUserType(UserType type) {
+    Map<UserType, int> _type = {
+      UserType.student: 0,
+      UserType.teacher: 1,
+      UserType.admin: 2,
+    };
+
+    return _type[type]!;
+  }
 }
 
 enum UserType {
   student,
   teacher,
   admin,
-}
-
-int _parseUserType(UserType type) {
-  Map<UserType, int> _type = {
-    UserType.student: 0,
-    UserType.teacher: 1,
-    UserType.admin: 2,
-  };
-
-  return _type[type]!;
 }

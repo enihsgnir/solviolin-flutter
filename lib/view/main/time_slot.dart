@@ -4,8 +4,8 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:solviolin_admin/model/regular_schedule.dart';
 import 'package:solviolin_admin/util/controller.dart';
+import 'package:solviolin_admin/util/data_source.dart';
 import 'package:solviolin_admin/util/network.dart';
-import 'package:solviolin_admin/widget/selection.dart';
 import 'package:solviolin_admin/widget/single_reusable.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
 
@@ -83,6 +83,8 @@ class _TimeSlotState extends State<TimeSlot> {
             } else if (details.targetElement == CalendarElement.appointment) {
               _showReserved(details);
             }
+
+            calendarController.displayDate = controller.selectedDay;
           },
           headerStyle: CalendarHeaderStyle(
             textStyle: TextStyle(color: Colors.white, fontSize: 28),
@@ -107,7 +109,6 @@ class _TimeSlotState extends State<TimeSlot> {
             displayNameTextStyle: TextStyle(fontSize: 20),
           ),
           initialDisplayDate: controller.selectedDay,
-          showDatePickerButton: true,
           showCurrentTimeIndicator: false,
           showNavigationArrow: true,
           allowedViews: [CalendarView.week, CalendarView.timelineDay],
@@ -204,7 +205,7 @@ class _TimeSlotState extends State<TimeSlot> {
                 }
               },
               style: ElevatedButton.styleFrom(
-                primary: const Color.fromRGBO(96, 128, 104, 100),
+                primary: symbolColor,
                 padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
               ),
               child: Text(
@@ -264,7 +265,7 @@ class _TimeSlotState extends State<TimeSlot> {
                 }
               },
               style: ElevatedButton.styleFrom(
-                primary: const Color.fromRGBO(96, 128, 104, 100),
+                primary: symbolColor,
                 padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
               ),
               child: Text(
@@ -323,7 +324,7 @@ class _TimeSlotState extends State<TimeSlot> {
                 }
               },
               style: ElevatedButton.styleFrom(
-                primary: const Color.fromRGBO(96, 128, 104, 100),
+                primary: symbolColor,
                 padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
               ),
               child: Text(
@@ -419,7 +420,7 @@ class _TimeSlotState extends State<TimeSlot> {
                     }
                   },
                   style: ElevatedButton.styleFrom(
-                    primary: const Color.fromRGBO(96, 128, 104, 100),
+                    primary: symbolColor,
                     padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
                   ),
                   child: Text(
@@ -503,25 +504,15 @@ class _TimeSlotState extends State<TimeSlot> {
               ),
               Padding(
                 padding: const EdgeInsets.fromLTRB(12, 12, 12, 0),
-                child: input(
-                  "강사",
-                  teacherRegular,
-                  "강사명을 입력하세요!",
-                  true,
-                ),
+                child: input("강사", teacherRegular, "강사명을 입력하세요!"),
               ),
               Padding(
                 padding: const EdgeInsets.fromLTRB(12, 12, 12, 0),
-                child: branchDropdown(null, "지점을 선택하세요!", true),
+                child: branchDropdown(null, "지점을 선택하세요!"),
               ),
               Padding(
                 padding: const EdgeInsets.fromLTRB(12, 12, 12, 0),
-                child: input(
-                  "수강생",
-                  userRegular,
-                  "이름을 입력하세요!",
-                  true,
-                ),
+                child: input("수강생", userRegular, "이름을 입력하세요!"),
               ),
             ],
           ),
@@ -560,7 +551,7 @@ class _TimeSlotState extends State<TimeSlot> {
                 }
               },
               style: ElevatedButton.styleFrom(
-                primary: const Color.fromRGBO(96, 128, 104, 100),
+                primary: symbolColor,
                 padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
               ),
               child: Text(
@@ -599,25 +590,15 @@ class _TimeSlotState extends State<TimeSlot> {
               ),
               Padding(
                 padding: const EdgeInsets.fromLTRB(12, 12, 12, 0),
-                child: input(
-                  "강사",
-                  teacherUser,
-                  "강사명을 입력하세요!",
-                  true,
-                ),
+                child: input("강사", teacherUser, "강사명을 입력하세요!"),
               ),
               Padding(
                 padding: const EdgeInsets.fromLTRB(12, 12, 12, 0),
-                child: branchDropdown("User", "지점을 선택하세요!", true),
+                child: branchDropdown("User", "지점을 선택하세요!"),
               ),
               Padding(
                 padding: const EdgeInsets.fromLTRB(12, 12, 12, 0),
-                child: input(
-                  "수강생",
-                  userUser,
-                  "이름을 입력하세요!",
-                  true,
-                ),
+                child: input("수강생", userUser, "이름을 입력하세요!"),
               ),
             ],
           ),
@@ -656,7 +637,7 @@ class _TimeSlotState extends State<TimeSlot> {
                 }
               },
               style: ElevatedButton.styleFrom(
-                primary: const Color.fromRGBO(96, 128, 104, 100),
+                primary: symbolColor,
                 padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
               ),
               child: Text(
@@ -695,25 +676,15 @@ class _TimeSlotState extends State<TimeSlot> {
               ),
               Padding(
                 padding: const EdgeInsets.fromLTRB(12, 12, 12, 0),
-                child: input(
-                  "강사",
-                  teacherAdmin,
-                  "강사명을 입력하세요!",
-                  true,
-                ),
+                child: input("강사", teacherAdmin, "강사명을 입력하세요!"),
               ),
               Padding(
                 padding: const EdgeInsets.fromLTRB(12, 12, 12, 0),
-                child: branchDropdown("Admin", "지점을 선택하세요!", true),
+                child: branchDropdown("Admin", "지점을 선택하세요!"),
               ),
               Padding(
                 padding: const EdgeInsets.fromLTRB(12, 12, 12, 0),
-                child: input(
-                  "수강생",
-                  userAdmin,
-                  "이름을 입력하세요!",
-                  true,
-                ),
+                child: input("수강생", userAdmin, "이름을 입력하세요!"),
               ),
             ],
           ),
@@ -752,7 +723,7 @@ class _TimeSlotState extends State<TimeSlot> {
                 }
               },
               style: ElevatedButton.styleFrom(
-                primary: const Color.fromRGBO(96, 128, 104, 100),
+                primary: symbolColor,
                 padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
               ),
               child: Text(
@@ -791,25 +762,15 @@ class _TimeSlotState extends State<TimeSlot> {
               ),
               Padding(
                 padding: const EdgeInsets.fromLTRB(12, 12, 12, 0),
-                child: input(
-                  "강사",
-                  teacherFree,
-                  "강사명을 입력하세요!",
-                  true,
-                ),
+                child: input("강사", teacherFree, "강사명을 입력하세요!"),
               ),
               Padding(
                 padding: const EdgeInsets.fromLTRB(12, 12, 12, 0),
-                child: branchDropdown("Free", "지점을 선택하세요!", true),
+                child: branchDropdown("Free", "지점을 선택하세요!"),
               ),
               Padding(
                 padding: const EdgeInsets.fromLTRB(12, 12, 12, 0),
-                child: input(
-                  "수강생",
-                  userFree,
-                  "이름을 입력하세요!",
-                  true,
-                ),
+                child: input("수강생", userFree, "이름을 입력하세요!"),
               ),
             ],
           ),
@@ -848,7 +809,7 @@ class _TimeSlotState extends State<TimeSlot> {
                 }
               },
               style: ElevatedButton.styleFrom(
-                primary: const Color.fromRGBO(96, 128, 104, 100),
+                primary: symbolColor,
                 padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
               ),
               child: Text(

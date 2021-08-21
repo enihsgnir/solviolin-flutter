@@ -1,8 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:solviolin_admin/util/controller.dart';
 import 'package:solviolin_admin/util/data_source.dart';
-import 'package:solviolin_admin/widget/selection.dart';
 import 'package:solviolin_admin/widget/single_reusable.dart';
 
 class UserSearch extends StatefulWidget {
@@ -15,8 +15,10 @@ class UserSearch extends StatefulWidget {
 class _UserSearchState extends State<UserSearch> {
   TextEditingController id = TextEditingController();
   BranchController branch = Get.put(BranchController());
-  CheckController _isPaid = Get.put(CheckController(), tag: "isPaid");
-  CheckController _status = Get.put(CheckController(), tag: "status");
+  CheckController isPaid = Get.put(CheckController(), tag: "isPaid");
+  CheckController status = Get.put(CheckController(), tag: "status");
+
+  SearchController search = Get.find<SearchController>(tag: "User");
 
   @override
   void dispose() {
@@ -27,28 +29,28 @@ class _UserSearchState extends State<UserSearch> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(8),
+      padding: EdgeInsets.all(8.r),
       decoration: BoxDecoration(
         color: Colors.transparent,
         border: Border.all(color: Colors.grey),
-        borderRadius: BorderRadius.circular(15),
+        borderRadius: BorderRadius.circular(15.r),
       ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Container(
             alignment: Alignment.centerLeft,
-            padding: const EdgeInsets.only(left: 24),
+            padding: EdgeInsets.only(left: 24.r),
             child: input("이름", id),
           ),
           Container(
             alignment: Alignment.centerLeft,
-            padding: const EdgeInsets.fromLTRB(24, 12, 0, 0),
+            padding: EdgeInsets.fromLTRB(24.r, 6.r, 0, 0),
             child: branchDropdown(),
           ),
           Container(
             alignment: Alignment.centerLeft,
-            padding: const EdgeInsets.fromLTRB(24, 12, 0, 0),
+            padding: EdgeInsets.fromLTRB(24.r, 6.r, 0, 0),
             child: check(
               tag: "isPaid",
               item: "결제 여부",
@@ -60,7 +62,7 @@ class _UserSearchState extends State<UserSearch> {
             children: [
               Container(
                 alignment: Alignment.centerLeft,
-                padding: const EdgeInsets.fromLTRB(24, 12, 0, 0),
+                padding: EdgeInsets.fromLTRB(24.r, 6.r, 0, 0),
                 child: check(
                   tag: "status",
                   item: "등록 여부",
@@ -69,28 +71,31 @@ class _UserSearchState extends State<UserSearch> {
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.only(left: 60),
+                padding: EdgeInsets.only(left: 36.r),
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    primary: const Color.fromRGBO(96, 128, 104, 100),
+                    primary: symbolColor,
                   ),
                   onPressed: () async {
                     try {
-                      String userID = id.text;
+                      search.text1 = branch.branchName;
+                      search.text2 = id.text == "" ? null : id.text;
+                      search.number1 = isPaid.result;
+                      search.number2 = status.result;
+
                       await getUsersData(
-                        branchName: branch.branchName,
-                        userID: userID == "" ? null : userID,
-                        isPaid: _isPaid.result,
-                        status: _status.result,
+                        branchName: search.text1,
+                        userID: search.text2,
+                        isPaid: search.number1,
+                        status: search.number2,
                       );
+
+                      search.isSearched = true;
                     } catch (e) {
                       showErrorMessage(context, e.toString());
                     }
                   },
-                  child: Text(
-                    "검색",
-                    style: TextStyle(fontSize: 20),
-                  ),
+                  child: Text("검색", style: TextStyle(fontSize: 20.r)),
                 ),
               ),
             ],

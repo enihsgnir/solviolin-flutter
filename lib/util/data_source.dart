@@ -7,14 +7,14 @@ import 'package:solviolin_admin/util/controller.dart';
 import 'package:solviolin_admin/util/network.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
 
-Client _client = Get.put(Client());
+Client _client = Get.find<Client>();
 DataController _controller = Get.find<DataController>();
 
-extension on num {
-  // num get a => Platform.isIOS ? this / 2 : this;
-
-  // num get b => this * _controller.ratio;
+extension RFS on num {
+  double get r => this * _controller.ratio; //'r'esponsible font size
 }
+
+Color symbolColor = const Color.fromRGBO(96, 128, 104, 100);
 
 Future<void> logoutAndDeleteData() async {
   await _client.logout();
@@ -48,8 +48,11 @@ Future<void> getReservationData({
   String? userID,
   String? teacherID,
 }) async {
-  final DateTime first = DateTime(focusedDay.year, focusedDay.month, 1);
-  final DateTime last = DateTime(focusedDay.year, focusedDay.month + 1, 0);
+  final int weekday = focusedDay.weekday % 7;
+
+  final DateTime first =
+      DateTime(focusedDay.year, focusedDay.month, focusedDay.day - weekday);
+  final DateTime last = first.add(const Duration(days: 7));
 
   _controller.updateTeacherName(await _client.getTeacherName(
     branchName: branchName,

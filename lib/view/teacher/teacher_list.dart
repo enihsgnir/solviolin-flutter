@@ -4,6 +4,7 @@ import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:get/get.dart';
 import 'package:solviolin_admin/model/teacher.dart';
 import 'package:solviolin_admin/util/controller.dart';
+import 'package:solviolin_admin/util/data_source.dart';
 import 'package:solviolin_admin/util/format.dart';
 import 'package:solviolin_admin/util/network.dart';
 import 'package:solviolin_admin/widget/single_reusable.dart';
@@ -38,12 +39,12 @@ class _TeacherListState extends State<TeacherList> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(CupertinoIcons.delete, size: 48),
+                        Icon(CupertinoIcons.delete, size: 48.r),
                         Text(
                           "삭제",
                           style: TextStyle(
                             color: Colors.white,
-                            fontSize: 20,
+                            fontSize: 20.r,
                           ),
                         )
                       ],
@@ -58,14 +59,14 @@ class _TeacherListState extends State<TeacherList> {
                               "강사 삭제",
                               style: TextStyle(
                                 color: Colors.white,
-                                fontSize: 28,
+                                fontSize: 28.r,
                               ),
                             ),
                             content: Text(
                               "정말 삭제하시겠습니까?",
                               style: TextStyle(
                                 color: Colors.white,
-                                fontSize: 20,
+                                fontSize: 20.r,
                               ),
                             ),
                             actions: [
@@ -74,14 +75,16 @@ class _TeacherListState extends State<TeacherList> {
                                   Get.back();
                                 },
                                 style: OutlinedButton.styleFrom(
-                                  padding:
-                                      const EdgeInsets.fromLTRB(16, 12, 16, 12),
+                                  padding: EdgeInsets.symmetric(
+                                    vertical: 12.r,
+                                    horizontal: 16.r,
+                                  ),
                                 ),
                                 child: Text(
                                   "취소",
                                   style: TextStyle(
                                     color: Colors.white,
-                                    fontSize: 20,
+                                    fontSize: 20.r,
                                   ),
                                 ),
                               ),
@@ -98,14 +101,15 @@ class _TeacherListState extends State<TeacherList> {
                                   }
                                 },
                                 style: ElevatedButton.styleFrom(
-                                  primary:
-                                      const Color.fromRGBO(96, 128, 104, 100),
-                                  padding:
-                                      const EdgeInsets.fromLTRB(16, 12, 16, 12),
+                                  primary: symbolColor,
+                                  padding: EdgeInsets.symmetric(
+                                    vertical: 12.r,
+                                    horizontal: 16.r,
+                                  ),
                                 ),
                                 child: Text(
                                   "확인",
-                                  style: TextStyle(fontSize: 20),
+                                  style: TextStyle(fontSize: 20.r),
                                 ),
                               ),
                             ],
@@ -118,17 +122,17 @@ class _TeacherListState extends State<TeacherList> {
               ],
               child: Container(
                 width: double.infinity,
-                height: 120,
+                height: 120.r,
                 decoration: BoxDecoration(
                   color: Colors.transparent,
                   border: Border.all(color: Colors.grey),
-                  borderRadius: BorderRadius.circular(15),
+                  borderRadius: BorderRadius.circular(15.r),
                 ),
-                margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+                margin: EdgeInsets.symmetric(vertical: 4.r, horizontal: 8.r),
                 child: DefaultTextStyle(
                   style: TextStyle(
                     color: Colors.white,
-                    fontSize: 28,
+                    fontSize: 28.r,
                   ),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,

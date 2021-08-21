@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:solviolin_admin/model/ledger.dart';
 import 'package:solviolin_admin/util/controller.dart';
+import 'package:solviolin_admin/util/data_source.dart';
 
 class LedgerList extends StatefulWidget {
   const LedgerList({Key? key}) : super(key: key);
@@ -28,11 +29,11 @@ class _LedgerListState extends State<LedgerList> {
               decoration: BoxDecoration(
                 color: Colors.transparent,
                 border: Border.all(color: Colors.grey),
-                borderRadius: BorderRadius.circular(15),
+                borderRadius: BorderRadius.circular(15.r),
               ),
-              margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+              margin: EdgeInsets.symmetric(vertical: 4.r, horizontal: 8.r),
               child: DefaultTextStyle(
-                style: TextStyle(color: Colors.white, fontSize: 28),
+                style: TextStyle(color: Colors.white, fontSize: 28.r),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [

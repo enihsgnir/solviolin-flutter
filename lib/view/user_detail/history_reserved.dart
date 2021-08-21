@@ -1,10 +1,11 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:solviolin_admin/model/reservation.dart';
-import 'package:solviolin_admin/util/format.dart';
-import 'package:solviolin_admin/widget/notification.dart';
+import 'package:solviolin_admin/util/data_source.dart';
+import 'package:solviolin_admin/util/network.dart';
 import 'package:solviolin_admin/widget/single_reusable.dart';
 
 class HistoryReserved extends StatefulWidget {
@@ -20,11 +21,15 @@ class HistoryReserved extends StatefulWidget {
 }
 
 class _HistoryReservedState extends State<HistoryReserved> {
+  Client _client = Get.find<Client>();
+
   @override
   Widget build(BuildContext context) {
     return ListView.builder(
       itemCount: widget.reservations.length,
       itemBuilder: (context, index) {
+        Reservation reservation = widget.reservations[index];
+
         return Slidable(
           actionPane: SlidableScrollActionPane(),
           secondaryActions: [
@@ -36,28 +41,27 @@ class _HistoryReservedState extends State<HistoryReserved> {
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Icon(CupertinoIcons.delete_left, size: 48),
+                          Icon(CupertinoIcons.delete_left, size: 48.r),
                           Text(
                             "취소",
                             style: TextStyle(
                               color: Colors.white,
-                              fontSize: 20,
+                              fontSize: 20.r,
                             ),
                           )
                         ],
                       ),
                       onTap: () async {
-                        widget.reservations[index].bookingStatus.abs() == 2
+                        reservation.bookingStatus.abs() == 2
                             ? showErrorMessage(context, "이미 취소된 수업입니다.")
-                            : await showModalCancel(
-                                context, widget.reservations[index]);
+                            : await showModalCancel(context, reservation);
                       },
                     ),
                   ),
                   Container(
-                    margin: EdgeInsets.symmetric(vertical: 8),
+                    margin: EdgeInsets.symmetric(vertical: 8.r),
                     color: Colors.white,
-                    width: 0.25,
+                    width: 0.25.r,
                   ),
                 ],
               ),
@@ -66,30 +70,29 @@ class _HistoryReservedState extends State<HistoryReserved> {
               child: Row(
                 children: [
                   Container(
-                    margin: EdgeInsets.symmetric(vertical: 8),
+                    margin: EdgeInsets.symmetric(vertical: 8.r),
                     color: Colors.white,
-                    width: 0.25,
+                    width: 0.25.r,
                   ),
                   Expanded(
                     child: InkWell(
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Icon(Icons.more_time, size: 48),
+                          Icon(Icons.more_time, size: 48.r),
                           Text(
                             "연장",
                             style: TextStyle(
                               color: Colors.white,
-                              fontSize: 20,
+                              fontSize: 20.r,
                             ),
                           )
                         ],
                       ),
                       onTap: () async {
-                        widget.reservations[index].bookingStatus.abs() == 3
+                        reservation.bookingStatus.abs() == 3
                             ? showErrorMessage(context, "이미 연장된 수업입니다.")
-                            : await showModalExtend(
-                                context, widget.reservations[index]);
+                            : await showModalExtend(context, reservation);
                       },
                     ),
                   ),
@@ -99,51 +102,45 @@ class _HistoryReservedState extends State<HistoryReserved> {
           ],
           actionExtentRatio: 1 / 5,
           child: Container(
-            height: 120,
+            height: 120.r,
             decoration: BoxDecoration(
-              color: Theme.of(context).scaffoldBackgroundColor,
+              color: Colors.transparent,
               border: Border.all(color: Colors.grey),
-              borderRadius: BorderRadius.circular(15),
+              borderRadius: BorderRadius.circular(15.r),
             ),
-            margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+            margin: EdgeInsets.fromLTRB(8.r, 4.r, 8.r, 4.r),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
-                  "${widget.reservations[index].teacherID}" +
-                      " / ${widget.reservations[index].branchName}",
+                  "${reservation.teacherID} / ${reservation.branchName}",
                   style: TextStyle(
                     color: Colors.white,
-                    fontSize: 24,
-                    decoration:
-                        widget.reservations[index].bookingStatus.abs() == 2
-                            ? TextDecoration.lineThrough
-                            : null,
+                    fontSize: 24.r,
+                    decoration: reservation.bookingStatus.abs() == 2
+                        ? TextDecoration.lineThrough
+                        : null,
                   ),
                 ),
                 Text(
-                  DateFormat("yy/MM/dd HH:mm")
-                          .format(widget.reservations[index].startDate) +
+                  DateFormat("yy/MM/dd HH:mm").format(reservation.startDate) +
                       " ~ " +
-                      DateFormat("HH:mm")
-                          .format(widget.reservations[index].endDate),
+                      DateFormat("HH:mm").format(reservation.endDate),
                   style: TextStyle(
                     color: Colors.white,
-                    fontSize: 24,
-                    decoration:
-                        widget.reservations[index].bookingStatus.abs() == 2
-                            ? TextDecoration.lineThrough
-                            : null,
+                    fontSize: 24.r,
+                    decoration: reservation.bookingStatus.abs() == 2
+                        ? TextDecoration.lineThrough
+                        : null,
                   ),
                 ),
                 Container(
                   alignment: Alignment.centerRight,
-                  padding: const EdgeInsets.only(right: 24),
+                  padding: EdgeInsets.only(right: 24.r),
                   width: double.infinity,
                   child: Text(
-                    bookingStatusToString(
-                        widget.reservations[index].bookingStatus),
-                    style: TextStyle(color: Colors.red, fontSize: 20),
+                    _statusToString(reservation.bookingStatus),
+                    style: TextStyle(color: Colors.red, fontSize: 20.r),
                   ),
                 ),
               ],
@@ -152,5 +149,105 @@ class _HistoryReservedState extends State<HistoryReserved> {
         );
       },
     );
+  }
+
+  Future showModalCancel(BuildContext context, Reservation reservation) {
+    return showCupertinoModalPopup(
+      context: context,
+      builder: (context) {
+        return CupertinoActionSheet(
+          title: Text(
+            DateFormat("HH:mm").format(reservation.startDate) +
+                " ~ " +
+                DateFormat("HH:mm").format(reservation.endDate),
+            style: TextStyle(fontSize: 24.r),
+          ),
+          message: Text("수업을 취소 하시겠습니까?", style: TextStyle(fontSize: 24.r)),
+          actions: [
+            CupertinoActionSheetAction(
+              onPressed: () async {
+                try {
+                  await _client.cancelReservation(reservation.id);
+                  try {} catch (e) {
+                    await _client.logout();
+                    Get.offAllNamed("/login");
+                    showErrorMessage(context, e.toString());
+                  }
+                } catch (e) {
+                  Get.back();
+                  showErrorMessage(context, e.toString());
+                }
+              },
+              isDestructiveAction: true,
+              child: Text("수업 취소", style: TextStyle(fontSize: 24.r)),
+            ),
+          ],
+          cancelButton: CupertinoActionSheetAction(
+            onPressed: () {
+              Get.back();
+            },
+            isDefaultAction: true,
+            child: Text("닫기", style: TextStyle(fontSize: 24.r)),
+          ),
+        );
+      },
+    );
+  }
+
+  Future showModalExtend(BuildContext context, Reservation reservation) {
+    return showCupertinoModalPopup(
+      context: context,
+      builder: (context) {
+        return CupertinoActionSheet(
+          title: Text(
+            DateFormat("yy/MM/dd HH:mm").format(reservation.startDate) +
+                " ~ " +
+                DateFormat("HH:mm").format(
+                    reservation.endDate.add(const Duration(minutes: 15))),
+            style: TextStyle(fontSize: 24.r),
+          ),
+          message: Text("수업을 15분 연장 하시겠습니까?", style: TextStyle(fontSize: 24.r)),
+          actions: [
+            CupertinoActionSheetAction(
+              onPressed: () async {
+                try {
+                  await _client.extendReservation(reservation.id);
+                  try {} catch (e) {
+                    await _client.logout();
+                    Get.offAllNamed("/login");
+                    showErrorMessage(context, e.toString());
+                  }
+                } catch (e) {
+                  Get.back();
+                  showErrorMessage(context, e.toString());
+                }
+              },
+              child: Text("수업 연장", style: TextStyle(fontSize: 24.r)),
+            ),
+          ],
+          cancelButton: CupertinoActionSheetAction(
+            onPressed: () {
+              Get.back();
+            },
+            isDefaultAction: true,
+            child: Text("닫기", style: TextStyle(fontSize: 24.r)),
+          ),
+        );
+      },
+    );
+  }
+
+  String _statusToString(int bookingStatus) {
+    Map<int, String> status = {
+      0: "Original",
+      1: "MadeUp",
+      2: "Canceled",
+      3: "Extended",
+      -1: "MadeUp(by Admin)",
+      -2: "Canceled(by Admin)",
+      -3: "Extended(by Admin)",
+    };
+
+    return status[bookingStatus]!;
   }
 }

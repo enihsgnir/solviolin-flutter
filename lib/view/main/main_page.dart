@@ -6,7 +6,6 @@ import 'package:solviolin_admin/util/controller.dart';
 import 'package:solviolin_admin/util/data_source.dart';
 import 'package:solviolin_admin/util/network.dart';
 import 'package:solviolin_admin/view/main/time_slot.dart';
-import 'package:solviolin_admin/widget/selection.dart';
 import 'package:solviolin_admin/widget/single_reusable.dart';
 
 class MainPage extends StatefulWidget {
@@ -48,14 +47,33 @@ class _MainPageState extends State<MainPage> {
   Widget build(BuildContext context) {
     Get.find<DataController>();
 
+    Get.put(DateTimeController());
+
     return GestureDetector(
       onTap: () => FocusScope.of(context).unfocus(),
       child: Scaffold(
         appBar: appBar(
           "메인",
           actions: [
+            IconButton(
+              onPressed: () async {
+                try {
+                  if (search.isSearched) {
+                    await getReservationData(
+                      focusedDay: search.dateTime1!,
+                      branchName: search.text1!,
+                      userID: search.text2,
+                      teacherID: search.text3,
+                    );
+                  }
+                } catch (e) {
+                  showErrorMessage(context, e.toString());
+                }
+              },
+              icon: Icon(CupertinoIcons.refresh),
+            ),
             Container(
-              padding: const EdgeInsets.all(16),
+              padding: EdgeInsets.all(16.r),
               child: InkWell(
                 child: Icon(CupertinoIcons.slider_horizontal_3),
                 onTap: () {
@@ -69,7 +87,7 @@ class _MainPageState extends State<MainPage> {
                             "검색",
                             style: TextStyle(
                               color: Colors.white,
-                              fontSize: 28,
+                              fontSize: 28.r,
                             ),
                           ),
                           content: Column(
@@ -77,27 +95,17 @@ class _MainPageState extends State<MainPage> {
                             children: [
                               Padding(
                                 padding:
-                                    const EdgeInsets.fromLTRB(12, 12, 12, 0),
-                                child: input(
-                                  "수강생",
-                                  user,
-                                  "이름을 입력하세요!",
-                                  true,
-                                ),
+                                    EdgeInsets.fromLTRB(12.r, 12.r, 12.r, 0),
+                                child: input("수강생", user),
                               ),
                               Padding(
                                 padding:
-                                    const EdgeInsets.fromLTRB(12, 12, 12, 0),
-                                child: input(
-                                  "강사",
-                                  teacher,
-                                  "강사명을 입력하세요!",
-                                  true,
-                                ),
+                                    EdgeInsets.fromLTRB(12.r, 12.r, 12.r, 0),
+                                child: input("강사", teacher),
                               ),
                               Padding(
                                 padding:
-                                    const EdgeInsets.fromLTRB(12, 12, 12, 0),
+                                    EdgeInsets.fromLTRB(12.r, 12.r, 12.r, 0.r),
                                 child: branchDropdown(null, "지점을 선택하세요!"),
                               ),
                             ],
@@ -109,47 +117,49 @@ class _MainPageState extends State<MainPage> {
                               },
                               style: OutlinedButton.styleFrom(
                                 padding:
-                                    const EdgeInsets.fromLTRB(16, 12, 16, 12),
+                                    EdgeInsets.fromLTRB(16.r, 12.r, 16.r, 12),
                               ),
                               child: Text(
                                 "취소",
                                 style: TextStyle(
                                   color: Colors.white,
-                                  fontSize: 20,
+                                  fontSize: 20.r,
                                 ),
                               ),
                             ),
                             ElevatedButton(
-                              onPressed: branch.branchName == null
-                                  ? () {
-                                      showErrorMessage(
-                                          context, "필수 입력값을 확인하세요!");
-                                    }
-                                  : () async {
-                                      try {
-                                        await getReservationData(
-                                          focusedDay: _controller.selectedDay,
-                                          branchName: branch.branchName!,
-                                          userID: user.text,
-                                          teacherID: teacher.text == ""
-                                              ? null
-                                              : teacher.text,
-                                        );
-                                        Get.back();
-                                        search.isSearched = true;
-                                      } catch (e) {
-                                        showErrorMessage(context, e.toString());
-                                      }
-                                    },
+                              onPressed: () async {
+                                try {
+                                  search.dateTime1 = _controller.selectedDay;
+                                  search.text1 = branch.branchName;
+                                  search.text2 =
+                                      user.text == "" ? null : user.text;
+                                  search.text3 =
+                                      teacher.text == "" ? null : teacher.text;
+
+                                  await getReservationData(
+                                    focusedDay: search.dateTime1!,
+                                    branchName: search.text1!,
+                                    userID: search.text2,
+                                    teacherID: search.text3,
+                                  );
+                                  Get.back();
+
+                                  search.isSearched = true;
+                                } catch (e) {
+                                  showErrorMessage(context, e.toString());
+                                }
+                              },
                               style: ElevatedButton.styleFrom(
-                                primary:
-                                    const Color.fromRGBO(96, 128, 104, 100),
-                                padding:
-                                    const EdgeInsets.fromLTRB(16, 12, 16, 12),
+                                primary: symbolColor,
+                                padding: EdgeInsets.symmetric(
+                                  vertical: 12.r,
+                                  horizontal: 16.r,
+                                ),
                               ),
                               child: Text(
-                                "등록",
-                                style: TextStyle(fontSize: 20),
+                                "검색",
+                                style: TextStyle(fontSize: 20.r),
                               ),
                             ),
                           ],
@@ -159,6 +169,40 @@ class _MainPageState extends State<MainPage> {
                   );
                 },
               ),
+            ),
+            IconButton(
+              onPressed: () async {
+                DateTimeController controller = Get.find<DateTimeController>();
+
+                final DateTime initialDate = DateTime.now();
+                DateTime? newDate;
+
+                newDate = await showDatePicker(
+                  context: context,
+                  initialDate: controller.date ?? initialDate,
+                  firstDate:
+                      DateTime(initialDate.year, initialDate.month - 5, 1),
+                  lastDate: _controller.currentTerm[0].termEnd
+                      .add(const Duration(hours: 23, minutes: 59, seconds: 59)),
+                  builder: (context, child) {
+                    return Theme(
+                      data: ThemeData.dark().copyWith(
+                        textTheme: TextTheme(
+                          headline5: TextStyle(fontSize: 24),
+                          subtitle2: TextStyle(fontSize: 16),
+                          caption: TextStyle(fontSize: 16),
+                        ),
+                      ),
+                      child: child!,
+                    );
+                  },
+                );
+
+                if (newDate != null) {
+                  controller.updateDate(newDate);
+                }
+              },
+              icon: Icon(Icons.calendar_today),
             ),
           ],
         ),

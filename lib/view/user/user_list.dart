@@ -28,26 +28,26 @@ class _UserListState extends State<UserList> {
 
             return InkWell(
               child: Container(
-                padding: const EdgeInsets.all(12),
+                padding: EdgeInsets.all(12.r),
                 decoration: BoxDecoration(
                   color: Colors.transparent,
                   border: Border.all(color: Colors.grey),
-                  borderRadius: BorderRadius.circular(15),
+                  borderRadius: BorderRadius.circular(15.r),
                 ),
-                margin: const EdgeInsets.symmetric(
-                  vertical: 4,
-                  horizontal: 8,
+                margin: EdgeInsets.symmetric(
+                  vertical: 4.r,
+                  horizontal: 8.r,
                 ),
                 child: DefaultTextStyle(
                   style: TextStyle(
                     color: Colors.white,
-                    fontSize: 24,
+                    fontSize: 24.r,
                   ),
                   child: Column(
                     children: [
                       Text("${user.userName} / ${user.branchName}"),
                       Text(_parsePhoneNumber(user.userPhone)),
-                      Text("${_parseStatus(user.status)}" +
+                      Text("${_statusToString(user.status)}" +
                           " / 크레딧: ${user.userCredit}"),
                       Text("결제일: ${_ledgerToString(user.ledgers)}"),
                     ],
@@ -56,7 +56,7 @@ class _UserListState extends State<UserList> {
               ),
               onTap: () async {
                 try {
-                  await getUserDetailData(controller.users[index]);
+                  await getUserDetailData(user);
                   Get.toNamed("/user/detail");
                 } catch (e) {
                   showErrorMessage(context, e.toString());
@@ -68,28 +68,36 @@ class _UserListState extends State<UserList> {
       },
     );
   }
+
+  String _parsePhoneNumber(String phone) {
+    if (phone.length == 10) {
+      return phone.replaceAllMapped(
+        RegExp(r"(\d{3})(\d{3})(\d+)"),
+        (match) => "${match[1]}-${match[2]}-${match[3]}",
+      );
+    } else if (phone.length == 11) {
+      return phone.replaceAllMapped(
+        RegExp(r"(\d{3})(\d{4})(\d+)"),
+        (match) => "${match[1]}-${match[2]}-${match[3]}",
+      );
+    } else {
+      return phone.replaceAllMapped(
+        RegExp(r"(\d{3})(\d+)"),
+        (match) => "${match[1]}-${match[2]}",
+      );
+    }
+  }
+
+  String _statusToString(int status) {
+    Map<int, String> _status = {
+      0: "미등록",
+      1: "등록",
+    };
+
+    return _status[status]!;
+  }
+
+  String _ledgerToString(List<Ledger> ledgers) => ledgers.length == 0
+      ? "결제 기록 없음"
+      : DateFormat("yy/MM/dd HH:mm").format(ledgers[0].paidAt);
 }
-
-String _parsePhoneNumber(String phone) {
-  int middle = phone.length == 10 ? 6 : 7;
-
-  return phone.substring(0, 3) +
-      "-" +
-      phone.substring(3, middle) +
-      "-" +
-      phone.substring(middle);
-  //NumberFormat("###-####-####").format(number)
-}
-
-String _parseStatus(int status) {
-  Map<int, String> _status = {
-    0: "등록",
-    1: "미등록",
-  };
-
-  return _status[status]!;
-}
-
-String _ledgerToString(List<Ledger> ledgers) => ledgers.length == 0
-    ? "결제 기록 없음"
-    : DateFormat("yy/MM/dd HH:mm").format(ledgers[0].paidAt);

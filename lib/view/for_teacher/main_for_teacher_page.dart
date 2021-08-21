@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:solviolin_admin/util/controller.dart';
-import 'package:solviolin_admin/view/for_teacher_profile.dart/time_slot_for_teacher.dart';
+import 'package:solviolin_admin/view/for_teacher/time_slot_for_teacher.dart';
 import 'package:solviolin_admin/widget/single_reusable.dart';
 
 class MainForTeacherPage extends StatefulWidget {

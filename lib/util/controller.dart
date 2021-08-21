@@ -1,8 +1,9 @@
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:solviolin_admin/model/admin_profile.dart';
 import 'package:solviolin_admin/model/change.dart';
 import 'package:solviolin_admin/model/control.dart';
 import 'package:solviolin_admin/model/ledger.dart';
+import 'package:solviolin_admin/model/profile.dart';
 import 'package:solviolin_admin/model/regular_schedule.dart';
 import 'package:solviolin_admin/model/reservation.dart';
 import 'package:solviolin_admin/model/teacher.dart';
@@ -13,20 +14,24 @@ import 'package:solviolin_admin/util/data_source.dart';
 class DataController extends GetxController {
   late final double ratio;
 
-  late AdminProfile profile;
-  late List<String> branches;
+  late Profile profile;
+
   late List<Term> currentTerm;
+  List<Term> terms = [];
+  late List<String> branches;
+
+  DateTime selectedDay = DateTime.now();
+  List<String> teacherName = [];
   List<Reservation> reservations = [];
   ReservationDataSource? reservationDataSource;
-  List<String> teacherName = [];
-  DateTime selectedDay = DateTime.now();
+
   List<User> users = [];
   late List<RegularSchedule> regularSchedules;
   late List<Reservation> thisMonthReservations;
   late List<Reservation> lastMonthReservations;
   late List<Change> changes;
+
   List<Control> controls = [];
-  List<Term> terms = [];
   List<Teacher> teachers = [];
   List<Ledger> ledgers = [];
   late String totalLeger;
@@ -36,8 +41,18 @@ class DataController extends GetxController {
     update();
   }
 
-  void updateProfile(AdminProfile data) {
+  void updateProfile(Profile data) {
     profile = data;
+    update();
+  }
+
+  void updateCurrentTerm(List<Term> data) {
+    currentTerm = data;
+    update();
+  }
+
+  void updateTerms(List<Term> data) {
+    terms = data;
     update();
   }
 
@@ -46,8 +61,13 @@ class DataController extends GetxController {
     update();
   }
 
-  void updateCurrentTerm(List<Term> data) {
-    currentTerm = data;
+  void updateSelectedDay(DateTime data) {
+    selectedDay = data;
+    update();
+  }
+
+  void updateTeacherName(List<String> data) {
+    teacherName = data;
     update();
   }
 
@@ -61,16 +81,6 @@ class DataController extends GetxController {
     update();
   }
 
-  void updateTeacherName(List<String> data) {
-    teacherName = data;
-    update();
-  }
-
-  void updateSelectedDay(DateTime data) {
-    selectedDay = data;
-    update();
-  }
-
   void updateUsers(List<User> data) {
     users = data;
     update();
@@ -81,7 +91,6 @@ class DataController extends GetxController {
     update();
   }
 
-  // updateThisMonthRESVs
   void updateThisMonthReservations(List<Reservation> data) {
     thisMonthReservations = data;
     update();
@@ -99,11 +108,6 @@ class DataController extends GetxController {
 
   void updateControls(List<Control> data) {
     controls = data;
-    update();
-  }
-
-  void updateTerms(List<Term> data) {
-    terms = data;
     update();
   }
 
@@ -140,4 +144,61 @@ class SearchController extends GetxController {
 
   int? number1;
   int? number2;
+}
+
+class BranchController extends GetxController {
+  String? branchName;
+
+  void updateBranchName(String data) {
+    branchName = data;
+    update();
+  }
+}
+
+class WorkDowController extends GetxController {
+  int? workDow;
+
+  void updateWorkDow(int data) {
+    workDow = data;
+    update();
+  }
+}
+
+class TermController extends GetxController {
+  int? termID;
+
+  void updateTermID(int data) {
+    termID = data;
+    update();
+  }
+}
+
+class CheckController extends GetxController {
+  int? result;
+
+  void updateResult(int? data) {
+    result = data;
+    update();
+  }
+}
+
+class DateTimeController extends GetxController {
+  DateTime? date;
+  TimeOfDay? time;
+  DateTime? dateTime;
+
+  void updateDate(DateTime? data) {
+    date = data;
+    update();
+  }
+
+  void updateTime(TimeOfDay? data) {
+    time = data;
+    update();
+  }
+
+  void updateDateTime(DateTime? data) {
+    dateTime = data;
+    update();
+  }
 }

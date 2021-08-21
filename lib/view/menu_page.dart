@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:solviolin_admin/util/controller.dart';
+import 'package:solviolin_admin/util/data_source.dart';
 import 'package:solviolin_admin/util/network.dart';
 import 'package:solviolin_admin/widget/single_reusable.dart';
 
@@ -33,50 +34,46 @@ class _MenuPageState extends State<MenuPage> {
     return Scaffold(
       body: SafeArea(
         child: Center(
-          child: DefaultTextStyle(
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 22,
-            ),
-            child: ListView(
-              children: [
-                Container(height: 150),
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    menu("메인", () => Get.toNamed("/main")),
-                    menu("유저", () => Get.toNamed("/user")),
-                    menu("오픈/클로즈", () => Get.toNamed("/control")),
-                    menu("학기", () => Get.toNamed("/term")),
-                    menu("강사", () => Get.toNamed("/teacher")),
-                    menu("지점 등록", () => _showBranchRegister()),
-                    menu("매출", () => Get.toNamed("/ledger")),
-                  ],
-                ),
-              ],
-            ),
+          child: ListView(
+            children: [
+              Container(height: 180.r),
+              Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  menu("메인", () => Get.toNamed("/main")),
+                  menu("유저", () => Get.toNamed("/user")),
+                  menu("오픈/클로즈", () => Get.toNamed("/control")),
+                  menu("학기", () => Get.toNamed("/term")),
+                  menu("강사", () => Get.toNamed("/teacher")),
+                  menu("지점 등록", () => _showBranchRegister()),
+                  menu("매출", () => Get.toNamed("/ledger")),
+                ],
+              ),
+            ],
           ),
         ),
       ),
     );
   }
 
-  Widget menu(String name, void Function() onTap) {
+  Widget menu(String name, void Function() onPressed) {
     return Padding(
-      padding: const EdgeInsets.all(24),
-      child: InkWell(
+      padding: EdgeInsets.all(24.r),
+      child: ElevatedButton(
+        onPressed: onPressed,
+        style: ElevatedButton.styleFrom(
+          primary: symbolColor,
+          textStyle: TextStyle(color: Colors.white, fontSize: 22.r),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(15.r),
+          ),
+        ),
         child: Container(
           alignment: Alignment.center,
-          decoration: BoxDecoration(
-            color: const Color.fromRGBO(96, 128, 104, 100),
-            borderRadius: BorderRadius.circular(15),
-          ),
-          width: 165,
-          height: 60,
+          width: 135.r,
+          height: 60.r,
           child: Text(name),
         ),
-        onTap: onTap,
-        enableFeedback: false,
       ),
     );
   }
@@ -91,17 +88,12 @@ class _MenuPageState extends State<MenuPage> {
             "지점 등록",
             style: TextStyle(
               color: Colors.white,
-              fontSize: 28,
+              fontSize: 28.r,
             ),
           ),
           content: Padding(
-            padding: const EdgeInsets.fromLTRB(12, 12, 12, 0),
-            child: input(
-              "지점",
-              branch,
-              "지점명을 입력하세요!",
-              true,
-            ),
+            padding: EdgeInsets.fromLTRB(12.r, 12.r, 12.r, 0),
+            child: input("지점", branch, "지점명을 입력하세요!"),
           ),
           actions: [
             OutlinedButton(
@@ -109,36 +101,29 @@ class _MenuPageState extends State<MenuPage> {
                 Get.back();
               },
               style: OutlinedButton.styleFrom(
-                padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
+                padding: EdgeInsets.fromLTRB(16.r, 12.r, 16.r, 12.r),
               ),
               child: Text(
                 "취소",
                 style: TextStyle(
                   color: Colors.white,
-                  fontSize: 20,
+                  fontSize: 20.r,
                 ),
               ),
             ),
             ElevatedButton(
-              onPressed: branch.text == ""
-                  ? () {
-                      showErrorMessage(context, "필수 입력값을 확인하세요!");
-                    }
-                  : () async {
-                      try {
-                        await client.registerBranch(branch.text);
-                      } catch (e) {
-                        showErrorMessage(context, e.toString());
-                      }
-                    },
+              onPressed: () async {
+                try {
+                  await client.registerBranch(branch.text);
+                } catch (e) {
+                  showErrorMessage(context, e.toString());
+                }
+              },
               style: ElevatedButton.styleFrom(
-                primary: const Color.fromRGBO(96, 128, 104, 100),
-                padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
+                primary: symbolColor,
+                padding: EdgeInsets.fromLTRB(16.r, 12.r, 16.r, 12.r),
               ),
-              child: Text(
-                "등록",
-                style: TextStyle(fontSize: 20),
-              ),
+              child: Text("등록", style: TextStyle(fontSize: 20.r)),
             ),
           ],
         );

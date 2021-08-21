@@ -7,6 +7,7 @@ class Reservation {
   DateTime endDate;
   int bookingStatus;
   int extendedMin;
+  String userID;
   String teacherID;
   String branchName;
   Color? color;
@@ -17,6 +18,7 @@ class Reservation {
     required this.endDate,
     required this.bookingStatus,
     required this.extendedMin,
+    required this.userID,
     required this.teacherID,
     required this.branchName,
     this.color,
@@ -29,6 +31,7 @@ class Reservation {
       endDate: parseDateTime(json["endDate"]),
       bookingStatus: json["bookingStatus"],
       extendedMin: json["extendedMin"],
+      userID: json["userID"],
       teacherID: json["teacherID"],
       branchName: json["branchName"],
       color: Color(int.parse(

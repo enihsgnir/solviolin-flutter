@@ -4,6 +4,7 @@ class User {
   String userID;
   String userName;
   String userPhone;
+  int userType;
   String branchName;
   int userCredit;
   int status;
@@ -13,6 +14,7 @@ class User {
     required this.userID,
     required this.userName,
     required this.userPhone,
+    required this.userType,
     required this.branchName,
     required this.userCredit,
     required this.status,
@@ -24,6 +26,7 @@ class User {
       userID: json["userID"],
       userName: json["userName"],
       userPhone: json["userPhone"],
+      userType: json["userType"],
       branchName: json["branchName"],
       userCredit: json["userCredit"],
       status: json["status"],

@@ -1,5 +1,31 @@
 import 'package:flutter/material.dart';
 
+DateTime parseDateOnly(String date) => DateUtils.dateOnly(DateTime.parse(date));
+
+Duration parseTimeOnly(String time) {
+  List<String> times = time.split(":");
+  int hours = int.parse(times[0]);
+  int minutes = int.parse(times[1]);
+
+  return Duration(hours: hours, minutes: minutes);
+}
+
+DateTime parseDateTime(String dateTime) {
+  DateTime _dateTime = DateTime.parse(dateTime);
+
+  return DateTime(_dateTime.year, _dateTime.month, _dateTime.day,
+      _dateTime.hour, _dateTime.minute);
+}
+
+String twoDigits(int n) => n < 10 ? "0$n" : "$n";
+
+String timeToString(Duration time) {
+  String twoDigitMinutes =
+      twoDigits(time.inMinutes.remainder(Duration.minutesPerHour));
+
+  return "${twoDigits(time.inHours)}:$twoDigitMinutes";
+}
+
 String dowToString(int dow) {
   Map<int, String> days = {
     0: "SUN",
@@ -13,55 +39,6 @@ String dowToString(int dow) {
   };
 
   return days[dow]!;
-}
-
-Duration parseTimeOnly(String time) {
-  List<String> times = time.split(":");
-  int hours = int.parse(times[0]);
-  int minutes = int.parse(times[1]);
-
-  return Duration(hours: hours, minutes: minutes);
-}
-
-String twoDigits(int n) => n < 10 ? "0$n" : "$n";
-
-String timeToString(Duration time) {
-  String twoDigitMinutes =
-      twoDigits(time.inMinutes.remainder(Duration.minutesPerHour));
-
-  return "${twoDigits(time.inHours)}:$twoDigitMinutes";
-}
-
-DateTime parseDateOnly(String date) => DateUtils.dateOnly(DateTime.parse(date));
-
-DateTime parseDateTime(String dateTime) {
-  DateTime _dateTime = DateTime.parse(dateTime);
-
-  return DateTime(_dateTime.year, _dateTime.month, _dateTime.day,
-      _dateTime.hour, _dateTime.minute);
-}
-
-String bookingStatusToString(int bookingStatus) {
-  Map<int, String> status = {
-    0: "Original",
-    1: "MadeUp",
-    2: "Canceled",
-    3: "Extended",
-    -1: "MadeUp(by Admin)",
-    -2: "Canceled(by Admin)",
-    -3: "Extended(by Admin)",
-  };
-
-  return status[bookingStatus]!;
-}
-
-String controlStatusToString(int status) {
-  Map<int, String> _status = {
-    0: "Open",
-    1: "Close",
-  };
-
-  return _status[status]!;
 }
 
 // int getFirstDayOffset(DateTime date) {

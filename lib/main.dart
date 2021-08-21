@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -8,8 +10,8 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:solviolin_admin/util/controller.dart';
 import 'package:solviolin_admin/util/network.dart';
 import 'package:solviolin_admin/view/control/control_page.dart';
-import 'package:solviolin_admin/view/for_teacher_profile.dart/main_for_teacher_page.dart';
-import 'package:solviolin_admin/view/for_teacher_profile.dart/menu_for_teacher_page.dart';
+import 'package:solviolin_admin/view/for_teacher/main_for_teacher_page.dart';
+import 'package:solviolin_admin/view/for_teacher/menu_for_teacher_page.dart';
 import 'package:solviolin_admin/view/ledger/ledger_page.dart';
 import 'package:solviolin_admin/view/loading_page.dart';
 import 'package:solviolin_admin/view/login_page.dart';
@@ -39,32 +41,16 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  DataController _controller = Get.put(DataController());
-
-  @override
-  void initState() {
-    super.initState();
-    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
-      statusBarColor: Colors.transparent,
-    ));
-  }
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    _controller.updateRatio(MediaQuery.of(context).size.height / 1152);
-  }
-
   @override
   Widget build(BuildContext context) {
     Get.put(FlutterSecureStorage());
     Get.put(Client());
+    Get.put(DataController());
 
     return GetMaterialApp(
       builder: (context, child) => MediaQuery(
         data: MediaQuery.of(context).copyWith(
-          devicePixelRatio: 2,
-          textScaleFactor: 1.0,
+          textScaleFactor: min(MediaQuery.of(context).textScaleFactor, 1.0),
         ),
         child: child!,
       ),
@@ -73,8 +59,6 @@ class _MyAppState extends State<MyApp> {
         brightness: Brightness.dark,
         primaryColor: Colors.black,
         accentColor: Colors.white,
-        highlightColor: Colors.transparent,
-        splashColor: Colors.transparent,
         textTheme:
             GoogleFonts.nanumGothicTextTheme(Theme.of(context).textTheme),
       ),
@@ -98,7 +82,6 @@ class _MyAppState extends State<MyApp> {
         GetPage(name: "/menu-teacher", page: () => MenuForTeacherPage()),
         GetPage(name: "/main-teacher", page: () => MainForTeacherPage()),
       ],
-      debugShowCheckedModeBanner: false,
     );
   }
 }

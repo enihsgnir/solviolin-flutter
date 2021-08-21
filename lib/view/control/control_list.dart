@@ -6,7 +6,6 @@ import 'package:intl/intl.dart';
 import 'package:solviolin_admin/model/control.dart';
 import 'package:solviolin_admin/util/controller.dart';
 import 'package:solviolin_admin/util/data_source.dart';
-import 'package:solviolin_admin/util/format.dart';
 import 'package:solviolin_admin/util/network.dart';
 import 'package:solviolin_admin/widget/single_reusable.dart';
 
@@ -18,11 +17,13 @@ class ControlList extends StatefulWidget {
 }
 
 class _ControlListState extends State<ControlList> {
+  Client client = Get.find<Client>();
+
+  SearchController search = Get.find<SearchController>(tag: "Control");
+
   @override
   Widget build(BuildContext context) {
-    Client client = Get.find<Client>();
     Get.find<DataController>();
-    SearchController search = Get.find<SearchController>();
 
     return GetBuilder<DataController>(
       builder: (controller) {
@@ -40,12 +41,12 @@ class _ControlListState extends State<ControlList> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(CupertinoIcons.delete_left, size: 48),
+                        Icon(CupertinoIcons.delete_left, size: 48.r),
                         Text(
                           "취소",
                           style: TextStyle(
                             color: Colors.white,
-                            fontSize: 20,
+                            fontSize: 20.r,
                           ),
                         )
                       ],
@@ -71,13 +72,13 @@ class _ControlListState extends State<ControlList> {
                 decoration: BoxDecoration(
                   color: Colors.transparent,
                   border: Border.all(color: Colors.grey),
-                  borderRadius: BorderRadius.circular(15),
+                  borderRadius: BorderRadius.circular(15.r),
                 ),
-                margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+                margin: EdgeInsets.symmetric(vertical: 4.r, horizontal: 8.r),
                 child: Column(
                   children: [
                     Text("${control.teacherID} / ${control.branchName}" +
-                        " / ${controlStatusToString(control.status)}"),
+                        " / ${_statusToString(control.status)}"),
                     Text("시작: " +
                         DateFormat("yy/MM/dd HH:mm")
                             .format(control.controlStart)),
@@ -92,5 +93,14 @@ class _ControlListState extends State<ControlList> {
         );
       },
     );
+  }
+
+  String _statusToString(int status) {
+    Map<int, String> _status = {
+      0: "Open",
+      1: "Close",
+    };
+
+    return _status[status]!;
   }
 }

@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:solviolin_admin/model/regular_schedule.dart';
 import 'package:solviolin_admin/util/controller.dart';
+import 'package:solviolin_admin/util/data_source.dart';
 import 'package:solviolin_admin/util/format.dart';
 import 'package:solviolin_admin/util/network.dart';
 import 'package:solviolin_admin/view/user_detail/changed_reservation.dart';
 import 'package:solviolin_admin/view/user_detail/history_reserved.dart';
-import 'package:solviolin_admin/widget/selection.dart';
 import 'package:solviolin_admin/widget/single_reusable.dart';
 
 class UserDetailPage extends StatefulWidget {
@@ -61,15 +61,13 @@ class _UserDetailPageState extends State<UserDetailPage>
       body: SafeArea(
         child: GetBuilder<DataController>(
           builder: (controller) {
-            List<RegularSchedule> regulars = controller.regularSchedules;
-
             return Column(
               children: [
                 Stack(
                   alignment: Alignment.bottomCenter,
                   children: [
                     Container(
-                      height: 175,
+                      height: 175.r,
                       child: PageView.builder(
                         controller: PageController(),
                         physics: ClampingScrollPhysics(),
@@ -78,30 +76,33 @@ class _UserDetailPageState extends State<UserDetailPage>
                             currentPage = page;
                           });
                         },
-                        itemCount: regulars.length,
+                        itemCount: controller.regularSchedules.length,
                         itemBuilder: (context, index) {
+                          RegularSchedule regular =
+                              controller.regularSchedules[index];
+
                           return DefaultTextStyle(
-                            style: TextStyle(fontSize: 28),
+                            style: TextStyle(fontSize: 28.r),
                             child: Container(
                               decoration: BoxDecoration(
                                 color: Colors.transparent,
                                 border: Border.all(color: Colors.grey),
-                                borderRadius: BorderRadius.circular(15),
+                                borderRadius: BorderRadius.circular(15.r),
                               ),
-                              margin: const EdgeInsets.all(8),
+                              margin: EdgeInsets.all(8.r),
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.start,
                                 children: [
                                   Container(
                                     alignment: Alignment.centerLeft,
-                                    padding: const EdgeInsets.fromLTRB(
-                                        24, 12, 24, 0),
+                                    padding: EdgeInsets.fromLTRB(
+                                        24.r, 12.r, 24.r, 0),
                                     width: double.infinity,
                                     child: Row(
                                       mainAxisAlignment:
                                           MainAxisAlignment.spaceBetween,
                                       children: [
-                                        const Text("내 수업"),
+                                        Text(regular.userID),
                                         ElevatedButton(
                                           style: ElevatedButton.styleFrom(
                                             primary: const Color.fromRGBO(
@@ -117,7 +118,7 @@ class _UserDetailPageState extends State<UserDetailPage>
                                                       "정규 종료",
                                                       style: TextStyle(
                                                         color: Colors.white,
-                                                        fontSize: 28,
+                                                        fontSize: 28.r,
                                                       ),
                                                     ),
                                                     content: Column(
@@ -125,15 +126,18 @@ class _UserDetailPageState extends State<UserDetailPage>
                                                           MainAxisSize.min,
                                                       children: [
                                                         Padding(
-                                                          padding:
-                                                              const EdgeInsets
-                                                                      .fromLTRB(
-                                                                  12,
-                                                                  12,
-                                                                  12,
+                                                          padding: EdgeInsets
+                                                              .fromLTRB(
+                                                                  12.r,
+                                                                  12.r,
+                                                                  12.r,
                                                                   0),
                                                           child: pickDateTime(
-                                                              context, "종료일"),
+                                                            context,
+                                                            "종료일",
+                                                            null,
+                                                            true,
+                                                          ),
                                                         ),
                                                       ],
                                                     ),
@@ -144,62 +148,52 @@ class _UserDetailPageState extends State<UserDetailPage>
                                                         },
                                                         style: OutlinedButton
                                                             .styleFrom(
-                                                          padding:
-                                                              const EdgeInsets
-                                                                      .fromLTRB(
-                                                                  16,
-                                                                  12,
-                                                                  16,
-                                                                  12),
+                                                          padding: EdgeInsets
+                                                              .fromLTRB(
+                                                                  16.r,
+                                                                  12.r,
+                                                                  16.r,
+                                                                  12.r),
                                                         ),
                                                         child: Text(
                                                           "취소",
                                                           style: TextStyle(
                                                             color: Colors.white,
-                                                            fontSize: 20,
+                                                            fontSize: 20.r,
                                                           ),
                                                         ),
                                                       ),
                                                       ElevatedButton(
-                                                        onPressed:
-                                                            end.dateTime == null
-                                                                ? () {
-                                                                    showErrorMessage(
-                                                                        context,
-                                                                        "필수 입력값을 확인하세요!");
-                                                                  }
-                                                                : () async {
-                                                                    try {
-                                                                      await client
-                                                                          .updateEndDateAndDeleteLaterCourse(
-                                                                        regulars[index]
-                                                                            .id,
-                                                                        endDate:
-                                                                            end.date!,
-                                                                      );
-                                                                    } catch (e) {
-                                                                      showErrorMessage(
-                                                                          context,
-                                                                          e.toString());
-                                                                    }
-                                                                  },
+                                                        onPressed: () async {
+                                                          try {
+                                                            await client
+                                                                .updateEndDateAndDeleteLaterCourse(
+                                                              regular.id,
+                                                              endDate:
+                                                                  end.date!,
+                                                            );
+                                                          } catch (e) {
+                                                            showErrorMessage(
+                                                                context,
+                                                                e.toString());
+                                                          }
+                                                        },
                                                         style: ElevatedButton
                                                             .styleFrom(
                                                           primary: const Color
                                                                   .fromRGBO(96,
                                                               128, 104, 100),
-                                                          padding:
-                                                              const EdgeInsets
-                                                                      .fromLTRB(
-                                                                  16,
-                                                                  12,
-                                                                  16,
-                                                                  12),
+                                                          padding: EdgeInsets
+                                                              .fromLTRB(
+                                                                  16.r,
+                                                                  12.r,
+                                                                  16.r,
+                                                                  12.r),
                                                         ),
                                                         child: Text(
                                                           "등록",
                                                           style: TextStyle(
-                                                              fontSize: 20),
+                                                              fontSize: 20.r),
                                                         ),
                                                       ),
                                                     ],
@@ -208,20 +202,20 @@ class _UserDetailPageState extends State<UserDetailPage>
                                           },
                                           child: Text(
                                             "정규 종료",
-                                            style: TextStyle(fontSize: 20),
+                                            style: TextStyle(fontSize: 20.r),
                                           ),
                                         ),
                                       ],
                                     ),
                                   ),
                                   Text(
-                                    regulars[index].teacherID +
-                                        " / ${regulars[index].branchName}",
+                                    regular.teacherID +
+                                        " / ${regular.branchName}",
                                   ),
                                   Text(
-                                    "${dowToString(regulars[index].dow)}" +
-                                        " / ${timeToString(regulars[index].startTime)}" +
-                                        " ~ ${timeToString(regulars[index].endTime)}",
+                                    "${dowToString(regular.dow)}" +
+                                        " / ${timeToString(regular.startTime)}" +
+                                        " ~ ${timeToString(regular.endTime)}",
                                   ),
                                 ],
                               ),
@@ -234,12 +228,12 @@ class _UserDetailPageState extends State<UserDetailPage>
                       alignment: AlignmentDirectional.topStart,
                       children: [
                         Container(
-                          margin: EdgeInsets.only(bottom: 16),
+                          margin: EdgeInsets.only(bottom: 16.r),
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: List<Widget>.generate(
-                              regulars.length,
+                              controller.regularSchedules.length,
                               (index) => index == currentPage
                                   ? indicator(isActive: true)
                                   : indicator(isActive: false),
@@ -262,7 +256,7 @@ class _UserDetailPageState extends State<UserDetailPage>
                             border: Border(
                               right: BorderSide(
                                 color: Colors.grey,
-                                width: 0.5,
+                                width: 0.5.r,
                               ),
                             ),
                           ),
@@ -272,7 +266,7 @@ class _UserDetailPageState extends State<UserDetailPage>
                               "원비납부",
                               style: TextStyle(
                                 color: Colors.white,
-                                fontSize: 28,
+                                fontSize: 28.r,
                               ),
                             ),
                           ),
@@ -286,7 +280,7 @@ class _UserDetailPageState extends State<UserDetailPage>
                             border: Border(
                               left: BorderSide(
                                 color: Colors.grey,
-                                width: 0.5,
+                                width: 0.5.r,
                               ),
                             ),
                           ),
@@ -296,7 +290,7 @@ class _UserDetailPageState extends State<UserDetailPage>
                               "정보수정",
                               style: TextStyle(
                                 color: Colors.white,
-                                fontSize: 28,
+                                fontSize: 28.r,
                               ),
                             ),
                           ),
@@ -306,47 +300,47 @@ class _UserDetailPageState extends State<UserDetailPage>
                   ),
                 ),
                 Container(
-                  margin: EdgeInsets.all(8),
+                  margin: EdgeInsets.all(8.r),
                   color: Colors.grey,
-                  height: 0.5,
+                  height: 0.5.r,
                 ),
                 TabBar(
                   controller: tabController,
                   enableFeedback: false,
                   tabs: [
                     Tab(
-                      child: Text("지난 달", style: TextStyle(fontSize: 28)),
+                      child: Text("지난 달", style: TextStyle(fontSize: 28.r)),
                     ),
                     Tab(
-                      child: Text("이번 달", style: TextStyle(fontSize: 28)),
+                      child: Text("이번 달", style: TextStyle(fontSize: 28.r)),
                     ),
                     Tab(
-                      child: Text("변경내역", style: TextStyle(fontSize: 28)),
+                      child: Text("변경내역", style: TextStyle(fontSize: 28.r)),
                     ),
                   ],
                 ),
                 Container(
-                  margin: EdgeInsets.all(8),
+                  margin: EdgeInsets.all(8.r),
                   color: Colors.grey,
-                  height: 0.5,
+                  height: 0.5.r,
                 ),
                 Container(
-                  height: 700,
+                  height: 700.r,
                   child: TabBarView(
                     controller: tabController,
                     children: [
                       Padding(
-                        padding: const EdgeInsets.only(top: 4),
+                        padding: EdgeInsets.only(top: 4.r),
                         child:
                             HistoryReserved(controller.lastMonthReservations),
                       ),
                       Padding(
-                        padding: const EdgeInsets.only(top: 4),
+                        padding: EdgeInsets.only(top: 4.r),
                         child:
                             HistoryReserved(controller.thisMonthReservations),
                       ),
                       Padding(
-                        padding: const EdgeInsets.only(top: 4),
+                        padding: EdgeInsets.only(top: 4.r),
                         child: ChangedReservation(),
                       ),
                     ],
@@ -363,12 +357,12 @@ class _UserDetailPageState extends State<UserDetailPage>
   Widget indicator({required bool isActive}) {
     return AnimatedContainer(
       decoration: BoxDecoration(
-        color: isActive ? const Color.fromRGBO(96, 128, 104, 100) : Colors.grey,
+        color: isActive ? symbolColor : Colors.grey,
         shape: BoxShape.circle,
       ),
-      width: isActive ? 12 : 8,
-      height: isActive ? 12 : 8,
-      margin: const EdgeInsets.symmetric(horizontal: 8),
+      width: isActive ? 12.r : 8.r,
+      height: isActive ? 12.r : 8.r,
+      margin: EdgeInsets.symmetric(horizontal: 8.r),
       duration: const Duration(milliseconds: 150),
     );
   }
@@ -383,22 +377,22 @@ class _UserDetailPageState extends State<UserDetailPage>
             "원비납부",
             style: TextStyle(
               color: Colors.white,
-              fontSize: 28,
+              fontSize: 28.r,
             ),
           ),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               Padding(
-                padding: const EdgeInsets.fromLTRB(12, 12, 12, 0),
-                child: input("금액", amount, "금액을 입력하세요!", true),
+                padding: EdgeInsets.fromLTRB(12.r, 12.r, 12.r, 0),
+                child: input("금액", amount, "금액을 입력하세요!"),
               ),
               Padding(
-                padding: const EdgeInsets.fromLTRB(12, 12, 12, 0),
+                padding: EdgeInsets.fromLTRB(12.r, 12.r, 12.r, 0),
                 child: branchDropdown("Expend", "지점을 선택하세요!"),
               ),
               Padding(
-                padding: const EdgeInsets.fromLTRB(12, 12, 12, 0),
+                padding: EdgeInsets.fromLTRB(12.r, 12.r, 12.r, 0),
                 child: termDropdown("지점을 선택하세요!"),
               ),
             ],
@@ -409,44 +403,35 @@ class _UserDetailPageState extends State<UserDetailPage>
                 Get.back();
               },
               style: OutlinedButton.styleFrom(
-                padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
+                padding: EdgeInsets.fromLTRB(16.r, 12.r, 16.r, 12.r),
               ),
               child: Text(
                 "취소",
                 style: TextStyle(
                   color: Colors.white,
-                  fontSize: 20,
+                  fontSize: 20.r,
                 ),
               ),
             ),
             ElevatedButton(
-              onPressed: amount.text == "" ||
-                      expend.branchName == null ||
-                      term.termID == null
-                  ? () {
-                      showErrorMessage(context, "필수 입력값을 확인하세요!");
-                    }
-                  : () async {
-                      try {
-                        await client.registerLedger(
-                          userID: _controller.regularSchedules[0].userID,
-                          amount: int.parse(amount.text),
-                          termID: term.termID!,
-                          branchName: expend.branchName!,
-                        );
-                        Get.back();
-                      } catch (e) {
-                        showErrorMessage(context, e.toString());
-                      }
-                    },
+              onPressed: () async {
+                try {
+                  await client.registerLedger(
+                    userID: _controller.regularSchedules[0].userID,
+                    amount: int.parse(amount.text),
+                    termID: term.termID!,
+                    branchName: expend.branchName!,
+                  );
+                  Get.back();
+                } catch (e) {
+                  showErrorMessage(context, e.toString());
+                }
+              },
               style: ElevatedButton.styleFrom(
-                primary: const Color.fromRGBO(96, 128, 104, 100),
-                padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
+                primary: symbolColor,
+                padding: EdgeInsets.fromLTRB(16.r, 12.r, 16.r, 12.r),
               ),
-              child: Text(
-                "등록",
-                style: TextStyle(fontSize: 20),
-              ),
+              child: Text("등록", style: TextStyle(fontSize: 20.r)),
             ),
           ],
         );
@@ -464,37 +449,38 @@ class _UserDetailPageState extends State<UserDetailPage>
             "정보수정",
             style: TextStyle(
               color: Colors.white,
-              fontSize: 28,
+              fontSize: 28.r,
             ),
           ),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               Padding(
-                padding: const EdgeInsets.fromLTRB(12, 12, 12, 0),
+                padding: EdgeInsets.fromLTRB(12.r, 12.r, 12.r, 0),
                 child: branchDropdown("Update", "지점을 선택하세요!"),
               ),
               Padding(
-                padding: const EdgeInsets.fromLTRB(12, 12, 12, 0),
-                child: input("전화번호", phone, "번호를 입력하세요!", true),
+                padding: EdgeInsets.fromLTRB(12.r, 12.r, 12.r, 0),
+                child: input("전화번호", phone, "번호를 입력하세요!"),
               ),
               Container(
                 alignment: Alignment.centerLeft,
-                padding: const EdgeInsets.fromLTRB(12, 12, 12, 0),
+                padding: EdgeInsets.fromLTRB(12.r, 12.r, 12.r, 0),
                 child: check(
                   tag: "Update",
                   item: "등록 여부",
                   trueName: "등록",
                   falseName: "미등록",
+                  isMandatory: true,
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.fromLTRB(12, 12, 12, 0),
-                child: input("크레딧", credit, "크레딧을 입력하세요!", true),
+                padding: EdgeInsets.fromLTRB(12.r, 12.r, 12.r, 0),
+                child: input("크레딧", credit, "크레딧을 입력하세요!"),
               ),
               Padding(
-                padding: const EdgeInsets.fromLTRB(12, 12, 12, 0),
-                child: input("이름", name, "이름을 입력하세요!", true),
+                padding: EdgeInsets.fromLTRB(12.r, 12.r, 12.r, 0),
+                child: input("이름", name, "이름을 입력하세요!"),
               ),
             ],
           ),
@@ -504,49 +490,38 @@ class _UserDetailPageState extends State<UserDetailPage>
                 Get.back();
               },
               style: OutlinedButton.styleFrom(
-                padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
+                padding: EdgeInsets.fromLTRB(16.r, 12.r, 16.r, 12.r),
               ),
               child: Text(
                 "취소",
                 style: TextStyle(
                   color: Colors.white,
-                  fontSize: 20,
+                  fontSize: 20.r,
                 ),
               ),
             ),
             ElevatedButton(
-              onPressed: update.branchName == null ||
-                      phone.text == "" ||
-                      status.result == null ||
-                      credit.text == "" ||
-                      name.text == ""
-                  ? () {
-                      showErrorMessage(context, "필수 입력값을 확인하세요!");
-                    }
-                  : () async {
-                      try {
-                        await client.updateUserInformation(
-                          _controller.regularSchedules[0].userID,
-                          userBranch: update.branchName,
-                          userPhone: phone.text == "" ? null : phone.text,
-                          status: status.result,
-                          userCredit:
-                              credit.text == "" ? null : int.parse(credit.text),
-                          userName: name.text == "" ? null : name.text,
-                        );
-                        Get.back();
-                      } catch (e) {
-                        showErrorMessage(context, e.toString());
-                      }
-                    },
+              onPressed: () async {
+                try {
+                  await client.updateUserInformation(
+                    _controller.regularSchedules[0].userID,
+                    userBranch: update.branchName,
+                    userPhone: phone.text == "" ? null : phone.text,
+                    status: status.result,
+                    userCredit:
+                        credit.text == "" ? null : int.parse(credit.text),
+                    userName: name.text == "" ? null : name.text,
+                  );
+                  Get.back();
+                } catch (e) {
+                  showErrorMessage(context, e.toString());
+                }
+              },
               style: ElevatedButton.styleFrom(
-                primary: const Color.fromRGBO(96, 128, 104, 100),
-                padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
+                primary: symbolColor,
+                padding: EdgeInsets.fromLTRB(16.r, 12.r, 16.r, 12.r),
               ),
-              child: Text(
-                "등록",
-                style: TextStyle(fontSize: 20),
-              ),
+              child: Text("등록", style: TextStyle(fontSize: 20.r)),
             ),
           ],
         );

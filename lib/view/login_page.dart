@@ -14,13 +14,13 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   DataController _controller = Get.find<DataController>();
 
-  TextEditingController idController = TextEditingController();
-  TextEditingController pwController = TextEditingController();
+  TextEditingController id = TextEditingController();
+  TextEditingController pw = TextEditingController();
 
   @override
   void dispose() {
-    idController.dispose();
-    pwController.dispose();
+    id.dispose();
+    pw.dispose();
     super.dispose();
   }
 
@@ -34,8 +34,8 @@ class _LoginPageState extends State<LoginPage> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Container(
-                width: 180,
-                height: 180,
+                width: 180.r,
+                height: 180.r,
                 decoration: const BoxDecoration(
                   image: const DecorationImage(
                     image: const AssetImage("assets/solviolin_logo.png"),
@@ -45,9 +45,9 @@ class _LoginPageState extends State<LoginPage> {
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.fromLTRB(8, 30, 8, 8),
+                padding: EdgeInsets.fromLTRB(8.r, 30.r, 8.r, 8.r),
                 child: TextFormField(
-                  controller: idController,
+                  controller: id,
                   decoration: const InputDecoration(
                     labelText: "아이디",
                     labelStyle: const TextStyle(color: Colors.white),
@@ -58,16 +58,16 @@ class _LoginPageState extends State<LoginPage> {
                       borderSide: const BorderSide(color: Colors.white),
                     ),
                   ),
-                  style: TextStyle(color: Colors.white, fontSize: 20),
+                  style: TextStyle(color: Colors.white, fontSize: 20.r),
                   validator: (value) {
                     return value == null ? "아이디를 입력해주세요" : null;
                   },
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.all(8),
+                padding: EdgeInsets.all(8.r),
                 child: TextFormField(
-                  controller: pwController,
+                  controller: pw,
                   decoration: const InputDecoration(
                     labelText: "비밀번호",
                     labelStyle: const TextStyle(color: Colors.white),
@@ -78,7 +78,7 @@ class _LoginPageState extends State<LoginPage> {
                       borderSide: const BorderSide(color: Colors.white),
                     ),
                   ),
-                  style: TextStyle(color: Colors.white, fontSize: 20),
+                  style: TextStyle(color: Colors.white, fontSize: 20.r),
                   obscureText: true,
                   validator: (value) {
                     return value == null ? "비밀번호를 입력해주세요" : null;
@@ -87,44 +87,39 @@ class _LoginPageState extends State<LoginPage> {
               ),
               Container(
                 width: double.infinity,
-                height: 60,
-                margin: const EdgeInsets.all(16),
+                height: 60.r,
+                margin: EdgeInsets.all(16.r),
                 child: TextButton(
-                  onPressed:
-                      idController.text.isEmpty || pwController.text.isEmpty
-                          ? () {
-                              // showErrorMessage(context, "필수 입력값을 확인하세요!");
-                            }
-                          : () async {
-                              try {
-                                await getInitialData(
-                                  isLoggedIn: false,
-                                  userID: idController.text,
-                                  userPassword: pwController.text,
-                                );
-                                Get.put(DataController());
-                                if (_controller.profile.userType == 2) {
-                                  Get.offAllNamed("/menu");
-                                } else if (_controller.profile.userType == 1) {
-                                  Get.offAllNamed("/menu-teacher");
-                                }
-                              } catch (e) {
-                                await logoutAndDeleteData();
-                                Get.offAllNamed("/login");
-                                showErrorMessage(context, e.toString());
-                              }
-                            },
+                  onPressed: () async {
+                    try {
+                      await getInitialData(
+                        isLoggedIn: false,
+                        userID: id.text,
+                        userPassword: pw.text,
+                      );
+                      if (_controller.profile.userType == 2) {
+                        Get.offAllNamed("/menu");
+                      } else if (_controller.profile.userType == 1) {
+                        Get.offAllNamed("/menu-teacher");
+                      }
+                    } catch (e) {
+                      Get.put(DataController());
+                      await logoutAndDeleteData();
+                      Get.offAllNamed("/login");
+                      showErrorMessage(context, e.toString());
+                    }
+                  },
                   style: TextButton.styleFrom(
-                    backgroundColor: const Color.fromRGBO(96, 128, 104, 100),
+                    backgroundColor: symbolColor,
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30),
+                      borderRadius: BorderRadius.circular(30.r),
                     ),
                   ),
                   child: Text(
                     "로그인",
                     style: TextStyle(
-                      color: const Color.fromRGBO(203, 173, 204, 80),
-                      fontSize: 24,
+                      color: Colors.white,
+                      fontSize: 24.r,
                       fontWeight: FontWeight.bold,
                     ),
                   ),

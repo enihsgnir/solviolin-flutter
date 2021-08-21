@@ -4,10 +4,10 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart'
 import 'package:get/get.dart' hide Response;
 import 'package:intl/intl.dart';
 import 'package:pretty_dio_logger/pretty_dio_logger.dart';
-import 'package:solviolin_admin/model/admin_profile.dart';
 import 'package:solviolin_admin/model/change.dart';
 import 'package:solviolin_admin/model/control.dart';
 import 'package:solviolin_admin/model/ledger.dart';
+import 'package:solviolin_admin/model/profile.dart';
 import 'package:solviolin_admin/model/regular_schedule.dart';
 import 'package:solviolin_admin/model/reservation.dart';
 import 'package:solviolin_admin/model/teacher.dart';
@@ -41,17 +41,14 @@ class Client {
         bool containsAccess = await storage.containsKey(key: "accessToken");
         bool containsRefresh = await storage.containsKey(key: "refreshToken");
 
-        if (response.statusCode == 400) {
-          return handler.reject(NetworkException._(
-            message: "정보가 올바르지 않습니다.",
-            options: response.requestOptions,
-          ));
-        } else if (response.statusCode == 401) {
-          if (!containsAccess && !containsRefresh) {
-            return handler.reject(NetworkException._(
-              message: "아이디 또는 비밀번호가 일치하지 않습니다.",
-              options: response.requestOptions,
-            ));
+        if (response.statusCode == 401) {
+          if (containsAccess && containsRefresh) {
+            try {
+              await refresh();
+              return handler.next(await retry(response.requestOptions));
+            } on NetworkException catch (e) {
+              return handler.reject(e);
+            }
           } else if (!containsAccess && containsRefresh) {
             Get.offAllNamed("/login");
             await logout();
@@ -60,24 +57,21 @@ class Client {
               message: "인증이 만료되었습니다. 자동으로 로그아웃 됩니다.",
               options: response.requestOptions,
             ));
-          } else if (containsAccess && containsRefresh) {
-            try {
-              await refresh();
-              return handler.next(await retry(response.requestOptions));
-            } on NetworkException catch (e) {
-              return handler.reject(e);
-            }
           }
-        } else if (response.statusCode == 404) {
+        } else if (response.statusCode != 200 && response.statusCode != 201) {
+          var message = response.data["message"];
+          if (message is List<dynamic>) {
+            message = message.join("\n");
+          }
+
           return handler.reject(NetworkException._(
-            message: "정보를 불러올 수 없습니다.",
+            message: message,
             options: response.requestOptions,
           ));
         }
 
         return handler.next(response);
       },
-      onError: (error, handler) => handler.next(error),
     ));
   }
 
@@ -119,14 +113,11 @@ class Client {
 
   Future<void> logoutWithToken() async {
     if (await isLoggedIn()) {
-      Response response = await dio.patch("/auth/log-out");
-      if (response.statusCode != 200 && response.statusCode != 201) {
-        throw "로그아웃에 실패했습니다.";
-      }
+      await dio.patch("/auth/log-out");
     }
   }
 
-  Future<AdminProfile> login(String userID, String userPassword) async {
+  Future<Profile> login(String userID, String userPassword) async {
     Response response = await dio.post("/auth/login", data: {
       "userID": userID,
       "userPassword": userPassword,
@@ -137,7 +128,7 @@ class Client {
             key: "accessToken", value: response.data["access_token"]);
         await storage.write(
             key: "refreshToken", value: response.data["refresh_token"]);
-        return AdminProfile.fromJson(response.data);
+        return Profile.fromJson(response.data);
       } else {
         throw "수강생은 로그인할 수 없습니다.";
       }
@@ -145,12 +136,12 @@ class Client {
     throw "내 정보를 불러올 수 없습니다.";
   }
 
-  Future<AdminProfile> getProfile() async {
+  Future<Profile> getProfile() async {
     if (await isLoggedIn()) {
       Response response = await dio.get("/auth/profile");
       if (response.statusCode == 200) {
         if (response.data["userType"] != 0) {
-          return AdminProfile.fromJson(response.data);
+          return Profile.fromJson(response.data);
         } else {
           throw "수강생은 로그인할 수 없습니다.";
         }
@@ -169,7 +160,7 @@ class Client {
     String? token,
   }) async {
     if (await isLoggedIn()) {
-      Response response = await dio.post(
+      await dio.post(
         "/user",
         data: {
           "userID": userID,
@@ -181,11 +172,6 @@ class Client {
           "token": token,
         }..removeWhere((key, value) => value == null),
       );
-      if (response.statusCode == 409) {
-        throw "아이디 또는 전화번호가 중복됩니다.";
-      } else if (response.statusCode != 200 && response.statusCode != 201) {
-        throw "유저 등록에 실패했습니다.";
-      }
     }
   }
 
@@ -225,7 +211,7 @@ class Client {
     String? token,
   }) async {
     if (await isLoggedIn()) {
-      Response response = await dio.patch(
+      await dio.patch(
         "/user/$userID",
         data: {
           "userName": userName,
@@ -236,11 +222,6 @@ class Client {
           "token": token,
         }..removeWhere((key, value) => value == null),
       );
-      if (response.statusCode == 409) {
-        throw "아이디 또는 전화번호가 중복됩니다.";
-      } else if (response.statusCode != 200 && response.statusCode != 201) {
-        throw "해당 유저 정보 업데이트에 실패했습니다.";
-      }
     }
   }
 
@@ -249,13 +230,10 @@ class Client {
     required DateTime termEnd,
   }) async {
     if (await isLoggedIn()) {
-      Response response = await dio.post("/term", data: {
+      await dio.post("/term", data: {
         "termStart": termStart.toIso8601String(),
         "termEnd": termEnd.toIso8601String(),
       });
-      if (response.statusCode != 200 && response.statusCode != 201) {
-        throw "학기 등록에 실패했습니다.";
-      }
     }
   }
 
@@ -293,16 +271,13 @@ class Client {
     required Duration endTime,
   }) async {
     if (await isLoggedIn()) {
-      Response response = await dio.post("/teacher", data: {
+      await dio.post("/teacher", data: {
         "teacherID": teacherID,
         "teacherBranch": teacherBranch,
         "workDow": workDow,
         "startTime": timeToString(startTime),
         "endTime": timeToString(endTime),
       });
-      if (response.statusCode != 200 && response.statusCode != 201) {
-        throw "선생님 스케줄 등록에 실패했습니다.";
-      }
     }
   }
 
@@ -311,16 +286,13 @@ class Client {
     String? branchName,
   }) async {
     if (await isLoggedIn()) {
-      Response response = await dio.delete(
+      await dio.delete(
         "/teacher",
         queryParameters: {
           "teacherID": teacherID,
           "branchName": branchName,
         }..removeWhere((key, value) => value == null),
       );
-      if (response.statusCode != 200 && response.statusCode != 201) {
-        throw "선생님 스케줄 삭제에 실패했습니다.";
-      }
     }
   }
 
@@ -407,7 +379,7 @@ class Client {
     required int cancelInClose,
   }) async {
     if (await isLoggedIn()) {
-      Response response = await dio.post("/control", data: {
+      await dio.post("/control", data: {
         "teacherID": teacherID,
         "branchName": branchName,
         "controlStart": controlStart.toIso8601String(),
@@ -415,40 +387,24 @@ class Client {
         "status": status,
         "cancelInClose": cancelInClose,
       });
-      if (response.statusCode != 200 && response.statusCode != 201) {
-        throw "컨트롤 등록에 실패했습니다.";
-      }
     }
   }
 
   Future<void> deleteControl(int id) async {
     if (await isLoggedIn()) {
-      Response response = await dio.delete("/control/$id");
-      if (response.statusCode != 200 && response.statusCode != 201) {
-        throw "컨트롤 삭제에 실패했습니다.";
-      }
+      await dio.delete("/control/$id");
     }
   }
 
   Future<void> cancelReservation(int id) async {
     if (await isLoggedIn()) {
-      Response response = await dio.patch("/reservation/user/cancel/$id");
-      if (response.statusCode == 403) {
-        throw "다른 수강생의 수업을 취소할 수 없습니다.";
-      } else if (response.statusCode == 405) {
-        throw "이번 학기에 더 이상 수업을 취소할 수 없습니다.";
-      } else if (response.statusCode != 200 && response.statusCode != 201) {
-        throw "수업 취소에 실패했습니다.";
-      }
+      await dio.patch("/reservation/user/cancel/$id");
     }
   }
 
   Future<void> cancelReservationByAdmin(int id) async {
     if (await isLoggedIn()) {
-      Response response = await dio.patch("/reservation/admin/cancel/$id");
-      if (response.statusCode != 200 && response.statusCode != 201) {
-        throw "관리자에 의한 수업 취소에 실패했습니다.";
-      }
+      await dio.patch("/reservation/admin/cancel/$id");
     }
   }
 
@@ -460,20 +416,13 @@ class Client {
     required String userID,
   }) async {
     if (await isLoggedIn()) {
-      Response response = await dio.post("/reservation/user", data: {
+      await dio.post("/reservation/user", data: {
         "teacherID": teacherID,
         "branchName": branchName,
         "startDate": startDate.toIso8601String(),
         "endDate": endDate.toIso8601String(),
         "userID": userID,
       });
-      if (response.statusCode == 409) {
-        throw "해당 시간에 이미 수업이 존재합니다. 다시 시도해 주세요.";
-      } else if (response.statusCode == 412) {
-        throw "해당 시간에는 수업을 예약할 수 없습니다.";
-      } else if (response.statusCode != 200 && response.statusCode != 201) {
-        throw "보강 예약에 실패했습니다.";
-      }
     }
   }
 
@@ -485,20 +434,13 @@ class Client {
     required String userID,
   }) async {
     if (await isLoggedIn()) {
-      Response response = await dio.post("/reservation/admin", data: {
+      await dio.post("/reservation/admin", data: {
         "teacherID": teacherID,
         "branchName": branchName,
         "startDate": startDate.toIso8601String(),
         "endDate": endDate.toIso8601String(),
         "userID": userID,
       });
-      if (response.statusCode == 409) {
-        throw "해당 시간에 이미 수업이 존재합니다. 다시 시도해 주세요.";
-      } else if (response.statusCode == 412) {
-        throw "해당 시간에는 수업을 예약할 수 없습니다.";
-      } else if (response.statusCode != 200 && response.statusCode != 201) {
-        throw "관리자에 의한 보강 예약에 실패했습니다.";
-      }
     }
   }
 
@@ -510,31 +452,19 @@ class Client {
     required String userID,
   }) async {
     if (await isLoggedIn()) {
-      Response response = await dio.post("/reservation/free", data: {
+      await dio.post("/reservation/free", data: {
         "teacherID": teacherID,
         "branchName": branchName,
         "startDate": startDate.toIso8601String(),
         "endDate": endDate.toIso8601String(),
         "userID": userID,
       });
-      if (response.statusCode == 409) {
-        throw "해당 시간에 이미 수업이 존재합니다. 다시 시도해 주세요.";
-      } else if (response.statusCode != 200 && response.statusCode != 201) {
-        throw "관리자에 의한 무료 수업 예약에 실패했습니다.";
-      }
     }
   }
 
   Future<void> extendReservation(int id) async {
     if (await isLoggedIn()) {
-      Response response = await dio.patch("/reservation/user/extend/$id");
-      if (response.statusCode == 403) {
-        throw "다른 수강생의 수업을 연장할 수 없습니다.";
-      } else if (response.statusCode == 409) {
-        throw "해당 시간에 이미 수업이 존재합니다. 다시 시도해 주세요.";
-      } else if (response.statusCode != 200 && response.statusCode != 201) {
-        throw "수업 연장에 실패했습니다.";
-      }
+      await dio.patch("/reservation/user/extend/$id");
     }
   }
 
@@ -543,11 +473,7 @@ class Client {
     required int count,
   }) async {
     if (await isLoggedIn()) {
-      Response response =
-          await dio.patch("/reservation/admin/extend/$id/$count");
-      if (response.statusCode != 200 && response.statusCode != 201) {
-        throw "관리자에 의한 수업 연장에 실패했습니다.";
-      }
+      await dio.patch("/reservation/admin/extend/$id/$count");
     }
   }
 
@@ -607,18 +533,13 @@ class Client {
     required String userID,
   }) async {
     if (await isLoggedIn()) {
-      Response response = await dio.post("/reservation/admin", data: {
+      await dio.post("/reservation/admin", data: {
         "teacherID": teacherID,
         "branchName": branchName,
         "startDate": startDate.toIso8601String(),
         "endDate": endDate.toIso8601String(),
         "userID": userID,
       });
-      if (response.statusCode == 409) {
-        throw "해당 시간에 이미 수업이 존재합니다. 다시 시도해 주세요.";
-      } else if (response.statusCode != 200 && response.statusCode != 201) {
-        throw "정기 예약에 실패했습니다.";
-      }
     }
   }
 
@@ -627,35 +548,21 @@ class Client {
     required DateTime endDate,
   }) async {
     if (await isLoggedIn()) {
-      Response response = await dio.patch("/reservation/regular/$id", data: {
+      await dio.patch("/reservation/regular/$id", data: {
         "endDate": endDate.toIso8601String(),
       });
-      if (response.statusCode != 200 && response.statusCode != 201) {
-        throw "종료 일자 갱신에 실패했습니다.";
-      }
     }
   }
 
   Future<void> extendAllCoursesOfBranch(String branch) async {
     if (await isLoggedIn()) {
-      Response response = await dio.post("/reservation/regular/extend/$branch");
-      if (response.statusCode == 409) {
-        throw "해당 시간에 이미 수업이 존재합니다. 다시 시도해 주세요.";
-      } else if (response.statusCode != 200 && response.statusCode != 201) {
-        throw "해당 지점의 모든 수업 이월에 실패했습니다.";
-      }
+      await dio.post("/reservation/regular/extend/$branch");
     }
   }
 
   Future<void> extendAllCoursesOfUser(String userID) async {
     if (await isLoggedIn()) {
-      Response response =
-          await dio.post("/reservation/regular/extend/user/$userID");
-      if (response.statusCode == 409) {
-        throw "해당 시간에 이미 수업이 존재합니다. 다시 시도해 주세요.";
-      } else if (response.statusCode != 200 && response.statusCode != 201) {
-        throw "해당 유저의 모든 수업 이월에 실패했습니다.";
-      }
+      await dio.post("/reservation/regular/extend/user/$userID");
     }
   }
 
@@ -665,13 +572,10 @@ class Client {
     required DateTime termEnd,
   }) async {
     if (await isLoggedIn()) {
-      Response response = await dio.patch("/reservation/term/$id", data: {
+      await dio.patch("/reservation/term/$id", data: {
         "termStart": termStart,
         "termEnd": termEnd,
       });
-      if (response.statusCode != 200 && response.statusCode != 201) {
-        throw "학기 수정에 실패했습니다.";
-      }
     }
   }
 
@@ -691,12 +595,9 @@ class Client {
 
   Future<void> registerBranch(String branchName) async {
     if (await isLoggedIn()) {
-      Response response = await dio.post("/branch", data: {
+      await dio.post("/branch", data: {
         "branchName": branchName,
       });
-      if (response.statusCode != 200 && response.statusCode != 201) {
-        throw "새로운 지점 생성에 실패했습니다.";
-      }
     }
   }
 
@@ -720,15 +621,12 @@ class Client {
     required String branchName,
   }) async {
     if (await isLoggedIn()) {
-      Response response = await dio.post("/ledger", data: {
+      await dio.post("/ledger", data: {
         "userID": userID,
         "amount": amount,
         "termID": termID,
         "branchName": branchName,
       });
-      if (response.statusCode != 200 && response.statusCode != 201) {
-        throw "매출 입력에 실패했습니다.";
-      }
     }
   }
 

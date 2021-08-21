@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:solviolin_admin/util/controller.dart';
@@ -13,23 +15,32 @@ class LoadingPage extends StatefulWidget {
 }
 
 class _LoadingPageState extends State<LoadingPage> {
-  Client client = Get.put(Client());
+  Client _client = Get.find<Client>();
   DataController _controller = Get.find<DataController>();
 
   @override
   void initState() {
     super.initState();
     Future.delayed(const Duration(seconds: 1), () async {
-      // await client.logout(); // for test
+      // await _client.logout(); // for test
 
       try {
         await checkUser();
       } catch (e) {
-        await client.logout();
+        await _client.logout();
         Get.offAllNamed("/login");
         showErrorMessage(context, e.toString());
       }
     });
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _controller.updateRatio(
+      min(MediaQuery.of(context).size.width / 540,
+          MediaQuery.of(context).size.height / 1152),
+    );
   }
 
   @override
@@ -41,8 +52,8 @@ class _LoadingPageState extends State<LoadingPage> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Container(
-                height: 180,
-                width: 180,
+                height: 180.r,
+                width: 180.r,
                 decoration: const BoxDecoration(
                   image: const DecorationImage(
                     image: const AssetImage("assets/solviolin_logo.png"),
@@ -52,10 +63,10 @@ class _LoadingPageState extends State<LoadingPage> {
                 ),
               ),
               Container(
-                padding: const EdgeInsets.only(top: 30),
+                padding: EdgeInsets.only(top: 30.r),
                 child: Text(
                   "솔바이올린",
-                  style: TextStyle(color: Colors.white, fontSize: 40),
+                  style: TextStyle(color: Colors.white, fontSize: 40.r),
                 ),
               ),
             ],
@@ -66,7 +77,7 @@ class _LoadingPageState extends State<LoadingPage> {
   }
 
   Future<void> checkUser() async {
-    if (await client.isLoggedIn()) {
+    if (await _client.isLoggedIn()) {
       await getInitialData();
       if (_controller.profile.userType == 2) {
         Get.offAllNamed("/menu");
@@ -74,7 +85,7 @@ class _LoadingPageState extends State<LoadingPage> {
         Get.offAllNamed("/menu-teacher");
       }
     } else {
-      await client.logout();
+      await _client.logout();
       Get.offAllNamed("/login");
     }
   }
