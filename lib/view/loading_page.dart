@@ -1,9 +1,11 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:solviolin/util/controller.dart';
 import 'package:solviolin/util/data_source.dart';
 import 'package:solviolin/util/network.dart';
-import 'package:solviolin/util/notification.dart';
+import 'package:solviolin/widget/single_reusable.dart';
 
 class LoadingPage extends StatefulWidget {
   const LoadingPage({Key? key}) : super(key: key);
@@ -13,7 +15,8 @@ class LoadingPage extends StatefulWidget {
 }
 
 class _LoadingPageState extends State<LoadingPage> {
-  Client client = Get.put(Client());
+  Client _client = Get.put(Client());
+  DataController _controller = Get.find<DataController>();
 
   @override
   void initState() {
@@ -24,11 +27,20 @@ class _LoadingPageState extends State<LoadingPage> {
       try {
         await checkUser();
       } catch (e) {
-        await client.logout();
+        await _client.logout();
         Get.offAllNamed("/login");
-        showErrorMessage(context, e.toString());
+        showError(context, e.toString());
       }
     });
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _controller.updateRatio(
+      min(MediaQuery.of(context).size.width / 540,
+          MediaQuery.of(context).size.height / 1152),
+    );
   }
 
   @override
@@ -51,10 +63,10 @@ class _LoadingPageState extends State<LoadingPage> {
                 ),
               ),
               Container(
-                padding: const EdgeInsets.only(top: 30),
+                padding: EdgeInsets.only(top: 30.r),
                 child: Text(
                   "솔바이올린",
-                  style: TextStyle(color: Colors.white, fontSize: 40.sp),
+                  style: TextStyle(color: Colors.white, fontSize: 40.r),
                 ),
               ),
             ],
@@ -65,11 +77,11 @@ class _LoadingPageState extends State<LoadingPage> {
   }
 
   Future<void> checkUser() async {
-    if (await client.isLoggedIn()) {
+    if (await _client.isLoggedIn()) {
       await getInitialData();
       Get.offAllNamed("/main");
     } else {
-      await client.logout();
+      await _client.logout();
       Get.offAllNamed("/login");
     }
   }

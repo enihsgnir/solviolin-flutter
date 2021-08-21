@@ -3,9 +3,10 @@ import 'dart:async';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:quiver/async.dart';
+import 'package:solviolin/util/data_source.dart';
+import 'package:solviolin/widget/single_reusable.dart';
 
 class MetronomePage extends StatefulWidget {
   const MetronomePage({Key? key}) : super(key: key);
@@ -47,23 +48,14 @@ class _MetronomePageState extends State<MetronomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(
-          onPressed: () {
-            Get.back();
-          },
-          icon: Icon(CupertinoIcons.chevron_left, size: 28.r),
-        ),
-        title: Text("메트로놈", style: TextStyle(fontSize: 28.sp)),
-        backgroundColor: Colors.transparent,
-      ),
+      appBar: appBar("메트로놈"),
       body: Column(
         children: [
           Container(
-            height: 172.h,
+            height: 172.r,
           ),
           Container(
-            padding: const EdgeInsets.all(16),
+            padding: EdgeInsets.all(16.r),
             alignment: Alignment.center,
             width: 216.r,
             height: 108.r,
@@ -71,7 +63,7 @@ class _MetronomePageState extends State<MetronomePage> {
               "Tempo",
               style: TextStyle(
                 color: Colors.white,
-                fontSize: 54.sp,
+                fontSize: 54.r,
               ),
             ),
           ),
@@ -79,21 +71,17 @@ class _MetronomePageState extends State<MetronomePage> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Container(
-                padding: const EdgeInsets.all(16),
+                padding: EdgeInsets.all(16.r),
                 child: InkWell(
                   child: Container(
-                    padding: const EdgeInsets.all(8),
+                    padding: EdgeInsets.all(8.r),
                     decoration: BoxDecoration(
-                      color: const Color.fromRGBO(96, 128, 104, 100),
+                      color: symbolColor,
                       shape: BoxShape.circle,
                     ),
                     width: 81.r,
                     height: 81.r,
-                    child: Icon(
-                      Icons.remove,
-                      color: Colors.white,
-                      size: 54.r,
-                    ),
+                    child: Icon(Icons.remove, color: Colors.white, size: 54.r),
                   ),
                   onTap: () => count(CountType.decrease),
                   enableFeedback: false,
@@ -106,31 +94,24 @@ class _MetronomePageState extends State<MetronomePage> {
                 child: InkWell(
                   child: Text(
                     "${tempos[_index]}",
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 108.sp,
-                    ),
+                    style: TextStyle(color: Colors.white, fontSize: 108.r),
                   ),
                   onTap: select,
                   enableFeedback: false,
                 ),
               ),
               Container(
-                padding: const EdgeInsets.all(16),
+                padding: EdgeInsets.all(16.r),
                 child: InkWell(
                   child: Container(
-                    padding: const EdgeInsets.all(8),
+                    padding: EdgeInsets.all(8.r),
                     decoration: BoxDecoration(
-                      color: const Color.fromRGBO(96, 128, 104, 100),
+                      color: symbolColor,
                       shape: BoxShape.circle,
                     ),
                     width: 81.r,
                     height: 81.r,
-                    child: Icon(
-                      Icons.add,
-                      color: Colors.white,
-                      size: 54.r,
-                    ),
+                    child: Icon(Icons.add, color: Colors.white, size: 54.r),
                   ),
                   onTap: () => count(CountType.increase),
                   enableFeedback: false,
@@ -139,7 +120,7 @@ class _MetronomePageState extends State<MetronomePage> {
             ],
           ),
           Container(
-            padding: const EdgeInsets.all(16),
+            padding: EdgeInsets.all(16.r),
             child: InkWell(
               child: Container(
                 alignment: Alignment.center,
@@ -196,10 +177,10 @@ class _MetronomePageState extends State<MetronomePage> {
       context: context,
       builder: (context) {
         return Container(
-          height: 400.h,
+          height: 400.r,
           child: CupertinoPicker(
             scrollController: FixedExtentScrollController(initialItem: _index),
-            itemExtent: 52.h,
+            itemExtent: 52.r,
             onSelectedItemChanged: (index) {
               setState(() {
                 if (isPlaying) {
@@ -217,10 +198,7 @@ class _MetronomePageState extends State<MetronomePage> {
                 alignment: Alignment.center,
                 child: Text(
                   "${tempos[index]}",
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 36.sp,
-                  ),
+                  style: TextStyle(color: Colors.white, fontSize: 36.r),
                 ),
               ),
             ),

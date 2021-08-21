@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import 'package:solviolin/util/controller.dart';
 import 'package:solviolin/util/data_source.dart';
 import 'package:solviolin/util/network.dart';
-import 'package:solviolin/util/notification.dart';
+import 'package:solviolin/widget/single_reusable.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
@@ -14,13 +12,15 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  TextEditingController idController = TextEditingController();
-  TextEditingController pwController = TextEditingController();
+  Client client = Get.find<Client>();
+
+  TextEditingController id = TextEditingController();
+  TextEditingController pw = TextEditingController();
 
   @override
   void dispose() {
-    idController.dispose();
-    pwController.dispose();
+    id.dispose();
+    pw.dispose();
     super.dispose();
   }
 
@@ -43,9 +43,9 @@ class _LoginPageState extends State<LoginPage> {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.fromLTRB(8, 30, 8, 8),
+              padding: EdgeInsets.fromLTRB(8.r, 30.r, 8.r, 8.r),
               child: TextFormField(
-                controller: idController,
+                controller: id,
                 decoration: const InputDecoration(
                   labelText: "아이디",
                   labelStyle: const TextStyle(color: Colors.white),
@@ -56,16 +56,16 @@ class _LoginPageState extends State<LoginPage> {
                     borderSide: const BorderSide(color: Colors.white),
                   ),
                 ),
-                style: TextStyle(color: Colors.white, fontSize: 20.sp),
+                style: TextStyle(color: Colors.white, fontSize: 20.r),
                 validator: (value) {
                   return (value == null) ? "아이디를 입력해주세요" : null;
                 },
               ),
             ),
             Padding(
-              padding: const EdgeInsets.all(8),
+              padding: EdgeInsets.all(8.r),
               child: TextFormField(
-                controller: pwController,
+                controller: pw,
                 decoration: const InputDecoration(
                   labelText: "비밀번호",
                   labelStyle: const TextStyle(color: Colors.white),
@@ -76,7 +76,7 @@ class _LoginPageState extends State<LoginPage> {
                     borderSide: const BorderSide(color: Colors.white),
                   ),
                 ),
-                style: TextStyle(color: Colors.white, fontSize: 20.sp),
+                style: TextStyle(color: Colors.white, fontSize: 20.r),
                 obscureText: true,
                 validator: (value) {
                   return (value == null) ? "비밀번호를 입력해주세요" : null;
@@ -85,26 +85,21 @@ class _LoginPageState extends State<LoginPage> {
             ),
             Container(
               width: double.infinity,
-              height: 60.h,
-              margin: const EdgeInsets.all(16),
+              height: 60.r,
+              margin: EdgeInsets.all(16.r),
               child: TextButton(
                 onPressed: () async {
-                  Client client = Get.put(Client());
-                  DataController controller = Get.find<DataController>();
-
                   try {
-                    controller.updateUser(await client.login(
-                        idController.text, pwController.text));
-                    await getInitialData(isLoggedIn: false);
+                    await getInitialData(false, id.text, pw.text);
                     Get.offAllNamed("/main");
                   } catch (e) {
                     await client.logout();
                     Get.offAllNamed("/login");
-                    showErrorMessage(context, e.toString());
+                    showError(context, e.toString());
                   }
                 },
                 style: TextButton.styleFrom(
-                  backgroundColor: const Color.fromRGBO(96, 128, 104, 100),
+                  backgroundColor: symbolColor,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(30.r),
                   ),
@@ -112,8 +107,8 @@ class _LoginPageState extends State<LoginPage> {
                 child: Text(
                   "로그인",
                   style: TextStyle(
-                    color: const Color.fromRGBO(203, 173, 204, 80),
-                    fontSize: 24.sp,
+                    color: Colors.white,
+                    fontSize: 24.r,
                     fontWeight: FontWeight.bold,
                   ),
                 ),

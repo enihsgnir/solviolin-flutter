@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-import 'package:solviolin/util/constant.dart';
 import 'package:solviolin/util/controller.dart';
 import 'package:solviolin/util/data_source.dart';
 import 'package:table_calendar/table_calendar.dart';
@@ -35,20 +33,20 @@ class _CalendarReservedState extends State<CalendarReserved> {
           firstDay: DateTime(kToday.year, kToday.month - 5, 1),
           lastDay: controller.currentTerm[0].termEnd
               .add(const Duration(hours: 23, minutes: 59, seconds: 59)),
-          currentDay: DateTime.now().add(Duration(hours: 9)),
+          currentDay: DateTime.now().add(const Duration(hours: 9)),
           weekendDays: const [DateTime.sunday],
           availableCalendarFormats: const {CalendarFormat.month: "Month"},
           pageJumpingEnabled: true,
           sixWeekMonthsEnforced: true,
-          rowHeight: 72.h,
-          daysOfWeekHeight: 24.h,
+          rowHeight: 72.r,
+          daysOfWeekHeight: 24.r,
           headerStyle: HeaderStyle(
             titleCentered: true,
             titleTextFormatter: (date, locale) =>
                 DateFormat.yMMM().format(date),
             titleTextStyle: TextStyle(
               color: Colors.white,
-              fontSize: 32.sp,
+              fontSize: 32.r,
               fontWeight: FontWeight.bold,
             ),
             leftChevronIcon: Icon(Icons.chevron_left, size: 32.r),
@@ -59,14 +57,14 @@ class _CalendarReservedState extends State<CalendarReserved> {
                 DateFormat.E(locale).format(date)[0],
             weekdayStyle: TextStyle(
               color: const Color(0xFF4F4F4F),
-              fontSize: 20.sp,
+              fontSize: 20.r,
             ),
-            weekendStyle: TextStyle(color: Colors.red, fontSize: 20.sp),
+            weekendStyle: TextStyle(color: Colors.red, fontSize: 20.r),
           ),
           calendarStyle: CalendarStyle(
             todayTextStyle: TextStyle(
               color: kToday.weekday == 7 ? const Color(0xFFFAFAFA) : Colors.red,
-              fontSize: 24.sp,
+              fontSize: 24.r,
             ),
             todayDecoration: BoxDecoration(
               color: kToday.weekday == 7 ? Colors.red : const Color(0xFFFAFAFA),
@@ -76,7 +74,7 @@ class _CalendarReservedState extends State<CalendarReserved> {
               color: _selectedDay.weekday == 7
                   ? Colors.red
                   : const Color(0xFFFAFAFA),
-              fontSize: 24.sp,
+              fontSize: 24.r,
             ),
             selectedDecoration: const BoxDecoration(
               color: const Color.fromRGBO(227, 214, 208, 0.15),
@@ -84,19 +82,19 @@ class _CalendarReservedState extends State<CalendarReserved> {
             ),
             outsideTextStyle: TextStyle(
               color: Colors.grey.withOpacity(0.5),
-              fontSize: 20.sp,
+              fontSize: 20.r,
             ),
             disabledTextStyle: TextStyle(
               color: Colors.grey.withOpacity(0.1),
-              fontSize: 20.sp,
+              fontSize: 20.r,
             ),
-            holidayTextStyle: TextStyle(color: Colors.white, fontSize: 24.sp),
-            holidayDecoration: const BoxDecoration(
-              color: const Color.fromRGBO(96, 128, 104, 100),
+            holidayTextStyle: TextStyle(color: Colors.white, fontSize: 24.r),
+            holidayDecoration: BoxDecoration(
+              color: symbolColor,
               shape: BoxShape.circle,
             ),
-            weekendTextStyle: TextStyle(color: Colors.red, fontSize: 24.sp),
-            defaultTextStyle: TextStyle(color: Colors.white70, fontSize: 24.sp),
+            weekendTextStyle: TextStyle(color: Colors.red, fontSize: 24.r),
+            defaultTextStyle: TextStyle(color: Colors.white70, fontSize: 24.r),
           ),
           selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
           holidayPredicate: (day) => getEvents().containsKey(day),

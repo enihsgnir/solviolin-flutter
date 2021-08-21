@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 import 'package:solviolin/model/change.dart';
 import 'package:solviolin/util/controller.dart';
-import 'package:solviolin/util/format.dart';
+import 'package:solviolin/util/data_source.dart';
 
 class ChangedReservation extends StatefulWidget {
   const ChangedReservation({Key? key}) : super(key: key);
@@ -19,37 +19,38 @@ class _ChangedReservationState extends State<ChangedReservation> {
 
     return GetBuilder<DataController>(
       builder: (controller) {
-        List<Change> changes = controller.changes;
-
         return ListView.builder(
-          itemCount: changes.length,
+          itemCount: controller.changes.length,
           itemBuilder: (context, index) {
+            Change change = controller.changes[index];
+
             return Container(
               decoration: BoxDecoration(
-                color: Theme.of(context).scaffoldBackgroundColor,
+                color: Colors.transparent,
                 border: Border.all(color: Colors.grey),
                 borderRadius: BorderRadius.circular(15.r),
               ),
-              height: 120.h,
-              margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+              height: 120.r,
+              margin: EdgeInsets.fromLTRB(8.r, 4.r, 8.r, 4.r),
               child: DefaultTextStyle(
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 28.sp,
-                ),
+                style: TextStyle(color: Colors.white, fontSize: 28.r),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      "${changes[index].from.teacherID} / ${changes[index].from.branchName}",
+                      "${change.from.teacherID} / ${change.from.branchName}",
                     ),
                     Text(
-                      "변경 전: ${dateTimeToString(changes[index].from.startDate)}",
+                      "변경 전: " +
+                          DateFormat("yy/MM/dd HH:mm")
+                              .format(change.from.startDate),
                     ),
                     Text(
-                      changes[index].to == null
+                      change.to == null
                           ? "변경 사항이 없습니다."
-                          : "변경 후: ${dateTimeToString(changes[index].to!.startDate)}",
+                          : "변경 후: " +
+                              DateFormat("yy/MM/dd HH:mm")
+                                  .format(change.to!.startDate),
                     ),
                   ],
                 ),

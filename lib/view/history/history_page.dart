@@ -1,13 +1,14 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:solviolin/model/regular_schedule.dart';
 import 'package:solviolin/util/controller.dart';
+import 'package:solviolin/util/data_source.dart';
 import 'package:solviolin/util/format.dart';
-import 'package:solviolin/widget/changed_reservation.dart';
-import 'package:solviolin/widget/history_reserved.dart';
-import 'package:solviolin/widget/indicator.dart';
+import 'package:solviolin/view/history/changed_reservation.dart';
+import 'package:solviolin/view/history/history_reserved.dart';
+import 'package:solviolin/view/main/indicator.dart';
+import 'package:solviolin/widget/single_reusable.dart';
 
 class HistoryPage extends StatefulWidget {
   const HistoryPage({Key? key}) : super(key: key);
@@ -32,21 +33,10 @@ class _HistoryPageState extends State<HistoryPage>
     Get.find<DataController>();
 
     return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(
-          onPressed: () {
-            Get.back();
-          },
-          icon: Icon(CupertinoIcons.chevron_left, size: 28.r),
-        ),
-        title: Text("내 예약", style: TextStyle(fontSize: 28.sp)),
-        backgroundColor: Colors.transparent,
-      ),
+      appBar: appBar("내 예약"),
       body: SafeArea(
         child: GetBuilder<DataController>(
           builder: (controller) {
-            List<RegularSchedule> regulars = controller.regularSchedules;
-
             return ListView(
               physics: const NeverScrollableScrollPhysics(),
               children: [
@@ -54,7 +44,7 @@ class _HistoryPageState extends State<HistoryPage>
                   alignment: Alignment.bottomCenter,
                   children: [
                     Container(
-                      height: 175.h,
+                      height: 175.r,
                       child: PageView.builder(
                         controller: PageController(),
                         physics: ClampingScrollPhysics(),
@@ -63,38 +53,38 @@ class _HistoryPageState extends State<HistoryPage>
                             currentPage = page;
                           });
                         },
-                        itemCount: regulars.length,
+                        itemCount: controller.regularSchedules.length,
                         itemBuilder: (context, index) {
+                          RegularSchedule regular =
+                              controller.regularSchedules[index];
+
                           return DefaultTextStyle(
-                            style: TextStyle(fontSize: 28.sp),
+                            style: TextStyle(fontSize: 28.r),
                             child: Container(
                               decoration: BoxDecoration(
-                                color:
-                                    Theme.of(context).scaffoldBackgroundColor,
+                                color: Colors.transparent,
                                 border: Border.all(color: Colors.grey),
                                 borderRadius: BorderRadius.circular(15.r),
                               ),
-                              margin: const EdgeInsets.all(8),
+                              margin: EdgeInsets.all(8.r),
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.start,
                                 children: [
                                   Container(
                                     alignment: Alignment.centerLeft,
-                                    padding: const EdgeInsets.only(
-                                      left: 24,
-                                      top: 12,
-                                    ),
+                                    padding:
+                                        EdgeInsets.fromLTRB(24.r, 12.r, 0, 0),
                                     width: double.infinity,
                                     child: const Text("내 수업"),
                                   ),
                                   Text(
-                                    regulars[index].teacherID +
-                                        " / ${regulars[index].branchName}",
+                                    regular.teacherID +
+                                        " / ${regular.branchName}",
                                   ),
                                   Text(
-                                    "${dowToString(regulars[index].dow)}" +
-                                        " / ${timeToString(regulars[index].startTime)}" +
-                                        " ~ ${timeToString(regulars[index].endTime)}",
+                                    "${dowToString(regular.dow)}" +
+                                        " / ${timeToString(regular.startTime)}" +
+                                        " ~ ${timeToString(regular.endTime)}",
                                   ),
                                 ],
                               ),
@@ -107,12 +97,12 @@ class _HistoryPageState extends State<HistoryPage>
                       alignment: AlignmentDirectional.topStart,
                       children: [
                         Container(
-                          margin: EdgeInsets.only(bottom: 16.h),
+                          margin: EdgeInsets.only(bottom: 16.r),
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: List<Widget>.generate(
-                              regulars.length,
+                              controller.regularSchedules.length,
                               (index) => index == currentPage
                                   ? indicator(isActive: true)
                                   : indicator(isActive: false),
@@ -124,47 +114,47 @@ class _HistoryPageState extends State<HistoryPage>
                   ],
                 ),
                 Container(
-                  margin: EdgeInsets.all(8),
+                  margin: EdgeInsets.all(8.r),
                   color: Colors.grey,
-                  height: 0.5,
+                  height: 0.5.r,
                 ),
                 TabBar(
                   controller: tabController,
                   enableFeedback: false,
                   tabs: [
                     Tab(
-                      child: Text("지난 달", style: TextStyle(fontSize: 28.sp)),
+                      child: Text("지난 달", style: TextStyle(fontSize: 28.r)),
                     ),
                     Tab(
-                      child: Text("이번 달", style: TextStyle(fontSize: 28.sp)),
+                      child: Text("이번 달", style: TextStyle(fontSize: 28.r)),
                     ),
                     Tab(
-                      child: Text("변경내역", style: TextStyle(fontSize: 28.sp)),
+                      child: Text("변경내역", style: TextStyle(fontSize: 28.r)),
                     ),
                   ],
                 ),
                 Container(
-                  margin: EdgeInsets.all(8),
+                  margin: EdgeInsets.all(8.r),
                   color: Colors.grey,
-                  height: 0.5,
+                  height: 0.5.r,
                 ),
                 Container(
-                  height: 1.sh,
+                  height: 1152.r,
                   child: TabBarView(
                     controller: tabController,
                     children: [
                       Padding(
-                        padding: const EdgeInsets.only(top: 4),
+                        padding: EdgeInsets.only(top: 4.r),
                         child:
                             HistoryReserved(controller.lastMonthReservations),
                       ),
                       Padding(
-                        padding: const EdgeInsets.only(top: 4),
+                        padding: EdgeInsets.only(top: 4.r),
                         child:
                             HistoryReserved(controller.thisMonthReservations),
                       ),
                       Padding(
-                        padding: const EdgeInsets.only(top: 4),
+                        padding: EdgeInsets.only(top: 4.r),
                         child: ChangedReservation(),
                       ),
                     ],

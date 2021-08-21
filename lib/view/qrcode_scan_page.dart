@@ -2,11 +2,11 @@ import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
+import 'package:solviolin/util/data_source.dart';
 import 'package:solviolin/util/network.dart';
-import 'package:solviolin/util/notification.dart';
+import 'package:solviolin/widget/single_reusable.dart';
 
 class QRCodeScanPage extends StatefulWidget {
   const QRCodeScanPage({Key? key}) : super(key: key);
@@ -39,16 +39,7 @@ class _QRCodeScanPageState extends State<QRCodeScanPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(
-          onPressed: () {
-            Get.back();
-          },
-          icon: Icon(CupertinoIcons.chevron_left, size: 28.r),
-        ),
-        title: Text("코드스캔", style: TextStyle(fontSize: 28.sp)),
-        backgroundColor: Colors.transparent,
-      ),
+      appBar: appBar("코드스캔"),
       body: Stack(
         alignment: Alignment.center,
         children: [
@@ -63,7 +54,7 @@ class _QRCodeScanPageState extends State<QRCodeScanPage> {
                     await Get.put(Client()).checkIn(result!.code);
                     Get.back();
                   } catch (e) {
-                    showErrorMessage(context, e.toString());
+                    showError(context, e.toString());
                   }
                 });
               });
@@ -73,11 +64,11 @@ class _QRCodeScanPageState extends State<QRCodeScanPage> {
               borderWidth: 10,
               borderRadius: 10,
               borderLength: 20,
-              cutOutSize: 0.8.sw,
+              cutOutSize: 400.r,
             ),
           ),
           Positioned(
-            bottom: 10.h,
+            bottom: 10.r,
             child: Container(
               padding: EdgeInsets.all(12),
               decoration: BoxDecoration(
@@ -91,7 +82,7 @@ class _QRCodeScanPageState extends State<QRCodeScanPage> {
             ),
           ),
           Positioned(
-            top: 10.h,
+            top: 10.r,
             child: Container(
               padding: EdgeInsets.symmetric(horizontal: 16),
               decoration: BoxDecoration(

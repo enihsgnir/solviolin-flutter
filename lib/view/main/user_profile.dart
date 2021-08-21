@@ -1,10 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:solviolin/util/controller.dart';
 import 'package:solviolin/util/data_source.dart';
-import 'package:solviolin/util/notification.dart';
+import 'package:solviolin/widget/single_reusable.dart';
 
 class UserProfile extends StatefulWidget {
   const UserProfile({Key? key}) : super(key: key);
@@ -19,7 +18,7 @@ class _UserProfileState extends State<UserProfile> {
     Get.find<DataController>();
 
     return Container(
-      height: 100.h,
+      height: 100.r,
       decoration: BoxDecoration(
         color: const Color.fromRGBO(1, 50, 32, 1),
         borderRadius: BorderRadius.circular(15.r),
@@ -30,23 +29,23 @@ class _UserProfileState extends State<UserProfile> {
             child: Row(
               children: [
                 Container(
-                  padding: const EdgeInsets.only(left: 24),
+                  padding: EdgeInsets.only(left: 24.r),
                   child: InkWell(
                     onTap: () async {
                       try {
                         await getReservedHistoryData();
                         Get.toNamed("/history");
                       } catch (e) {
-                        showErrorMessage(context, e.toString());
+                        showError(context, e.toString());
                       }
                     },
                     child: GetBuilder<DataController>(
                       builder: (controller) {
                         return Text(
-                          "${controller.user.userID}님",
+                          "${controller.profile.userID}님",
                           style: TextStyle(
                             color: Colors.white,
-                            fontSize: 40.sp,
+                            fontSize: 40.r,
                             fontWeight: FontWeight.bold,
                           ),
                         );
@@ -62,14 +61,14 @@ class _UserProfileState extends State<UserProfile> {
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 16.w),
+                  padding: EdgeInsets.symmetric(horizontal: 16.r),
                   child: InkWell(
                     onTap: () async {
                       try {
                         await getReservedHistoryData();
                         Get.toNamed("/history");
                       } catch (e) {
-                        showErrorMessage(context, e.toString());
+                        showError(context, e.toString());
                       }
                     },
                     child: Icon(
@@ -79,7 +78,7 @@ class _UserProfileState extends State<UserProfile> {
                   ),
                 ),
                 Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 16.w),
+                  padding: EdgeInsets.symmetric(horizontal: 16.r),
                   child: InkWell(
                     onTap: () {
                       Get.toNamed("/scan");
@@ -91,7 +90,7 @@ class _UserProfileState extends State<UserProfile> {
                   ),
                 ),
                 Padding(
-                  padding: EdgeInsets.only(left: 16.w, right: 24),
+                  padding: EdgeInsets.fromLTRB(16.r, 0, 24.r, 0),
                   child: InkWell(
                     onTap: () {
                       Get.toNamed("/metronome");

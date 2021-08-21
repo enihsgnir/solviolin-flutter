@@ -1,13 +1,16 @@
 import 'package:get/get.dart';
 import 'package:solviolin/model/change.dart';
+import 'package:solviolin/model/profile.dart';
 import 'package:solviolin/model/regular_schedule.dart';
 import 'package:solviolin/model/reservation.dart';
 import 'package:solviolin/model/term.dart';
-import 'package:solviolin/model/user.dart';
-import 'package:solviolin/util/constant.dart';
+import 'package:solviolin/util/data_source.dart';
 
 class DataController extends GetxController {
-  late User user;
+  late final double ratio;
+
+  late Profile profile;
+
   late List<RegularSchedule> regularSchedules;
   late List<DateTime> availabaleSpots;
   late List<Reservation> myValidReservations;
@@ -19,8 +22,13 @@ class DataController extends GetxController {
   late List<Change> changes;
   int currentPage = 0;
 
-  void updateUser(User data) {
-    user = data;
+  void updateRatio(double data) {
+    ratio = data;
+    update();
+  }
+
+  void updateProfile(Profile data) {
+    profile = data;
     update();
   }
 

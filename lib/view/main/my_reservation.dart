@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 import 'package:solviolin/model/reservation.dart';
 import 'package:solviolin/util/controller.dart';
-import 'package:solviolin/util/format.dart';
-import 'package:solviolin/widget/indicator.dart';
+import 'package:solviolin/util/data_source.dart';
+import 'package:solviolin/view/main/indicator.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 class MyReservation extends StatefulWidget {
@@ -35,7 +35,7 @@ class _MyReservationState extends State<MyReservation> {
                     alignment: Alignment.bottomCenter,
                     children: [
                       Container(
-                        height: 135.h,
+                        height: 135.r,
                         child: PageView.builder(
                           controller: PageController(),
                           physics: ClampingScrollPhysics(),
@@ -44,26 +44,32 @@ class _MyReservationState extends State<MyReservation> {
                           },
                           itemCount: reservations.length,
                           itemBuilder: (context, index) {
+                            Reservation reservation = reservations[index];
+
                             return Container(
-                              padding: EdgeInsets.only(top: 16.h),
+                              padding: EdgeInsets.only(top: 16.r),
                               decoration: BoxDecoration(
-                                color:
-                                    Theme.of(context).scaffoldBackgroundColor,
+                                color: Colors.transparent,
                                 border: Border.all(color: Colors.grey),
                                 borderRadius: BorderRadius.circular(15.r),
                               ),
-                              margin: const EdgeInsets.symmetric(horizontal: 8),
+                              margin: EdgeInsets.symmetric(horizontal: 8.r),
                               child: DefaultTextStyle(
                                 style: TextStyle(
-                                    color: Colors.white, fontSize: 28.sp),
+                                  color: Colors.white,
+                                  fontSize: 28.r,
+                                ),
                                 child: Column(
                                   children: [
                                     Text(
-                                      "${reservations[index].teacherID} / ${reservations[index].branchName}",
+                                      "${reservation.teacherID} / ${reservation.branchName}",
                                     ),
                                     Text(
-                                      "${dateTimeToString(reservations[index].startDate)} " +
-                                          "~ ${dateTimeToTimeString(reservations[index].endDate)}",
+                                      DateFormat("yy/MM/dd HH:mm")
+                                              .format(reservation.startDate) +
+                                          " ~ " +
+                                          DateFormat("HH:mm")
+                                              .format(reservation.endDate),
                                     ),
                                   ],
                                 ),
@@ -76,7 +82,7 @@ class _MyReservationState extends State<MyReservation> {
                         alignment: AlignmentDirectional.topStart,
                         children: [
                           Container(
-                            margin: EdgeInsets.only(bottom: 16.h),
+                            margin: EdgeInsets.only(bottom: 16.r),
                             child: Row(
                               mainAxisSize: MainAxisSize.min,
                               mainAxisAlignment: MainAxisAlignment.center,
@@ -93,7 +99,7 @@ class _MyReservationState extends State<MyReservation> {
                     ],
                   ),
                   Container(
-                    margin: const EdgeInsets.all(8),
+                    margin: EdgeInsets.all(8.r),
                     color: Colors.grey,
                     height: 0.5,
                   ),

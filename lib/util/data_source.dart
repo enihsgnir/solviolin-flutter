@@ -1,117 +1,119 @@
 import 'dart:collection';
 
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:solviolin/model/reservation.dart';
-import 'package:solviolin/util/constant.dart';
 import 'package:solviolin/util/controller.dart';
 import 'package:solviolin/util/network.dart';
 import 'package:table_calendar/table_calendar.dart';
 
-Future<void> getInitialData({bool isLoggedIn = true}) async {
-  Client client = Get.put(Client());
-  DataController controller = Get.find<DataController>();
+Client _client = Get.find<Client>();
+DataController _controller = Get.find<DataController>();
 
+extension RFS on num {
+  double get r => this * _controller.ratio; //'r'esponsible font size
+}
+
+final DateTime kToday = DateTime.now().add(Duration(hours: 9));
+
+Color symbolColor = const Color.fromRGBO(96, 128, 104, 100);
+
+Future<void> getInitialData([
+  bool isLoggedIn = true,
+  String? userID,
+  String? userPassword,
+]) async {
   final DateTime first = DateTime(kToday.year, kToday.month, 1);
   final DateTime last = DateTime(kToday.year, kToday.month + 1, 0);
 
   if (isLoggedIn == true) {
-    controller.updateUser(await client.getProfile());
+    _controller.updateProfile(await _client.getProfile());
+  } else {
+    _controller.updateProfile(await _client.login(userID!, userPassword!));
   }
 
-  controller.updateRegularSchedules(await client.getRegularSchedules()
+  _controller.updateRegularSchedules(await _client.getRegularSchedules()
     ..sort((a, b) {
       int primary = a.dow.compareTo(b.dow);
       return primary != 0 ? primary : a.startTime.compareTo(b.startTime);
     }));
 
-  controller.updateAvailableSpots(await client.getAvailableSpots(
-    branchName: controller.user.branchName,
-    teacherID: controller.regularSchedules[0].teacherID,
+  _controller.updateAvailableSpots(await _client.getAvailableSpots(
+    branchName: _controller.profile.branchName,
+    teacherID: _controller.regularSchedules[0].teacherID,
     startDate: DateTime(kToday.year, kToday.month, kToday.day),
   )
     ..sort((a, b) => a.compareTo(b)));
 
-  controller.updateMyValidReservations(await client.getReservations(
-    branchName: controller.user.branchName,
+  _controller.updateMyValidReservations(await _client.getReservations(
+    branchName: _controller.profile.branchName,
     startDate: first,
     endDate: last.add(Duration(hours: 23, minutes: 59, seconds: 59)),
-    userID: controller.user.userID,
+    userID: _controller.profile.userID,
     bookingStatus: [-3, -1, 0, 1, 3],
   )
     ..sort((a, b) => a.startDate.compareTo(b.startDate)));
 
-  controller.updateCurrentTerm(await client.getCurrentTerm()
+  _controller.updateCurrentTerm(await _client.getCurrentTerm()
     ..sort((a, b) => a.termStart.compareTo(b.termStart)));
 }
 
 Future<void> getUserBasedData() async {
-  Client client = Get.put(Client());
-  DataController controller = Get.find<DataController>();
+  _controller.updateProfile(await _client.getProfile());
 
-  controller.updateUser(await client.getProfile());
-
-  controller.updateRegularSchedules(await client.getRegularSchedules()
+  _controller.updateRegularSchedules(await _client.getRegularSchedules()
     ..sort((a, b) {
       int primary = a.dow.compareTo(b.dow);
       return primary != 0 ? primary : a.startTime.compareTo(b.startTime);
     }));
 
-  controller.updateCurrentTerm(await client.getCurrentTerm()
+  _controller.updateCurrentTerm(await _client.getCurrentTerm()
     ..sort((a, b) => a.termStart.compareTo(b.termStart)));
 }
 
 Future<void> getSelectedDayData(DateTime selectedDay) async {
-  Client client = Get.put(Client());
-  DataController controller = Get.find<DataController>();
-
-  controller.updateAvailableSpots(await client.getAvailableSpots(
-    branchName: controller.user.branchName,
-    teacherID: controller.regularSchedules[0].teacherID,
+  _controller.updateAvailableSpots(await _client.getAvailableSpots(
+    branchName: _controller.profile.branchName,
+    teacherID: _controller.regularSchedules[0].teacherID,
     startDate: selectedDay,
   )
     ..sort((a, b) => a.compareTo(b)));
 }
 
 Future<void> getChangedPageData(DateTime focusedDay) async {
-  Client client = Get.put(Client());
-  DataController controller = Get.find<DataController>();
-
   final DateTime first = DateTime(focusedDay.year, focusedDay.month, 1);
   final DateTime last = DateTime(focusedDay.year, focusedDay.month + 1, 0);
 
-  controller.updateMyValidReservations(await client.getReservations(
-    branchName: controller.user.branchName,
+  _controller.updateMyValidReservations(await _client.getReservations(
+    branchName: _controller.profile.branchName,
     startDate: first,
     endDate: last.add(Duration(hours: 23, minutes: 59, seconds: 59)),
-    userID: controller.user.userID,
+    userID: _controller.profile.userID,
     bookingStatus: [-3, -1, 0, 1, 3],
   )
     ..sort((a, b) => a.startDate.compareTo(b.startDate)));
 }
 
 Future<void> getReservedHistoryData() async {
-  Client client = Get.put(Client());
-  DataController controller = Get.find<DataController>();
-
-  controller.updateThisMonthReservations(await client.getReservations(
-    branchName: controller.user.branchName,
+  _controller.updateThisMonthReservations(await _client.getReservations(
+    branchName: _controller.profile.branchName,
     startDate: DateTime(kToday.year, kToday.month, 1),
     endDate: DateTime(kToday.year, kToday.month + 1, 0, 23, 59, 59),
-    userID: controller.user.userID,
+    userID: _controller.profile.userID,
     bookingStatus: [-3, -2, -1, 0, 1, 2, 3],
   )
     ..sort((a, b) => a.startDate.compareTo(b.startDate)));
 
-  controller.updateLastMonthReservations(await client.getReservations(
-    branchName: controller.user.branchName,
+  _controller.updateLastMonthReservations(await _client.getReservations(
+    branchName: _controller.profile.branchName,
     startDate: DateTime(kToday.year, kToday.month - 1, 1),
     endDate: DateTime(kToday.year, kToday.month, 0, 23, 59, 59),
-    userID: controller.user.userID,
+    userID: _controller.profile.userID,
     bookingStatus: [-3, -2, -1, 0, 1, 2, 3],
   )
     ..sort((a, b) => a.startDate.compareTo(b.startDate)));
 
-  controller.updateChanges(await client.getChanges()
+  _controller.updateChanges(await _client.getChanges()
     ..sort((a, b) {
       int primary = a.from.startDate.compareTo(b.from.startDate);
       return primary != 0
@@ -138,7 +140,7 @@ LinkedHashMap<DateTime, List<Reservation>> getEvents() =>
     )..addAll(getEventSource());
 
 Map<DateTime, List<Reservation>> getEventSource() =>
-    Get.find<DataController>().myValidReservations.groupBy((reservation) {
+    _controller.myValidReservations.groupBy((reservation) {
       DateTime date = reservation.startDate;
       return DateTime(date.year, date.month, date.day);
     });
