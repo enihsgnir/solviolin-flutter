@@ -29,7 +29,7 @@ class _LoadingPageState extends State<LoadingPage> {
       } catch (e) {
         await _client.logout();
         Get.offAllNamed("/login");
-        showErrorMessage(context, e.toString());
+        showError(context, e.toString());
       }
     });
   }

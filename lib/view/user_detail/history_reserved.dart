@@ -4,6 +4,7 @@ import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:solviolin_admin/model/reservation.dart';
+import 'package:solviolin_admin/util/controller.dart';
 import 'package:solviolin_admin/util/data_source.dart';
 import 'package:solviolin_admin/util/network.dart';
 import 'package:solviolin_admin/widget/single_reusable.dart';
@@ -22,6 +23,9 @@ class HistoryReserved extends StatefulWidget {
 
 class _HistoryReservedState extends State<HistoryReserved> {
   Client _client = Get.find<Client>();
+
+  SearchController search = Get.find<SearchController>(tag: "User");
+  DetailController detail = Get.find<DetailController>();
 
   @override
   Widget build(BuildContext context) {
@@ -53,7 +57,7 @@ class _HistoryReservedState extends State<HistoryReserved> {
                       ),
                       onTap: () async {
                         reservation.bookingStatus.abs() == 2
-                            ? showErrorMessage(context, "이미 취소된 수업입니다.")
+                            ? showError(context, "이미 취소된 수업입니다.")
                             : await showModalCancel(context, reservation);
                       },
                     ),
@@ -91,7 +95,7 @@ class _HistoryReservedState extends State<HistoryReserved> {
                       ),
                       onTap: () async {
                         reservation.bookingStatus.abs() == 3
-                            ? showErrorMessage(context, "이미 연장된 수업입니다.")
+                            ? showError(context, "이미 연장된 수업입니다.")
                             : await showModalExtend(context, reservation);
                       },
                     ),
@@ -168,14 +172,22 @@ class _HistoryReservedState extends State<HistoryReserved> {
               onPressed: () async {
                 try {
                   await _client.cancelReservation(reservation.id);
-                  try {} catch (e) {
-                    await _client.logout();
-                    Get.offAllNamed("/login");
-                    showErrorMessage(context, e.toString());
-                  }
+
+                  await getUsersData(
+                    branchName: search.text1,
+                    userID: search.text2,
+                    isPaid: search.number1,
+                    status: search.number2,
+                  );
+                  await getUserDetailData(detail.user!);
+                  // try {} catch (e) {
+                  //   await _client.logout();
+                  //   Get.offAllNamed("/login");
+                  //   showErrorMessage(context, e.toString());
+                  // }
                 } catch (e) {
                   Get.back();
-                  showErrorMessage(context, e.toString());
+                  showError(context, e.toString());
                 }
               },
               isDestructiveAction: true,
@@ -212,14 +224,22 @@ class _HistoryReservedState extends State<HistoryReserved> {
               onPressed: () async {
                 try {
                   await _client.extendReservation(reservation.id);
-                  try {} catch (e) {
-                    await _client.logout();
-                    Get.offAllNamed("/login");
-                    showErrorMessage(context, e.toString());
-                  }
+
+                  await getUsersData(
+                    branchName: search.text1,
+                    userID: search.text2,
+                    isPaid: search.number1,
+                    status: search.number2,
+                  );
+                  await getUserDetailData(detail.user!);
+                  // try {} catch (e) {
+                  //   await _client.logout();
+                  //   Get.offAllNamed("/login");
+                  //   showErrorMessage(context, e.toString());
+                  // }
                 } catch (e) {
                   Get.back();
-                  showErrorMessage(context, e.toString());
+                  showError(context, e.toString());
                 }
               },
               child: Text("수업 연장", style: TextStyle(fontSize: 24.r)),

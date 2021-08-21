@@ -16,8 +16,6 @@ class _LedgerSearchState extends State<LedgerSearch> {
   TextEditingController user = TextEditingController();
   TermController term = Get.put(TermController());
 
-  SearchController search = Get.find<SearchController>();
-
   @override
   void dispose() {
     user.dispose();
@@ -112,7 +110,7 @@ class _LedgerSearchState extends State<LedgerSearch> {
                         },
                       );
                     } catch (e) {
-                      showErrorMessage(context, e.toString());
+                      showError(context, e.toString());
                     }
                   },
                   child: Text("합계", style: TextStyle(fontSize: 20.r)),
@@ -141,7 +139,7 @@ class _LedgerSearchState extends State<LedgerSearch> {
                         userID: user.text,
                       );
                     } catch (e) {
-                      showErrorMessage(context, e.toString());
+                      showError(context, e.toString());
                     }
                   },
                   child: Text("검색", style: TextStyle(fontSize: 20.r)),

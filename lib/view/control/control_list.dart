@@ -62,7 +62,7 @@ class _ControlListState extends State<ControlList> {
                           status: search.number1,
                         );
                       } catch (e) {
-                        showErrorMessage(context, e.toString());
+                        showError(context, e.toString());
                       }
                     },
                   ),

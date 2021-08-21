@@ -17,6 +17,8 @@ class TermPage extends StatefulWidget {
 class _TermPageState extends State<TermPage> {
   Client client = Get.find<Client>();
 
+  DataController _controller = Get.find<DataController>();
+
   DateTimeController start = Get.put(DateTimeController(), tag: "Start");
   DateTimeController end = Get.put(DateTimeController(), tag: "End");
   BranchController branch = Get.put(BranchController());
@@ -112,8 +114,10 @@ class _TermPageState extends State<TermPage> {
                     termStart: start.date!,
                     termEnd: end.date!,
                   );
+
+                  _controller.updateTerms(await client.getTerms(10));
                 } catch (e) {
-                  showErrorMessage(context, e.toString());
+                  showError(context, e.toString());
                 }
               },
               style: ElevatedButton.styleFrom(
@@ -199,7 +203,7 @@ class _TermPageState extends State<TermPage> {
                 try {
                   await client.extendAllCoursesOfBranch(branch.branchName!);
                 } catch (e) {
-                  showErrorMessage(context, e.toString());
+                  showError(context, e.toString());
                 }
               },
               style: ElevatedButton.styleFrom(
@@ -258,7 +262,7 @@ class _TermPageState extends State<TermPage> {
                 try {
                   await client.extendAllCoursesOfUser(user.text);
                 } catch (e) {
-                  showErrorMessage(context, e.toString());
+                  showError(context, e.toString());
                 }
               },
               style: ElevatedButton.styleFrom(

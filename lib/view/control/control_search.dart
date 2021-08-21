@@ -95,7 +95,7 @@ class _ControlSearchState extends State<ControlSearch> {
 
                       search.isSearched = true;
                     } catch (e) {
-                      showErrorMessage(context, e.toString());
+                      showError(context, e.toString());
                     }
                   },
                   child: Text("검색", style: TextStyle(fontSize: 20.r)),

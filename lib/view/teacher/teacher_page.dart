@@ -24,7 +24,7 @@ class _TeacherPageState extends State<TeacherPage> {
   DateTimeController start = Get.put(DateTimeController(), tag: "Start");
   DateTimeController end = Get.put(DateTimeController(), tag: "End");
 
-  SearchController search = Get.put(SearchController());
+  SearchController search = Get.find<SearchController>(tag: "Teacher");
 
   @override
   void dispose() {
@@ -126,8 +126,15 @@ class _TeacherPageState extends State<TeacherPage> {
                               minutes: end.time!.minute,
                             ),
                           );
+
+                          if (search.isSearched) {
+                            await getTeachersData(
+                              teacherID: search.text1,
+                              branchName: search.text2,
+                            );
+                          }
                         } catch (e) {
-                          showErrorMessage(context, e.toString());
+                          showError(context, e.toString());
                         }
                       },
                       style: ElevatedButton.styleFrom(

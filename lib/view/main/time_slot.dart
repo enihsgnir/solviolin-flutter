@@ -64,7 +64,7 @@ class _TimeSlotState extends State<TimeSlot> {
           controller: calendarController,
           onTap: (details) async {
             if (!search.isSearched && !hasBeenShown) {
-              await showErrorMessage(context, "필터를 사용하여 예약을 검색할 수 있습니다");
+              await showError(context, "필터를 사용하여 예약을 검색할 수 있습니다");
               hasBeenShown = true;
             }
 
@@ -201,7 +201,7 @@ class _TimeSlotState extends State<TimeSlot> {
                 try {
                   await client.cancelReservation(details.appointments![0].id);
                 } catch (e) {
-                  showErrorMessage(context, e.toString());
+                  showError(context, e.toString());
                 }
               },
               style: ElevatedButton.styleFrom(
@@ -261,7 +261,7 @@ class _TimeSlotState extends State<TimeSlot> {
                   await client
                       .cancelReservationByAdmin(details.appointments![0].id);
                 } catch (e) {
-                  showErrorMessage(context, e.toString());
+                  showError(context, e.toString());
                 }
               },
               style: ElevatedButton.styleFrom(
@@ -320,7 +320,7 @@ class _TimeSlotState extends State<TimeSlot> {
                 try {
                   await client.extendReservation(details.appointments![0].id);
                 } catch (e) {
-                  showErrorMessage(context, e.toString());
+                  showError(context, e.toString());
                 }
               },
               style: ElevatedButton.styleFrom(
@@ -416,7 +416,7 @@ class _TimeSlotState extends State<TimeSlot> {
                         count: count ? 1 : 0,
                       );
                     } catch (e) {
-                      showErrorMessage(context, e.toString());
+                      showError(context, e.toString());
                     }
                   },
                   style: ElevatedButton.styleFrom(
@@ -547,7 +547,7 @@ class _TimeSlotState extends State<TimeSlot> {
                     userID: userRegular.text,
                   );
                 } catch (e) {
-                  showErrorMessage(context, e.toString());
+                  showError(context, e.toString());
                 }
               },
               style: ElevatedButton.styleFrom(
@@ -633,7 +633,7 @@ class _TimeSlotState extends State<TimeSlot> {
                     userID: userUser.text,
                   );
                 } catch (e) {
-                  showErrorMessage(context, e.toString());
+                  showError(context, e.toString());
                 }
               },
               style: ElevatedButton.styleFrom(
@@ -719,7 +719,7 @@ class _TimeSlotState extends State<TimeSlot> {
                     userID: userAdmin.text,
                   );
                 } catch (e) {
-                  showErrorMessage(context, e.toString());
+                  showError(context, e.toString());
                 }
               },
               style: ElevatedButton.styleFrom(
@@ -805,7 +805,7 @@ class _TimeSlotState extends State<TimeSlot> {
                     userID: userFree.text,
                   );
                 } catch (e) {
-                  showErrorMessage(context, e.toString());
+                  showError(context, e.toString());
                 }
               },
               style: ElevatedButton.styleFrom(

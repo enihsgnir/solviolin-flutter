@@ -67,7 +67,7 @@ class _MainPageState extends State<MainPage> {
                     );
                   }
                 } catch (e) {
-                  showErrorMessage(context, e.toString());
+                  showError(context, e.toString());
                 }
               },
               icon: Icon(CupertinoIcons.refresh),
@@ -147,7 +147,7 @@ class _MainPageState extends State<MainPage> {
 
                                   search.isSearched = true;
                                 } catch (e) {
-                                  showErrorMessage(context, e.toString());
+                                  showError(context, e.toString());
                                 }
                               },
                               style: ElevatedButton.styleFrom(
@@ -180,10 +180,8 @@ class _MainPageState extends State<MainPage> {
                 newDate = await showDatePicker(
                   context: context,
                   initialDate: controller.date ?? initialDate,
-                  firstDate:
-                      DateTime(initialDate.year, initialDate.month - 5, 1),
-                  lastDate: _controller.currentTerm[0].termEnd
-                      .add(const Duration(hours: 23, minutes: 59, seconds: 59)),
+                  firstDate: DateTime(initialDate.year - 3),
+                  lastDate: DateTime(initialDate.year + 1),
                   builder: (context, child) {
                     return Theme(
                       data: ThemeData.dark().copyWith(

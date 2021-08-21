@@ -146,6 +146,15 @@ class SearchController extends GetxController {
   int? number2;
 }
 
+class DetailController extends GetxController {
+  User? user;
+
+  void updateUser(User data) {
+    user = data;
+    update();
+  }
+}
+
 class BranchController extends GetxController {
   String? branchName;
 

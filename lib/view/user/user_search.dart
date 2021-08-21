@@ -92,7 +92,7 @@ class _UserSearchState extends State<UserSearch> {
 
                       search.isSearched = true;
                     } catch (e) {
-                      showErrorMessage(context, e.toString());
+                      showError(context, e.toString());
                     }
                   },
                   child: Text("검색", style: TextStyle(fontSize: 20.r)),

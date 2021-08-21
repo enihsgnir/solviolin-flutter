@@ -92,11 +92,7 @@ class _LoginPageState extends State<LoginPage> {
                 child: TextButton(
                   onPressed: () async {
                     try {
-                      await getInitialData(
-                        isLoggedIn: false,
-                        userID: id.text,
-                        userPassword: pw.text,
-                      );
+                      await getInitialData(false, id.text, pw.text);
                       if (_controller.profile.userType == 2) {
                         Get.offAllNamed("/menu");
                       } else if (_controller.profile.userType == 1) {
@@ -106,7 +102,7 @@ class _LoginPageState extends State<LoginPage> {
                       Get.put(DataController());
                       await logoutAndDeleteData();
                       Get.offAllNamed("/login");
-                      showErrorMessage(context, e.toString());
+                      showError(context, e.toString());
                     }
                   },
                   style: TextButton.styleFrom(

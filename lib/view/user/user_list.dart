@@ -15,6 +15,8 @@ class UserList extends StatefulWidget {
 }
 
 class _UserListState extends State<UserList> {
+  DetailController detail = Get.put(DetailController());
+
   @override
   Widget build(BuildContext context) {
     Get.find<DataController>();
@@ -57,9 +59,10 @@ class _UserListState extends State<UserList> {
               onTap: () async {
                 try {
                   await getUserDetailData(user);
+                  detail.updateUser(user);
                   Get.toNamed("/user/detail");
                 } catch (e) {
-                  showErrorMessage(context, e.toString());
+                  showError(context, e.toString());
                 }
               },
             );
@@ -80,11 +83,13 @@ class _UserListState extends State<UserList> {
         RegExp(r"(\d{3})(\d{4})(\d+)"),
         (match) => "${match[1]}-${match[2]}-${match[3]}",
       );
-    } else {
+    } else if (phone.length > 3) {
       return phone.replaceAllMapped(
         RegExp(r"(\d{3})(\d+)"),
         (match) => "${match[1]}-${match[2]}",
       );
+    } else {
+      return phone;
     }
   }
 

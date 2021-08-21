@@ -19,6 +19,8 @@ class TeacherList extends StatefulWidget {
 class _TeacherListState extends State<TeacherList> {
   Client client = Get.find<Client>();
 
+  SearchController search = Get.find<SearchController>(tag: "Teacher");
+
   @override
   Widget build(BuildContext context) {
     Get.find<DataController>();
@@ -95,9 +97,14 @@ class _TeacherListState extends State<TeacherList> {
                                       teacherID: teacher.teacherID,
                                       branchName: teacher.branchName,
                                     );
+
+                                    await getTeachersData(
+                                      teacherID: search.text1,
+                                      branchName: search.text2,
+                                    );
                                     Get.back();
                                   } catch (e) {
-                                    showErrorMessage(context, e.toString());
+                                    showError(context, e.toString());
                                   }
                                 },
                                 style: ElevatedButton.styleFrom(

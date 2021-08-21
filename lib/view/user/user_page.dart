@@ -215,7 +215,7 @@ class _UserPageState extends State<UserPage> {
                           );
                         }
                       } catch (e) {
-                        showErrorMessage(context, e.toString());
+                        showError(context, e.toString());
                       }
                     },
                     style: ElevatedButton.styleFrom(

@@ -62,7 +62,6 @@ class _TimeSlotForTeacherState extends State<TimeSlotForTeacher> {
             displayNameTextStyle: TextStyle(fontSize: 20),
           ),
           initialDisplayDate: controller.selectedDay,
-          showDatePickerButton: true,
           showCurrentTimeIndicator: false,
           showNavigationArrow: true,
           allowedViews: [CalendarView.week, CalendarView.timelineDay],

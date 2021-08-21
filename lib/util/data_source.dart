@@ -20,15 +20,14 @@ Future<void> logoutAndDeleteData() async {
   await _client.logout();
 }
 
-Future<void> getInitialData({
+Future<void> getInitialData([
   bool isLoggedIn = true,
   String? userID,
   String? userPassword,
-}) async {
+]) async {
   if (isLoggedIn == true) {
     _controller.updateProfile(await _client.getProfile());
   } else {
-    assert(userID != null && userPassword != null);
     _controller.updateProfile(await _client.login(userID!, userPassword!));
   }
 
@@ -107,7 +106,7 @@ class ReservationDataSource extends CalendarDataSource {
     String end = DateFormat("HH:mm").format(appointments![index]
         .endDate
         .add(Duration(minutes: appointments![index].extendedMin)));
-    return "$start ~ $end\n" + appointments![index].userID;
+    return appointments![index].userID + "\n$start ~ $end";
   }
 
   @override

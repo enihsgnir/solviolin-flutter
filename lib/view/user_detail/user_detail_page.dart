@@ -36,6 +36,9 @@ class _UserDetailPageState extends State<UserDetailPage>
   TextEditingController credit = TextEditingController();
   TextEditingController name = TextEditingController();
 
+  SearchController search = Get.find<SearchController>(tag: "User");
+  DetailController detail = Get.find<DetailController>();
+
   @override
   void initState() {
     super.initState();
@@ -172,9 +175,20 @@ class _UserDetailPageState extends State<UserDetailPage>
                                                               endDate:
                                                                   end.date!,
                                                             );
+                                                            await getUsersData(
+                                                              branchName:
+                                                                  search.text1,
+                                                              userID:
+                                                                  search.text2,
+                                                              isPaid: search
+                                                                  .number1,
+                                                              status: search
+                                                                  .number2,
+                                                            );
+                                                            await getUserDetailData(
+                                                                detail.user!);
                                                           } catch (e) {
-                                                            showErrorMessage(
-                                                                context,
+                                                            showError(context,
                                                                 e.toString());
                                                           }
                                                         },
@@ -422,9 +436,17 @@ class _UserDetailPageState extends State<UserDetailPage>
                     termID: term.termID!,
                     branchName: expend.branchName!,
                   );
+                  await getUsersData(
+                    branchName: search.text1,
+                    userID: search.text2,
+                    isPaid: search.number1,
+                    status: search.number2,
+                  );
+                  await getUserDetailData(detail.user!);
+
                   Get.back();
                 } catch (e) {
-                  showErrorMessage(context, e.toString());
+                  showError(context, e.toString());
                 }
               },
               style: ElevatedButton.styleFrom(
@@ -447,10 +469,7 @@ class _UserDetailPageState extends State<UserDetailPage>
         return AlertDialog(
           title: Text(
             "정보수정",
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 28.r,
-            ),
+            style: TextStyle(color: Colors.white, fontSize: 28.r),
           ),
           content: Column(
             mainAxisSize: MainAxisSize.min,
@@ -494,10 +513,7 @@ class _UserDetailPageState extends State<UserDetailPage>
               ),
               child: Text(
                 "취소",
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 20.r,
-                ),
+                style: TextStyle(color: Colors.white, fontSize: 20.r),
               ),
             ),
             ElevatedButton(
@@ -512,9 +528,18 @@ class _UserDetailPageState extends State<UserDetailPage>
                         credit.text == "" ? null : int.parse(credit.text),
                     userName: name.text == "" ? null : name.text,
                   );
+
+                  await getUsersData(
+                    branchName: search.text1,
+                    userID: search.text2,
+                    isPaid: search.number1,
+                    status: search.number2,
+                  );
+                  await getUserDetailData(detail.user!);
+
                   Get.back();
                 } catch (e) {
-                  showErrorMessage(context, e.toString());
+                  showError(context, e.toString());
                 }
               },
               style: ElevatedButton.styleFrom(

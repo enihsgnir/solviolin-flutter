@@ -15,6 +15,8 @@ class MenuPage extends StatefulWidget {
 
 class _MenuPageState extends State<MenuPage> {
   Client client = Get.find<Client>();
+  DataController _controller = Get.find<DataController>();
+
   TextEditingController branch = TextEditingController();
 
   @override
@@ -29,12 +31,13 @@ class _MenuPageState extends State<MenuPage> {
     Get.put(SearchController(), tag: "User");
     Get.put(SearchController(), tag: "Control");
     Get.put(SearchController(), tag: "Teacher");
-    Get.put(SearchController(), tag: "Ledger");
+    Get.put(SearchController(), tag: "Branch");
 
     return Scaffold(
       body: SafeArea(
         child: Center(
           child: ListView(
+            physics: const NeverScrollableScrollPhysics(),
             children: [
               Container(height: 180.r),
               Column(
@@ -115,8 +118,10 @@ class _MenuPageState extends State<MenuPage> {
               onPressed: () async {
                 try {
                   await client.registerBranch(branch.text);
+
+                  _controller.updateBranches(await client.getBranches());
                 } catch (e) {
-                  showErrorMessage(context, e.toString());
+                  showError(context, e.toString());
                 }
               },
               style: ElevatedButton.styleFrom(

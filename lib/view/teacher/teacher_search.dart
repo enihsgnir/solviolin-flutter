@@ -15,7 +15,7 @@ class _TeacherSearchState extends State<TeacherSearch> {
   TextEditingController teacher = TextEditingController();
   BranchController branch = Get.put(BranchController());
 
-  SearchController search = Get.find<SearchController>();
+  SearchController search = Get.find<SearchController>(tag: "Teacher");
 
   @override
   void dispose() {
@@ -55,13 +55,17 @@ class _TeacherSearchState extends State<TeacherSearch> {
                   ),
                   onPressed: () async {
                     try {
-                      String teacherID = teacher.text;
+                      search.text1 = teacher.text == "" ? null : teacher.text;
+                      search.text2 = branch.branchName;
+
                       await getTeachersData(
-                        teacherID: teacherID == "" ? null : teacherID,
-                        branchName: branch.branchName,
+                        teacherID: search.text1,
+                        branchName: search.text2,
                       );
+
+                      search.isSearched = true;
                     } catch (e) {
-                      showErrorMessage(context, e.toString());
+                      showError(context, e.toString());
                     }
                   },
                   child: Text("검색", style: TextStyle(fontSize: 20.r)),

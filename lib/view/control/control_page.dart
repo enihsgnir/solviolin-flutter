@@ -159,7 +159,7 @@ class _ControlPageState extends State<ControlPage> {
                             );
                           }
                         } catch (e) {
-                          showErrorMessage(context, e.toString());
+                          showError(context, e.toString());
                         }
                       },
                       style: ElevatedButton.styleFrom(
