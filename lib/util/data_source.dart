@@ -1,7 +1,11 @@
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:solviolin_admin/model/reservation.dart';
+import 'package:solviolin_admin/model/teacher_info.dart';
 import 'package:solviolin_admin/model/user.dart';
 import 'package:solviolin_admin/util/controller.dart';
 import 'package:solviolin_admin/util/network.dart';
@@ -42,26 +46,26 @@ Future<void> getInitialData([
 }
 
 Future<void> getReservationData({
-  required DateTime focusedDay,
+  required DateTime displayDate,
   required String branchName,
   String? userID,
   String? teacherID,
 }) async {
-  final int weekday = focusedDay.weekday % 7;
-
+  final int weekday = displayDate.weekday % 7;
   final DateTime first =
-      DateTime(focusedDay.year, focusedDay.month, focusedDay.day - weekday);
-  final DateTime last = first.add(const Duration(days: 7));
+      DateTime(displayDate.year, displayDate.month, displayDate.day - weekday);
+  final DateTime last =
+      first.add(const Duration(days: 6, hours: 23, minutes: 59, seconds: 59));
 
-  _controller.updateTeacherName(await _client.getTeacherName(
+  _controller.updateTeacherInfos(await _client.getTeacherInfos(
     branchName: branchName,
   )
-    ..sort((a, b) => a.compareTo(b)));
+    ..sort((a, b) => a.teacherID.compareTo(b.teacherID)));
 
   _controller.updateReservations(await _client.getReservations(
     branchName: branchName,
     startDate: first,
-    endDate: last.add(Duration(hours: 23, minutes: 59, seconds: 59)),
+    endDate: last,
     userID: userID,
     bookingStatus: [-3, -1, 0, 1, 3],
   )
@@ -77,17 +81,55 @@ Future<void> getReservationData({
   _controller.updateReservationDataSource(ReservationDataSource());
 }
 
+Future<void> getReservationDataForTeacher({
+  required DateTime displayDate,
+  required String branchName,
+  required String teacherID,
+}) async {
+  final int weekday = displayDate.weekday % 7;
+  final DateTime first =
+      DateTime(displayDate.year, displayDate.month, displayDate.day - weekday);
+  final DateTime last =
+      first.add(const Duration(days: 6, hours: 23, minutes: 59, seconds: 59));
+
+  _controller.updateTeacherInfos(
+    [TeacherInfo(teacherID: teacherID, color: symbolColor)],
+  );
+
+  _controller.updateReservations(await _client.getReservations(
+    branchName: branchName,
+    startDate: first,
+    endDate: last,
+    bookingStatus: [-3, -1, 0, 1, 3],
+  )
+    ..sort((a, b) => a.startDate.compareTo(b.startDate))
+    ..removeWhere((element) => element.teacherID != teacherID));
+
+  _controller.updateReservationDataSource(ReservationDataSource());
+}
+
+bool isSameWeek(DateTime newDate, DateTime oldDate) {
+  final int weekday = oldDate.weekday % 7;
+  final DateTime first =
+      DateTime(oldDate.year, oldDate.month, oldDate.day - weekday);
+  final DateTime last =
+      first.add(const Duration(days: 6, hours: 23, minutes: 59, seconds: 59));
+
+  return DateUtils.isSameDay(newDate, first) ||
+      DateUtils.isSameDay(newDate, last) ||
+      (newDate.isAfter(first) && newDate.isBefore(last));
+}
+
 class ReservationDataSource extends CalendarDataSource {
   ReservationDataSource() {
     appointments = _controller.reservations;
 
     resources = List<CalendarResource>.generate(
-      _controller.teacherName.length,
+      _controller.teacherInfos.length,
       (index) => CalendarResource(
-        displayName: _controller.teacherName[index],
+        displayName: _controller.teacherInfos[index].teacherID,
         id: index,
-        // color:
-        //     Color((Random().nextDouble() * 0xFFFFFF).toInt()).withOpacity(0.8),
+        color: _controller.teacherInfos[index].color ?? Colors.transparent,
       ),
     );
   }
@@ -96,16 +138,12 @@ class ReservationDataSource extends CalendarDataSource {
   DateTime getStartTime(int index) => appointments![index].startDate;
 
   @override
-  DateTime getEndTime(int index) => appointments![index]
-      .endDate
-      .add(Duration(minutes: appointments![index].extendedMin));
+  DateTime getEndTime(int index) => appointments![index].endDate;
 
   @override
   String getSubject(int index) {
     String start = DateFormat("HH:mm").format(appointments![index].startDate);
-    String end = DateFormat("HH:mm").format(appointments![index]
-        .endDate
-        .add(Duration(minutes: appointments![index].extendedMin)));
+    String end = DateFormat("HH:mm").format(appointments![index].endDate);
     return appointments![index].userID + "\n$start ~ $end";
   }
 
@@ -113,8 +151,14 @@ class ReservationDataSource extends CalendarDataSource {
   Color getColor(int index) => appointments![index].color;
 
   @override
-  List<Object> getResourceIds(int index) =>
-      [_controller.teacherName.indexOf(appointments![index].teacherID)];
+  List<Object> getResourceIds(int index) {
+    List<String> teacherIDs = List<String>.generate(
+      _controller.teacherInfos.length,
+      (index) => _controller.teacherInfos[index].teacherID,
+    );
+
+    return [teacherIDs.indexOf(appointments![index].teacherID)];
+  }
 }
 
 Future<void> getUsersData({
@@ -127,9 +171,34 @@ Future<void> getUsersData({
     branchName: branchName,
     userID: userID,
     isPaid: isPaid,
+    userType: 0,
     status: status,
   )
     ..sort((a, b) => a.userID.compareTo(b.userID)));
+}
+
+Future<File> saveUsersData({
+  String? branchName,
+  String? userID,
+  int? isPaid,
+  int? status,
+}) async {
+  final String path = "storage/emulated/0/Download/SolViolin";
+  final Directory directory = Directory(path);
+  if (!await directory.exists()) {
+    directory.create();
+  }
+
+  final File file = File(path + "/users_list.json");
+  final List<dynamic> data = await _client.getRawUsers(
+    branchName: branchName,
+    userID: userID,
+    isPaid: isPaid,
+    userType: 0,
+    status: status,
+  );
+
+  return file.writeAsString(json.encode(data));
 }
 
 Future<void> getUserDetailData(User user) async {
@@ -162,12 +231,12 @@ Future<void> getUserDetailData(User user) async {
 
   _controller.updateChanges(await _client.getChangesWithID(user.userID)
     ..sort((a, b) {
-      int primary = a.from.startDate.compareTo(b.from.startDate);
+      int primary = a.fromDate.compareTo(b.fromDate);
       return primary != 0
           ? primary
-          : a.to == null || b.to == null
+          : a.toDate == null || b.toDate == null
               ? 0
-              : a.to!.startDate.compareTo(b.to!.startDate);
+              : a.toDate!.compareTo(b.toDate!);
     }));
 }
 

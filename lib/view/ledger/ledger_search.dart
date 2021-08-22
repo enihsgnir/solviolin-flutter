@@ -27,7 +27,6 @@ class _LedgerSearchState extends State<LedgerSearch> {
     return Container(
       padding: EdgeInsets.all(8.r),
       decoration: BoxDecoration(
-        color: Colors.transparent,
         border: Border.all(color: Colors.grey),
         borderRadius: BorderRadius.circular(15.r),
       ),
@@ -76,7 +75,7 @@ class _LedgerSearchState extends State<LedgerSearch> {
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
                                     Text(
-                                      "${controller.totalLeger}원",
+                                      controller.totalLeger,
                                       style: TextStyle(
                                         color: Colors.white,
                                         fontSize: 20.r,

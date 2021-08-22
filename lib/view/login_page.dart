@@ -44,6 +44,13 @@ class _LoginPageState extends State<LoginPage> {
                   shape: BoxShape.circle,
                 ),
               ),
+              Container(
+                padding: EdgeInsets.only(top: 12.r),
+                child: Text(
+                  "솔바이올린 강사/관리자용",
+                  style: TextStyle(color: Colors.white, fontSize: 28.r),
+                ),
+              ),
               Padding(
                 padding: EdgeInsets.fromLTRB(8.r, 30.r, 8.r, 8.r),
                 child: TextFormField(

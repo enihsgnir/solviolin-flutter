@@ -31,17 +31,50 @@ class _UserSearchState extends State<UserSearch> {
     return Container(
       padding: EdgeInsets.all(8.r),
       decoration: BoxDecoration(
-        color: Colors.transparent,
         border: Border.all(color: Colors.grey),
         borderRadius: BorderRadius.circular(15.r),
       ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Container(
-            alignment: Alignment.centerLeft,
-            padding: EdgeInsets.only(left: 24.r),
-            child: input("이름", id),
+          Row(
+            children: [
+              Container(
+                alignment: Alignment.centerLeft,
+                padding: EdgeInsets.only(left: 24.r),
+                child: input("이름", id),
+              ),
+              Padding(
+                padding: EdgeInsets.only(left: 16.r),
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    primary: symbolColor,
+                  ),
+                  onPressed: () async {
+                    await saveUsersData(
+                      branchName: branch.branchName,
+                      userID: id.text == "" ? null : id.text,
+                      isPaid: isPaid.result,
+                      status: status.result,
+                    );
+
+                    Get.snackbar(
+                      "",
+                      "",
+                      titleText: Text(
+                        "유저 정보 목록 저장",
+                        style: TextStyle(color: Colors.white, fontSize: 24.r),
+                      ),
+                      messageText: Text(
+                        "storage/emulated/0/Download/SolViolin/users_list.json",
+                        style: TextStyle(color: Colors.white, fontSize: 20.r),
+                      ),
+                    );
+                  },
+                  child: Text("저장", style: TextStyle(fontSize: 20.r)),
+                ),
+              ),
+            ],
           ),
           Container(
             alignment: Alignment.centerLeft,

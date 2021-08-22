@@ -18,6 +18,7 @@ class TimeSlot extends StatefulWidget {
 
 class _TimeSlotState extends State<TimeSlot> {
   Client client = Get.find<Client>();
+  DataController _controller = Get.find<DataController>();
 
   TextEditingController teacherRegular = TextEditingController();
   BranchController branchRegular = Get.put(BranchController(), tag: "Regular");
@@ -38,6 +39,8 @@ class _TimeSlotState extends State<TimeSlot> {
   SearchController search = Get.find<SearchController>(tag: "Main");
   bool hasBeenShown = false;
 
+  CalendarController calendarController = Get.find<CalendarController>();
+
   @override
   void dispose() {
     teacherRegular.dispose();
@@ -53,9 +56,6 @@ class _TimeSlotState extends State<TimeSlot> {
 
   @override
   Widget build(BuildContext context) {
-    Get.find<DataController>();
-    CalendarController calendarController = CalendarController();
-
     return GetBuilder<DataController>(
       builder: (controller) {
         return SfCalendar(
@@ -69,46 +69,62 @@ class _TimeSlotState extends State<TimeSlot> {
             }
 
             if (details.targetElement == CalendarElement.viewHeader) {
-              controller.updateSelectedDay(details.date!);
-
-              calendarController.displayDate = details.date!;
-              calendarController.selectedDate = details.date!;
               if (calendarController.view == CalendarView.week) {
                 calendarController.view = CalendarView.timelineDay;
               } else {
                 calendarController.view = CalendarView.week;
               }
+
+              calendarController.displayDate = details.date!;
+              controller.updateDisplayDate(calendarController.displayDate!);
             } else if (details.targetElement == CalendarElement.calendarCell) {
               _showEmpty(details);
             } else if (details.targetElement == CalendarElement.appointment) {
               _showReserved(details);
             }
+          },
+          onViewChanged: (details) async {
+            if (!isSameWeek(
+                calendarController.displayDate!, controller.displayDate)) {
+              controller.updateDisplayDate(calendarController.displayDate!);
 
-            calendarController.displayDate = controller.selectedDay;
+              try {
+                if (search.isSearched) {
+                  await getReservationData(
+                    displayDate: controller.displayDate,
+                    branchName: search.text1!,
+                    userID: search.text2,
+                    teacherID: search.text3,
+                  );
+                }
+              } catch (e) {
+                showError(context, e.toString());
+              }
+            }
           },
           headerStyle: CalendarHeaderStyle(
-            textStyle: TextStyle(color: Colors.white, fontSize: 28),
+            textStyle: TextStyle(color: Colors.white, fontSize: 28.r),
           ),
           viewHeaderStyle: ViewHeaderStyle(
-            dateTextStyle: TextStyle(color: Colors.white, fontSize: 20),
-            dayTextStyle: TextStyle(color: Colors.white, fontSize: 16),
+            dateTextStyle: TextStyle(color: Colors.white, fontSize: 20.r),
+            dayTextStyle: TextStyle(color: Colors.white, fontSize: 16.r),
           ),
-          appointmentTextStyle: TextStyle(color: Colors.white, fontSize: 16),
+          appointmentTextStyle: TextStyle(color: Colors.white, fontSize: 16.r),
           timeSlotViewSettings: TimeSlotViewSettings(
             startHour: 9,
             endHour: 22.5,
             timeFormat: "HH:mm",
             timeInterval: const Duration(minutes: 30),
-            timeIntervalWidth: 120,
-            timeIntervalHeight: 60,
-            timeTextStyle: TextStyle(fontSize: 16),
+            timeIntervalWidth: 120.r,
+            timeIntervalHeight: 60.r,
+            timeTextStyle: TextStyle(fontSize: 16.r),
           ),
           resourceViewSettings: ResourceViewSettings(
             visibleResourceCount: 5,
             showAvatar: false,
-            displayNameTextStyle: TextStyle(fontSize: 20),
+            displayNameTextStyle: TextStyle(fontSize: 20.r),
           ),
-          initialDisplayDate: controller.selectedDay,
+          initialDisplayDate: controller.displayDate,
           showCurrentTimeIndicator: false,
           showNavigationArrow: true,
           allowedViews: [CalendarView.week, CalendarView.timelineDay],
@@ -200,6 +216,17 @@ class _TimeSlotState extends State<TimeSlot> {
               onPressed: () async {
                 try {
                   await client.cancelReservation(details.appointments![0].id);
+
+                  if (search.isSearched) {
+                    await getReservationData(
+                      displayDate: _controller.displayDate,
+                      branchName: search.text1!,
+                      userID: search.text2,
+                      teacherID: search.text3,
+                    );
+                  }
+
+                  Get.back();
                 } catch (e) {
                   showError(context, e.toString());
                 }
@@ -260,6 +287,17 @@ class _TimeSlotState extends State<TimeSlot> {
                 try {
                   await client
                       .cancelReservationByAdmin(details.appointments![0].id);
+
+                  if (search.isSearched) {
+                    await getReservationData(
+                      displayDate: _controller.displayDate,
+                      branchName: search.text1!,
+                      userID: search.text2,
+                      teacherID: search.text3,
+                    );
+                  }
+
+                  Get.back();
                 } catch (e) {
                   showError(context, e.toString());
                 }
@@ -319,6 +357,17 @@ class _TimeSlotState extends State<TimeSlot> {
               onPressed: () async {
                 try {
                   await client.extendReservation(details.appointments![0].id);
+
+                  if (search.isSearched) {
+                    await getReservationData(
+                      displayDate: _controller.displayDate,
+                      branchName: search.text1!,
+                      userID: search.text2,
+                      teacherID: search.text3,
+                    );
+                  }
+
+                  Get.back();
                 } catch (e) {
                   showError(context, e.toString());
                 }
@@ -415,6 +464,17 @@ class _TimeSlotState extends State<TimeSlot> {
                         id: details.appointments![0].id,
                         count: count ? 1 : 0,
                       );
+
+                      if (search.isSearched) {
+                        await getReservationData(
+                          displayDate: _controller.displayDate,
+                          branchName: search.text1!,
+                          userID: search.text2,
+                          teacherID: search.text3,
+                        );
+                      }
+
+                      Get.back();
                     } catch (e) {
                       showError(context, e.toString());
                     }
@@ -484,82 +544,95 @@ class _TimeSlotState extends State<TimeSlot> {
       context: context,
       barrierColor: Colors.black26,
       builder: (context) {
-        return AlertDialog(
-          title: Text(
-            "정규 등록",
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 28,
+        return SingleChildScrollView(
+          child: AlertDialog(
+            title: Text(
+              "정규 등록",
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 28,
+              ),
             ),
-          ),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                DateFormat("yy/MM/dd HH:mm").format(details.date!) + " ~ ",
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 20,
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  DateFormat("yy/MM/dd HH:mm").format(details.date!) + " ~ ",
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 20,
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(12, 12, 12, 0),
+                  child: input("강사", teacherRegular, "강사명을 입력하세요!"),
+                ),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(12, 12, 12, 0),
+                  child: branchDropdown("Regular", "지점을 선택하세요!"),
+                ),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(12, 12, 12, 0),
+                  child: input("수강생", userRegular, "이름을 입력하세요!"),
+                ),
+              ],
+            ),
+            actions: [
+              OutlinedButton(
+                onPressed: () {
+                  Get.back();
+                },
+                style: OutlinedButton.styleFrom(
+                  padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
+                ),
+                child: Text(
+                  "취소",
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 20,
+                  ),
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(12, 12, 12, 0),
-                child: input("강사", teacherRegular, "강사명을 입력하세요!"),
-              ),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(12, 12, 12, 0),
-                child: branchDropdown(null, "지점을 선택하세요!"),
-              ),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(12, 12, 12, 0),
-                child: input("수강생", userRegular, "이름을 입력하세요!"),
+              ElevatedButton(
+                onPressed: () async {
+                  try {
+                    RegularSchedule regular = (await client
+                        .getRegularSchedulesByAdmin(userRegular.text))[0];
+
+                    await client.reserveRegularReservation(
+                      teacherID: teacherRegular.text,
+                      branchName: branchRegular.branchName!,
+                      startDate: details.date!,
+                      endDate: details.date!
+                          .add(regular.endTime - regular.startTime),
+                      userID: userRegular.text,
+                    );
+
+                    if (search.isSearched) {
+                      await getReservationData(
+                        displayDate: _controller.displayDate,
+                        branchName: search.text1!,
+                        userID: search.text2,
+                        teacherID: search.text3,
+                      );
+                    }
+
+                    Get.back();
+                  } catch (e) {
+                    showError(context, e.toString());
+                  }
+                },
+                style: ElevatedButton.styleFrom(
+                  primary: symbolColor,
+                  padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
+                ),
+                child: Text(
+                  "등록",
+                  style: TextStyle(fontSize: 20),
+                ),
               ),
             ],
           ),
-          actions: [
-            OutlinedButton(
-              onPressed: () {
-                Get.back();
-              },
-              style: OutlinedButton.styleFrom(
-                padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
-              ),
-              child: Text(
-                "취소",
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 20,
-                ),
-              ),
-            ),
-            ElevatedButton(
-              onPressed: () async {
-                try {
-                  RegularSchedule regular = (await client
-                      .getRegularSchedulesByAdmin(userRegular.text))[0];
-
-                  await client.reserveRegularReservation(
-                    teacherID: teacherRegular.text,
-                    branchName: branchRegular.branchName!,
-                    startDate: details.date!,
-                    endDate:
-                        details.date!.add(regular.endTime - regular.startTime),
-                    userID: userRegular.text,
-                  );
-                } catch (e) {
-                  showError(context, e.toString());
-                }
-              },
-              style: ElevatedButton.styleFrom(
-                primary: symbolColor,
-                padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
-              ),
-              child: Text(
-                "등록",
-                style: TextStyle(fontSize: 20),
-              ),
-            ),
-          ],
         );
       },
     );
@@ -570,82 +643,95 @@ class _TimeSlotState extends State<TimeSlot> {
       context: context,
       barrierColor: Colors.black26,
       builder: (context) {
-        return AlertDialog(
-          title: Text(
-            "보강 예약 (수강생)",
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 28,
+        return SingleChildScrollView(
+          child: AlertDialog(
+            title: Text(
+              "보강 예약 (수강생)",
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 28,
+              ),
             ),
-          ),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                DateFormat("yy/MM/dd HH:mm").format(details.date!) + " ~ ",
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 20,
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  DateFormat("yy/MM/dd HH:mm").format(details.date!) + " ~ ",
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 20,
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(12, 12, 12, 0),
+                  child: input("강사", teacherUser, "강사명을 입력하세요!"),
+                ),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(12, 12, 12, 0),
+                  child: branchDropdown("User", "지점을 선택하세요!"),
+                ),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(12, 12, 12, 0),
+                  child: input("수강생", userUser, "이름을 입력하세요!"),
+                ),
+              ],
+            ),
+            actions: [
+              OutlinedButton(
+                onPressed: () {
+                  Get.back();
+                },
+                style: OutlinedButton.styleFrom(
+                  padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
+                ),
+                child: Text(
+                  "취소",
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 20,
+                  ),
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(12, 12, 12, 0),
-                child: input("강사", teacherUser, "강사명을 입력하세요!"),
-              ),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(12, 12, 12, 0),
-                child: branchDropdown("User", "지점을 선택하세요!"),
-              ),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(12, 12, 12, 0),
-                child: input("수강생", userUser, "이름을 입력하세요!"),
+              ElevatedButton(
+                onPressed: () async {
+                  try {
+                    RegularSchedule regular = (await client
+                        .getRegularSchedulesByAdmin(userUser.text))[0];
+
+                    await client.makeUpReservation(
+                      teacherID: teacherUser.text,
+                      branchName: branchUser.branchName!,
+                      startDate: details.date!,
+                      endDate: details.date!
+                          .add(regular.endTime - regular.startTime),
+                      userID: userUser.text,
+                    );
+
+                    if (search.isSearched) {
+                      await getReservationData(
+                        displayDate: _controller.displayDate,
+                        branchName: search.text1!,
+                        userID: search.text2,
+                        teacherID: search.text3,
+                      );
+                    }
+
+                    Get.back();
+                  } catch (e) {
+                    showError(context, e.toString());
+                  }
+                },
+                style: ElevatedButton.styleFrom(
+                  primary: symbolColor,
+                  padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
+                ),
+                child: Text(
+                  "등록",
+                  style: TextStyle(fontSize: 20),
+                ),
               ),
             ],
           ),
-          actions: [
-            OutlinedButton(
-              onPressed: () {
-                Get.back();
-              },
-              style: OutlinedButton.styleFrom(
-                padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
-              ),
-              child: Text(
-                "취소",
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 20,
-                ),
-              ),
-            ),
-            ElevatedButton(
-              onPressed: () async {
-                try {
-                  RegularSchedule regular = (await client
-                      .getRegularSchedulesByAdmin(userUser.text))[0];
-
-                  await client.makeUpReservation(
-                    teacherID: teacherUser.text,
-                    branchName: branchUser.branchName!,
-                    startDate: details.date!,
-                    endDate:
-                        details.date!.add(regular.endTime - regular.startTime),
-                    userID: userUser.text,
-                  );
-                } catch (e) {
-                  showError(context, e.toString());
-                }
-              },
-              style: ElevatedButton.styleFrom(
-                primary: symbolColor,
-                padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
-              ),
-              child: Text(
-                "등록",
-                style: TextStyle(fontSize: 20),
-              ),
-            ),
-          ],
         );
       },
     );
@@ -656,82 +742,95 @@ class _TimeSlotState extends State<TimeSlot> {
       context: context,
       barrierColor: Colors.black26,
       builder: (context) {
-        return AlertDialog(
-          title: Text(
-            "보강 예약 (관리자)",
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 28,
+        return SingleChildScrollView(
+          child: AlertDialog(
+            title: Text(
+              "보강 예약 (관리자)",
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 28,
+              ),
             ),
-          ),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                DateFormat("yy/MM/dd HH:mm").format(details.date!) + " ~ ",
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 20,
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  DateFormat("yy/MM/dd HH:mm").format(details.date!) + " ~ ",
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 20,
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(12, 12, 12, 0),
+                  child: input("강사", teacherAdmin, "강사명을 입력하세요!"),
+                ),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(12, 12, 12, 0),
+                  child: branchDropdown("Admin", "지점을 선택하세요!"),
+                ),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(12, 12, 12, 0),
+                  child: input("수강생", userAdmin, "이름을 입력하세요!"),
+                ),
+              ],
+            ),
+            actions: [
+              OutlinedButton(
+                onPressed: () {
+                  Get.back();
+                },
+                style: OutlinedButton.styleFrom(
+                  padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
+                ),
+                child: Text(
+                  "취소",
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 20,
+                  ),
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(12, 12, 12, 0),
-                child: input("강사", teacherAdmin, "강사명을 입력하세요!"),
-              ),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(12, 12, 12, 0),
-                child: branchDropdown("Admin", "지점을 선택하세요!"),
-              ),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(12, 12, 12, 0),
-                child: input("수강생", userAdmin, "이름을 입력하세요!"),
+              ElevatedButton(
+                onPressed: () async {
+                  try {
+                    RegularSchedule regular = (await client
+                        .getRegularSchedulesByAdmin(userAdmin.text))[0];
+
+                    await client.makeUpReservationByAdmin(
+                      teacherID: teacherAdmin.text,
+                      branchName: branchAdmin.branchName!,
+                      startDate: details.date!,
+                      endDate: details.date!
+                          .add(regular.endTime - regular.startTime),
+                      userID: userAdmin.text,
+                    );
+
+                    if (search.isSearched) {
+                      await getReservationData(
+                        displayDate: _controller.displayDate,
+                        branchName: search.text1!,
+                        userID: search.text2,
+                        teacherID: search.text3,
+                      );
+                    }
+
+                    Get.back();
+                  } catch (e) {
+                    showError(context, e.toString());
+                  }
+                },
+                style: ElevatedButton.styleFrom(
+                  primary: symbolColor,
+                  padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
+                ),
+                child: Text(
+                  "등록",
+                  style: TextStyle(fontSize: 20),
+                ),
               ),
             ],
           ),
-          actions: [
-            OutlinedButton(
-              onPressed: () {
-                Get.back();
-              },
-              style: OutlinedButton.styleFrom(
-                padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
-              ),
-              child: Text(
-                "취소",
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 20,
-                ),
-              ),
-            ),
-            ElevatedButton(
-              onPressed: () async {
-                try {
-                  RegularSchedule regular = (await client
-                      .getRegularSchedulesByAdmin(userAdmin.text))[0];
-
-                  await client.makeUpReservationByAdmin(
-                    teacherID: teacherAdmin.text,
-                    branchName: branchAdmin.branchName!,
-                    startDate: details.date!,
-                    endDate:
-                        details.date!.add(regular.endTime - regular.startTime),
-                    userID: userAdmin.text,
-                  );
-                } catch (e) {
-                  showError(context, e.toString());
-                }
-              },
-              style: ElevatedButton.styleFrom(
-                primary: symbolColor,
-                padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
-              ),
-              child: Text(
-                "등록",
-                style: TextStyle(fontSize: 20),
-              ),
-            ),
-          ],
         );
       },
     );
@@ -742,82 +841,95 @@ class _TimeSlotState extends State<TimeSlot> {
       context: context,
       barrierColor: Colors.black26,
       builder: (context) {
-        return AlertDialog(
-          title: Text(
-            "무료 보강 등록",
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 28,
+        return SingleChildScrollView(
+          child: AlertDialog(
+            title: Text(
+              "무료 보강 등록",
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 28,
+              ),
             ),
-          ),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                DateFormat("yy/MM/dd HH:mm").format(details.date!) + " ~ ",
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 20,
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  DateFormat("yy/MM/dd HH:mm").format(details.date!) + " ~ ",
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 20,
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(12, 12, 12, 0),
+                  child: input("강사", teacherFree, "강사명을 입력하세요!"),
+                ),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(12, 12, 12, 0),
+                  child: branchDropdown("Free", "지점을 선택하세요!"),
+                ),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(12, 12, 12, 0),
+                  child: input("수강생", userFree, "이름을 입력하세요!"),
+                ),
+              ],
+            ),
+            actions: [
+              OutlinedButton(
+                onPressed: () {
+                  Get.back();
+                },
+                style: OutlinedButton.styleFrom(
+                  padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
+                ),
+                child: Text(
+                  "취소",
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 20,
+                  ),
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(12, 12, 12, 0),
-                child: input("강사", teacherFree, "강사명을 입력하세요!"),
-              ),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(12, 12, 12, 0),
-                child: branchDropdown("Free", "지점을 선택하세요!"),
-              ),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(12, 12, 12, 0),
-                child: input("수강생", userFree, "이름을 입력하세요!"),
+              ElevatedButton(
+                onPressed: () async {
+                  try {
+                    RegularSchedule regular = (await client
+                        .getRegularSchedulesByAdmin(userFree.text))[0];
+
+                    await client.reserveFreeCourse(
+                      teacherID: teacherFree.text,
+                      branchName: branchFree.branchName!,
+                      startDate: details.date!,
+                      endDate: details.date!
+                          .add(regular.endTime - regular.startTime),
+                      userID: userFree.text,
+                    );
+
+                    if (search.isSearched) {
+                      await getReservationData(
+                        displayDate: _controller.displayDate,
+                        branchName: search.text1!,
+                        userID: search.text2,
+                        teacherID: search.text3,
+                      );
+                    }
+
+                    Get.back();
+                  } catch (e) {
+                    showError(context, e.toString());
+                  }
+                },
+                style: ElevatedButton.styleFrom(
+                  primary: symbolColor,
+                  padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
+                ),
+                child: Text(
+                  "등록",
+                  style: TextStyle(fontSize: 20),
+                ),
               ),
             ],
           ),
-          actions: [
-            OutlinedButton(
-              onPressed: () {
-                Get.back();
-              },
-              style: OutlinedButton.styleFrom(
-                padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
-              ),
-              child: Text(
-                "취소",
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 20,
-                ),
-              ),
-            ),
-            ElevatedButton(
-              onPressed: () async {
-                try {
-                  RegularSchedule regular = (await client
-                      .getRegularSchedulesByAdmin(userFree.text))[0];
-
-                  await client.reserveFreeCourse(
-                    teacherID: teacherFree.text,
-                    branchName: branchFree.branchName!,
-                    startDate: details.date!,
-                    endDate:
-                        details.date!.add(regular.endTime - regular.startTime),
-                    userID: userFree.text,
-                  );
-                } catch (e) {
-                  showError(context, e.toString());
-                }
-              },
-              style: ElevatedButton.styleFrom(
-                primary: symbolColor,
-                padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
-              ),
-              child: Text(
-                "등록",
-                style: TextStyle(fontSize: 20),
-              ),
-            ),
-          ],
         );
       },
     );

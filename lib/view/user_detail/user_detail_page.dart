@@ -88,7 +88,6 @@ class _UserDetailPageState extends State<UserDetailPage>
                             style: TextStyle(fontSize: 28.r),
                             child: Container(
                               decoration: BoxDecoration(
-                                color: Colors.transparent,
                                 border: Border.all(color: Colors.grey),
                                 borderRadius: BorderRadius.circular(15.r),
                               ),
@@ -187,6 +186,8 @@ class _UserDetailPageState extends State<UserDetailPage>
                                                             );
                                                             await getUserDetailData(
                                                                 detail.user!);
+
+                                                            Get.back();
                                                           } catch (e) {
                                                             showError(context,
                                                                 e.toString());
@@ -259,6 +260,11 @@ class _UserDetailPageState extends State<UserDetailPage>
                   ],
                 ),
                 Container(
+                  margin: EdgeInsets.fromLTRB(8.r, 4.r, 8.r, 4.r),
+                  color: Colors.grey,
+                  height: 0.5,
+                ),
+                Container(
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -266,7 +272,6 @@ class _UserDetailPageState extends State<UserDetailPage>
                         child: Container(
                           width: double.infinity,
                           decoration: BoxDecoration(
-                            color: Colors.transparent,
                             border: Border(
                               right: BorderSide(
                                 color: Colors.grey,
@@ -290,7 +295,6 @@ class _UserDetailPageState extends State<UserDetailPage>
                         child: Container(
                           width: double.infinity,
                           decoration: BoxDecoration(
-                            color: Colors.transparent,
                             border: Border(
                               left: BorderSide(
                                 color: Colors.grey,
@@ -329,7 +333,7 @@ class _UserDetailPageState extends State<UserDetailPage>
                       child: Text("이번 달", style: TextStyle(fontSize: 28.r)),
                     ),
                     Tab(
-                      child: Text("변경내역", style: TextStyle(fontSize: 28.r)),
+                      child: Text("변경 내역", style: TextStyle(fontSize: 28.r)),
                     ),
                   ],
                 ),
@@ -476,11 +480,11 @@ class _UserDetailPageState extends State<UserDetailPage>
             children: [
               Padding(
                 padding: EdgeInsets.fromLTRB(12.r, 12.r, 12.r, 0),
-                child: branchDropdown("Update", "지점을 선택하세요!"),
+                child: branchDropdown("Update"),
               ),
               Padding(
                 padding: EdgeInsets.fromLTRB(12.r, 12.r, 12.r, 0),
-                child: input("전화번호", phone, "번호를 입력하세요!"),
+                child: input("전화번호", phone),
               ),
               Container(
                 alignment: Alignment.centerLeft,
@@ -490,16 +494,15 @@ class _UserDetailPageState extends State<UserDetailPage>
                   item: "등록 여부",
                   trueName: "등록",
                   falseName: "미등록",
-                  isMandatory: true,
                 ),
               ),
               Padding(
                 padding: EdgeInsets.fromLTRB(12.r, 12.r, 12.r, 0),
-                child: input("크레딧", credit, "크레딧을 입력하세요!"),
+                child: input("크레딧", credit),
               ),
               Padding(
                 padding: EdgeInsets.fromLTRB(12.r, 12.r, 12.r, 0),
-                child: input("이름", name, "이름을 입력하세요!"),
+                child: input("이름", name),
               ),
             ],
           ),

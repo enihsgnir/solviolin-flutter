@@ -46,6 +46,11 @@ class _ControlPageState extends State<ControlPage> {
                 padding: EdgeInsets.all(8.r),
                 child: ControlSearch(),
               ),
+              Container(
+                margin: EdgeInsets.fromLTRB(8.r, 4.r, 8.r, 4.r),
+                color: Colors.grey,
+                height: 0.5,
+              ),
               Expanded(
                 child: ControlList(),
               ),
@@ -158,6 +163,8 @@ class _ControlPageState extends State<ControlPage> {
                               status: search.number1,
                             );
                           }
+
+                          Get.back();
                         } catch (e) {
                           showError(context, e.toString());
                         }

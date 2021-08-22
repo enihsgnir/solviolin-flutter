@@ -1,19 +1,18 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-import 'package:solviolin_admin/model/ledger.dart';
+import 'package:solviolin_admin/model/canceled.dart';
 import 'package:solviolin_admin/util/controller.dart';
 import 'package:solviolin_admin/util/data_source.dart';
 
-class LedgerList extends StatefulWidget {
-  const LedgerList({Key? key}) : super(key: key);
+class CanceledList extends StatefulWidget {
+  const CanceledList({Key? key}) : super(key: key);
 
   @override
-  _LedgerListState createState() => _LedgerListState();
+  _CanceledListState createState() => _CanceledListState();
 }
 
-class _LedgerListState extends State<LedgerList> {
+class _CanceledListState extends State<CanceledList> {
   @override
   Widget build(BuildContext context) {
     Get.find<DataController>();
@@ -21,9 +20,9 @@ class _LedgerListState extends State<LedgerList> {
     return GetBuilder<DataController>(
       builder: (controller) {
         return ListView.builder(
-          itemCount: controller.ledgers.length,
+          itemCount: controller.canceledReservations.length,
           itemBuilder: (context, index) {
-            Ledger ledger = controller.ledgers[index];
+            Canceled canceled = controller.canceledReservations[index];
 
             return Container(
               decoration: BoxDecoration(
@@ -36,10 +35,15 @@ class _LedgerListState extends State<LedgerList> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text("${ledger.userID} / ${ledger.branchName}"),
-                    Text(NumberFormat("#,###원").format(ledger.amount)),
-                    Text("결제일자: " +
-                        DateFormat("yy/MM/dd HH:mm").format(ledger.paidAt)),
+                    Text(
+                        "${canceled.teacherID} / ${canceled.userID} / ${canceled.branchName}"),
+                    Text(DateFormat("yy/MM/dd HH:mm")
+                            .format(canceled.startDate) +
+                        " ~ " +
+                        DateFormat("HH:mm").format(canceled.endDate)),
+                    Text(canceled.toID.length == 0
+                        ? "보강 미예약"
+                        : "보강 ID: " + canceled.toID.toString()),
                   ],
                 ),
               ),

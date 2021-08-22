@@ -1,18 +1,25 @@
-import 'package:solviolin_admin/model/reservation.dart';
+import 'package:solviolin_admin/util/format.dart';
 
 class Change {
-  Reservation from;
-  Reservation? to;
+  String teacherID;
+  String branchName;
+  DateTime fromDate;
+  DateTime? toDate;
 
   Change({
-    required this.from,
-    this.to,
+    required this.teacherID,
+    required this.branchName,
+    required this.fromDate,
+    this.toDate,
   });
 
   factory Change.fromJson(Map<String, dynamic> json) {
     return Change(
-      from: Reservation.fromJson(json["from"]),
-      to: Reservation.fromJson(json["to"]),
+      teacherID: json["from"]["teacherID"],
+      branchName: json["from"]["branchName"],
+      fromDate: parseDateTime(json["from"]["startDate"]),
+      toDate:
+          json["to"] == null ? null : parseDateTime(json["to"]["startDate"]),
     );
   }
 }

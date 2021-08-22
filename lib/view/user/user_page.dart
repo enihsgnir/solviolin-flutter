@@ -50,6 +50,11 @@ class _UserPageState extends State<UserPage> {
                 padding: EdgeInsets.all(8.r),
                 child: UserSearch(),
               ),
+              Container(
+                margin: EdgeInsets.fromLTRB(8.r, 4.r, 8.r, 4.r),
+                color: Colors.grey,
+                height: 0.5,
+              ),
               Expanded(
                 child: UserList(),
               ),
@@ -214,6 +219,8 @@ class _UserPageState extends State<UserPage> {
                             status: search.number2,
                           );
                         }
+
+                        Get.back();
                       } catch (e) {
                         showError(context, e.toString());
                       }

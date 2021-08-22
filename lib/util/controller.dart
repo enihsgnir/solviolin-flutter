@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:solviolin_admin/model/canceled.dart';
 import 'package:solviolin_admin/model/change.dart';
 import 'package:solviolin_admin/model/control.dart';
 import 'package:solviolin_admin/model/ledger.dart';
@@ -7,6 +8,7 @@ import 'package:solviolin_admin/model/profile.dart';
 import 'package:solviolin_admin/model/regular_schedule.dart';
 import 'package:solviolin_admin/model/reservation.dart';
 import 'package:solviolin_admin/model/teacher.dart';
+import 'package:solviolin_admin/model/teacher_info.dart';
 import 'package:solviolin_admin/model/term.dart';
 import 'package:solviolin_admin/model/user.dart';
 import 'package:solviolin_admin/util/data_source.dart';
@@ -20,8 +22,8 @@ class DataController extends GetxController {
   List<Term> terms = [];
   late List<String> branches;
 
-  DateTime selectedDay = DateTime.now();
-  List<String> teacherName = [];
+  DateTime displayDate = DateTime.now();
+  List<TeacherInfo> teacherInfos = [];
   List<Reservation> reservations = [];
   ReservationDataSource? reservationDataSource;
 
@@ -33,6 +35,7 @@ class DataController extends GetxController {
 
   List<Control> controls = [];
   List<Teacher> teachers = [];
+  List<Canceled> canceledReservations = [];
   List<Ledger> ledgers = [];
   late String totalLeger;
 
@@ -61,13 +64,13 @@ class DataController extends GetxController {
     update();
   }
 
-  void updateSelectedDay(DateTime data) {
-    selectedDay = data;
+  void updateDisplayDate(DateTime data) {
+    displayDate = data;
     update();
   }
 
-  void updateTeacherName(List<String> data) {
-    teacherName = data;
+  void updateTeacherInfos(List<TeacherInfo> data) {
+    teacherInfos = data;
     update();
   }
 
@@ -116,6 +119,11 @@ class DataController extends GetxController {
     update();
   }
 
+  void updateCanceledReservations(List<Canceled> data) {
+    canceledReservations = data;
+    update();
+  }
+
   void updateLedgers(List<Ledger> data) {
     ledgers = data;
     update();
@@ -133,14 +141,12 @@ class SearchController extends GetxController {
   String? text1;
   String? text2;
   String? text3;
-  String? text4;
-  String? text5;
 
   DateTime? dateTime1;
   DateTime? dateTime2;
 
-  Duration? time1;
-  Duration? time2;
+  // Duration? time1;
+  // Duration? time2;
 
   int? number1;
   int? number2;

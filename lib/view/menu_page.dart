@@ -39,7 +39,7 @@ class _MenuPageState extends State<MenuPage> {
           child: ListView(
             physics: const NeverScrollableScrollPhysics(),
             children: [
-              Container(height: 180.r),
+              Container(height: 140.r),
               Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -47,7 +47,8 @@ class _MenuPageState extends State<MenuPage> {
                   menu("유저", () => Get.toNamed("/user")),
                   menu("오픈/클로즈", () => Get.toNamed("/control")),
                   menu("학기", () => Get.toNamed("/term")),
-                  menu("강사", () => Get.toNamed("/teacher")),
+                  menu("강사 스케줄", () => Get.toNamed("/teacher")),
+                  menu("취소 내역", () => Get.toNamed("/canceled")),
                   menu("지점 등록", () => _showBranchRegister()),
                   menu("매출", () => Get.toNamed("/ledger")),
                 ],
@@ -96,7 +97,7 @@ class _MenuPageState extends State<MenuPage> {
           ),
           content: Padding(
             padding: EdgeInsets.fromLTRB(12.r, 12.r, 12.r, 0),
-            child: input("지점", branch, "지점명을 입력하세요!"),
+            child: input("지점명", branch, "지점명을 입력하세요!"),
           ),
           actions: [
             OutlinedButton(
@@ -120,6 +121,7 @@ class _MenuPageState extends State<MenuPage> {
                   await client.registerBranch(branch.text);
 
                   _controller.updateBranches(await client.getBranches());
+                  Get.back();
                 } catch (e) {
                   showError(context, e.toString());
                 }

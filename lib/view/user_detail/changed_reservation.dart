@@ -25,32 +25,31 @@ class _ChangedReservationState extends State<ChangedReservation> {
             Change change = controller.changes[index];
 
             return Container(
-              height: 120.r,
+              width: double.infinity,
+              padding: EdgeInsets.symmetric(vertical: 16.r),
               decoration: BoxDecoration(
-                color: Colors.transparent,
                 border: Border.all(color: Colors.grey),
                 borderRadius: BorderRadius.circular(15.r),
               ),
               margin: EdgeInsets.fromLTRB(8.r, 4.r, 8.r, 4.r),
               child: DefaultTextStyle(
-                style: TextStyle(color: Colors.white, fontSize: 28.r),
+                style: TextStyle(color: Colors.white, fontSize: 24.r),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      "${change.from.teacherID} / ${change.from.branchName}",
+                      "${change.teacherID} / ${change.branchName}",
                     ),
                     Text(
                       "변경 전: " +
-                          DateFormat("yy/MM/dd HH:mm")
-                              .format(change.from.startDate),
+                          DateFormat("yy/MM/dd HH:mm").format(change.fromDate),
                     ),
                     Text(
-                      change.to == null
+                      change.toDate == null
                           ? "변경 사항이 없습니다."
                           : "변경 후: " +
                               DateFormat("yy/MM/dd HH:mm")
-                                  .format(change.to!.startDate),
+                                  .format(change.toDate!),
                     ),
                   ],
                 ),

@@ -28,7 +28,6 @@ class _TeacherSearchState extends State<TeacherSearch> {
     return Container(
       padding: EdgeInsets.fromLTRB(8.r, 8.r, 8.r, 24.r),
       decoration: BoxDecoration(
-        color: Colors.transparent,
         border: Border.all(color: Colors.grey),
         borderRadius: BorderRadius.circular(15.r),
       ),

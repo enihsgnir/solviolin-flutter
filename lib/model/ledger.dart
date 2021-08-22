@@ -21,7 +21,7 @@ class Ledger {
       userID: json["userID"],
       termID: json["termID"],
       branchName: json["branchName"],
-      paidAt: parseDateTime(json["paidAt"]),
+      paidAt: parseDateTime(json["paidAt"]).add(const Duration(hours: 9)),
     );
   }
 }

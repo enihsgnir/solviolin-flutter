@@ -38,18 +38,21 @@ class _TeacherListState extends State<TeacherList> {
               secondaryActions: [
                 SlideAction(
                   child: InkWell(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(CupertinoIcons.delete, size: 48.r),
-                        Text(
-                          "삭제",
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 20.r,
-                          ),
-                        )
-                      ],
+                    child: Container(
+                      width: double.infinity,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(CupertinoIcons.delete, size: 48.r),
+                          Text(
+                            "삭제",
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 20.r,
+                            ),
+                          )
+                        ],
+                      ),
                     ),
                     onTap: () {
                       showDialog(
@@ -58,7 +61,7 @@ class _TeacherListState extends State<TeacherList> {
                         builder: (context) {
                           return AlertDialog(
                             title: Text(
-                              "강사 삭제",
+                              "강사 스케줄 삭제",
                               style: TextStyle(
                                 color: Colors.white,
                                 fontSize: 28.r,
@@ -93,15 +96,13 @@ class _TeacherListState extends State<TeacherList> {
                               ElevatedButton(
                                 onPressed: () async {
                                   try {
-                                    await client.deleteTeacher(
-                                      teacherID: teacher.teacherID,
-                                      branchName: teacher.branchName,
-                                    );
+                                    await client.deleteTeacher(teacher.id);
 
                                     await getTeachersData(
                                       teacherID: search.text1,
                                       branchName: search.text2,
                                     );
+
                                     Get.back();
                                   } catch (e) {
                                     showError(context, e.toString());
@@ -131,16 +132,12 @@ class _TeacherListState extends State<TeacherList> {
                 width: double.infinity,
                 height: 120.r,
                 decoration: BoxDecoration(
-                  color: Colors.transparent,
                   border: Border.all(color: Colors.grey),
                   borderRadius: BorderRadius.circular(15.r),
                 ),
                 margin: EdgeInsets.symmetric(vertical: 4.r, horizontal: 8.r),
                 child: DefaultTextStyle(
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 28.r,
-                  ),
+                  style: TextStyle(color: Colors.white, fontSize: 28.r),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [

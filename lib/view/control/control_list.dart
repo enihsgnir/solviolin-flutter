@@ -38,54 +38,112 @@ class _ControlListState extends State<ControlList> {
               secondaryActions: [
                 SlideAction(
                   child: InkWell(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(CupertinoIcons.delete_left, size: 48.r),
-                        Text(
-                          "취소",
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 20.r,
-                          ),
-                        )
-                      ],
+                    child: Container(
+                      width: double.infinity,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(CupertinoIcons.delete, size: 48.r),
+                          Text(
+                            "삭제",
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 20.r,
+                            ),
+                          )
+                        ],
+                      ),
                     ),
-                    onTap: () async {
-                      try {
-                        await client.deleteControl(control.id);
-                        await getControlsData(
-                          branchName: search.text1!,
-                          teacherID: search.text2,
-                          startDate: search.dateTime1,
-                          endDate: search.dateTime2,
-                          status: search.number1,
-                        );
-                      } catch (e) {
-                        showError(context, e.toString());
-                      }
+                    onTap: () {
+                      showDialog(
+                        context: context,
+                        barrierColor: Colors.black26,
+                        builder: (context) {
+                          return AlertDialog(
+                            title: Text(
+                              "오픈/클로즈 삭제",
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 28.r,
+                              ),
+                            ),
+                            content: Text(
+                              "정말 삭제하시겠습니까?",
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 20.r,
+                              ),
+                            ),
+                            actions: [
+                              OutlinedButton(
+                                onPressed: () {
+                                  Get.back();
+                                },
+                                style: OutlinedButton.styleFrom(
+                                  padding: EdgeInsets.fromLTRB(
+                                      16.r, 12.r, 16.r, 12.r),
+                                ),
+                                child: Text(
+                                  "취소",
+                                  style: TextStyle(
+                                      color: Colors.white, fontSize: 20.r),
+                                ),
+                              ),
+                              ElevatedButton(
+                                onPressed: () async {
+                                  try {
+                                    await client.deleteControl(control.id);
+                                    await getControlsData(
+                                      branchName: search.text1!,
+                                      teacherID: search.text2,
+                                      startDate: search.dateTime1,
+                                      endDate: search.dateTime2,
+                                      status: search.number1,
+                                    );
+
+                                    Get.back();
+                                  } catch (e) {
+                                    showError(context, e.toString());
+                                  }
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  primary: symbolColor,
+                                  padding: EdgeInsets.fromLTRB(
+                                      16.r, 12.r, 16.r, 12.r),
+                                ),
+                                child: Text("확인",
+                                    style: TextStyle(fontSize: 20.r)),
+                              ),
+                            ],
+                          );
+                        },
+                      );
                     },
                   ),
                 ),
               ],
               child: Container(
+                width: double.infinity,
                 decoration: BoxDecoration(
-                  color: Colors.transparent,
                   border: Border.all(color: Colors.grey),
                   borderRadius: BorderRadius.circular(15.r),
                 ),
                 margin: EdgeInsets.symmetric(vertical: 4.r, horizontal: 8.r),
-                child: Column(
-                  children: [
-                    Text("${control.teacherID} / ${control.branchName}" +
-                        " / ${_statusToString(control.status)}"),
-                    Text("시작: " +
-                        DateFormat("yy/MM/dd HH:mm")
-                            .format(control.controlStart)),
-                    Text("종료: " +
-                        DateFormat("yy/MM/dd HH:mm")
-                            .format(control.controlEnd)),
-                  ],
+                child: DefaultTextStyle(
+                  style: TextStyle(color: Colors.white, fontSize: 28.r),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text("${control.teacherID} / ${control.branchName}" +
+                          " / ${_statusToString(control.status)}"),
+                      Text("시작: " +
+                          DateFormat("yy/MM/dd HH:mm")
+                              .format(control.controlStart)),
+                      Text("종료: " +
+                          DateFormat("yy/MM/dd HH:mm")
+                              .format(control.controlEnd)),
+                    ],
+                  ),
                 ),
               ),
             );

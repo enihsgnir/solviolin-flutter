@@ -116,6 +116,8 @@ class _TermPageState extends State<TermPage> {
                   );
 
                   _controller.updateTerms(await client.getTerms(10));
+
+                  Get.back();
                 } catch (e) {
                   showError(context, e.toString());
                 }
@@ -202,6 +204,8 @@ class _TermPageState extends State<TermPage> {
               onPressed: () async {
                 try {
                   await client.extendAllCoursesOfBranch(branch.branchName!);
+
+                  Get.back();
                 } catch (e) {
                   showError(context, e.toString());
                 }
@@ -261,6 +265,8 @@ class _TermPageState extends State<TermPage> {
               onPressed: () async {
                 try {
                   await client.extendAllCoursesOfUser(user.text);
+
+                  Get.back();
                 } catch (e) {
                   showError(context, e.toString());
                 }

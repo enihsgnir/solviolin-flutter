@@ -42,18 +42,21 @@ class _HistoryReservedState extends State<HistoryReserved> {
                 children: [
                   Expanded(
                     child: InkWell(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(CupertinoIcons.delete_left, size: 48.r),
-                          Text(
-                            "취소",
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 20.r,
-                            ),
-                          )
-                        ],
+                      child: Container(
+                        width: double.infinity,
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(CupertinoIcons.delete_left, size: 48.r),
+                            Text(
+                              "취소",
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 20.r,
+                              ),
+                            )
+                          ],
+                        ),
                       ),
                       onTap: () async {
                         reservation.bookingStatus.abs() == 2
@@ -80,18 +83,21 @@ class _HistoryReservedState extends State<HistoryReserved> {
                   ),
                   Expanded(
                     child: InkWell(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(Icons.more_time, size: 48.r),
-                          Text(
-                            "연장",
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 20.r,
-                            ),
-                          )
-                        ],
+                      child: Container(
+                        width: double.infinity,
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(Icons.more_time, size: 48.r),
+                            Text(
+                              "연장",
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 20.r,
+                              ),
+                            )
+                          ],
+                        ),
                       ),
                       onTap: () async {
                         reservation.bookingStatus.abs() == 3
@@ -106,9 +112,9 @@ class _HistoryReservedState extends State<HistoryReserved> {
           ],
           actionExtentRatio: 1 / 5,
           child: Container(
-            height: 120.r,
+            width: double.infinity,
+            padding: EdgeInsets.symmetric(vertical: 16.r),
             decoration: BoxDecoration(
-              color: Colors.transparent,
               border: Border.all(color: Colors.grey),
               borderRadius: BorderRadius.circular(15.r),
             ),
@@ -180,11 +186,6 @@ class _HistoryReservedState extends State<HistoryReserved> {
                     status: search.number2,
                   );
                   await getUserDetailData(detail.user!);
-                  // try {} catch (e) {
-                  //   await _client.logout();
-                  //   Get.offAllNamed("/login");
-                  //   showErrorMessage(context, e.toString());
-                  // }
                 } catch (e) {
                   Get.back();
                   showError(context, e.toString());
@@ -232,11 +233,6 @@ class _HistoryReservedState extends State<HistoryReserved> {
                     status: search.number2,
                   );
                   await getUserDetailData(detail.user!);
-                  // try {} catch (e) {
-                  //   await _client.logout();
-                  //   Get.offAllNamed("/login");
-                  //   showErrorMessage(context, e.toString());
-                  // }
                 } catch (e) {
                   Get.back();
                   showError(context, e.toString());

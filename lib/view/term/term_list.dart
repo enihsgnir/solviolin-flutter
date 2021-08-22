@@ -38,18 +38,21 @@ class _TermListState extends State<TermList> {
               secondaryActions: [
                 SlideAction(
                   child: InkWell(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(CupertinoIcons.pencil, size: 48.r),
-                        Text(
-                          "수정",
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 20.r,
-                          ),
-                        )
-                      ],
+                    child: Container(
+                      width: double.infinity,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(CupertinoIcons.pencil, size: 48.r),
+                          Text(
+                            "수정",
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 20.r,
+                            ),
+                          )
+                        ],
+                      ),
                     ),
                     onTap: () {
                       showDialog(
@@ -108,6 +111,7 @@ class _TermListState extends State<TermList> {
                                       termStart: start.date!,
                                       termEnd: end.date!,
                                     );
+
                                     Get.back();
                                   } catch (e) {
                                     showError(context, e.toString());
@@ -141,15 +145,9 @@ class _TermListState extends State<TermList> {
                   border: Border.all(color: Colors.grey),
                   borderRadius: BorderRadius.circular(15.r),
                 ),
-                margin: EdgeInsets.symmetric(
-                  vertical: 4.r,
-                  horizontal: 8.r,
-                ),
+                margin: EdgeInsets.fromLTRB(8.r, 4.r, 8.r, 4.r),
                 child: DefaultTextStyle(
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 24.r,
-                  ),
+                  style: TextStyle(color: Colors.white, fontSize: 24.r),
                   child: Column(
                     children: [
                       Text("시작: " +

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-import 'package:solviolin_admin/model/ledger.dart';
 import 'package:solviolin_admin/model/user.dart';
 import 'package:solviolin_admin/util/controller.dart';
 import 'package:solviolin_admin/util/data_source.dart';
@@ -32,26 +31,19 @@ class _UserListState extends State<UserList> {
               child: Container(
                 padding: EdgeInsets.all(12.r),
                 decoration: BoxDecoration(
-                  color: Colors.transparent,
                   border: Border.all(color: Colors.grey),
                   borderRadius: BorderRadius.circular(15.r),
                 ),
-                margin: EdgeInsets.symmetric(
-                  vertical: 4.r,
-                  horizontal: 8.r,
-                ),
+                margin: EdgeInsets.fromLTRB(8.r, 4.r, 8.r, 4.r),
                 child: DefaultTextStyle(
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 24.r,
-                  ),
+                  style: TextStyle(color: Colors.white, fontSize: 24.r),
                   child: Column(
                     children: [
                       Text("${user.userName} / ${user.branchName}"),
                       Text(_parsePhoneNumber(user.userPhone)),
                       Text("${_statusToString(user.status)}" +
                           " / 크레딧: ${user.userCredit}"),
-                      Text("결제일: ${_ledgerToString(user.ledgers)}"),
+                      Text("결제일: ${_ledgerToString(user.paidAt)}"),
                     ],
                   ),
                 ),
@@ -102,7 +94,7 @@ class _UserListState extends State<UserList> {
     return _status[status]!;
   }
 
-  String _ledgerToString(List<Ledger> ledgers) => ledgers.length == 0
+  String _ledgerToString(List<DateTime> paidAt) => paidAt.length == 0
       ? "결제 기록 없음"
-      : DateFormat("yy/MM/dd HH:mm").format(ledgers[0].paidAt);
+      : DateFormat("yy/MM/dd HH:mm").format(paidAt[0]);
 }

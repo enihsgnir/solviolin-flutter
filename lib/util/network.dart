@@ -4,6 +4,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart'
 import 'package:get/get.dart' hide Response;
 import 'package:intl/intl.dart';
 import 'package:pretty_dio_logger/pretty_dio_logger.dart';
+import 'package:solviolin_admin/model/canceled.dart';
 import 'package:solviolin_admin/model/change.dart';
 import 'package:solviolin_admin/model/control.dart';
 import 'package:solviolin_admin/model/ledger.dart';
@@ -11,6 +12,7 @@ import 'package:solviolin_admin/model/profile.dart';
 import 'package:solviolin_admin/model/regular_schedule.dart';
 import 'package:solviolin_admin/model/reservation.dart';
 import 'package:solviolin_admin/model/teacher.dart';
+import 'package:solviolin_admin/model/teacher_info.dart';
 import 'package:solviolin_admin/model/term.dart';
 import 'package:solviolin_admin/model/user.dart';
 import 'package:solviolin_admin/util/format.dart';
@@ -28,7 +30,7 @@ class Client {
     dio.options.followRedirects = false;
     dio.options.validateStatus = (status) => status! < 600;
 
-    dio.interceptors.add(PrettyDioLogger(request: false));
+    dio.interceptors.add(PrettyDioLogger(request: false, requestBody: true));
     dio.interceptors.add(InterceptorsWrapper(
       onRequest: (options, handler) async {
         if (await isLoggedIn()) {
@@ -62,6 +64,8 @@ class Client {
           var message = response.data["message"];
           if (message is List<dynamic>) {
             message = message.join("\n");
+          } else {
+            message = message.toString();
           }
 
           return handler.reject(NetworkException._(
@@ -107,14 +111,11 @@ class Client {
   }
 
   Future<void> logout() async {
-    await storage.deleteAll();
-    dio.options.headers.remove("Authorization");
-  }
-
-  Future<void> logoutWithToken() async {
     if (await isLoggedIn()) {
       await dio.patch("/auth/log-out");
     }
+    await storage.deleteAll();
+    dio.options.headers.remove("Authorization");
   }
 
   Future<Profile> login(String userID, String userPassword) async {
@@ -179,6 +180,7 @@ class Client {
     String? branchName,
     String? userID,
     int? isPaid,
+    int? userType,
     int? status,
   }) async {
     if (await isLoggedIn()) {
@@ -188,6 +190,7 @@ class Client {
           "branchName": branchName,
           "userID": userID,
           "isPaid": isPaid,
+          "userType": userType,
           "status": status,
         }..removeWhere((key, value) => value == null),
       );
@@ -196,6 +199,31 @@ class Client {
           response.data.length,
           (index) => User.fromJson(response.data[index]),
         );
+      }
+    }
+    throw "유저 목록을 불러올 수 없습니다.";
+  }
+
+  Future<List<dynamic>> getRawUsers({
+    String? branchName,
+    String? userID,
+    int? isPaid,
+    int? userType,
+    int? status,
+  }) async {
+    if (await isLoggedIn()) {
+      Response response = await dio.get(
+        "/user",
+        queryParameters: {
+          "branchName": branchName,
+          "userID": userID,
+          "isPaid": isPaid,
+          "userType": userType,
+          "status": status,
+        }..removeWhere((key, value) => value == null),
+      );
+      if (response.statusCode == 200) {
+        return response.data;
       }
     }
     throw "유저 목록을 불러올 수 없습니다.";
@@ -281,18 +309,9 @@ class Client {
     }
   }
 
-  Future<void> deleteTeacher({
-    String? teacherID,
-    String? branchName,
-  }) async {
+  Future<void> deleteTeacher(int id) async {
     if (await isLoggedIn()) {
-      await dio.delete(
-        "/teacher",
-        queryParameters: {
-          "teacherID": teacherID,
-          "branchName": branchName,
-        }..removeWhere((key, value) => value == null),
-      );
+      await dio.delete("/teacher/$id");
     }
   }
 
@@ -315,13 +334,12 @@ class Client {
         );
       }
     }
-    throw "선생님 스케줄 목록을 불러올 수 없습니다.";
+    throw "강사 스케줄 목록을 불러올 수 없습니다.";
   }
 
-  Future<List<String>> getTeacherName({
+  Future<List<TeacherInfo>> getTeacherInfos({
     String? branchName,
     int? workDow,
-    String? teacherID,
   }) async {
     if (await isLoggedIn()) {
       Response response = await dio.get(
@@ -329,17 +347,16 @@ class Client {
         queryParameters: {
           "branchName": branchName,
           "workDow": workDow,
-          "teacherID": teacherID,
         }..removeWhere((key, value) => value == null),
       );
       if (response.statusCode == 200) {
-        return List<String>.generate(
+        return List<TeacherInfo>.generate(
           response.data.length,
-          (index) => response.data[index]["teacherID"],
+          (index) => TeacherInfo.fromJson(response.data[index]),
         );
       }
     }
-    throw "선생님 이름 목록을 불러올 수 없습니다.";
+    throw "강사 정보 목록을 불러올 수 없습니다.";
   }
 
   Future<List<Control>> getControls({
@@ -525,6 +542,19 @@ class Client {
     throw "변경 내역을 불러올 수 없습니다.";
   }
 
+  Future<List<Canceled>> getCanceledReservations(String teacherID) async {
+    if (await isLoggedIn()) {
+      Response response = await dio.get("/reservation/canceled/$teacherID");
+      if (response.statusCode == 200) {
+        return List<Canceled>.generate(
+          response.data.length,
+          (index) => Canceled.fromJson(response.data[index]),
+        );
+      }
+    }
+    throw "취소 내역을 불러올 수 없습니다.";
+  }
+
   Future<void> reserveRegularReservation({
     required String teacherID,
     required String branchName,
@@ -533,7 +563,7 @@ class Client {
     required String userID,
   }) async {
     if (await isLoggedIn()) {
-      await dio.post("/reservation/admin", data: {
+      await dio.post("/reservation/regular", data: {
         "teacherID": teacherID,
         "branchName": branchName,
         "startDate": startDate.toIso8601String(),
@@ -661,12 +691,13 @@ class Client {
         "termID": termID,
       });
       if (response.statusCode == 200) {
-        return response.data != "0"
-            ? NumberFormat.simpleCurrency(
-                locale: "ko_KR",
-                name: "",
-              ).format(response.data)
-            : "0";
+        // return response.data != "0"
+        //     ? NumberFormat.simpleCurrency(
+        //         locale: "ko_KR",
+        //         name: "",
+        //       ).format(response.data)
+        //     : "0";
+        return NumberFormat("#,###원").format(int.parse(response.data));
       }
     }
     throw "총 매출 정보를 불러올 수 없습니다.";

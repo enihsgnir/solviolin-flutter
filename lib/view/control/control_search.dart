@@ -32,7 +32,6 @@ class _ControlSearchState extends State<ControlSearch> {
     return Container(
       padding: EdgeInsets.all(8.r),
       decoration: BoxDecoration(
-        color: Colors.transparent,
         border: Border.all(color: Colors.grey),
         borderRadius: BorderRadius.circular(15.r),
       ),
@@ -72,7 +71,7 @@ class _ControlSearchState extends State<ControlSearch> {
                 ),
               ),
               Padding(
-                padding: EdgeInsets.only(left: 60.r),
+                padding: EdgeInsets.only(left: 36.r),
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
                     primary: symbolColor,

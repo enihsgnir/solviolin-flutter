@@ -1,6 +1,7 @@
 import 'package:solviolin_admin/util/format.dart';
 
 class Teacher {
+  int id;
   String teacherID;
   String branchName;
   int workDow;
@@ -8,6 +9,7 @@ class Teacher {
   Duration endTime;
 
   Teacher({
+    required this.id,
     required this.teacherID,
     required this.branchName,
     required this.workDow,
@@ -17,6 +19,7 @@ class Teacher {
 
   factory Teacher.fromJson(Map<String, dynamic> json) {
     return Teacher(
+      id: json["id"],
       teacherID: json["teacherID"],
       branchName: json["branchName"],
       workDow: json["workDow"],

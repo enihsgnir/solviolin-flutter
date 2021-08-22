@@ -45,6 +45,11 @@ class _TeacherPageState extends State<TeacherPage> {
                 padding: EdgeInsets.all(8.r),
                 child: TeacherSearch(),
               ),
+              Container(
+                margin: EdgeInsets.fromLTRB(8.r, 4.r, 8.r, 4.r),
+                color: Colors.grey,
+                height: 0.5,
+              ),
               Expanded(
                 child: TeacherList(),
               ),
@@ -83,11 +88,11 @@ class _TeacherPageState extends State<TeacherPage> {
                       ),
                       Padding(
                         padding: EdgeInsets.fromLTRB(12.r, 12.r, 12.r, 0),
-                        child: pickDateTime(context, "시작일", "Start", true),
+                        child: pickTime(context, "시작시간", "Start", true),
                       ),
                       Padding(
                         padding: EdgeInsets.fromLTRB(12.r, 12.r, 12.r, 0),
-                        child: pickDateTime(context, "종료일", "End", true),
+                        child: pickTime(context, "종료시간", "End", true),
                       ),
                     ],
                   ),
@@ -133,6 +138,8 @@ class _TeacherPageState extends State<TeacherPage> {
                               branchName: search.text2,
                             );
                           }
+
+                          Get.back();
                         } catch (e) {
                           showError(context, e.toString());
                         }
