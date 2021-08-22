@@ -49,7 +49,6 @@ class _MyReservationState extends State<MyReservation> {
                             return Container(
                               padding: EdgeInsets.only(top: 16.r),
                               decoration: BoxDecoration(
-                                color: Colors.transparent,
                                 border: Border.all(color: Colors.grey),
                                 borderRadius: BorderRadius.circular(15.r),
                               ),

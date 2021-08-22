@@ -38,33 +38,33 @@ class _CalendarReservedState extends State<CalendarReserved> {
           availableCalendarFormats: const {CalendarFormat.month: "Month"},
           pageJumpingEnabled: true,
           sixWeekMonthsEnforced: true,
-          rowHeight: 72.r,
-          daysOfWeekHeight: 24.r,
+          rowHeight: 60.r,
+          daysOfWeekHeight: 20.r,
           headerStyle: HeaderStyle(
             titleCentered: true,
             titleTextFormatter: (date, locale) =>
                 DateFormat.yMMM().format(date),
             titleTextStyle: TextStyle(
               color: Colors.white,
-              fontSize: 32.r,
+              fontSize: 28.r,
               fontWeight: FontWeight.bold,
             ),
-            leftChevronIcon: Icon(Icons.chevron_left, size: 32.r),
-            rightChevronIcon: Icon(Icons.chevron_right, size: 32.r),
+            leftChevronIcon: Icon(Icons.chevron_left, size: 28.r),
+            rightChevronIcon: Icon(Icons.chevron_right, size: 28.r),
           ),
           daysOfWeekStyle: DaysOfWeekStyle(
             dowTextFormatter: (date, locale) =>
                 DateFormat.E(locale).format(date)[0],
             weekdayStyle: TextStyle(
               color: const Color(0xFF4F4F4F),
-              fontSize: 20.r,
+              fontSize: 18.r,
             ),
             weekendStyle: TextStyle(color: Colors.red, fontSize: 20.r),
           ),
           calendarStyle: CalendarStyle(
             todayTextStyle: TextStyle(
               color: kToday.weekday == 7 ? const Color(0xFFFAFAFA) : Colors.red,
-              fontSize: 24.r,
+              fontSize: 22.r,
             ),
             todayDecoration: BoxDecoration(
               color: kToday.weekday == 7 ? Colors.red : const Color(0xFFFAFAFA),
@@ -74,7 +74,7 @@ class _CalendarReservedState extends State<CalendarReserved> {
               color: _selectedDay.weekday == 7
                   ? Colors.red
                   : const Color(0xFFFAFAFA),
-              fontSize: 24.r,
+              fontSize: 22.r,
             ),
             selectedDecoration: const BoxDecoration(
               color: const Color.fromRGBO(227, 214, 208, 0.15),
@@ -82,19 +82,19 @@ class _CalendarReservedState extends State<CalendarReserved> {
             ),
             outsideTextStyle: TextStyle(
               color: Colors.grey.withOpacity(0.5),
-              fontSize: 20.r,
+              fontSize: 18.r,
             ),
             disabledTextStyle: TextStyle(
               color: Colors.grey.withOpacity(0.1),
-              fontSize: 20.r,
+              fontSize: 18.r,
             ),
-            holidayTextStyle: TextStyle(color: Colors.white, fontSize: 24.r),
+            holidayTextStyle: TextStyle(color: Colors.white, fontSize: 22.r),
             holidayDecoration: BoxDecoration(
               color: symbolColor,
               shape: BoxShape.circle,
             ),
-            weekendTextStyle: TextStyle(color: Colors.red, fontSize: 24.r),
-            defaultTextStyle: TextStyle(color: Colors.white70, fontSize: 24.r),
+            weekendTextStyle: TextStyle(color: Colors.red, fontSize: 22.r),
+            defaultTextStyle: TextStyle(color: Colors.white70, fontSize: 22.r),
           ),
           selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
           holidayPredicate: (day) => getEvents().containsKey(day),

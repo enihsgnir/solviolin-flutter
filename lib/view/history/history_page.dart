@@ -62,7 +62,6 @@ class _HistoryPageState extends State<HistoryPage>
                             style: TextStyle(fontSize: 28.r),
                             child: Container(
                               decoration: BoxDecoration(
-                                color: Colors.transparent,
                                 border: Border.all(color: Colors.grey),
                                 borderRadius: BorderRadius.circular(15.r),
                               ),
@@ -129,7 +128,7 @@ class _HistoryPageState extends State<HistoryPage>
                       child: Text("이번 달", style: TextStyle(fontSize: 28.r)),
                     ),
                     Tab(
-                      child: Text("변경내역", style: TextStyle(fontSize: 28.r)),
+                      child: Text("변경 내역", style: TextStyle(fontSize: 28.r)),
                     ),
                   ],
                 ),
@@ -145,13 +144,11 @@ class _HistoryPageState extends State<HistoryPage>
                     children: [
                       Padding(
                         padding: EdgeInsets.only(top: 4.r),
-                        child:
-                            HistoryReserved(controller.lastMonthReservations),
+                        child: HistoryReserved(isThisMonth: false),
                       ),
                       Padding(
                         padding: EdgeInsets.only(top: 4.r),
-                        child:
-                            HistoryReserved(controller.thisMonthReservations),
+                        child: HistoryReserved(isThisMonth: true),
                       ),
                       Padding(
                         padding: EdgeInsets.only(top: 4.r),

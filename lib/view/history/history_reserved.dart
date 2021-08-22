@@ -10,11 +10,11 @@ import 'package:solviolin/util/network.dart';
 import 'package:solviolin/widget/single_reusable.dart';
 
 class HistoryReserved extends StatefulWidget {
-  final List<Reservation> reservations;
+  final bool isThisMonth;
 
-  const HistoryReserved(
-    this.reservations, {
+  const HistoryReserved({
     Key? key,
+    required this.isThisMonth,
   }) : super(key: key);
 
   @override
@@ -27,127 +27,142 @@ class _HistoryReservedState extends State<HistoryReserved> {
 
   @override
   Widget build(BuildContext context) {
-    return ListView.builder(
-      itemCount: widget.reservations.length,
-      itemBuilder: (context, index) {
-        Reservation reservation = widget.reservations[index];
+    return GetBuilder<DataController>(
+      builder: (controller) {
+        return ListView.builder(
+          itemCount: widget.isThisMonth
+              ? controller.thisMonthReservations.length
+              : controller.lastMonthReservations.length,
+          itemBuilder: (context, index) {
+            Reservation reservation = widget.isThisMonth
+                ? controller.thisMonthReservations[index]
+                : controller.lastMonthReservations[index];
 
-        return Slidable(
-          actionPane: SlidableScrollActionPane(),
-          actionExtentRatio: 1 / 5,
-          secondaryActions: [
-            SlideAction(
-              child: Row(
-                children: [
-                  Expanded(
-                    child: InkWell(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(CupertinoIcons.delete_left, size: 48.r),
-                          Text(
-                            "취소",
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 20.r,
+            return Slidable(
+              actionPane: SlidableScrollActionPane(),
+              actionExtentRatio: 1 / 5,
+              secondaryActions: [
+                SlideAction(
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: InkWell(
+                          child: Container(
+                            width: double.infinity,
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(CupertinoIcons.delete_left, size: 48.r),
+                                Text(
+                                  "취소",
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 20.r,
+                                  ),
+                                )
+                              ],
                             ),
-                          )
-                        ],
+                          ),
+                          onTap: () async {
+                            reservation.bookingStatus.abs() == 2
+                                ? showError(context, "이미 취소된 수업입니다.")
+                                : await _showCancel(context, reservation);
+                          },
+                        ),
                       ),
-                      onTap: () async {
-                        reservation.bookingStatus.abs() == 2
-                            ? showError(context, "이미 취소된 수업입니다.")
-                            : await _showCancel(context, reservation);
-                      },
-                    ),
-                  ),
-                  Container(
-                    margin: EdgeInsets.symmetric(vertical: 8.r),
-                    color: Colors.white,
-                    width: 0.25.r,
-                  ),
-                ],
-              ),
-            ),
-            SlideAction(
-              child: Row(
-                children: [
-                  Container(
-                    margin: EdgeInsets.symmetric(vertical: 8.r),
-                    color: Colors.white,
-                    width: 0.25.r,
-                  ),
-                  Expanded(
-                    child: InkWell(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(Icons.more_time, size: 48.r),
-                          Text(
-                            "연장",
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 20.r,
-                            ),
-                          )
-                        ],
+                      Container(
+                        margin: EdgeInsets.symmetric(vertical: 8.r),
+                        color: Colors.white,
+                        width: 0.25.r,
                       ),
-                      onTap: () async {
-                        reservation.bookingStatus.abs() == 3
-                            ? showError(context, "이미 연장된 수업입니다.")
-                            : await _showExtend(context, reservation);
-                      },
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-          child: Container(
-            decoration: BoxDecoration(
-              color: Colors.transparent,
-              border: Border.all(color: Colors.grey),
-              borderRadius: BorderRadius.circular(15.r),
-            ),
-            height: 108.r,
-            margin: EdgeInsets.fromLTRB(8.r, 4.r, 8.r, 4.r),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  "${reservation.teacherID} / ${reservation.branchName}",
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 24.r,
-                    decoration: reservation.bookingStatus.abs() == 2
-                        ? TextDecoration.lineThrough
-                        : null,
+                    ],
                   ),
                 ),
-                Text(
-                  DateFormat("yy/MM/dd HH:mm").format(reservation.startDate) +
-                      " ~ " +
-                      DateFormat("HH:mm").format(reservation.endDate),
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 24.r,
-                    decoration: reservation.bookingStatus.abs() == 2
-                        ? TextDecoration.lineThrough
-                        : null,
-                  ),
-                ),
-                Container(
-                  alignment: Alignment.centerRight,
-                  padding: const EdgeInsets.only(right: 24),
-                  width: double.infinity,
-                  child: Text(
-                    _statusToString(reservation.bookingStatus),
-                    style: TextStyle(color: Colors.red, fontSize: 20.r),
+                SlideAction(
+                  child: Row(
+                    children: [
+                      Container(
+                        margin: EdgeInsets.symmetric(vertical: 8.r),
+                        color: Colors.white,
+                        width: 0.25.r,
+                      ),
+                      Expanded(
+                        child: InkWell(
+                          child: Container(
+                            width: double.infinity,
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(Icons.more_time, size: 48.r),
+                                Text(
+                                  "연장",
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 20.r,
+                                  ),
+                                )
+                              ],
+                            ),
+                          ),
+                          onTap: () async {
+                            reservation.bookingStatus.abs() == 3
+                                ? showError(context, "이미 연장된 수업입니다.")
+                                : await _showExtend(context, reservation);
+                          },
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ],
-            ),
-          ),
+              child: Container(
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  border: Border.all(color: Colors.grey),
+                  borderRadius: BorderRadius.circular(15.r),
+                ),
+                padding: EdgeInsets.symmetric(vertical: 24.r),
+                margin: EdgeInsets.fromLTRB(8.r, 4.r, 8.r, 4.r),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      "${reservation.teacherID} / ${reservation.branchName}",
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 24.r,
+                        decoration: reservation.bookingStatus.abs() == 2
+                            ? TextDecoration.lineThrough
+                            : null,
+                      ),
+                    ),
+                    Text(
+                      DateFormat("yy/MM/dd HH:mm")
+                              .format(reservation.startDate) +
+                          " ~ " +
+                          DateFormat("HH:mm").format(reservation.endDate),
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 24.r,
+                        decoration: reservation.bookingStatus.abs() == 2
+                            ? TextDecoration.lineThrough
+                            : null,
+                      ),
+                    ),
+                    Container(
+                      alignment: Alignment.centerRight,
+                      padding: const EdgeInsets.only(right: 24),
+                      width: double.infinity,
+                      child: Text(
+                        _statusToString(reservation.bookingStatus),
+                        style: TextStyle(color: Colors.red, fontSize: 20.r),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
         );
       },
     );
@@ -169,17 +184,14 @@ class _HistoryReservedState extends State<HistoryReserved> {
             onPressed: () async {
               try {
                 await _client.cancelReservation(reservation.id);
-                try {
-                  await getUserBasedData();
-                  await getSelectedDayData(_controller.selectedDay);
-                  await getChangedPageData(_controller.focusedDay);
-                } catch (e) {
-                  await _client.logout();
-                  Get.offAllNamed("/login");
-                  showError(context, e.toString());
-                }
-              } catch (e) {
+
+                await getUserBasedData();
+                await getSelectedDayData(_controller.selectedDay);
+                await getChangedPageData(_controller.focusedDay);
+                await getReservedHistoryData();
+
                 Get.back();
+              } catch (e) {
                 showError(context, e.toString());
               }
             },
@@ -215,17 +227,14 @@ class _HistoryReservedState extends State<HistoryReserved> {
             onPressed: () async {
               try {
                 await _client.extendReservation(reservation.id);
-                try {
-                  await getUserBasedData();
-                  await getSelectedDayData(_controller.selectedDay);
-                  await getChangedPageData(_controller.focusedDay);
-                } catch (e) {
-                  await _client.logout();
-                  Get.offAllNamed("/login");
-                  showError(context, e.toString());
-                }
-              } catch (e) {
+
+                await getUserBasedData();
+                await getSelectedDayData(_controller.selectedDay);
+                await getChangedPageData(_controller.focusedDay);
+                await getReservedHistoryData();
+
                 Get.back();
+              } catch (e) {
                 showError(context, e.toString());
               }
             },

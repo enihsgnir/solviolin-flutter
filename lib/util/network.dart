@@ -102,6 +102,9 @@ class Client {
   }
 
   Future<void> logout() async {
+    if (await isLoggedIn()) {
+      await dio.patch("/auth/log-out");
+    }
     await storage.deleteAll();
     dio.options.headers.remove("Authorization");
   }
@@ -112,11 +115,15 @@ class Client {
       "userPassword": userPassword,
     });
     if (response.statusCode == 201) {
-      await storage.write(
-          key: "accessToken", value: response.data["access_token"]);
-      await storage.write(
-          key: "refreshToken", value: response.data["refresh_token"]);
-      return Profile.fromJson(response.data);
+      if (response.data["userType"] == 0) {
+        await storage.write(
+            key: "accessToken", value: response.data["access_token"]);
+        await storage.write(
+            key: "refreshToken", value: response.data["refresh_token"]);
+        return Profile.fromJson(response.data);
+      } else {
+        throw "강사 및 관리자는 별도의 앱을 이용하기 바랍니다.";
+      }
     }
     throw "내 정보를 불러올 수 없습니다.";
   }

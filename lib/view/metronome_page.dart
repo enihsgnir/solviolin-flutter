@@ -70,21 +70,15 @@ class _MetronomePageState extends State<MetronomePage> {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Container(
-                padding: EdgeInsets.all(16.r),
-                child: InkWell(
-                  child: Container(
-                    padding: EdgeInsets.all(8.r),
-                    decoration: BoxDecoration(
-                      color: symbolColor,
-                      shape: BoxShape.circle,
-                    ),
-                    width: 81.r,
-                    height: 81.r,
-                    child: Icon(Icons.remove, color: Colors.white, size: 54.r),
-                  ),
-                  onTap: () => count(CountType.decrease),
-                  enableFeedback: false,
+              ElevatedButton(
+                onPressed: () => count(CountType.decrease),
+                style: ElevatedButton.styleFrom(
+                  primary: symbolColor,
+                  shape: CircleBorder(),
+                ),
+                child: Padding(
+                  padding: EdgeInsets.all(12.r),
+                  child: Icon(Icons.remove, color: Colors.white, size: 54.r),
                 ),
               ),
               Container(
@@ -100,41 +94,34 @@ class _MetronomePageState extends State<MetronomePage> {
                   enableFeedback: false,
                 ),
               ),
-              Container(
-                padding: EdgeInsets.all(16.r),
-                child: InkWell(
-                  child: Container(
-                    padding: EdgeInsets.all(8.r),
-                    decoration: BoxDecoration(
-                      color: symbolColor,
-                      shape: BoxShape.circle,
-                    ),
-                    width: 81.r,
-                    height: 81.r,
-                    child: Icon(Icons.add, color: Colors.white, size: 54.r),
-                  ),
-                  onTap: () => count(CountType.increase),
-                  enableFeedback: false,
+              ElevatedButton(
+                onPressed: () => count(CountType.increase),
+                style: ElevatedButton.styleFrom(
+                  primary: symbolColor,
+                  shape: CircleBorder(),
+                ),
+                child: Padding(
+                  padding: EdgeInsets.all(12.r),
+                  child: Icon(Icons.add, color: Colors.white, size: 54.r),
                 ),
               ),
             ],
           ),
-          Container(
-            padding: EdgeInsets.all(16.r),
-            child: InkWell(
-              child: Container(
-                alignment: Alignment.center,
-                width: 216.r,
-                height: 216.r,
-                child: Icon(
-                  isPlaying
-                      ? Icons.pause_circle_outline_rounded
-                      : Icons.play_circle_outline_rounded,
-                  size: 162.r,
-                ),
+          Padding(
+            padding: EdgeInsets.all(32.r),
+            child: OutlinedButton(
+              onPressed: play,
+              style: OutlinedButton.styleFrom(
+                primary: Colors.white,
+                shape: CircleBorder(),
+                enableFeedback: false,
               ),
-              onTap: play,
-              enableFeedback: false,
+              child: Icon(
+                isPlaying
+                    ? Icons.pause_circle_outline_rounded
+                    : Icons.play_circle_outline_rounded,
+                size: 162.r,
+              ),
             ),
           ),
         ],

@@ -14,7 +14,7 @@ extension RFS on num {
   double get r => this * _controller.ratio; //'r'esponsible font size
 }
 
-final DateTime kToday = DateTime.now().add(Duration(hours: 9));
+DateTime kToday = DateTime.now().add(Duration(hours: 9));
 
 Color symbolColor = const Color.fromRGBO(96, 128, 104, 100);
 
@@ -115,12 +115,12 @@ Future<void> getReservedHistoryData() async {
 
   _controller.updateChanges(await _client.getChanges()
     ..sort((a, b) {
-      int primary = a.from.startDate.compareTo(b.from.startDate);
+      int primary = a.fromDate.compareTo(b.fromDate);
       return primary != 0
           ? primary
-          : a.to == null || b.to == null
+          : a.toDate == null || b.toDate == null
               ? 0
-              : a.to!.startDate.compareTo(b.to!.startDate);
+              : a.toDate!.compareTo(b.toDate!);
     }));
 }
 

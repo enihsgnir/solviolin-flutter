@@ -16,6 +16,8 @@ class QRCodeScanPage extends StatefulWidget {
 }
 
 class _QRCodeScanPageState extends State<QRCodeScanPage> {
+  Client _client = Get.find<Client>();
+
   final GlobalKey qrKey = GlobalKey(debugLabel: "QR");
   Barcode? result;
   QRViewController? qrController;
@@ -51,7 +53,7 @@ class _QRCodeScanPageState extends State<QRCodeScanPage> {
                 setState(() async {
                   result = scanData;
                   try {
-                    await Get.put(Client()).checkIn(result!.code);
+                    await _client.checkIn(result!.code);
                     Get.back();
                   } catch (e) {
                     showError(context, e.toString());

@@ -15,14 +15,14 @@ class LoadingPage extends StatefulWidget {
 }
 
 class _LoadingPageState extends State<LoadingPage> {
-  Client _client = Get.put(Client());
+  Client _client = Get.find<Client>();
   DataController _controller = Get.find<DataController>();
 
   @override
   void initState() {
     super.initState();
     Future.delayed(const Duration(seconds: 1), () async {
-      // await client.logout(); // for test
+      // await _client.logout(); // for test
 
       try {
         await checkUser();

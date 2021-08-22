@@ -42,36 +42,38 @@ class _GridAvailableState extends State<GridAvailable> {
                       ),
                     ),
                   )
-                : GridView.count(
-                    shrinkWrap: true,
-                    padding: EdgeInsets.fromLTRB(8.r, 8.r, 8.r, 0),
-                    crossAxisCount: 4,
-                    mainAxisSpacing: 16.r,
-                    crossAxisSpacing: 8.r,
-                    childAspectRatio: 2,
-                    children: List<Widget>.generate(
-                      controller.availabaleSpots.length,
-                      (index) => InkWell(
-                        child: Container(
-                          alignment: Alignment.center,
-                          decoration: BoxDecoration(
-                            color: symbolColor,
-                            borderRadius: BorderRadius.circular(15.r),
+                : Expanded(
+                    child: GridView.count(
+                      shrinkWrap: true,
+                      padding: EdgeInsets.fromLTRB(8.r, 8.r, 8.r, 0),
+                      crossAxisCount: 4,
+                      mainAxisSpacing: 16.r,
+                      crossAxisSpacing: 8.r,
+                      childAspectRatio: 2.2,
+                      children: List<Widget>.generate(
+                        controller.availabaleSpots.length,
+                        (index) => InkWell(
+                          child: Container(
+                            alignment: Alignment.center,
+                            decoration: BoxDecoration(
+                              color: symbolColor,
+                              borderRadius: BorderRadius.circular(15.r),
+                            ),
+                            child: Text(
+                              DateFormat("HH:mm")
+                                  .format(controller.availabaleSpots[index]),
+                              style: TextStyle(
+                                  color: Colors.white, fontSize: 20.r),
+                            ),
                           ),
-                          child: Text(
-                            DateFormat("HH:mm")
-                                .format(controller.availabaleSpots[index]),
-                            style:
-                                TextStyle(color: Colors.white, fontSize: 22.r),
-                          ),
+                          onTap: () async {
+                            await _showReserve(
+                              context,
+                              controller.availabaleSpots[index],
+                            );
+                          },
+                          enableFeedback: false,
                         ),
-                        onTap: () async {
-                          await _showReserve(
-                            context,
-                            controller.availabaleSpots[index],
-                          );
-                        },
-                        enableFeedback: false,
                       ),
                     ),
                   );

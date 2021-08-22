@@ -15,8 +15,10 @@ class DataController extends GetxController {
   late List<DateTime> availabaleSpots;
   late List<Reservation> myValidReservations;
   late List<Term> currentTerm;
+
   DateTime selectedDay = kToday;
   late DateTime focusedDay;
+
   late List<Reservation> thisMonthReservations;
   late List<Reservation> lastMonthReservations;
   late List<Change> changes;
