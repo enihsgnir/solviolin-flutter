@@ -255,13 +255,13 @@ class _HistoryReservedState extends State<HistoryReserved> {
 
   String _statusToString(int bookingStatus) {
     Map<int, String> status = {
-      0: "Original",
-      1: "MadeUp",
-      2: "Canceled",
-      3: "Extended",
-      -1: "MadeUp(by Admin)",
-      -2: "Canceled(by Admin)",
-      -3: "Extended(by Admin)",
+      0: "정규",
+      1: "보강",
+      2: "취소",
+      3: "연장",
+      -1: "보강(관리자)",
+      -2: "취소(관리자)",
+      -3: "연장(관리자)",
     };
 
     return status[bookingStatus]!;

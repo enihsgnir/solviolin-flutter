@@ -90,15 +90,15 @@ class _MainPageState extends State<MainPage> {
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             Padding(
-                              padding: EdgeInsets.fromLTRB(12.r, 12.r, 12.r, 0),
+                              padding: EdgeInsets.fromLTRB(12.r, 6.r, 12.r, 0),
                               child: input("수강생", user),
                             ),
                             Padding(
-                              padding: EdgeInsets.fromLTRB(12.r, 12.r, 12.r, 0),
+                              padding: EdgeInsets.fromLTRB(12.r, 6.r, 12.r, 0),
                               child: input("강사", teacher),
                             ),
                             Padding(
-                              padding: EdgeInsets.fromLTRB(12.r, 12.r, 12.r, 0),
+                              padding: EdgeInsets.fromLTRB(12.r, 6.r, 12.r, 0),
                               child: branchDropdown(null, "지점을 선택하세요!"),
                             ),
                           ],

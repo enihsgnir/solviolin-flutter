@@ -79,11 +79,11 @@ class _TermPageState extends State<TermPage> {
             mainAxisSize: MainAxisSize.min,
             children: [
               Padding(
-                padding: EdgeInsets.fromLTRB(12.r, 12.r, 12.r, 0),
+                padding: EdgeInsets.fromLTRB(12.r, 6.r, 12.r, 0),
                 child: pickDate(context, "시작일", "Start", true),
               ),
               Padding(
-                padding: EdgeInsets.fromLTRB(12.r, 12.r, 12.r, 0),
+                padding: EdgeInsets.fromLTRB(12.r, 6.r, 12.r, 0),
                 child: pickDate(context, "종료일", "End", true),
               ),
             ],
@@ -178,7 +178,7 @@ class _TermPageState extends State<TermPage> {
             ),
           ),
           content: Padding(
-            padding: EdgeInsets.fromLTRB(12.r, 12.r, 12.r, 0),
+            padding: EdgeInsets.fromLTRB(12.r, 6.r, 12.r, 0),
             child: branchDropdown(null, "지점을 선택하세요!"),
           ),
           actions: [
@@ -230,57 +230,59 @@ class _TermPageState extends State<TermPage> {
       context: context,
       barrierColor: Colors.black26,
       builder: (context) {
-        return AlertDialog(
-          title: Text(
-            "정규 연장 (수강생)",
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 28.r,
-            ),
-          ),
-          content: Padding(
-            padding: EdgeInsets.fromLTRB(12.r, 12.r, 12.r, 0),
-            child: input("이름", user, "이름을 입력하세요!"),
-          ),
-          actions: [
-            OutlinedButton(
-              onPressed: () {
-                Get.back();
-              },
-              style: OutlinedButton.styleFrom(
-                padding: EdgeInsets.symmetric(
-                  vertical: 12.r,
-                  horizontal: 16.r,
-                ),
-              ),
-              child: Text(
-                "취소",
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 20.r,
-                ),
+        return SingleChildScrollView(
+          child: AlertDialog(
+            title: Text(
+              "정규 연장 (수강생)",
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 28.r,
               ),
             ),
-            ElevatedButton(
-              onPressed: () async {
-                try {
-                  await client.extendAllCoursesOfUser(user.text);
-
+            content: Padding(
+              padding: EdgeInsets.fromLTRB(12.r, 6.r, 12.r, 0),
+              child: input("이름", user, "이름을 입력하세요!"),
+            ),
+            actions: [
+              OutlinedButton(
+                onPressed: () {
                   Get.back();
-                } catch (e) {
-                  showError(context, e.toString());
-                }
-              },
-              style: ElevatedButton.styleFrom(
-                primary: symbolColor,
-                padding: EdgeInsets.symmetric(
-                  vertical: 12.r,
-                  horizontal: 16.r,
+                },
+                style: OutlinedButton.styleFrom(
+                  padding: EdgeInsets.symmetric(
+                    vertical: 12.r,
+                    horizontal: 16.r,
+                  ),
+                ),
+                child: Text(
+                  "취소",
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 20.r,
+                  ),
                 ),
               ),
-              child: Text("등록", style: TextStyle(fontSize: 20.r)),
-            ),
-          ],
+              ElevatedButton(
+                onPressed: () async {
+                  try {
+                    await client.extendAllCoursesOfUser(user.text);
+
+                    Get.back();
+                  } catch (e) {
+                    showError(context, e.toString());
+                  }
+                },
+                style: ElevatedButton.styleFrom(
+                  primary: symbolColor,
+                  padding: EdgeInsets.symmetric(
+                    vertical: 12.r,
+                    horizontal: 16.r,
+                  ),
+                ),
+                child: Text("등록", style: TextStyle(fontSize: 20.r)),
+              ),
+            ],
+          ),
         );
       },
     );

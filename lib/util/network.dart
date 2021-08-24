@@ -43,23 +43,23 @@ class Client {
         bool containsAccess = await storage.containsKey(key: "accessToken");
         bool containsRefresh = await storage.containsKey(key: "refreshToken");
 
-        if (response.statusCode == 401) {
-          if (containsAccess && containsRefresh) {
-            try {
-              await refresh();
-              return handler.next(await retry(response.requestOptions));
-            } on NetworkException catch (e) {
-              return handler.reject(e);
-            }
-          } else if (!containsAccess && containsRefresh) {
-            Get.offAllNamed("/login");
-            await logout();
-
-            return handler.reject(NetworkException._(
-              message: "인증이 만료되었습니다. 자동으로 로그아웃 됩니다.",
-              options: response.requestOptions,
-            ));
+        if (response.statusCode == 401 && containsAccess && containsRefresh) {
+          try {
+            await refresh();
+            return handler.next(await retry(response.requestOptions));
+          } on NetworkException catch (e) {
+            return handler.reject(e);
           }
+        } else if (response.statusCode == 401 &&
+            !containsAccess &&
+            containsRefresh) {
+          Get.offAllNamed("/login");
+          await logout();
+
+          return handler.reject(NetworkException._(
+            message: "인증이 만료되었습니다. 자동으로 로그아웃 됩니다.",
+            options: response.requestOptions,
+          ));
         } else if (response.statusCode != 200 && response.statusCode != 201) {
           var message = response.data["message"];
           if (message is List<dynamic>) {

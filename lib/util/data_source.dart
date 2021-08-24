@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:solviolin_admin/model/reservation.dart';
 import 'package:solviolin_admin/model/teacher_info.dart';
 import 'package:solviolin_admin/model/user.dart';
@@ -177,19 +178,16 @@ Future<void> getUsersData({
     ..sort((a, b) => a.userID.compareTo(b.userID)));
 }
 
-Future<File> saveUsersData({
+Future<void> saveUsersData({
   String? branchName,
   String? userID,
   int? isPaid,
   int? status,
 }) async {
-  final String path = "storage/emulated/0/Download/SolViolin";
-  final Directory directory = Directory(path);
-  if (!await directory.exists()) {
-    directory.create();
-  }
+  final Directory directory = await getApplicationDocumentsDirectory();
+  final String path = directory.path;
+  final File file = File("$path/users_list.json");
 
-  final File file = File(path + "/users_list.json");
   final List<dynamic> data = await _client.getRawUsers(
     branchName: branchName,
     userID: userID,
@@ -198,7 +196,20 @@ Future<File> saveUsersData({
     status: status,
   );
 
-  return file.writeAsString(json.encode(data));
+  file.writeAsString(json.encode(data));
+
+  Get.snackbar(
+    "",
+    "",
+    titleText: Text(
+      "유저 정보 목록 저장",
+      style: TextStyle(color: Colors.white, fontSize: 24.r),
+    ),
+    messageText: Text(
+      "$path/users_list.json",
+      style: TextStyle(color: Colors.white, fontSize: 20.r),
+    ),
+  );
 }
 
 Future<void> getUserDetailData(User user) async {

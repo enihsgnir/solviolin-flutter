@@ -70,7 +70,7 @@ class _UserDetailPageState extends State<UserDetailPage>
                   alignment: Alignment.bottomCenter,
                   children: [
                     Container(
-                      height: 175.r,
+                      height: 225.r,
                       child: PageView.builder(
                         controller: PageController(),
                         physics: ClampingScrollPhysics(),
@@ -390,76 +390,78 @@ class _UserDetailPageState extends State<UserDetailPage>
       context: context,
       barrierColor: Colors.black26,
       builder: (context) {
-        return AlertDialog(
-          title: Text(
-            "원비납부",
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 28.r,
+        return SingleChildScrollView(
+          child: AlertDialog(
+            title: Text(
+              "원비납부",
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 28.r,
+              ),
             ),
-          ),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Padding(
-                padding: EdgeInsets.fromLTRB(12.r, 12.r, 12.r, 0),
-                child: input("금액", amount, "금액을 입력하세요!"),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Padding(
+                  padding: EdgeInsets.fromLTRB(12.r, 6.r, 12.r, 0),
+                  child: input("금액", amount, "금액을 입력하세요!"),
+                ),
+                Padding(
+                  padding: EdgeInsets.fromLTRB(12.r, 6.r, 12.r, 0),
+                  child: branchDropdown("Expend", "지점을 선택하세요!"),
+                ),
+                Padding(
+                  padding: EdgeInsets.fromLTRB(12.r, 6.r, 12.r, 0),
+                  child: termDropdown("지점을 선택하세요!"),
+                ),
+              ],
+            ),
+            actions: [
+              OutlinedButton(
+                onPressed: () {
+                  Get.back();
+                },
+                style: OutlinedButton.styleFrom(
+                  padding: EdgeInsets.fromLTRB(16.r, 12.r, 16.r, 12.r),
+                ),
+                child: Text(
+                  "취소",
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 20.r,
+                  ),
+                ),
               ),
-              Padding(
-                padding: EdgeInsets.fromLTRB(12.r, 12.r, 12.r, 0),
-                child: branchDropdown("Expend", "지점을 선택하세요!"),
-              ),
-              Padding(
-                padding: EdgeInsets.fromLTRB(12.r, 12.r, 12.r, 0),
-                child: termDropdown("지점을 선택하세요!"),
+              ElevatedButton(
+                onPressed: () async {
+                  try {
+                    await client.registerLedger(
+                      userID: _controller.regularSchedules[0].userID,
+                      amount: int.parse(amount.text),
+                      termID: term.termID!,
+                      branchName: expend.branchName!,
+                    );
+                    await getUsersData(
+                      branchName: search.text1,
+                      userID: search.text2,
+                      isPaid: search.number1,
+                      status: search.number2,
+                    );
+                    await getUserDetailData(detail.user!);
+
+                    Get.back();
+                  } catch (e) {
+                    showError(context, e.toString());
+                  }
+                },
+                style: ElevatedButton.styleFrom(
+                  primary: symbolColor,
+                  padding: EdgeInsets.fromLTRB(16.r, 12.r, 16.r, 12.r),
+                ),
+                child: Text("등록", style: TextStyle(fontSize: 20.r)),
               ),
             ],
           ),
-          actions: [
-            OutlinedButton(
-              onPressed: () {
-                Get.back();
-              },
-              style: OutlinedButton.styleFrom(
-                padding: EdgeInsets.fromLTRB(16.r, 12.r, 16.r, 12.r),
-              ),
-              child: Text(
-                "취소",
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 20.r,
-                ),
-              ),
-            ),
-            ElevatedButton(
-              onPressed: () async {
-                try {
-                  await client.registerLedger(
-                    userID: _controller.regularSchedules[0].userID,
-                    amount: int.parse(amount.text),
-                    termID: term.termID!,
-                    branchName: expend.branchName!,
-                  );
-                  await getUsersData(
-                    branchName: search.text1,
-                    userID: search.text2,
-                    isPaid: search.number1,
-                    status: search.number2,
-                  );
-                  await getUserDetailData(detail.user!);
-
-                  Get.back();
-                } catch (e) {
-                  showError(context, e.toString());
-                }
-              },
-              style: ElevatedButton.styleFrom(
-                primary: symbolColor,
-                padding: EdgeInsets.fromLTRB(16.r, 12.r, 16.r, 12.r),
-              ),
-              child: Text("등록", style: TextStyle(fontSize: 20.r)),
-            ),
-          ],
         );
       },
     );
@@ -470,88 +472,90 @@ class _UserDetailPageState extends State<UserDetailPage>
       context: context,
       barrierColor: Colors.black26,
       builder: (context) {
-        return AlertDialog(
-          title: Text(
-            "정보수정",
-            style: TextStyle(color: Colors.white, fontSize: 28.r),
-          ),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Padding(
-                padding: EdgeInsets.fromLTRB(12.r, 12.r, 12.r, 0),
-                child: branchDropdown("Update"),
-              ),
-              Padding(
-                padding: EdgeInsets.fromLTRB(12.r, 12.r, 12.r, 0),
-                child: input("전화번호", phone),
-              ),
-              Container(
-                alignment: Alignment.centerLeft,
-                padding: EdgeInsets.fromLTRB(12.r, 12.r, 12.r, 0),
-                child: check(
-                  tag: "Update",
-                  item: "등록 여부",
-                  trueName: "등록",
-                  falseName: "미등록",
+        return SingleChildScrollView(
+          child: AlertDialog(
+            title: Text(
+              "정보수정",
+              style: TextStyle(color: Colors.white, fontSize: 28.r),
+            ),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Padding(
+                  padding: EdgeInsets.fromLTRB(12.r, 6.r, 12.r, 0),
+                  child: branchDropdown("Update"),
+                ),
+                Padding(
+                  padding: EdgeInsets.fromLTRB(12.r, 6.r, 12.r, 0),
+                  child: input("전화번호", phone),
+                ),
+                Container(
+                  alignment: Alignment.centerLeft,
+                  padding: EdgeInsets.fromLTRB(12.r, 6.r, 12.r, 0),
+                  child: check(
+                    tag: "Update",
+                    item: "등록 여부",
+                    trueName: "등록",
+                    falseName: "미등록",
+                  ),
+                ),
+                Padding(
+                  padding: EdgeInsets.fromLTRB(12.r, 6.r, 12.r, 0),
+                  child: input("크레딧", credit),
+                ),
+                Padding(
+                  padding: EdgeInsets.fromLTRB(12.r, 6.r, 12.r, 0),
+                  child: input("이름", name),
+                ),
+              ],
+            ),
+            actions: [
+              OutlinedButton(
+                onPressed: () {
+                  Get.back();
+                },
+                style: OutlinedButton.styleFrom(
+                  padding: EdgeInsets.fromLTRB(16.r, 12.r, 16.r, 12.r),
+                ),
+                child: Text(
+                  "취소",
+                  style: TextStyle(color: Colors.white, fontSize: 20.r),
                 ),
               ),
-              Padding(
-                padding: EdgeInsets.fromLTRB(12.r, 12.r, 12.r, 0),
-                child: input("크레딧", credit),
-              ),
-              Padding(
-                padding: EdgeInsets.fromLTRB(12.r, 12.r, 12.r, 0),
-                child: input("이름", name),
+              ElevatedButton(
+                onPressed: () async {
+                  try {
+                    await client.updateUserInformation(
+                      _controller.regularSchedules[0].userID,
+                      userBranch: update.branchName,
+                      userPhone: phone.text == "" ? null : phone.text,
+                      status: status.result,
+                      userCredit:
+                          credit.text == "" ? null : int.parse(credit.text),
+                      userName: name.text == "" ? null : name.text,
+                    );
+
+                    await getUsersData(
+                      branchName: search.text1,
+                      userID: search.text2,
+                      isPaid: search.number1,
+                      status: search.number2,
+                    );
+                    await getUserDetailData(detail.user!);
+
+                    Get.back();
+                  } catch (e) {
+                    showError(context, e.toString());
+                  }
+                },
+                style: ElevatedButton.styleFrom(
+                  primary: symbolColor,
+                  padding: EdgeInsets.fromLTRB(16.r, 12.r, 16.r, 12.r),
+                ),
+                child: Text("등록", style: TextStyle(fontSize: 20.r)),
               ),
             ],
           ),
-          actions: [
-            OutlinedButton(
-              onPressed: () {
-                Get.back();
-              },
-              style: OutlinedButton.styleFrom(
-                padding: EdgeInsets.fromLTRB(16.r, 12.r, 16.r, 12.r),
-              ),
-              child: Text(
-                "취소",
-                style: TextStyle(color: Colors.white, fontSize: 20.r),
-              ),
-            ),
-            ElevatedButton(
-              onPressed: () async {
-                try {
-                  await client.updateUserInformation(
-                    _controller.regularSchedules[0].userID,
-                    userBranch: update.branchName,
-                    userPhone: phone.text == "" ? null : phone.text,
-                    status: status.result,
-                    userCredit:
-                        credit.text == "" ? null : int.parse(credit.text),
-                    userName: name.text == "" ? null : name.text,
-                  );
-
-                  await getUsersData(
-                    branchName: search.text1,
-                    userID: search.text2,
-                    isPaid: search.number1,
-                    status: search.number2,
-                  );
-                  await getUserDetailData(detail.user!);
-
-                  Get.back();
-                } catch (e) {
-                  showError(context, e.toString());
-                }
-              },
-              style: ElevatedButton.styleFrom(
-                primary: symbolColor,
-                padding: EdgeInsets.fromLTRB(16.r, 12.r, 16.r, 12.r),
-              ),
-              child: Text("등록", style: TextStyle(fontSize: 20.r)),
-            ),
-          ],
         );
       },
     );

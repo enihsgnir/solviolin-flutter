@@ -51,25 +51,16 @@ class _UserSearchState extends State<UserSearch> {
                     primary: symbolColor,
                   ),
                   onPressed: () async {
-                    await saveUsersData(
-                      branchName: branch.branchName,
-                      userID: id.text == "" ? null : id.text,
-                      isPaid: isPaid.result,
-                      status: status.result,
-                    );
-
-                    Get.snackbar(
-                      "",
-                      "",
-                      titleText: Text(
-                        "유저 정보 목록 저장",
-                        style: TextStyle(color: Colors.white, fontSize: 24.r),
-                      ),
-                      messageText: Text(
-                        "storage/emulated/0/Download/SolViolin/users_list.json",
-                        style: TextStyle(color: Colors.white, fontSize: 20.r),
-                      ),
-                    );
+                    try {
+                      await saveUsersData(
+                        branchName: branch.branchName,
+                        userID: id.text == "" ? null : id.text,
+                        isPaid: isPaid.result,
+                        status: status.result,
+                      );
+                    } catch (e) {
+                      showError(context, e.toString());
+                    }
                   },
                   child: Text("저장", style: TextStyle(fontSize: 20.r)),
                 ),

@@ -36,23 +36,18 @@ class _MenuPageState extends State<MenuPage> {
     return Scaffold(
       body: SafeArea(
         child: Center(
-          child: ListView(
-            physics: const NeverScrollableScrollPhysics(),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              Container(height: 140.r),
-              Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  menu("메인", () => Get.toNamed("/main")),
-                  menu("유저", () => Get.toNamed("/user")),
-                  menu("오픈/클로즈", () => Get.toNamed("/control")),
-                  menu("학기", () => Get.toNamed("/term")),
-                  menu("강사 스케줄", () => Get.toNamed("/teacher")),
-                  menu("취소 내역", () => Get.toNamed("/canceled")),
-                  menu("지점 등록", () => _showBranchRegister()),
-                  menu("매출", () => Get.toNamed("/ledger")),
-                ],
-              ),
+              menu("메인", () => Get.toNamed("/main")),
+              menu("유저", () => Get.toNamed("/user")),
+              menu("오픈/클로즈", () => Get.toNamed("/control")),
+              menu("학기", () => Get.toNamed("/term")),
+              menu("강사 스케줄", () => Get.toNamed("/teacher")),
+              menu("취소 내역", () => Get.toNamed("/canceled")),
+              menu("지점 등록", () => _showBranchRegister()),
+              menu("매출", () => Get.toNamed("/ledger")),
+              menu("로그아웃", _showLogout, true),
             ],
           ),
         ),
@@ -60,24 +55,22 @@ class _MenuPageState extends State<MenuPage> {
     );
   }
 
-  Widget menu(String name, void Function() onPressed) {
-    return Padding(
-      padding: EdgeInsets.all(24.r),
-      child: ElevatedButton(
-        onPressed: onPressed,
-        style: ElevatedButton.styleFrom(
-          primary: symbolColor,
-          textStyle: TextStyle(color: Colors.white, fontSize: 22.r),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(15.r),
-          ),
+  Widget menu(String name, void Function() onPressed,
+      [bool isDestructive = false]) {
+    return ElevatedButton(
+      onPressed: onPressed,
+      style: ElevatedButton.styleFrom(
+        primary: isDestructive ? Colors.red : symbolColor,
+        textStyle: TextStyle(color: Colors.white, fontSize: 22.r),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(15.r),
         ),
-        child: Container(
-          alignment: Alignment.center,
-          width: 135.r,
-          height: 60.r,
-          child: Text(name),
-        ),
+      ),
+      child: Container(
+        alignment: Alignment.center,
+        width: 135.r,
+        height: 60.r,
+        child: Text(name),
       ),
     );
   }
@@ -87,17 +80,68 @@ class _MenuPageState extends State<MenuPage> {
       context: context,
       barrierColor: Colors.black26,
       builder: (context) {
-        return AlertDialog(
-          title: Text(
-            "지점 등록",
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 28.r,
+        return SingleChildScrollView(
+          child: AlertDialog(
+            title: Text(
+              "지점 등록",
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 28.r,
+              ),
             ),
+            content: Padding(
+              padding: EdgeInsets.fromLTRB(12.r, 6.r, 12.r, 0),
+              child: input("지점명", branch, "지점명을 입력하세요!"),
+            ),
+            actions: [
+              OutlinedButton(
+                onPressed: () {
+                  Get.back();
+                },
+                style: OutlinedButton.styleFrom(
+                  padding: EdgeInsets.fromLTRB(16.r, 12.r, 16.r, 12.r),
+                ),
+                child: Text(
+                  "취소",
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 20.r,
+                  ),
+                ),
+              ),
+              ElevatedButton(
+                onPressed: () async {
+                  try {
+                    await client.registerBranch(branch.text);
+
+                    _controller.updateBranches(await client.getBranches());
+                    Get.back();
+                  } catch (e) {
+                    showError(context, e.toString());
+                  }
+                },
+                style: ElevatedButton.styleFrom(
+                  primary: symbolColor,
+                  padding: EdgeInsets.fromLTRB(16.r, 12.r, 16.r, 12.r),
+                ),
+                child: Text("등록", style: TextStyle(fontSize: 20.r)),
+              ),
+            ],
           ),
-          content: Padding(
-            padding: EdgeInsets.fromLTRB(12.r, 12.r, 12.r, 0),
-            child: input("지점명", branch, "지점명을 입력하세요!"),
+        );
+      },
+    );
+  }
+
+  Future _showLogout() {
+    return showDialog(
+      context: context,
+      barrierColor: Colors.black26,
+      builder: (context) {
+        return AlertDialog(
+          content: Text(
+            "로그아웃 하시겠습니까?",
+            style: TextStyle(color: Colors.white, fontSize: 20.r),
           ),
           actions: [
             OutlinedButton(
@@ -109,19 +153,14 @@ class _MenuPageState extends State<MenuPage> {
               ),
               child: Text(
                 "취소",
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 20.r,
-                ),
+                style: TextStyle(color: Colors.white, fontSize: 20.r),
               ),
             ),
             ElevatedButton(
               onPressed: () async {
                 try {
-                  await client.registerBranch(branch.text);
-
-                  _controller.updateBranches(await client.getBranches());
-                  Get.back();
+                  client.logout();
+                  Get.offAllNamed("/login");
                 } catch (e) {
                   showError(context, e.toString());
                 }
@@ -130,7 +169,7 @@ class _MenuPageState extends State<MenuPage> {
                 primary: symbolColor,
                 padding: EdgeInsets.fromLTRB(16.r, 12.r, 16.r, 12.r),
               ),
-              child: Text("등록", style: TextStyle(fontSize: 20.r)),
+              child: Text("확인", style: TextStyle(fontSize: 20.r)),
             ),
           ],
         );

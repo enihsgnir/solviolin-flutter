@@ -78,52 +78,50 @@ class _UserPageState extends State<UserPage> {
           builder: (context, setState) {
             return GestureDetector(
               onTap: () => FocusScope.of(context).unfocus(),
-              child: AlertDialog(
-                title: Text(
-                  "유저 신규 등록",
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 28.r,
+              child: SingleChildScrollView(
+                child: AlertDialog(
+                  title: Text(
+                    "유저 신규 등록",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 28.r,
+                    ),
                   ),
-                ),
-                content: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Padding(
-                      padding: EdgeInsets.fromLTRB(12.r, 12.r, 12.r, 0),
-                      child: input("아이디", id, "아이디를 입력하세요!"),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.fromLTRB(12.r, 12.r, 12.r, 0),
-                      child: input("비밀번호", pw, "비밀번호를 입력하세요!"),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.fromLTRB(12.r, 12.r, 12.r, 0),
-                      child: input("이름", name, "이름을 입력하세요!"),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.fromLTRB(12.r, 12.r, 12.r, 0),
-                      child: input("전화번호", phone, "전화번호를 입력하세요!"),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.fromLTRB(12.r, 12.r, 12.r, 0),
-                      child: DefaultTextStyle(
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 20.r,
-                        ),
-                        child: Row(
-                          children: [
-                            Container(
-                              width: 110,
-                              child: label("구분", true),
-                            ),
-                            Container(
-                              width: 220.r,
-                              child: Row(
+                  content: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Padding(
+                        padding: EdgeInsets.fromLTRB(12.r, 6.r, 12.r, 0),
+                        child: input("아이디", id, "아이디를 입력하세요!"),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.fromLTRB(12.r, 6.r, 12.r, 0),
+                        child: input("비밀번호", pw, "비밀번호를 입력하세요!"),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.fromLTRB(12.r, 6.r, 12.r, 0),
+                        child: input("이름", name, "이름을 입력하세요!"),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.fromLTRB(12.r, 6.r, 12.r, 0),
+                        child: input("전화번호", phone, "전화번호를 입력하세요!"),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.fromLTRB(12.r, 6.r, 12.r, 0),
+                        child: DefaultTextStyle(
+                          style: TextStyle(color: Colors.white, fontSize: 20.r),
+                          child: Row(
+                            children: [
+                              Container(
+                                width: 110.r,
+                                child: label("구분", true),
+                              ),
+                              Row(
+                                mainAxisSize: MainAxisSize.min,
                                 children: [
                                   Container(
-                                    padding: EdgeInsets.all(8.r),
+                                    padding:
+                                        EdgeInsets.symmetric(horizontal: 2.r),
                                     child: Column(
                                       children: [
                                         Text("수강생"),
@@ -140,7 +138,8 @@ class _UserPageState extends State<UserPage> {
                                     ),
                                   ),
                                   Container(
-                                    padding: EdgeInsets.all(8.r),
+                                    padding:
+                                        EdgeInsets.symmetric(horizontal: 2.r),
                                     child: Column(
                                       children: [
                                         Text("강사"),
@@ -157,7 +156,8 @@ class _UserPageState extends State<UserPage> {
                                     ),
                                   ),
                                   Container(
-                                    padding: EdgeInsets.all(8.r),
+                                    padding:
+                                        EdgeInsets.symmetric(horizontal: 2.r),
                                     child: Column(
                                       children: [
                                         Text("관리자"),
@@ -175,63 +175,63 @@ class _UserPageState extends State<UserPage> {
                                   ),
                                 ],
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                       ),
+                      Padding(
+                        padding: EdgeInsets.fromLTRB(12.r, 6.r, 12.r, 0),
+                        child: branchDropdown("Register", "지점을 선택하세요!"),
+                      ),
+                    ],
+                  ),
+                  actions: [
+                    OutlinedButton(
+                      onPressed: () {
+                        Get.back();
+                      },
+                      style: OutlinedButton.styleFrom(
+                        padding: EdgeInsets.fromLTRB(16.r, 12.r, 16.r, 12.r),
+                      ),
+                      child: Text(
+                        "취소",
+                        style: TextStyle(color: Colors.white, fontSize: 20.r),
+                      ),
                     ),
-                    Padding(
-                      padding: EdgeInsets.fromLTRB(12.r, 12.r, 12.r, 0),
-                      child: branchDropdown("Register", "지점을 선택하세요!"),
+                    ElevatedButton(
+                      onPressed: () async {
+                        try {
+                          await client.registerUser(
+                            userID: id.text,
+                            userPassword: pw.text,
+                            userName: name.text,
+                            userPhone: phone.text,
+                            userType: _parseUserType(type),
+                            userBranch: branch.branchName!,
+                          );
+
+                          if (search.isSearched) {
+                            await getUsersData(
+                              branchName: search.text1,
+                              userID: search.text2,
+                              isPaid: search.number1,
+                              status: search.number2,
+                            );
+                          }
+
+                          Get.back();
+                        } catch (e) {
+                          showError(context, e.toString());
+                        }
+                      },
+                      style: ElevatedButton.styleFrom(
+                        primary: symbolColor,
+                        padding: EdgeInsets.fromLTRB(16.r, 12.r, 16.r, 12.r),
+                      ),
+                      child: Text("등록", style: TextStyle(fontSize: 20.r)),
                     ),
                   ],
                 ),
-                actions: [
-                  OutlinedButton(
-                    onPressed: () {
-                      Get.back();
-                    },
-                    style: OutlinedButton.styleFrom(
-                      padding: EdgeInsets.fromLTRB(16.r, 12.r, 16.r, 12.r),
-                    ),
-                    child: Text(
-                      "취소",
-                      style: TextStyle(color: Colors.white, fontSize: 20.r),
-                    ),
-                  ),
-                  ElevatedButton(
-                    onPressed: () async {
-                      try {
-                        await client.registerUser(
-                          userID: id.text,
-                          userPassword: pw.text,
-                          userName: name.text,
-                          userPhone: phone.text,
-                          userType: _parseUserType(type),
-                          userBranch: branch.branchName!,
-                        );
-
-                        if (search.isSearched) {
-                          await getUsersData(
-                            branchName: search.text1,
-                            userID: search.text2,
-                            isPaid: search.number1,
-                            status: search.number2,
-                          );
-                        }
-
-                        Get.back();
-                      } catch (e) {
-                        showError(context, e.toString());
-                      }
-                    },
-                    style: ElevatedButton.styleFrom(
-                      primary: symbolColor,
-                      padding: EdgeInsets.fromLTRB(16.r, 12.r, 16.r, 12.r),
-                    ),
-                    child: Text("등록", style: TextStyle(fontSize: 20.r)),
-                  ),
-                ],
               ),
             );
           },
