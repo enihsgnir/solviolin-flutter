@@ -5,6 +5,7 @@ import 'package:solviolin/model/regular_schedule.dart';
 import 'package:solviolin/util/controller.dart';
 import 'package:solviolin/util/data_source.dart';
 import 'package:solviolin/util/format.dart';
+import 'package:solviolin/util/network.dart';
 import 'package:solviolin/view/history/changed_reservation.dart';
 import 'package:solviolin/view/history/history_reserved.dart';
 import 'package:solviolin/view/main/indicator.dart';
@@ -20,6 +21,8 @@ class HistoryPage extends StatefulWidget {
 class _HistoryPageState extends State<HistoryPage>
     with TickerProviderStateMixin {
   late TabController tabController;
+  Client client = Get.find<Client>();
+
   int currentPage = 0;
 
   @override
@@ -33,7 +36,15 @@ class _HistoryPageState extends State<HistoryPage>
     Get.find<DataController>();
 
     return Scaffold(
-      appBar: appBar("내 예약"),
+      appBar: appBar(
+        "내 예약",
+        actions: [
+          IconButton(
+            onPressed: _showLogout,
+            icon: Icon(Icons.logout_outlined, size: 28.r),
+          ),
+        ],
+      ),
       body: SafeArea(
         child: GetBuilder<DataController>(
           builder: (controller) {
@@ -162,6 +173,50 @@ class _HistoryPageState extends State<HistoryPage>
           },
         ),
       ),
+    );
+  }
+
+  Future _showLogout() {
+    return showDialog(
+      context: context,
+      barrierColor: Colors.black26,
+      builder: (context) {
+        return AlertDialog(
+          content: Text(
+            "로그아웃 하시겠습니까?",
+            style: TextStyle(color: Colors.white, fontSize: 20.r),
+          ),
+          actions: [
+            OutlinedButton(
+              onPressed: () {
+                Get.back();
+              },
+              style: OutlinedButton.styleFrom(
+                padding: EdgeInsets.fromLTRB(16.r, 12.r, 16.r, 12.r),
+              ),
+              child: Text(
+                "취소",
+                style: TextStyle(color: Colors.white, fontSize: 20.r),
+              ),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                try {
+                  client.logout();
+                  Get.offAllNamed("/login");
+                } catch (e) {
+                  showError(context, e.toString());
+                }
+              },
+              style: ElevatedButton.styleFrom(
+                primary: symbolColor,
+                padding: EdgeInsets.fromLTRB(16.r, 12.r, 16.r, 12.r),
+              ),
+              child: Text("확인", style: TextStyle(fontSize: 20.r)),
+            ),
+          ],
+        );
+      },
     );
   }
 }
