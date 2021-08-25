@@ -1,4 +1,4 @@
-package com.example.solviolin
+package com.solviolin.solviolin
 
 import io.flutter.embedding.android.FlutterActivity
 
