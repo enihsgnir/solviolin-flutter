@@ -7,6 +7,7 @@ import 'package:solviolin_admin/model/ledger.dart';
 import 'package:solviolin_admin/model/profile.dart';
 import 'package:solviolin_admin/model/regular_schedule.dart';
 import 'package:solviolin_admin/model/reservation.dart';
+import 'package:solviolin_admin/model/salary.dart';
 import 'package:solviolin_admin/model/teacher.dart';
 import 'package:solviolin_admin/model/teacher_info.dart';
 import 'package:solviolin_admin/model/term.dart';
@@ -36,6 +37,7 @@ class DataController extends GetxController {
   List<Control> controls = [];
   List<Teacher> teachers = [];
   List<Canceled> canceledReservations = [];
+  List<Salary> salaries = [];
   List<Ledger> ledgers = [];
   late String totalLeger;
 
@@ -121,6 +123,11 @@ class DataController extends GetxController {
 
   void updateCanceledReservations(List<Canceled> data) {
     canceledReservations = data;
+    update();
+  }
+
+  void updateSalaries(List<Salary> data) {
+    salaries = data;
     update();
   }
 

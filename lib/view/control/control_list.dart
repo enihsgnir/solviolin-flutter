@@ -124,6 +124,7 @@ class _ControlListState extends State<ControlList> {
               ],
               child: Container(
                 width: double.infinity,
+                padding: EdgeInsets.symmetric(vertical: 8.r),
                 decoration: BoxDecoration(
                   border: Border.all(color: Colors.grey),
                   borderRadius: BorderRadius.circular(15.r),

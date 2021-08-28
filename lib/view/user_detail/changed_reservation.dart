@@ -26,7 +26,7 @@ class _ChangedReservationState extends State<ChangedReservation> {
 
             return Container(
               width: double.infinity,
-              padding: EdgeInsets.symmetric(vertical: 16.r),
+              padding: EdgeInsets.symmetric(vertical: 8.r),
               decoration: BoxDecoration(
                 border: Border.all(color: Colors.grey),
                 borderRadius: BorderRadius.circular(15.r),

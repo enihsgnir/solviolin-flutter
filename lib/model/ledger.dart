@@ -1,7 +1,7 @@
 import 'package:solviolin_admin/util/format.dart';
 
 class Ledger {
-  int amount;
+  num amount;
   String userID;
   int termID;
   String branchName;

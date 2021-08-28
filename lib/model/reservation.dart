@@ -9,6 +9,7 @@ class Reservation {
   String userID;
   String teacherID;
   String branchName;
+  int? regularID;
   Color? color;
 
   Reservation({
@@ -19,6 +20,7 @@ class Reservation {
     required this.userID,
     required this.teacherID,
     required this.branchName,
+    this.regularID,
     this.color,
   });
 
@@ -31,6 +33,7 @@ class Reservation {
       userID: json["userID"],
       teacherID: json["teacherID"],
       branchName: json["branchName"],
+      regularID: json["regularID"],
       color: json["teacher"]["color"] == null
           ? null
           : Color(int.parse(

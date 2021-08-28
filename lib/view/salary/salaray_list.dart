@@ -1,19 +1,18 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-import 'package:solviolin_admin/model/ledger.dart';
+import 'package:solviolin_admin/model/salary.dart';
 import 'package:solviolin_admin/util/controller.dart';
 import 'package:solviolin_admin/util/data_source.dart';
 
-class LedgerList extends StatefulWidget {
-  const LedgerList({Key? key}) : super(key: key);
+class SalaryList extends StatefulWidget {
+  const SalaryList({Key? key}) : super(key: key);
 
   @override
-  _LedgerListState createState() => _LedgerListState();
+  _SalaryListState createState() => _SalaryListState();
 }
 
-class _LedgerListState extends State<LedgerList> {
+class _SalaryListState extends State<SalaryList> {
   @override
   Widget build(BuildContext context) {
     Get.find<DataController>();
@@ -21,9 +20,9 @@ class _LedgerListState extends State<LedgerList> {
     return GetBuilder<DataController>(
       builder: (controller) {
         return ListView.builder(
-          itemCount: controller.ledgers.length,
+          itemCount: controller.salaries.length,
           itemBuilder: (context, index) {
-            Ledger ledger = controller.ledgers[index];
+            Salary salary = controller.salaries[index];
 
             return Container(
               padding: EdgeInsets.symmetric(vertical: 8.r),
@@ -31,16 +30,18 @@ class _LedgerListState extends State<LedgerList> {
                 border: Border.all(color: Colors.grey),
                 borderRadius: BorderRadius.circular(15.r),
               ),
-              margin: EdgeInsets.symmetric(vertical: 4.r, horizontal: 8.r),
+              margin: EdgeInsets.fromLTRB(8.r, 4.r, 8.r, 4.r),
               child: DefaultTextStyle(
                 style: TextStyle(color: Colors.white, fontSize: 28.r),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text("${ledger.userID} / ${ledger.branchName}"),
-                    Text(NumberFormat("#,###원").format(ledger.amount)),
-                    Text("결제일자: " +
-                        DateFormat("yy/MM/dd HH:mm").format(ledger.paidAt)),
+                    Text(salary.teacherID),
+                    Text("주간근로시간: " +
+                        NumberFormat("#,###분").format(salary.dayTime)),
+                    Text("야간근로시간: " +
+                        NumberFormat("#,###분").format(salary.nightTime)),
+                    Text("급여: " + NumberFormat("#,###원").format(salary.income)),
                   ],
                 ),
               ),

@@ -27,9 +27,12 @@ class _LoadingPageState extends State<LoadingPage> {
       try {
         await checkUser();
       } catch (e) {
-        await _client.logout();
-        Get.offAllNamed("/login");
-        showError(context, e.toString());
+        try {
+          await _client.logout();
+        } catch (e) {} finally {
+          Get.offAllNamed("/login");
+          showError(context, e.toString());
+        }
       }
     });
   }

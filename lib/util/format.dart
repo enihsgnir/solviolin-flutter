@@ -28,6 +28,7 @@ String timeToString(Duration time) {
 
 String dowToString(int dow) {
   Map<int, String> days = {
+    -1: "Null",
     0: "SUN",
     1: "MON",
     2: "TUE",

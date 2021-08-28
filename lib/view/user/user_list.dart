@@ -29,7 +29,7 @@ class _UserListState extends State<UserList> {
 
             return InkWell(
               child: Container(
-                padding: EdgeInsets.all(12.r),
+                padding: EdgeInsets.symmetric(vertical: 8.r),
                 decoration: BoxDecoration(
                   border: Border.all(color: Colors.grey),
                   borderRadius: BorderRadius.circular(15.r),

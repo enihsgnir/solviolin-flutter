@@ -139,7 +139,7 @@ class _TermListState extends State<TermList> {
               ],
               child: Container(
                 width: double.infinity,
-                padding: EdgeInsets.symmetric(vertical: 16.r),
+                padding: EdgeInsets.symmetric(vertical: 8.r),
                 decoration: BoxDecoration(
                   color: Colors.grey[850],
                   border: Border.all(color: Colors.grey),

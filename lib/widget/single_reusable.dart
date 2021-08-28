@@ -496,7 +496,7 @@ Widget pickTime(
               child: InkWell(
                 child: Text(
                   controller.time == null
-                      ? "아직 선택 안함"
+                      ? "미선택"
                       : timeToString(Duration(
                           hours: controller.time!.hour,
                           minutes: controller.time!.minute,

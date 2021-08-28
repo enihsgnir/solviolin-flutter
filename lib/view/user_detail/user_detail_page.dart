@@ -60,7 +60,7 @@ class _UserDetailPageState extends State<UserDetailPage>
 
     return Scaffold(
       resizeToAvoidBottomInset: false,
-      appBar: appBar("유저 상세"),
+      appBar: appBar("수강생 상세"),
       body: SafeArea(
         child: GetBuilder<DataController>(
           builder: (controller) {

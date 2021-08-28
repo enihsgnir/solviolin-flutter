@@ -37,6 +37,7 @@ class _MenuForTeacherPageState extends State<MenuForTeacherPage> {
                   showError(context, e.toString());
                 }
               }),
+              menu("체크인", () => Get.toNamed("/check-in")),
               menu("로그아웃", _showLogout, true),
             ],
           ),

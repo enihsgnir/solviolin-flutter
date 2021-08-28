@@ -22,9 +22,8 @@ class _UserPageState extends State<UserPage> {
   TextEditingController pw = TextEditingController();
   TextEditingController name = TextEditingController();
   TextEditingController phone = TextEditingController();
-  BranchController branch = Get.put(BranchController(), tag: "Register");
-
   UserType type = UserType.student;
+  BranchController branch = Get.put(BranchController(), tag: "Register");
 
   SearchController search = Get.find<SearchController>(tag: "User");
 
@@ -42,7 +41,7 @@ class _UserPageState extends State<UserPage> {
     return GestureDetector(
       onTap: () => FocusScope.of(context).unfocus(),
       child: Scaffold(
-        appBar: appBar("유저"),
+        appBar: appBar("수강생"),
         body: SafeArea(
           child: Column(
             children: [

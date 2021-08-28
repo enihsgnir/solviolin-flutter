@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:solviolin_admin/model/regular_schedule.dart';
 import 'package:solviolin_admin/model/reservation.dart';
 import 'package:solviolin_admin/model/teacher_info.dart';
 import 'package:solviolin_admin/model/user.dart';
@@ -215,12 +216,26 @@ Future<void> saveUsersData({
 Future<void> getUserDetailData(User user) async {
   final DateTime today = DateTime.now();
 
-  _controller.updateRegularSchedules(
-      await _client.getRegularSchedulesByAdmin(user.userID)
-        ..sort((a, b) {
-          int primary = a.dow.compareTo(b.dow);
-          return primary != 0 ? primary : a.startTime.compareTo(b.startTime);
-        }));
+  try {
+    _controller.updateRegularSchedules(
+        await _client.getRegularSchedulesByAdmin(user.userID)
+          ..sort((a, b) {
+            int primary = a.dow.compareTo(b.dow);
+            return primary != 0 ? primary : a.startTime.compareTo(b.startTime);
+          }));
+  } catch (e) {
+    _controller.updateRegularSchedules([
+      RegularSchedule(
+        id: -1,
+        startTime: const Duration(hours: 0, minutes: 0),
+        endTime: const Duration(hours: 0, minutes: 0),
+        dow: -1,
+        userID: user.userID,
+        teacherID: "Null",
+        branchName: user.branchName,
+      )
+    ]);
+  }
 
   _controller.updateThisMonthReservations(await _client.getReservations(
     branchName: user.branchName,

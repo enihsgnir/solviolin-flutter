@@ -25,6 +25,7 @@ class _CanceledListState extends State<CanceledList> {
             Canceled canceled = controller.canceledReservations[index];
 
             return Container(
+              padding: EdgeInsets.symmetric(vertical: 8.r),
               decoration: BoxDecoration(
                 border: Border.all(color: Colors.grey),
                 borderRadius: BorderRadius.circular(15.r),

@@ -130,7 +130,7 @@ class _TeacherListState extends State<TeacherList> {
               ],
               child: Container(
                 width: double.infinity,
-                height: 120.r,
+                padding: EdgeInsets.symmetric(vertical: 8.r),
                 decoration: BoxDecoration(
                   border: Border.all(color: Colors.grey),
                   borderRadius: BorderRadius.circular(15.r),

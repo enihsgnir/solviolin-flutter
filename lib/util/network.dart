@@ -11,6 +11,7 @@ import 'package:solviolin_admin/model/ledger.dart';
 import 'package:solviolin_admin/model/profile.dart';
 import 'package:solviolin_admin/model/regular_schedule.dart';
 import 'package:solviolin_admin/model/reservation.dart';
+import 'package:solviolin_admin/model/salary.dart';
 import 'package:solviolin_admin/model/teacher.dart';
 import 'package:solviolin_admin/model/teacher_info.dart';
 import 'package:solviolin_admin/model/term.dart';
@@ -542,6 +543,29 @@ class Client {
     throw "변경 내역을 불러올 수 없습니다.";
   }
 
+  Future<List<Salary>> getSalaries({
+    required String branchName,
+    required int termID,
+    required int dayTimeCost,
+    required int nightTimeCost,
+  }) async {
+    if (await isLoggedIn()) {
+      Response response = await dio.post("/reservation/salary", data: {
+        "branchName": branchName,
+        "termID": termID,
+        "dayTimeCost": dayTimeCost,
+        "nightTimeCost": nightTimeCost,
+      });
+      if (response.statusCode == 201) {
+        return List<Salary>.generate(
+          response.data.length,
+          (index) => Salary.fromList(response.data[index]),
+        );
+      }
+    }
+    throw "급여 목록을 불러올 수 없습니다.";
+  }
+
   Future<List<Canceled>> getCanceledReservations(String teacherID) async {
     if (await isLoggedIn()) {
       Response response = await dio.get("/reservation/canceled/$teacherID");
@@ -644,6 +668,14 @@ class Client {
     throw "지점 정보를 불러올 수 없습니다.";
   }
 
+  Future<void> checkIn(String branchCode) async {
+    if (await isLoggedIn()) {
+      await dio.post("/check-in", data: {
+        "branchCode": branchCode,
+      });
+    }
+  }
+
   Future<void> registerLedger({
     required String userID,
     required int amount,
@@ -691,13 +723,12 @@ class Client {
         "termID": termID,
       });
       if (response.statusCode == 200) {
-        // return response.data != "0"
-        //     ? NumberFormat.simpleCurrency(
-        //         locale: "ko_KR",
-        //         name: "",
-        //       ).format(response.data)
-        //     : "0";
-        return NumberFormat("#,###원").format(int.parse(response.data));
+        var total = response.data;
+        if (total is String) {
+          total = num.parse(total);
+        }
+
+        return NumberFormat("#,###원").format(total);
       }
     }
     throw "총 매출 정보를 불러올 수 없습니다.";

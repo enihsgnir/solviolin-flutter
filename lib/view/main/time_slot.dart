@@ -22,6 +22,7 @@ class _TimeSlotState extends State<TimeSlot> {
 
   TextEditingController teacherRegular = TextEditingController();
   BranchController branchRegular = Get.put(BranchController(), tag: "Regular");
+  DateTimeController endRegular = Get.put(DateTimeController(), tag: "Regular");
   TextEditingController userRegular = TextEditingController();
 
   TextEditingController teacherUser = TextEditingController();
@@ -143,25 +144,31 @@ class _TimeSlotState extends State<TimeSlot> {
               onPressed: () {
                 _showCancelByUser(details);
               },
-              child: Text("취소 (수강생)", style: TextStyle(fontSize: 24)),
+              child: Text("취소 (수강생)", style: TextStyle(fontSize: 24.r)),
             ),
             CupertinoActionSheetAction(
               onPressed: () {
                 _showCancelByAdmin(details);
               },
-              child: Text("취소 (관리자)", style: TextStyle(fontSize: 24)),
+              child: Text("취소 (관리자)", style: TextStyle(fontSize: 24.r)),
             ),
             CupertinoActionSheetAction(
               onPressed: () {
                 _showExtendByUser(details);
               },
-              child: Text("연장 (수강생)", style: TextStyle(fontSize: 24)),
+              child: Text("연장 (수강생)", style: TextStyle(fontSize: 24.r)),
             ),
             CupertinoActionSheetAction(
               onPressed: () {
                 _showExtendByAdmin(details);
               },
-              child: Text("연장 (관리자)", style: TextStyle(fontSize: 24)),
+              child: Text("연장 (관리자)", style: TextStyle(fontSize: 24.r)),
+            ),
+            CupertinoActionSheetAction(
+              onPressed: () {
+                _showDeleteLaterCourse(details);
+              },
+              child: Text("정규 종료", style: TextStyle(fontSize: 24.r)),
             ),
           ],
           cancelButton: CupertinoActionSheetAction(
@@ -169,7 +176,7 @@ class _TimeSlotState extends State<TimeSlot> {
               Get.back();
             },
             isDefaultAction: true,
-            child: Text("닫기", style: TextStyle(fontSize: 24)),
+            child: Text("닫기", style: TextStyle(fontSize: 24.r)),
           ),
         );
       },
@@ -184,17 +191,11 @@ class _TimeSlotState extends State<TimeSlot> {
         return AlertDialog(
           title: Text(
             "취소 (수강생)",
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 28,
-            ),
+            style: TextStyle(color: Colors.white, fontSize: 28.r),
           ),
           content: Text(
             "수강생의 권한으로 취소하시겠습니까?",
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 20,
-            ),
+            style: TextStyle(color: Colors.white, fontSize: 20.r),
           ),
           actions: [
             OutlinedButton(
@@ -202,14 +203,11 @@ class _TimeSlotState extends State<TimeSlot> {
                 Get.back();
               },
               style: OutlinedButton.styleFrom(
-                padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
+                padding: EdgeInsets.fromLTRB(16.r, 12.r, 16.r, 12.r),
               ),
               child: Text(
                 "취소",
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 20,
-                ),
+                style: TextStyle(color: Colors.white, fontSize: 20.r),
               ),
             ),
             ElevatedButton(
@@ -233,12 +231,9 @@ class _TimeSlotState extends State<TimeSlot> {
               },
               style: ElevatedButton.styleFrom(
                 primary: symbolColor,
-                padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
+                padding: EdgeInsets.fromLTRB(16.r, 12.r, 16.r, 12.r),
               ),
-              child: Text(
-                "확인",
-                style: TextStyle(fontSize: 20),
-              ),
+              child: Text("확인", style: TextStyle(fontSize: 20.r)),
             ),
           ],
         );
@@ -254,17 +249,11 @@ class _TimeSlotState extends State<TimeSlot> {
         return AlertDialog(
           title: Text(
             "취소 (관리자)",
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 28,
-            ),
+            style: TextStyle(color: Colors.white, fontSize: 28.r),
           ),
           content: Text(
             "관리자의 권한으로 취소하시겠습니까?",
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 20,
-            ),
+            style: TextStyle(color: Colors.white, fontSize: 20.r),
           ),
           actions: [
             OutlinedButton(
@@ -272,14 +261,11 @@ class _TimeSlotState extends State<TimeSlot> {
                 Get.back();
               },
               style: OutlinedButton.styleFrom(
-                padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
+                padding: EdgeInsets.fromLTRB(16.r, 12.r, 16.r, 12.r),
               ),
               child: Text(
                 "취소",
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 20,
-                ),
+                style: TextStyle(color: Colors.white, fontSize: 20.r),
               ),
             ),
             ElevatedButton(
@@ -304,12 +290,9 @@ class _TimeSlotState extends State<TimeSlot> {
               },
               style: ElevatedButton.styleFrom(
                 primary: symbolColor,
-                padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
+                padding: EdgeInsets.fromLTRB(16.r, 12.r, 16.r, 12.r),
               ),
-              child: Text(
-                "확인",
-                style: TextStyle(fontSize: 20),
-              ),
+              child: Text("확인", style: TextStyle(fontSize: 20.r)),
             ),
           ],
         );
@@ -325,17 +308,11 @@ class _TimeSlotState extends State<TimeSlot> {
         return AlertDialog(
           title: Text(
             "연장 (수강생)",
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 28,
-            ),
+            style: TextStyle(color: Colors.white, fontSize: 28.r),
           ),
           content: Text(
             "수강생의 권한으로 연장하시겠습니까?",
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 20,
-            ),
+            style: TextStyle(color: Colors.white, fontSize: 20.r),
           ),
           actions: [
             OutlinedButton(
@@ -343,14 +320,11 @@ class _TimeSlotState extends State<TimeSlot> {
                 Get.back();
               },
               style: OutlinedButton.styleFrom(
-                padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
+                padding: EdgeInsets.fromLTRB(16.r, 12.r, 16.r, 12.r),
               ),
               child: Text(
                 "취소",
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 20,
-                ),
+                style: TextStyle(color: Colors.white, fontSize: 20.r),
               ),
             ),
             ElevatedButton(
@@ -374,12 +348,9 @@ class _TimeSlotState extends State<TimeSlot> {
               },
               style: ElevatedButton.styleFrom(
                 primary: symbolColor,
-                padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
+                padding: EdgeInsets.fromLTRB(16.r, 12.r, 16.r, 12.r),
               ),
-              child: Text(
-                "확인",
-                style: TextStyle(fontSize: 20),
-              ),
+              child: Text("확인", style: TextStyle(fontSize: 20.r)),
             ),
           ],
         );
@@ -399,23 +370,17 @@ class _TimeSlotState extends State<TimeSlot> {
             return AlertDialog(
               title: Text(
                 "연장 (관리자)",
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 28,
-                ),
+                style: TextStyle(color: Colors.white, fontSize: 28.r),
               ),
               content: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
                     "관리자의 권한으로 연장하시겠습니까?",
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 20,
-                    ),
+                    style: TextStyle(color: Colors.white, fontSize: 20.r),
                   ),
                   Padding(
-                    padding: const EdgeInsets.fromLTRB(12, 12, 12, 0),
+                    padding: EdgeInsets.fromLTRB(12.r, 6.r, 12.r, 0),
                     child: Row(
                       children: [
                         Container(
@@ -447,14 +412,11 @@ class _TimeSlotState extends State<TimeSlot> {
                     Get.back();
                   },
                   style: OutlinedButton.styleFrom(
-                    padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
+                    padding: EdgeInsets.fromLTRB(16.r, 12.r, 16.r, 12.r),
                   ),
                   child: Text(
                     "취소",
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 20,
-                    ),
+                    style: TextStyle(color: Colors.white, fontSize: 20.r),
                   ),
                 ),
                 ElevatedButton(
@@ -481,16 +443,76 @@ class _TimeSlotState extends State<TimeSlot> {
                   },
                   style: ElevatedButton.styleFrom(
                     primary: symbolColor,
-                    padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
+                    padding: EdgeInsets.fromLTRB(16.r, 12.r, 16.r, 12.r),
                   ),
-                  child: Text(
-                    "확인",
-                    style: TextStyle(fontSize: 20),
-                  ),
+                  child: Text("확인", style: TextStyle(fontSize: 20.r)),
                 ),
               ],
             );
           },
+        );
+      },
+    );
+  }
+
+  Future _showDeleteLaterCourse(CalendarTapDetails details) {
+    return showDialog(
+      context: context,
+      barrierColor: Colors.black26,
+      builder: (context) {
+        return AlertDialog(
+          title: Text(
+            "정규 종료",
+            style: TextStyle(color: Colors.white, fontSize: 28.r),
+          ),
+          content: Text(
+            "종료일: " +
+                DateFormat("yy/MM/dd HH:mm")
+                    .format(details.appointments![0].endDate),
+            style: TextStyle(color: Colors.white, fontSize: 20.r),
+          ),
+          actions: [
+            OutlinedButton(
+              onPressed: () {
+                Get.back();
+              },
+              style: OutlinedButton.styleFrom(
+                padding: EdgeInsets.fromLTRB(16.r, 12.r, 16.r, 12.r),
+              ),
+              child: Text(
+                "취소",
+                style: TextStyle(color: Colors.white, fontSize: 20.r),
+              ),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                try {
+                  await client.updateEndDateAndDeleteLaterCourse(
+                    details.appointments![0].regularID,
+                    endDate: details.appointments![0].endDate,
+                  );
+
+                  if (search.isSearched) {
+                    await getReservationData(
+                      displayDate: _controller.displayDate,
+                      branchName: search.text1!,
+                      userID: search.text2,
+                      teacherID: search.text3,
+                    );
+                  }
+
+                  Get.back();
+                } catch (e) {
+                  showError(context, e.toString());
+                }
+              },
+              style: ElevatedButton.styleFrom(
+                primary: symbolColor,
+                padding: EdgeInsets.fromLTRB(16.r, 12.r, 16.r, 12.r),
+              ),
+              child: Text("확인", style: TextStyle(fontSize: 20.r)),
+            ),
+          ],
         );
       },
     );
@@ -506,25 +528,25 @@ class _TimeSlotState extends State<TimeSlot> {
               onPressed: () {
                 _showReserveRegular(details);
               },
-              child: Text("정규 등록", style: TextStyle(fontSize: 24)),
+              child: Text("정규 등록", style: TextStyle(fontSize: 24.r)),
             ),
             CupertinoActionSheetAction(
               onPressed: () {
                 _showMakeUpByUser(details);
               },
-              child: Text("보강 예약 (수강생)", style: TextStyle(fontSize: 24)),
+              child: Text("보강 예약 (수강생)", style: TextStyle(fontSize: 24.r)),
             ),
             CupertinoActionSheetAction(
               onPressed: () {
                 _showMakeUpByAdmin(details);
               },
-              child: Text("보강 예약 (관리자)", style: TextStyle(fontSize: 24)),
+              child: Text("보강 예약 (관리자)", style: TextStyle(fontSize: 24.r)),
             ),
             CupertinoActionSheetAction(
               onPressed: () {
                 _showFreeCourse(details);
               },
-              child: Text("무료 보강 등록", style: TextStyle(fontSize: 24)),
+              child: Text("무료 보강 등록", style: TextStyle(fontSize: 24.r)),
             ),
           ],
           cancelButton: CupertinoActionSheetAction(
@@ -532,7 +554,7 @@ class _TimeSlotState extends State<TimeSlot> {
               Get.back();
             },
             isDefaultAction: true,
-            child: Text("닫기", style: TextStyle(fontSize: 24)),
+            child: Text("닫기", style: TextStyle(fontSize: 24.r)),
           ),
         );
       },
@@ -548,31 +570,29 @@ class _TimeSlotState extends State<TimeSlot> {
           child: AlertDialog(
             title: Text(
               "정규 등록",
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 28,
-              ),
+              style: TextStyle(color: Colors.white, fontSize: 28.r),
             ),
             content: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
                   DateFormat("yy/MM/dd HH:mm").format(details.date!) + " ~ ",
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 20,
-                  ),
+                  style: TextStyle(color: Colors.white, fontSize: 20.r),
                 ),
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(12, 12, 12, 0),
+                  padding: EdgeInsets.fromLTRB(12.r, 6.r, 12.r, 0),
                   child: input("강사", teacherRegular, "강사명을 입력하세요!"),
                 ),
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(12, 12, 12, 0),
+                  padding: EdgeInsets.fromLTRB(12.r, 6.r, 12.r, 0),
                   child: branchDropdown("Regular", "지점을 선택하세요!"),
                 ),
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(12, 12, 12, 0),
+                  padding: EdgeInsets.fromLTRB(12.r, 6.r, 12.r, 0),
+                  child: pickTime(context, "종료시각", "Regular", true),
+                ),
+                Padding(
+                  padding: EdgeInsets.fromLTRB(12.r, 6.r, 12.r, 0),
                   child: input("수강생", userRegular, "이름을 입력하세요!"),
                 ),
               ],
@@ -583,28 +603,24 @@ class _TimeSlotState extends State<TimeSlot> {
                   Get.back();
                 },
                 style: OutlinedButton.styleFrom(
-                  padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
+                  padding: EdgeInsets.fromLTRB(16.r, 12.r, 16.r, 12.r),
                 ),
                 child: Text(
                   "취소",
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 20,
-                  ),
+                  style: TextStyle(color: Colors.white, fontSize: 20.r),
                 ),
               ),
               ElevatedButton(
                 onPressed: () async {
                   try {
-                    RegularSchedule regular = (await client
-                        .getRegularSchedulesByAdmin(userRegular.text))[0];
-
                     await client.reserveRegularReservation(
                       teacherID: teacherRegular.text,
                       branchName: branchRegular.branchName!,
                       startDate: details.date!,
-                      endDate: details.date!
-                          .add(regular.endTime - regular.startTime),
+                      endDate: DateUtils.dateOnly(details.date!).add(Duration(
+                        hours: endRegular.time!.hour,
+                        minutes: endRegular.time!.minute,
+                      )),
                       userID: userRegular.text,
                     );
 
@@ -624,12 +640,9 @@ class _TimeSlotState extends State<TimeSlot> {
                 },
                 style: ElevatedButton.styleFrom(
                   primary: symbolColor,
-                  padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
+                  padding: EdgeInsets.fromLTRB(16.r, 12.r, 16.r, 12.r),
                 ),
-                child: Text(
-                  "등록",
-                  style: TextStyle(fontSize: 20),
-                ),
+                child: Text("등록", style: TextStyle(fontSize: 20.r)),
               ),
             ],
           ),
@@ -647,31 +660,25 @@ class _TimeSlotState extends State<TimeSlot> {
           child: AlertDialog(
             title: Text(
               "보강 예약 (수강생)",
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 28,
-              ),
+              style: TextStyle(color: Colors.white, fontSize: 28.r),
             ),
             content: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
                   DateFormat("yy/MM/dd HH:mm").format(details.date!) + " ~ ",
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 20,
-                  ),
+                  style: TextStyle(color: Colors.white, fontSize: 20.r),
                 ),
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(12, 12, 12, 0),
+                  padding: EdgeInsets.fromLTRB(12.r, 6.r, 12.r, 0),
                   child: input("강사", teacherUser, "강사명을 입력하세요!"),
                 ),
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(12, 12, 12, 0),
+                  padding: EdgeInsets.fromLTRB(12.r, 6.r, 12.r, 0),
                   child: branchDropdown("User", "지점을 선택하세요!"),
                 ),
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(12, 12, 12, 0),
+                  padding: EdgeInsets.fromLTRB(12.r, 6.r, 12.r, 0),
                   child: input("수강생", userUser, "이름을 입력하세요!"),
                 ),
               ],
@@ -682,14 +689,11 @@ class _TimeSlotState extends State<TimeSlot> {
                   Get.back();
                 },
                 style: OutlinedButton.styleFrom(
-                  padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
+                  padding: EdgeInsets.fromLTRB(16.r, 12.r, 16.r, 12.r),
                 ),
                 child: Text(
                   "취소",
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 20,
-                  ),
+                  style: TextStyle(color: Colors.white, fontSize: 20.r),
                 ),
               ),
               ElevatedButton(
@@ -723,12 +727,9 @@ class _TimeSlotState extends State<TimeSlot> {
                 },
                 style: ElevatedButton.styleFrom(
                   primary: symbolColor,
-                  padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
+                  padding: EdgeInsets.fromLTRB(16.r, 12.r, 16.r, 12.r),
                 ),
-                child: Text(
-                  "등록",
-                  style: TextStyle(fontSize: 20),
-                ),
+                child: Text("등록", style: TextStyle(fontSize: 20.r)),
               ),
             ],
           ),
@@ -746,31 +747,25 @@ class _TimeSlotState extends State<TimeSlot> {
           child: AlertDialog(
             title: Text(
               "보강 예약 (관리자)",
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 28,
-              ),
+              style: TextStyle(color: Colors.white, fontSize: 28.r),
             ),
             content: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
                   DateFormat("yy/MM/dd HH:mm").format(details.date!) + " ~ ",
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 20,
-                  ),
+                  style: TextStyle(color: Colors.white, fontSize: 20.r),
                 ),
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(12, 12, 12, 0),
+                  padding: EdgeInsets.fromLTRB(12.r, 6.r, 12.r, 0),
                   child: input("강사", teacherAdmin, "강사명을 입력하세요!"),
                 ),
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(12, 12, 12, 0),
+                  padding: EdgeInsets.fromLTRB(12.r, 6.r, 12.r, 0),
                   child: branchDropdown("Admin", "지점을 선택하세요!"),
                 ),
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(12, 12, 12, 0),
+                  padding: EdgeInsets.fromLTRB(12.r, 6.r, 12.r, 0),
                   child: input("수강생", userAdmin, "이름을 입력하세요!"),
                 ),
               ],
@@ -781,14 +776,11 @@ class _TimeSlotState extends State<TimeSlot> {
                   Get.back();
                 },
                 style: OutlinedButton.styleFrom(
-                  padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
+                  padding: EdgeInsets.fromLTRB(16.r, 12.r, 16.r, 12.r),
                 ),
                 child: Text(
                   "취소",
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 20,
-                  ),
+                  style: TextStyle(color: Colors.white, fontSize: 20.r),
                 ),
               ),
               ElevatedButton(
@@ -822,12 +814,9 @@ class _TimeSlotState extends State<TimeSlot> {
                 },
                 style: ElevatedButton.styleFrom(
                   primary: symbolColor,
-                  padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
+                  padding: EdgeInsets.fromLTRB(16.r, 12.r, 16.r, 12.r),
                 ),
-                child: Text(
-                  "등록",
-                  style: TextStyle(fontSize: 20),
-                ),
+                child: Text("등록", style: TextStyle(fontSize: 20.r)),
               ),
             ],
           ),
@@ -845,31 +834,25 @@ class _TimeSlotState extends State<TimeSlot> {
           child: AlertDialog(
             title: Text(
               "무료 보강 등록",
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 28,
-              ),
+              style: TextStyle(color: Colors.white, fontSize: 28.r),
             ),
             content: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
                   DateFormat("yy/MM/dd HH:mm").format(details.date!) + " ~ ",
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 20,
-                  ),
+                  style: TextStyle(color: Colors.white, fontSize: 20.r),
                 ),
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(12, 12, 12, 0),
+                  padding: EdgeInsets.fromLTRB(12.r, 6.r, 12.r, 0),
                   child: input("강사", teacherFree, "강사명을 입력하세요!"),
                 ),
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(12, 12, 12, 0),
+                  padding: EdgeInsets.fromLTRB(12.r, 6.r, 12.r, 0),
                   child: branchDropdown("Free", "지점을 선택하세요!"),
                 ),
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(12, 12, 12, 0),
+                  padding: EdgeInsets.fromLTRB(12.r, 6.r, 12.r, 0),
                   child: input("수강생", userFree, "이름을 입력하세요!"),
                 ),
               ],
@@ -880,14 +863,11 @@ class _TimeSlotState extends State<TimeSlot> {
                   Get.back();
                 },
                 style: OutlinedButton.styleFrom(
-                  padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
+                  padding: EdgeInsets.fromLTRB(16.r, 12.r, 16.r, 12.r),
                 ),
                 child: Text(
                   "취소",
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 20,
-                  ),
+                  style: TextStyle(color: Colors.white, fontSize: 20.r),
                 ),
               ),
               ElevatedButton(
@@ -921,12 +901,9 @@ class _TimeSlotState extends State<TimeSlot> {
                 },
                 style: ElevatedButton.styleFrom(
                   primary: symbolColor,
-                  padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
+                  padding: EdgeInsets.fromLTRB(16.r, 12.r, 16.r, 12.r),
                 ),
-                child: Text(
-                  "등록",
-                  style: TextStyle(fontSize: 20),
-                ),
+                child: Text("등록", style: TextStyle(fontSize: 20.r)),
               ),
             ],
           ),
