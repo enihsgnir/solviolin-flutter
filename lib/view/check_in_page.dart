@@ -51,11 +51,28 @@ class _CheckInPageState extends State<CheckInPage> {
               controller.scannedDataStream.listen((scanData) {
                 setState(() async {
                   result = scanData;
+                  controller.pauseCamera();
                   try {
                     await _client.checkIn(result!.code);
+                    controller.stopCamera();
                     Get.back();
                   } catch (e) {
-                    showError(context, e.toString());
+                    Get.snackbar(
+                      "",
+                      "",
+                      snackPosition: SnackPosition.BOTTOM,
+                      titleText: Text(
+                        "Error",
+                        style: TextStyle(fontSize: 28.r),
+                      ),
+                      messageText: Text(
+                        e.toString(),
+                        style: TextStyle(color: Colors.red, fontSize: 24.r),
+                      ),
+                    );
+                    Future.delayed(const Duration(seconds: 2), () {
+                      controller.resumeCamera();
+                    });
                   }
                 });
               });
@@ -66,20 +83,6 @@ class _CheckInPageState extends State<CheckInPage> {
               borderRadius: 10.r,
               borderLength: 20.r,
               cutOutSize: 400.r,
-            ),
-          ),
-          Positioned(
-            bottom: 10.r,
-            child: Container(
-              padding: EdgeInsets.all(12.r),
-              decoration: BoxDecoration(
-                color: Colors.white24,
-                borderRadius: BorderRadius.circular(8.r),
-              ),
-              child: Text(
-                result != null ? "Complete!" : "Scan a code",
-                style: TextStyle(fontSize: 20.r),
-              ),
             ),
           ),
         ],
