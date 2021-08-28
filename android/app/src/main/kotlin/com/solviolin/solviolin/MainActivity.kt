@@ -1,4 +1,4 @@
-package com.solviolin.solviolin
+package com.solviolinTeam.user.solviolin
 
 import io.flutter.embedding.android.FlutterActivity
 

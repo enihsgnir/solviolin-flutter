@@ -1,5 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.solviolin.solviolin">
+    package="com.solviolinTeam.user.solviolin">
     <uses-permission android:name="android.permission.INTERNET"/>
    <application
         android:label="솔바이올린"
