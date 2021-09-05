@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:solviolin_admin/util/controller.dart';
 import 'package:solviolin_admin/util/data_source.dart';
+import 'package:solviolin_admin/widget/dropdown.dart';
 import 'package:solviolin_admin/widget/single_reusable.dart';
 
 class UserSearch extends StatefulWidget {
@@ -13,12 +14,13 @@ class UserSearch extends StatefulWidget {
 }
 
 class _UserSearchState extends State<UserSearch> {
-  TextEditingController id = TextEditingController();
-  BranchController branch = Get.put(BranchController());
-  CheckController isPaid = Get.put(CheckController(), tag: "isPaid");
-  CheckController status = Get.put(CheckController(), tag: "status");
+  var id = TextEditingController();
+  var branch = Get.put(BranchController());
+  var isPaid = Get.put(CheckController(), tag: "isPaid");
+  var type = Get.put(RadioController<UserType>(), tag: "Search");
+  var status = Get.put(CheckController(), tag: "status");
 
-  SearchController search = Get.find<SearchController>(tag: "User");
+  var search = Get.find<SearchController>(tag: "User");
 
   @override
   void dispose() {
@@ -28,104 +30,86 @@ class _UserSearchState extends State<UserSearch> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.all(8.r),
-      decoration: BoxDecoration(
-        border: Border.all(color: Colors.grey),
-        borderRadius: BorderRadius.circular(15.r),
-      ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Row(
-            children: [
-              Container(
-                alignment: Alignment.centerLeft,
-                padding: EdgeInsets.only(left: 24.r),
-                child: input("이름", id),
-              ),
-              Padding(
-                padding: EdgeInsets.only(left: 16.r),
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    primary: symbolColor,
-                  ),
-                  onPressed: () async {
-                    try {
-                      await saveUsersData(
-                        branchName: branch.branchName,
-                        userID: id.text == "" ? null : id.text,
-                        isPaid: isPaid.result,
-                        status: status.result,
-                      );
-                    } catch (e) {
-                      showError(context, e.toString());
-                    }
-                  },
-                  child: Text("저장", style: TextStyle(fontSize: 20.r)),
-                ),
-              ),
-            ],
-          ),
-          Container(
-            alignment: Alignment.centerLeft,
-            padding: EdgeInsets.fromLTRB(24.r, 6.r, 0, 0),
-            child: branchDropdown(),
-          ),
-          Container(
-            alignment: Alignment.centerLeft,
-            padding: EdgeInsets.fromLTRB(24.r, 6.r, 0, 0),
-            child: check(
-              tag: "isPaid",
-              item: "결제 여부",
-              trueName: "완료",
-              falseName: "미완료",
+    return mySearch(
+      contents: [
+        Row(
+          children: [
+            textInput("이름", id),
+            myActionButton(
+              onPressed: () async {
+                try {
+                  await saveUsersData(
+                    branchName: branch.branchName,
+                    userID: id.text == "" ? null : id.text,
+                    isPaid: isPaid.result,
+                    status: status.result,
+                  );
+                } catch (e) {
+                  showError(e.toString());
+                }
+              },
+              action: "저장",
             ),
-          ),
-          Row(
-            children: [
-              Container(
-                alignment: Alignment.centerLeft,
-                padding: EdgeInsets.fromLTRB(24.r, 6.r, 0, 0),
-                child: check(
-                  tag: "status",
-                  item: "등록 여부",
-                  trueName: "등록",
-                  falseName: "미등록",
-                ),
-              ),
-              Padding(
-                padding: EdgeInsets.only(left: 36.r),
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    primary: symbolColor,
-                  ),
-                  onPressed: () async {
-                    try {
-                      search.text1 = branch.branchName;
-                      search.text2 = id.text == "" ? null : id.text;
-                      search.number1 = isPaid.result;
-                      search.number2 = status.result;
+          ],
+        ),
+        branchDropdown(),
+        check(
+          tag: "isPaid",
+          item: "결제 여부",
+          trueName: "완료",
+          falseName: "미완료",
+        ),
+        myRadio<UserType>(
+          tag: "Search",
+          item: "구분",
+          names: ["수강생", "강사", "관리자"],
+          values: [UserType.student, UserType.teacher, UserType.admin],
+          groupValue: UserType.student,
+        ),
+        Row(
+          children: [
+            check(
+              tag: "status",
+              item: "등록 여부",
+              trueName: "등록",
+              falseName: "미등록",
+            ),
+            myActionButton(
+              onPressed: () async {
+                try {
+                  search.text1 = branch.branchName;
+                  search.text2 = id.text == "" ? null : id.text;
+                  search.number1 = isPaid.result;
+                  search.number2 = type.type == UserType.student
+                      ? 0
+                      : type.type == UserType.teacher
+                          ? 1
+                          : 2;
+                  search.number3 = status.result;
 
-                      await getUsersData(
-                        branchName: search.text1,
-                        userID: search.text2,
-                        isPaid: search.number1,
-                        status: search.number2,
-                      );
+                  await getUsersData(
+                    branchName: search.text1,
+                    userID: search.text2,
+                    isPaid: search.number1,
+                    userType: search.number2,
+                    status: search.number3,
+                  );
 
-                      search.isSearched = true;
-                    } catch (e) {
-                      showError(context, e.toString());
-                    }
-                  },
-                  child: Text("검색", style: TextStyle(fontSize: 20.r)),
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
+                  search.isSearched = true;
+                } catch (e) {
+                  showError(e.toString());
+                }
+              },
+            ),
+          ],
+        ),
+      ],
     );
   }
+}
+
+enum UserType {
+  student,
+  teacher,
+  admin,
 }

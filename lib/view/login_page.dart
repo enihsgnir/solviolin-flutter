@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:solviolin_admin/util/constant.dart';
 import 'package:solviolin_admin/util/controller.dart';
 import 'package:solviolin_admin/util/data_source.dart';
+import 'package:solviolin_admin/util/network.dart';
 import 'package:solviolin_admin/widget/single_reusable.dart';
 
 class LoginPage extends StatefulWidget {
@@ -12,6 +14,7 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
+  Client _client = Get.find<Client>();
   DataController _controller = Get.find<DataController>();
 
   TextEditingController id = TextEditingController();
@@ -107,9 +110,12 @@ class _LoginPageState extends State<LoginPage> {
                       }
                     } catch (e) {
                       Get.put(DataController());
-                      await logoutAndDeleteData();
-                      Get.offAllNamed("/login");
-                      showError(context, e.toString());
+                      try {
+                        await _client.logout();
+                      } catch (e) {} finally {
+                        Get.offAllNamed("/login");
+                        showError(e.toString());
+                      }
                     }
                   },
                   style: TextButton.styleFrom(

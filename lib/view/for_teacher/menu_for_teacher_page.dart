@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:solviolin_admin/util/constant.dart';
 import 'package:solviolin_admin/util/controller.dart';
 import 'package:solviolin_admin/util/data_source.dart';
 import 'package:solviolin_admin/util/network.dart';
@@ -29,12 +30,11 @@ class _MenuForTeacherPageState extends State<MenuForTeacherPage> {
                 try {
                   await getReservationDataForTeacher(
                     displayDate: _controller.displayDate,
-                    branchName: _controller.profile.branchName,
                     teacherID: _controller.profile.userID,
                   );
                   Get.toNamed("/main-teacher");
                 } catch (e) {
-                  showError(context, e.toString());
+                  showError(e.toString());
                 }
               }),
               menu("체크인", () => Get.toNamed("/check-in")),
@@ -70,45 +70,20 @@ class _MenuForTeacherPageState extends State<MenuForTeacherPage> {
   }
 
   Future _showLogout() {
-    return showDialog(
+    return showMyDialog(
       context: context,
-      barrierColor: Colors.black26,
-      builder: (context) {
-        return AlertDialog(
-          content: Text(
-            "로그아웃 하시겠습니까?",
-            style: TextStyle(color: Colors.white, fontSize: 20.r),
-          ),
-          actions: [
-            OutlinedButton(
-              onPressed: () {
-                Get.back();
-              },
-              style: OutlinedButton.styleFrom(
-                padding: EdgeInsets.fromLTRB(16.r, 12.r, 16.r, 12.r),
-              ),
-              child: Text(
-                "취소",
-                style: TextStyle(color: Colors.white, fontSize: 20.r),
-              ),
-            ),
-            ElevatedButton(
-              onPressed: () async {
-                try {
-                  client.logout();
-                  Get.offAllNamed("/login");
-                } catch (e) {
-                  showError(context, e.toString());
-                }
-              },
-              style: ElevatedButton.styleFrom(
-                primary: symbolColor,
-                padding: EdgeInsets.fromLTRB(16.r, 12.r, 16.r, 12.r),
-              ),
-              child: Text("확인", style: TextStyle(fontSize: 20.r)),
-            ),
-          ],
-        );
+      contents: [
+        Text(
+          "로그아웃 하시겠습니까?",
+          style: TextStyle(color: Colors.white, fontSize: 20.r),
+        ),
+      ],
+      onPressed: () async {
+        try {
+          client.logout();
+        } catch (e) {} finally {
+          Get.offAllNamed("/login");
+        }
       },
     );
   }

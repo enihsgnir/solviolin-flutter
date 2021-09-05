@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:solviolin_admin/model/user.dart';
+import 'package:solviolin_admin/util/constant.dart';
 import 'package:solviolin_admin/util/controller.dart';
 import 'package:solviolin_admin/util/data_source.dart';
 import 'package:solviolin_admin/widget/single_reusable.dart';
@@ -28,33 +29,25 @@ class _UserListState extends State<UserList> {
             User user = controller.users[index];
 
             return InkWell(
-              child: Container(
+              child: myCard(
                 padding: EdgeInsets.symmetric(vertical: 8.r),
-                decoration: BoxDecoration(
-                  border: Border.all(color: Colors.grey),
-                  borderRadius: BorderRadius.circular(15.r),
-                ),
-                margin: EdgeInsets.fromLTRB(8.r, 4.r, 8.r, 4.r),
-                child: DefaultTextStyle(
-                  style: TextStyle(color: Colors.white, fontSize: 24.r),
-                  child: Column(
-                    children: [
-                      Text("${user.userName} / ${user.branchName}"),
-                      Text(_parsePhoneNumber(user.userPhone)),
-                      Text("${_statusToString(user.status)}" +
-                          " / 크레딧: ${user.userCredit}"),
-                      Text("결제일: ${_ledgerToString(user.paidAt)}"),
-                    ],
-                  ),
-                ),
+                children: [
+                  Text("${user.userID} / ${user.branchName}"),
+                  Text(_parsePhoneNumber(user.userPhone)),
+                  Text("${_statusToString(user.status)}" +
+                      " / 크레딧: ${user.userCredit}"),
+                  Text("결제일: ${_ledgerToString(user.paidAt)}"),
+                ],
               ),
               onTap: () async {
                 try {
+                  FocusScope.of(context)
+                      .unfocus(); //TODO: move route with dismiss keyboard in other pages ex.Get.tonamed, floatingActionButton
                   await getUserDetailData(user);
                   detail.updateUser(user);
                   Get.toNamed("/user/detail");
                 } catch (e) {
-                  showError(context, e.toString());
+                  showError(e.toString());
                 }
               },
             );

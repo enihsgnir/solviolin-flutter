@@ -1,4 +1,5 @@
 // import 'package:flutter/material.dart';
+// import 'package:solviolin_admin/util/constant.dart';
 // import 'package:solviolin_admin/util/data_source.dart';
 
 // class SwipeableList extends StatefulWidget {
@@ -48,11 +49,7 @@
 //               return DefaultTextStyle(
 //                 style: TextStyle(fontSize: 28.r),
 //                 child: Container(
-//                   decoration: BoxDecoration(
-//                     color: Colors.grey[850],
-//                     border: Border.all(color: Colors.grey),
-//                     borderRadius: BorderRadius.circular(15.r),
-//                   ),
+//                   decoration: myDecoration,
 //                   margin: EdgeInsets.all(8.r),
 //                   child: widget.content,
 //                 ),

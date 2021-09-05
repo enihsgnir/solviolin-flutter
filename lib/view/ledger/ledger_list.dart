@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:solviolin_admin/model/ledger.dart';
+import 'package:solviolin_admin/util/constant.dart';
 import 'package:solviolin_admin/util/controller.dart';
-import 'package:solviolin_admin/util/data_source.dart';
 
 class LedgerList extends StatefulWidget {
   const LedgerList({Key? key}) : super(key: key);
@@ -27,10 +27,7 @@ class _LedgerListState extends State<LedgerList> {
 
             return Container(
               padding: EdgeInsets.symmetric(vertical: 8.r),
-              decoration: BoxDecoration(
-                border: Border.all(color: Colors.grey),
-                borderRadius: BorderRadius.circular(15.r),
-              ),
+              decoration: myDecoration,
               margin: EdgeInsets.symmetric(vertical: 4.r, horizontal: 8.r),
               child: DefaultTextStyle(
                 style: TextStyle(color: Colors.white, fontSize: 28.r),

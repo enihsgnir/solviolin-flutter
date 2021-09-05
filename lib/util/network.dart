@@ -23,7 +23,7 @@ class Client {
   final FlutterSecureStorage storage = Get.find<FlutterSecureStorage>();
 
   Client() {
-    dio.options.connectTimeout = 10000;
+    dio.options.connectTimeout = 5000;
     dio.options.receiveTimeout = 3000;
     dio.options.baseUrl = "https://xn--sy2bt7bxwhpof3wb.com";
 
@@ -77,6 +77,12 @@ class Client {
 
         return handler.next(response);
       },
+      onError: (error, handler) {
+        return handler.reject(NetworkException._(
+          message: "DioError: ${error.message}",
+          options: error.requestOptions,
+        ));
+      },
     ));
   }
 
@@ -112,11 +118,14 @@ class Client {
   }
 
   Future<void> logout() async {
-    if (await isLoggedIn()) {
-      await dio.patch("/auth/log-out");
+    try {
+      if (await isLoggedIn()) {
+        await dio.patch("/auth/log-out");
+      }
+    } finally {
+      await storage.deleteAll();
+      dio.options.headers.remove("Authorization");
     }
-    await storage.deleteAll();
-    dio.options.headers.remove("Authorization");
   }
 
   Future<Profile> login(String userID, String userPassword) async {
@@ -627,8 +636,8 @@ class Client {
   }) async {
     if (await isLoggedIn()) {
       await dio.patch("/reservation/term/$id", data: {
-        "termStart": termStart,
-        "termEnd": termEnd,
+        "termStart": termStart.toIso8601String(),
+        "termEnd": termEnd.toIso8601String(),
       });
     }
   }
@@ -744,7 +753,6 @@ class NetworkException extends DioError {
     required this.options,
   }) : super(
           requestOptions: options,
-          type: DioErrorType.response,
         );
 
   factory NetworkException._({
@@ -758,5 +766,15 @@ class NetworkException extends DioError {
   }
 
   @override
-  String toString() => message;
+  String toString() {
+    message += "\n${options.method}${options.path}";
+    if (options.queryParameters.isNotEmpty) {
+      message += "\n${options.queryParameters}";
+    }
+    if (options.data != null) {
+      message += "\n${options.data}";
+    }
+
+    return message;
+  }
 }

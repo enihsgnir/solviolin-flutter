@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:solviolin_admin/model/regular_schedule.dart';
+import 'package:solviolin_admin/util/constant.dart';
 import 'package:solviolin_admin/util/controller.dart';
 import 'package:solviolin_admin/util/data_source.dart';
 import 'package:solviolin_admin/util/format.dart';
 import 'package:solviolin_admin/util/network.dart';
 import 'package:solviolin_admin/view/user_detail/changed_reservation.dart';
 import 'package:solviolin_admin/view/user_detail/history_reserved.dart';
+import 'package:solviolin_admin/widget/dropdown.dart';
+import 'package:solviolin_admin/widget/picker.dart';
 import 'package:solviolin_admin/widget/single_reusable.dart';
 
 class UserDetailPage extends StatefulWidget {
@@ -59,8 +62,7 @@ class _UserDetailPageState extends State<UserDetailPage>
     Get.find<DataController>();
 
     return Scaffold(
-      resizeToAvoidBottomInset: false,
-      appBar: appBar("수강생 상세"),
+      appBar: myAppBar("유저 상세"),
       body: SafeArea(
         child: GetBuilder<DataController>(
           builder: (controller) {
@@ -73,7 +75,7 @@ class _UserDetailPageState extends State<UserDetailPage>
                       height: 225.r,
                       child: PageView.builder(
                         controller: PageController(),
-                        physics: ClampingScrollPhysics(),
+                        physics: const ClampingScrollPhysics(),
                         onPageChanged: (page) {
                           setState(() {
                             currentPage = page;
@@ -87,10 +89,7 @@ class _UserDetailPageState extends State<UserDetailPage>
                           return DefaultTextStyle(
                             style: TextStyle(fontSize: 28.r),
                             child: Container(
-                              decoration: BoxDecoration(
-                                border: Border.all(color: Colors.grey),
-                                borderRadius: BorderRadius.circular(15.r),
-                              ),
+                              decoration: myDecoration,
                               margin: EdgeInsets.all(8.r),
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.start,
@@ -107,114 +106,37 @@ class _UserDetailPageState extends State<UserDetailPage>
                                         Text(regular.userID),
                                         ElevatedButton(
                                           style: ElevatedButton.styleFrom(
-                                            primary: const Color.fromRGBO(
-                                                96, 128, 104, 100),
+                                            primary: symbolColor,
                                           ),
-                                          onPressed: () {
-                                            showDialog(
-                                                context: context,
-                                                barrierColor: Colors.black26,
-                                                builder: (context) {
-                                                  return AlertDialog(
-                                                    title: Text(
-                                                      "정규 종료",
-                                                      style: TextStyle(
-                                                        color: Colors.white,
-                                                        fontSize: 28.r,
-                                                      ),
-                                                    ),
-                                                    content: Column(
-                                                      mainAxisSize:
-                                                          MainAxisSize.min,
-                                                      children: [
-                                                        Padding(
-                                                          padding: EdgeInsets
-                                                              .fromLTRB(
-                                                                  12.r,
-                                                                  12.r,
-                                                                  12.r,
-                                                                  0),
-                                                          child: pickDateTime(
-                                                            context,
-                                                            "종료일",
-                                                            null,
-                                                            true,
-                                                          ),
-                                                        ),
-                                                      ],
-                                                    ),
-                                                    actions: [
-                                                      OutlinedButton(
-                                                        onPressed: () {
-                                                          Get.back();
-                                                        },
-                                                        style: OutlinedButton
-                                                            .styleFrom(
-                                                          padding: EdgeInsets
-                                                              .fromLTRB(
-                                                                  16.r,
-                                                                  12.r,
-                                                                  16.r,
-                                                                  12.r),
-                                                        ),
-                                                        child: Text(
-                                                          "취소",
-                                                          style: TextStyle(
-                                                            color: Colors.white,
-                                                            fontSize: 20.r,
-                                                          ),
-                                                        ),
-                                                      ),
-                                                      ElevatedButton(
-                                                        onPressed: () async {
-                                                          try {
-                                                            await client
-                                                                .updateEndDateAndDeleteLaterCourse(
-                                                              regular.id,
-                                                              endDate:
-                                                                  end.date!,
-                                                            );
-                                                            await getUsersData(
-                                                              branchName:
-                                                                  search.text1,
-                                                              userID:
-                                                                  search.text2,
-                                                              isPaid: search
-                                                                  .number1,
-                                                              status: search
-                                                                  .number2,
-                                                            );
-                                                            await getUserDetailData(
-                                                                detail.user!);
+                                          onPressed: () => showMyDialog(
+                                            context: context,
+                                            title: "정규 종료",
+                                            contents: [
+                                              pickDateTime(
+                                                  context, "종료일", null, true),
+                                            ],
+                                            onPressed: () async {
+                                              try {
+                                                await client
+                                                    .updateEndDateAndDeleteLaterCourse(
+                                                  regular.id,
+                                                  endDate: end.date!,
+                                                );
+                                                await getUsersData(
+                                                  branchName: search.text1,
+                                                  userID: search.text2,
+                                                  isPaid: search.number1,
+                                                  status: search.number2,
+                                                );
+                                                await getUserDetailData(
+                                                    detail.user!);
 
-                                                            Get.back();
-                                                          } catch (e) {
-                                                            showError(context,
-                                                                e.toString());
-                                                          }
-                                                        },
-                                                        style: ElevatedButton
-                                                            .styleFrom(
-                                                          primary: const Color
-                                                                  .fromRGBO(96,
-                                                              128, 104, 100),
-                                                          padding: EdgeInsets
-                                                              .fromLTRB(
-                                                                  16.r,
-                                                                  12.r,
-                                                                  16.r,
-                                                                  12.r),
-                                                        ),
-                                                        child: Text(
-                                                          "등록",
-                                                          style: TextStyle(
-                                                              fontSize: 20.r),
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  );
-                                                });
-                                          },
+                                                Get.back();
+                                              } catch (e) {
+                                                showError(e.toString());
+                                              }
+                                            },
+                                          ),
                                           child: Text(
                                             "정규 종료",
                                             style: TextStyle(fontSize: 20.r),
@@ -386,178 +308,57 @@ class _UserDetailPageState extends State<UserDetailPage>
   }
 
   Future _showExpend() {
-    return showDialog(
+    return showMyDialog(
       context: context,
-      barrierColor: Colors.black26,
-      builder: (context) {
-        return SingleChildScrollView(
-          child: AlertDialog(
-            title: Text(
-              "원비납부",
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 28.r,
-              ),
-            ),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Padding(
-                  padding: EdgeInsets.fromLTRB(12.r, 6.r, 12.r, 0),
-                  child: input("금액", amount, "금액을 입력하세요!"),
-                ),
-                Padding(
-                  padding: EdgeInsets.fromLTRB(12.r, 6.r, 12.r, 0),
-                  child: branchDropdown("Expend", "지점을 선택하세요!"),
-                ),
-                Padding(
-                  padding: EdgeInsets.fromLTRB(12.r, 6.r, 12.r, 0),
-                  child: termDropdown("지점을 선택하세요!"),
-                ),
-              ],
-            ),
-            actions: [
-              OutlinedButton(
-                onPressed: () {
-                  Get.back();
-                },
-                style: OutlinedButton.styleFrom(
-                  padding: EdgeInsets.fromLTRB(16.r, 12.r, 16.r, 12.r),
-                ),
-                child: Text(
-                  "취소",
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 20.r,
-                  ),
-                ),
-              ),
-              ElevatedButton(
-                onPressed: () async {
-                  try {
-                    await client.registerLedger(
-                      userID: _controller.regularSchedules[0].userID,
-                      amount: int.parse(amount.text),
-                      termID: term.termID!,
-                      branchName: expend.branchName!,
-                    );
-                    await getUsersData(
-                      branchName: search.text1,
-                      userID: search.text2,
-                      isPaid: search.number1,
-                      status: search.number2,
-                    );
-                    await getUserDetailData(detail.user!);
+      title: "원비납부",
+      contents: [
+        textInput("금액", amount, "금액을 입력하세요!"),
+        branchDropdown("Expend", "지점을 선택하세요!"),
+        termDropdown("지점을 선택하세요!"),
+      ],
+      onPressed: () async {
+        try {
+          await client.registerLedger(
+            userID: _controller.regularSchedules[0].userID,
+            amount: int.parse(amount.text),
+            termID: term.termID!,
+            branchName: expend.branchName!,
+          );
+          await getUsersData(
+            branchName: search.text1,
+            userID: search.text2,
+            isPaid: search.number1,
+            status: search.number2,
+          );
+          await getUserDetailData(detail.user!);
 
-                    Get.back();
-                  } catch (e) {
-                    showError(context, e.toString());
-                  }
-                },
-                style: ElevatedButton.styleFrom(
-                  primary: symbolColor,
-                  padding: EdgeInsets.fromLTRB(16.r, 12.r, 16.r, 12.r),
-                ),
-                child: Text("등록", style: TextStyle(fontSize: 20.r)),
-              ),
-            ],
-          ),
-        );
+          Get.back();
+        } catch (e) {
+          showError(e.toString());
+        }
       },
+      isScrolling: true,
     );
   }
 
   Future _showUpdate() {
-    return showDialog(
+    return showMyDialog(
       context: context,
-      barrierColor: Colors.black26,
-      builder: (context) {
-        return SingleChildScrollView(
-          child: AlertDialog(
-            title: Text(
-              "정보수정",
-              style: TextStyle(color: Colors.white, fontSize: 28.r),
-            ),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Padding(
-                  padding: EdgeInsets.fromLTRB(12.r, 6.r, 12.r, 0),
-                  child: branchDropdown("Update"),
-                ),
-                Padding(
-                  padding: EdgeInsets.fromLTRB(12.r, 6.r, 12.r, 0),
-                  child: input("전화번호", phone),
-                ),
-                Container(
-                  alignment: Alignment.centerLeft,
-                  padding: EdgeInsets.fromLTRB(12.r, 6.r, 12.r, 0),
-                  child: check(
-                    tag: "Update",
-                    item: "등록 여부",
-                    trueName: "등록",
-                    falseName: "미등록",
-                  ),
-                ),
-                Padding(
-                  padding: EdgeInsets.fromLTRB(12.r, 6.r, 12.r, 0),
-                  child: input("크레딧", credit),
-                ),
-                Padding(
-                  padding: EdgeInsets.fromLTRB(12.r, 6.r, 12.r, 0),
-                  child: input("이름", name),
-                ),
-              ],
-            ),
-            actions: [
-              OutlinedButton(
-                onPressed: () {
-                  Get.back();
-                },
-                style: OutlinedButton.styleFrom(
-                  padding: EdgeInsets.fromLTRB(16.r, 12.r, 16.r, 12.r),
-                ),
-                child: Text(
-                  "취소",
-                  style: TextStyle(color: Colors.white, fontSize: 20.r),
-                ),
-              ),
-              ElevatedButton(
-                onPressed: () async {
-                  try {
-                    await client.updateUserInformation(
-                      _controller.regularSchedules[0].userID,
-                      userBranch: update.branchName,
-                      userPhone: phone.text == "" ? null : phone.text,
-                      status: status.result,
-                      userCredit:
-                          credit.text == "" ? null : int.parse(credit.text),
-                      userName: name.text == "" ? null : name.text,
-                    );
-
-                    await getUsersData(
-                      branchName: search.text1,
-                      userID: search.text2,
-                      isPaid: search.number1,
-                      status: search.number2,
-                    );
-                    await getUserDetailData(detail.user!);
-
-                    Get.back();
-                  } catch (e) {
-                    showError(context, e.toString());
-                  }
-                },
-                style: ElevatedButton.styleFrom(
-                  primary: symbolColor,
-                  padding: EdgeInsets.fromLTRB(16.r, 12.r, 16.r, 12.r),
-                ),
-                child: Text("등록", style: TextStyle(fontSize: 20.r)),
-              ),
-            ],
-          ),
-        );
-      },
+      title: "정보수정",
+      contents: [
+        branchDropdown("Update"),
+        textInput("전화번호", phone),
+        check(
+          tag: "Update",
+          item: "등록 여부",
+          trueName: "등록",
+          falseName: "미등록",
+        ),
+        textInput("크레딧", credit),
+        textInput("이름", name),
+      ],
+      onPressed: () {},
+      isScrolling: true,
     );
   }
 }

@@ -157,6 +157,7 @@ class SearchController extends GetxController {
 
   int? number1;
   int? number2;
+  int? number3;
 }
 
 class DetailController extends GetxController {
@@ -223,4 +224,13 @@ class DateTimeController extends GetxController {
     dateTime = data;
     update();
   }
+}
+
+class RadioController<T> extends GetxController {
+  late T type;
+
+  // void updateType(T data) {
+  //   type = data;
+  //   update();
+  // }
 }

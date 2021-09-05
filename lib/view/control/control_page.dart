@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:solviolin_admin/util/constant.dart';
 import 'package:solviolin_admin/util/controller.dart';
 import 'package:solviolin_admin/util/data_source.dart';
 import 'package:solviolin_admin/util/network.dart';
 import 'package:solviolin_admin/view/control/control_list.dart';
 import 'package:solviolin_admin/view/control/control_search.dart';
+import 'package:solviolin_admin/widget/dropdown.dart';
+import 'package:solviolin_admin/widget/picker.dart';
 import 'package:solviolin_admin/widget/single_reusable.dart';
 
 class ControlPage extends StatefulWidget {
@@ -22,8 +25,10 @@ class _ControlPageState extends State<ControlPage> {
   DateTimeController start =
       Get.put(DateTimeController(), tag: "StartRegister");
   DateTimeController end = Get.put(DateTimeController(), tag: "EndRegister");
-  StatusType status = StatusType.open;
-  CancelInCloseType cancelInClose = CancelInCloseType.none;
+  RadioController<StatusType> status =
+      Get.put(RadioController<StatusType>(), tag: "Status");
+  RadioController<CancelInCloseType> cancelInClose =
+      Get.put(RadioController<CancelInCloseType>(), tag: "CancelInClose");
 
   SearchController search = Get.find<SearchController>(tag: "Control");
 
@@ -38,7 +43,7 @@ class _ControlPageState extends State<ControlPage> {
     return GestureDetector(
       onTap: () => FocusScope.of(context).unfocus(),
       child: Scaffold(
-        appBar: appBar("오픈/클로즈"),
+        appBar: myAppBar("오픈/클로즈"),
         body: SafeArea(
           child: Column(
             children: [
@@ -66,233 +71,65 @@ class _ControlPageState extends State<ControlPage> {
   }
 
   Future _showRegister() {
-    return showDialog(
+    return showMyDialog(
       context: context,
-      barrierColor: Colors.black26,
-      builder: (context) {
-        return StatefulBuilder(
-          builder: (context, setState) {
-            return SingleChildScrollView(
-              child: AlertDialog(
-                title: Text(
-                  "오픈/클로즈 등록",
-                  style: TextStyle(color: Colors.white, fontSize: 28.r),
-                ),
-                content: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Padding(
-                      padding: EdgeInsets.fromLTRB(12.r, 6.r, 12.r, 0),
-                      child: input("강사", teacher, "강사명을 입력하세요!"),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.fromLTRB(12.r, 6.r, 12.r, 0),
-                      child: branchDropdown("Register", "지점을 선택하세요!"),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.fromLTRB(12.r, 6.r, 12.r, 0),
-                      child: pickDateTime(
-                        context,
-                        "시작일",
-                        "StartRegister",
-                        true,
-                      ),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.fromLTRB(12.r, 6.r, 12.r, 0),
-                      child: pickDateTime(
-                        context,
-                        "종료일",
-                        "EndRegister",
-                        true,
-                      ),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.fromLTRB(12.r, 12.r, 12.r, 0),
-                      child: DefaultTextStyle(
-                        style: TextStyle(color: Colors.white, fontSize: 20.r),
-                        child: Row(
-                          children: [
-                            Container(
-                              width: 120.r,
-                              child: label("오픈/클로즈", true),
-                            ),
-                            Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Container(
-                                  padding:
-                                      EdgeInsets.symmetric(horizontal: 2.r),
-                                  child: Row(
-                                    children: [
-                                      Radio(
-                                        value: StatusType.open,
-                                        groupValue: status,
-                                        onChanged: (StatusType? value) {
-                                          setState(() {
-                                            status = value!;
-                                          });
-                                        },
-                                      ),
-                                      Text("오픈"),
-                                    ],
-                                  ),
-                                ),
-                                Container(
-                                  padding:
-                                      EdgeInsets.symmetric(horizontal: 2.r),
-                                  child: Row(
-                                    children: [
-                                      Radio(
-                                        value: StatusType.close,
-                                        groupValue: status,
-                                        onChanged: (StatusType? value) {
-                                          setState(() {
-                                            status = value!;
-                                          });
-                                        },
-                                      ),
-                                      Text("클로즈"),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.fromLTRB(12.r, 12.r, 12.r, 0),
-                      child: DefaultTextStyle(
-                        style: TextStyle(color: Colors.white, fontSize: 20.r),
-                        child: Row(
-                          children: [
-                            Container(
-                              width: 110.r,
-                              child: label("기간 내", true),
-                            ),
-                            Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Container(
-                                  padding:
-                                      EdgeInsets.symmetric(horizontal: 2.r),
-                                  child: Column(
-                                    children: [
-                                      Text("유지"),
-                                      Radio(
-                                        value: CancelInCloseType.none,
-                                        groupValue: cancelInClose,
-                                        onChanged: (CancelInCloseType? value) {
-                                          setState(() {
-                                            cancelInClose = value!;
-                                          });
-                                        },
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                Container(
-                                  padding:
-                                      EdgeInsets.symmetric(horizontal: 2.r),
-                                  child: Column(
-                                    children: [
-                                      Text("취소"),
-                                      Radio(
-                                        value: CancelInCloseType.cancel,
-                                        groupValue: cancelInClose,
-                                        onChanged: (CancelInCloseType? value) {
-                                          setState(() {
-                                            cancelInClose = value!;
-                                          });
-                                        },
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                Container(
-                                  padding:
-                                      EdgeInsets.symmetric(horizontal: 2.r),
-                                  child: Column(
-                                    children: [
-                                      Text("삭제"),
-                                      Radio(
-                                        value: CancelInCloseType.delete,
-                                        groupValue: cancelInClose,
-                                        onChanged: (CancelInCloseType? value) {
-                                          setState(() {
-                                            cancelInClose = value!;
-                                          });
-                                        },
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                actions: [
-                  OutlinedButton(
-                    onPressed: () {
-                      Get.back();
-                    },
-                    style: OutlinedButton.styleFrom(
-                      padding: EdgeInsets.fromLTRB(16.r, 12.r, 16.r, 12.r),
-                    ),
-                    child: Text(
-                      "취소",
-                      style: TextStyle(color: Colors.white, fontSize: 20.r),
-                    ),
-                  ),
-                  ElevatedButton(
-                    onPressed: () async {
-                      try {
-                        await client.registerControl(
-                          teacherID: teacher.text,
-                          branchName: branch.branchName!,
-                          controlStart: start.dateTime!,
-                          controlEnd: end.dateTime!,
-                          status: status == StatusType.open ? 0 : 1,
-                          cancelInClose: cancelInClose == CancelInCloseType.none
-                              ? 0
-                              : cancelInClose == CancelInCloseType.cancel
-                                  ? 1
-                                  : 2,
-                        );
+      title: "오픈/클로즈 등록",
+      contents: [
+        textInput("강사", teacher, "강사명을 입력하세요!"),
+        branchDropdown("Register", "지점을 선택하세요!"),
+        pickDateTime(context, "시작일", "StartRegister", true),
+        pickDateTime(context, "종료일", "EndRegister", true),
+        myRadio<StatusType>(
+          tag: "Status",
+          item: "오픈/클로즈",
+          names: ["오픈", "클로즈"],
+          values: [StatusType.open, StatusType.close],
+          groupValue: StatusType.open,
+        ),
+        myRadio<CancelInCloseType>(
+          tag: "CancelInClose",
+          item: "기간 내",
+          names: ["유지", "취소", "삭제"],
+          values: [
+            CancelInCloseType.none,
+            CancelInCloseType.cancel,
+            CancelInCloseType.delete,
+          ],
+          groupValue: CancelInCloseType.none,
+        ),
+      ],
+      onPressed: () async {
+        try {
+          await client.registerControl(
+            teacherID: teacher.text,
+            branchName: branch.branchName!,
+            controlStart: start.dateTime!,
+            controlEnd: end.dateTime!,
+            status: status.type == StatusType.open ? 0 : 1,
+            cancelInClose: cancelInClose.type == CancelInCloseType.none
+                ? 0
+                : cancelInClose.type == CancelInCloseType.cancel
+                    ? 1
+                    : 2,
+          );
 
-                        if (search.isSearched) {
-                          await getControlsData(
-                            branchName: search.text1!,
-                            teacherID: search.text2,
-                            startDate: search.dateTime1,
-                            endDate: search.dateTime2,
-                            status: search.number1,
-                          );
-                        }
-
-                        Get.back();
-                      } catch (e) {
-                        showError(context, e.toString());
-                      }
-                    },
-                    style: ElevatedButton.styleFrom(
-                      primary: symbolColor,
-                      padding: EdgeInsets.fromLTRB(16.r, 12.r, 16.r, 12.r),
-                    ),
-                    child: Text("등록", style: TextStyle(fontSize: 20.r)),
-                  ),
-                ],
-              ),
+          if (search.isSearched) {
+            await getControlsData(
+              branchName: search.text1!,
+              teacherID: search.text2,
+              startDate: search.dateTime1,
+              endDate: search.dateTime2,
+              status: search.number1,
             );
-          },
-        );
+          }
+
+          Get.back();
+        } catch (e) {
+          showError(e.toString());
+        }
       },
+      action: "등록",
+      isScrolling: true,
     );
   }
 }

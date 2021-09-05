@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:solviolin_admin/model/salary.dart';
+import 'package:solviolin_admin/util/constant.dart';
 import 'package:solviolin_admin/util/controller.dart';
-import 'package:solviolin_admin/util/data_source.dart';
 
 class SalaryList extends StatefulWidget {
   const SalaryList({Key? key}) : super(key: key);
@@ -26,10 +26,7 @@ class _SalaryListState extends State<SalaryList> {
 
             return Container(
               padding: EdgeInsets.symmetric(vertical: 8.r),
-              decoration: BoxDecoration(
-                border: Border.all(color: Colors.grey),
-                borderRadius: BorderRadius.circular(15.r),
-              ),
+              decoration: myDecoration,
               margin: EdgeInsets.fromLTRB(8.r, 4.r, 8.r, 4.r),
               child: DefaultTextStyle(
                 style: TextStyle(color: Colors.white, fontSize: 28.r),

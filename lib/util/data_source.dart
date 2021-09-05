@@ -9,22 +9,13 @@ import 'package:solviolin_admin/model/regular_schedule.dart';
 import 'package:solviolin_admin/model/reservation.dart';
 import 'package:solviolin_admin/model/teacher_info.dart';
 import 'package:solviolin_admin/model/user.dart';
+import 'package:solviolin_admin/util/constant.dart';
 import 'package:solviolin_admin/util/controller.dart';
 import 'package:solviolin_admin/util/network.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
 
 Client _client = Get.find<Client>();
 DataController _controller = Get.find<DataController>();
-
-extension RFS on num {
-  double get r => this * _controller.ratio; //'r'esponsible font size
-}
-
-Color symbolColor = const Color.fromRGBO(96, 128, 104, 100);
-
-Future<void> logoutAndDeleteData() async {
-  await _client.logout();
-}
 
 Future<void> getInitialData([
   bool isLoggedIn = true,
@@ -53,10 +44,10 @@ Future<void> getReservationData({
   String? userID,
   String? teacherID,
 }) async {
-  final int weekday = displayDate.weekday % 7;
-  final DateTime first =
+  final weekday = displayDate.weekday % 7;
+  final first =
       DateTime(displayDate.year, displayDate.month, displayDate.day - weekday);
-  final DateTime last =
+  final last =
       first.add(const Duration(days: 6, hours: 23, minutes: 59, seconds: 59));
 
   _controller.updateTeacherInfos(await _client.getTeacherInfos(
@@ -74,10 +65,9 @@ Future<void> getReservationData({
     ..sort((a, b) => a.startDate.compareTo(b.startDate)));
 
   if (teacherID != null) {
-    _controller.updateReservations([
-      for (Reservation reservation in _controller.reservations)
-        if (reservation.teacherID == teacherID) reservation
-    ]);
+    _controller.updateReservations(_controller.reservations
+        .where((element) => element.teacherID == teacherID)
+        .toList());
   }
 
   _controller.updateReservationDataSource(ReservationDataSource());
@@ -85,36 +75,47 @@ Future<void> getReservationData({
 
 Future<void> getReservationDataForTeacher({
   required DateTime displayDate,
-  required String branchName,
   required String teacherID,
 }) async {
-  final int weekday = displayDate.weekday % 7;
-  final DateTime first =
+  final weekday = displayDate.weekday % 7;
+  final first =
       DateTime(displayDate.year, displayDate.month, displayDate.day - weekday);
-  final DateTime last =
+  final last =
       first.add(const Duration(days: 6, hours: 23, minutes: 59, seconds: 59));
 
   _controller.updateTeacherInfos(
     [TeacherInfo(teacherID: teacherID, color: symbolColor)],
   );
 
-  _controller.updateReservations(await _client.getReservations(
-    branchName: branchName,
-    startDate: first,
-    endDate: last,
-    bookingStatus: [-3, -1, 0, 1, 3],
-  )
-    ..sort((a, b) => a.startDate.compareTo(b.startDate))
-    ..removeWhere((element) => element.teacherID != teacherID));
+  _controller.updateTeachers(await _client.getTeachers(
+    teacherID: teacherID,
+  ));
+
+  var _branches = List.generate(
+    _controller.teachers.length,
+    (index) => _controller.teachers[index].branchName,
+  ).toSet().toList();
+
+  List<Reservation> _reservations = [];
+  _branches.forEach((element) async {
+    _reservations.addAll(await _client.getReservations(
+      branchName: element,
+      startDate: first,
+      endDate: last,
+      bookingStatus: [-3, -1, 0, 1, 3],
+    )
+      ..sort((a, b) => a.startDate.compareTo(b.startDate))
+      ..removeWhere((element) => element.teacherID != teacherID));
+  });
+  _controller.updateReservations(_reservations);
 
   _controller.updateReservationDataSource(ReservationDataSource());
 }
 
 bool isSameWeek(DateTime newDate, DateTime oldDate) {
-  final int weekday = oldDate.weekday % 7;
-  final DateTime first =
-      DateTime(oldDate.year, oldDate.month, oldDate.day - weekday);
-  final DateTime last =
+  final weekday = oldDate.weekday % 7;
+  final first = DateTime(oldDate.year, oldDate.month, oldDate.day - weekday);
+  final last =
       first.add(const Duration(days: 6, hours: 23, minutes: 59, seconds: 59));
 
   return DateUtils.isSameDay(newDate, first) ||
@@ -133,7 +134,11 @@ class ReservationDataSource extends CalendarDataSource {
         id: index,
         color: _controller.teacherInfos[index].color ?? Colors.transparent,
       ),
-    );
+    )..add(CalendarResource(
+        displayName: "Others",
+        id: -1,
+        color: Colors.transparent,
+      ));
   }
 
   @override
@@ -144,9 +149,11 @@ class ReservationDataSource extends CalendarDataSource {
 
   @override
   String getSubject(int index) {
-    String start = DateFormat("HH:mm").format(appointments![index].startDate);
-    String end = DateFormat("HH:mm").format(appointments![index].endDate);
-    return appointments![index].userID + "\n$start ~ $end";
+    final start = DateFormat("HH:mm").format(appointments![index].startDate);
+    final end = DateFormat("HH:mm").format(appointments![index].endDate);
+    return appointments![index].userID +
+        "\n${appointments![index].teacherID}/${appointments![index].branchName}" +
+        "\n$start ~ $end";
   }
 
   @override
@@ -154,7 +161,7 @@ class ReservationDataSource extends CalendarDataSource {
 
   @override
   List<Object> getResourceIds(int index) {
-    List<String> teacherIDs = List<String>.generate(
+    var teacherIDs = List.generate(
       _controller.teacherInfos.length,
       (index) => _controller.teacherInfos[index].teacherID,
     );
@@ -167,13 +174,14 @@ Future<void> getUsersData({
   String? branchName,
   String? userID,
   int? isPaid,
+  int? userType,
   int? status,
 }) async {
   _controller.updateUsers(await _client.getUsers(
     branchName: branchName,
     userID: userID,
     isPaid: isPaid,
-    userType: 0,
+    userType: userType,
     status: status,
   )
     ..sort((a, b) => a.userID.compareTo(b.userID)));
@@ -185,18 +193,19 @@ Future<void> saveUsersData({
   int? isPaid,
   int? status,
 }) async {
-  final Directory directory = await getApplicationDocumentsDirectory();
-  final String path = directory.path;
-  final File file = File("$path/users_list.json");
+  final directory = Platform.isIOS
+      ? await getApplicationDocumentsDirectory()
+      : await getExternalStorageDirectory();
+  final path = directory?.path;
+  final file = File("$path/users_list.json");
 
-  final List<dynamic> data = await _client.getRawUsers(
+  final data = await _client.getRawUsers(
     branchName: branchName,
     userID: userID,
     isPaid: isPaid,
     userType: 0,
     status: status,
   );
-
   file.writeAsString(json.encode(data));
 
   Get.snackbar(
@@ -207,14 +216,15 @@ Future<void> saveUsersData({
       style: TextStyle(color: Colors.white, fontSize: 24.r),
     ),
     messageText: Text(
-      "$path/users_list.json",
+      file.path,
       style: TextStyle(color: Colors.white, fontSize: 20.r),
     ),
+    duration: const Duration(seconds: 10),
   );
 }
 
 Future<void> getUserDetailData(User user) async {
-  final DateTime today = DateTime.now();
+  final today = DateTime.now();
 
   try {
     _controller.updateRegularSchedules(
@@ -318,13 +328,13 @@ Future<void> getLedgersData({
     }));
 }
 
-// Implement with FutureBuilder not GetBuilder
+//TODO: Implement with FutureBuilder not GetBuilder
 Future<void> getTotalLedgerData({
   required String branchName,
   required int termID,
 }) async {
-  _controller.updateTotalLedger(await _client.getTotalLedger(
-    branchName: branchName,
-    termID: termID,
-  ));
+  // _controller.updateTotalLedger(await _client.getTotalLedger(
+  //   branchName: branchName,
+  //   termID: termID,
+  // ));
 }

@@ -1,11 +1,13 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:solviolin_admin/util/constant.dart';
 import 'package:solviolin_admin/util/controller.dart';
 import 'package:solviolin_admin/util/data_source.dart';
 import 'package:solviolin_admin/util/network.dart';
 import 'package:solviolin_admin/view/user/user_list.dart';
 import 'package:solviolin_admin/view/user/user_search.dart';
+import 'package:solviolin_admin/widget/dropdown.dart';
 import 'package:solviolin_admin/widget/single_reusable.dart';
 
 class UserPage extends StatefulWidget {
@@ -18,14 +20,14 @@ class UserPage extends StatefulWidget {
 class _UserPageState extends State<UserPage> {
   Client client = Get.find<Client>();
 
-  TextEditingController id = TextEditingController();
-  TextEditingController pw = TextEditingController();
-  TextEditingController name = TextEditingController();
-  TextEditingController phone = TextEditingController();
-  UserType type = UserType.student;
-  BranchController branch = Get.put(BranchController(), tag: "Register");
+  var id = TextEditingController();
+  var pw = TextEditingController();
+  var name = TextEditingController();
+  var phone = TextEditingController();
+  var type = Get.put(RadioController<UserType>(), tag: "Register");
+  var branch = Get.put(BranchController(), tag: "Register");
 
-  SearchController search = Get.find<SearchController>(tag: "User");
+  var search = Get.find<SearchController>(tag: "User");
 
   @override
   void dispose() {
@@ -41,7 +43,7 @@ class _UserPageState extends State<UserPage> {
     return GestureDetector(
       onTap: () => FocusScope.of(context).unfocus(),
       child: Scaffold(
-        appBar: appBar("수강생"),
+        appBar: myAppBar("유저"),
         body: SafeArea(
           child: Column(
             children: [
@@ -69,189 +71,54 @@ class _UserPageState extends State<UserPage> {
   }
 
   Future _showUserRegister() {
-    return showDialog(
+    return showMyDialog(
       context: context,
-      barrierColor: Colors.black26,
-      builder: (context) {
-        return StatefulBuilder(
-          builder: (context, setState) {
-            return GestureDetector(
-              onTap: () => FocusScope.of(context).unfocus(),
-              child: SingleChildScrollView(
-                child: AlertDialog(
-                  title: Text(
-                    "유저 신규 등록",
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 28.r,
-                    ),
-                  ),
-                  content: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Padding(
-                        padding: EdgeInsets.fromLTRB(12.r, 6.r, 12.r, 0),
-                        child: input("아이디", id, "아이디를 입력하세요!"),
-                      ),
-                      Padding(
-                        padding: EdgeInsets.fromLTRB(12.r, 6.r, 12.r, 0),
-                        child: input("비밀번호", pw, "비밀번호를 입력하세요!"),
-                      ),
-                      Padding(
-                        padding: EdgeInsets.fromLTRB(12.r, 6.r, 12.r, 0),
-                        child: input("이름", name, "이름을 입력하세요!"),
-                      ),
-                      Padding(
-                        padding: EdgeInsets.fromLTRB(12.r, 6.r, 12.r, 0),
-                        child: input("전화번호", phone, "전화번호를 입력하세요!"),
-                      ),
-                      Padding(
-                        padding: EdgeInsets.fromLTRB(12.r, 6.r, 12.r, 0),
-                        child: DefaultTextStyle(
-                          style: TextStyle(color: Colors.white, fontSize: 20.r),
-                          child: Row(
-                            children: [
-                              Container(
-                                width: 110.r,
-                                child: label("구분", true),
-                              ),
-                              Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Container(
-                                    padding:
-                                        EdgeInsets.symmetric(horizontal: 2.r),
-                                    child: Column(
-                                      children: [
-                                        Text("수강생"),
-                                        Radio(
-                                          value: UserType.student,
-                                          groupValue: type,
-                                          onChanged: (UserType? value) {
-                                            setState(() {
-                                              type = value!;
-                                            });
-                                          },
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  Container(
-                                    padding:
-                                        EdgeInsets.symmetric(horizontal: 2.r),
-                                    child: Column(
-                                      children: [
-                                        Text("강사"),
-                                        Radio(
-                                          value: UserType.teacher,
-                                          groupValue: type,
-                                          onChanged: (UserType? value) {
-                                            setState(() {
-                                              type = value!;
-                                            });
-                                          },
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  Container(
-                                    padding:
-                                        EdgeInsets.symmetric(horizontal: 2.r),
-                                    child: Column(
-                                      children: [
-                                        Text("관리자"),
-                                        Radio(
-                                          value: UserType.admin,
-                                          groupValue: type,
-                                          onChanged: (UserType? value) {
-                                            setState(() {
-                                              type = value!;
-                                            });
-                                          },
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                      Padding(
-                        padding: EdgeInsets.fromLTRB(12.r, 6.r, 12.r, 0),
-                        child: branchDropdown("Register", "지점을 선택하세요!"),
-                      ),
-                    ],
-                  ),
-                  actions: [
-                    OutlinedButton(
-                      onPressed: () {
-                        Get.back();
-                      },
-                      style: OutlinedButton.styleFrom(
-                        padding: EdgeInsets.fromLTRB(16.r, 12.r, 16.r, 12.r),
-                      ),
-                      child: Text(
-                        "취소",
-                        style: TextStyle(color: Colors.white, fontSize: 20.r),
-                      ),
-                    ),
-                    ElevatedButton(
-                      onPressed: () async {
-                        try {
-                          await client.registerUser(
-                            userID: id.text,
-                            userPassword: pw.text,
-                            userName: name.text,
-                            userPhone: phone.text,
-                            userType: _parseUserType(type),
-                            userBranch: branch.branchName!,
-                          );
+      title: "유저 신규 등록",
+      contents: [
+        textInput("아이디", id, "아이디를 입력하세요!"),
+        textInput("비밀번호", pw, "비밀번호를 입력하세요!"),
+        textInput("이름", name, "이름을 입력하세요!"),
+        textInput("전화번호", phone, "전화번호를 입력하세요!"),
+        myRadio<UserType>(
+          tag: "Register",
+          item: "구분",
+          names: ["수강생", "강사", "관리자"],
+          values: [UserType.student, UserType.teacher, UserType.admin],
+          groupValue: UserType.student,
+        ),
+        branchDropdown("Register", "지점을 선택하세요!"),
+      ],
+      onPressed: () async {
+        try {
+          await client.registerUser(
+            userID: id.text,
+            userPassword: pw.text,
+            userName: name.text,
+            userPhone: phone.text,
+            userType: type.type == UserType.student
+                ? 0
+                : type.type == UserType.teacher
+                    ? 1
+                    : 2,
+            userBranch: branch.branchName!,
+          );
 
-                          if (search.isSearched) {
-                            await getUsersData(
-                              branchName: search.text1,
-                              userID: search.text2,
-                              isPaid: search.number1,
-                              status: search.number2,
-                            );
-                          }
-
-                          Get.back();
-                        } catch (e) {
-                          showError(context, e.toString());
-                        }
-                      },
-                      style: ElevatedButton.styleFrom(
-                        primary: symbolColor,
-                        padding: EdgeInsets.fromLTRB(16.r, 12.r, 16.r, 12.r),
-                      ),
-                      child: Text("등록", style: TextStyle(fontSize: 20.r)),
-                    ),
-                  ],
-                ),
-              ),
+          if (search.isSearched) {
+            await getUsersData(
+              branchName: search.text1,
+              userID: search.text2,
+              isPaid: search.number1,
+              status: search.number2,
             );
-          },
-        );
+          }
+
+          Get.back();
+        } catch (e) {
+          showError(e.toString());
+        }
       },
+      action: "등록",
+      isScrolling: true,
     );
   }
-
-  int _parseUserType(UserType type) {
-    Map<UserType, int> _type = {
-      UserType.student: 0,
-      UserType.teacher: 1,
-      UserType.admin: 2,
-    };
-
-    return _type[type]!;
-  }
-}
-
-enum UserType {
-  student,
-  teacher,
-  admin,
 }

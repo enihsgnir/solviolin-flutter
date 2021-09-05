@@ -2,10 +2,12 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:solviolin_admin/util/constant.dart';
 import 'package:solviolin_admin/util/controller.dart';
 import 'package:solviolin_admin/util/data_source.dart';
 import 'package:solviolin_admin/util/network.dart';
 import 'package:solviolin_admin/view/main/time_slot.dart';
+import 'package:solviolin_admin/widget/dropdown.dart';
 import 'package:solviolin_admin/widget/single_reusable.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
 
@@ -51,7 +53,7 @@ class _MainPageState extends State<MainPage> {
     return GestureDetector(
       onTap: () => FocusScope.of(context).unfocus(),
       child: Scaffold(
-        appBar: appBar(
+        appBar: myAppBar(
           "메인",
           actions: [
             IconButton(
@@ -66,95 +68,13 @@ class _MainPageState extends State<MainPage> {
                     );
                   }
                 } catch (e) {
-                  showError(context, e.toString());
+                  showError(e.toString());
                 }
               },
               icon: Icon(CupertinoIcons.refresh, size: 24.r),
             ),
             IconButton(
-              onPressed: () {
-                showDialog(
-                  context: context,
-                  barrierColor: Colors.black26,
-                  builder: (context) {
-                    return SingleChildScrollView(
-                      child: AlertDialog(
-                        title: Text(
-                          "검색",
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 28.r,
-                          ),
-                        ),
-                        content: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Padding(
-                              padding: EdgeInsets.fromLTRB(12.r, 6.r, 12.r, 0),
-                              child: input("수강생", user),
-                            ),
-                            Padding(
-                              padding: EdgeInsets.fromLTRB(12.r, 6.r, 12.r, 0),
-                              child: input("강사", teacher),
-                            ),
-                            Padding(
-                              padding: EdgeInsets.fromLTRB(12.r, 6.r, 12.r, 0),
-                              child: branchDropdown(null, "지점을 선택하세요!"),
-                            ),
-                          ],
-                        ),
-                        actions: [
-                          OutlinedButton(
-                            onPressed: () {
-                              Get.back();
-                            },
-                            style: OutlinedButton.styleFrom(
-                              padding:
-                                  EdgeInsets.fromLTRB(16.r, 12.r, 16.r, 12.r),
-                            ),
-                            child: Text(
-                              "취소",
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 20.r,
-                              ),
-                            ),
-                          ),
-                          ElevatedButton(
-                            onPressed: () async {
-                              try {
-                                search.text1 = branch.branchName;
-                                search.text2 =
-                                    user.text == "" ? null : user.text;
-                                search.text3 =
-                                    teacher.text == "" ? null : teacher.text;
-
-                                await getReservationData(
-                                  displayDate: _controller.displayDate,
-                                  branchName: search.text1!,
-                                  userID: search.text2,
-                                  teacherID: search.text3,
-                                );
-
-                                search.isSearched = true;
-                                Get.back();
-                              } catch (e) {
-                                showError(context, e.toString());
-                              }
-                            },
-                            style: ElevatedButton.styleFrom(
-                              primary: symbolColor,
-                              padding:
-                                  EdgeInsets.fromLTRB(16.r, 12.r, 16.r, 12.r),
-                            ),
-                            child: Text("검색", style: TextStyle(fontSize: 20.r)),
-                          ),
-                        ],
-                      ),
-                    );
-                  },
-                );
-              },
+              onPressed: _showSearch,
               icon: Icon(CupertinoIcons.slider_horizontal_3, size: 24.r),
             ),
             IconButton(
@@ -196,7 +116,7 @@ class _MainPageState extends State<MainPage> {
                       );
                     }
                   } catch (e) {
-                    showError(context, e.toString());
+                    showError(e.toString());
                   }
                 }
               },
@@ -215,6 +135,39 @@ class _MainPageState extends State<MainPage> {
           ),
         ),
       ),
+    );
+  }
+
+  Future _showSearch() {
+    return showMyDialog(
+      context: context,
+      title: "검색",
+      contents: [
+        textInput("수강생", user),
+        textInput("강사", teacher),
+        branchDropdown(null, "지점을 선택하세요!"),
+      ],
+      onPressed: () async {
+        try {
+          search.text1 = branch.branchName;
+          search.text2 = user.text == "" ? null : user.text;
+          search.text3 = teacher.text == "" ? null : teacher.text;
+
+          await getReservationData(
+            displayDate: _controller.displayDate,
+            branchName: search.text1!,
+            userID: search.text2,
+            teacherID: search.text3,
+          );
+
+          search.isSearched = true;
+          Get.back();
+        } catch (e) {
+          showError(e.toString());
+        }
+      },
+      action: "검색",
+      isScrolling: true,
     );
   }
 }

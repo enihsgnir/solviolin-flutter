@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
-import 'package:solviolin_admin/util/data_source.dart';
+import 'package:solviolin_admin/util/constant.dart';
 import 'package:solviolin_admin/util/network.dart';
 import 'package:solviolin_admin/widget/single_reusable.dart';
 
@@ -40,7 +40,7 @@ class _CheckInPageState extends State<CheckInPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: appBar("체크인"),
+      appBar: myAppBar("체크인"),
       body: Stack(
         alignment: Alignment.center,
         children: [

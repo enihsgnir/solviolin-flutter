@@ -1,10 +1,12 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:solviolin_admin/util/constant.dart';
 import 'package:solviolin_admin/util/controller.dart';
-import 'package:solviolin_admin/util/data_source.dart';
 import 'package:solviolin_admin/util/network.dart';
 import 'package:solviolin_admin/view/term/term_list.dart';
+import 'package:solviolin_admin/widget/dropdown.dart';
+import 'package:solviolin_admin/widget/picker.dart';
 import 'package:solviolin_admin/widget/single_reusable.dart';
 
 class TermPage extends StatefulWidget {
@@ -35,7 +37,7 @@ class _TermPageState extends State<TermPage> {
     return GestureDetector(
       onTap: () => FocusScope.of(context).unfocus(),
       child: Scaffold(
-        appBar: appBar("학기"),
+        appBar: myAppBar("학기"),
         body: SafeArea(
           child: TermList(),
         ),
@@ -63,77 +65,28 @@ class _TermPageState extends State<TermPage> {
   }
 
   Future _showRegister() {
-    return showDialog(
+    return showMyDialog(
       context: context,
-      barrierColor: Colors.black26,
-      builder: (context) {
-        return AlertDialog(
-          title: Text(
-            "학기 등록",
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 28.r,
-            ),
-          ),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Padding(
-                padding: EdgeInsets.fromLTRB(12.r, 6.r, 12.r, 0),
-                child: pickDate(context, "시작일", "Start", true),
-              ),
-              Padding(
-                padding: EdgeInsets.fromLTRB(12.r, 6.r, 12.r, 0),
-                child: pickDate(context, "종료일", "End", true),
-              ),
-            ],
-          ),
-          actions: [
-            OutlinedButton(
-              onPressed: () {
-                Get.back();
-              },
-              style: OutlinedButton.styleFrom(
-                padding: EdgeInsets.symmetric(
-                  vertical: 12.r,
-                  horizontal: 16.r,
-                ),
-              ),
-              child: Text(
-                "취소",
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 20.r,
-                ),
-              ),
-            ),
-            ElevatedButton(
-              onPressed: () async {
-                try {
-                  await client.registerTerm(
-                    termStart: start.date!,
-                    termEnd: end.date!,
-                  );
+      title: "학기 등록",
+      contents: [
+        pickDate(context, "시작일", "Start", true),
+        pickDate(context, "종료일", "End", true),
+      ],
+      onPressed: () async {
+        try {
+          await client.registerTerm(
+            termStart: start.date!,
+            termEnd: end.date!,
+          );
 
-                  _controller.updateTerms(await client.getTerms(10));
+          _controller.updateTerms(await client.getTerms(10));
 
-                  Get.back();
-                } catch (e) {
-                  showError(context, e.toString());
-                }
-              },
-              style: ElevatedButton.styleFrom(
-                primary: symbolColor,
-                padding: EdgeInsets.symmetric(
-                  vertical: 12.r,
-                  horizontal: 16.r,
-                ),
-              ),
-              child: Text("등록", style: TextStyle(fontSize: 20.r)),
-            ),
-          ],
-        );
+          Get.back();
+        } catch (e) {
+          showError(e.toString());
+        }
       },
+      action: "등록",
     );
   }
 
@@ -153,9 +106,7 @@ class _TermPageState extends State<TermPage> {
             ),
           ],
           cancelButton: CupertinoActionSheetAction(
-            onPressed: () {
-              Get.back();
-            },
+            onPressed: Get.back,
             isDefaultAction: true,
             child: Text("닫기", style: TextStyle(fontSize: 24.r)),
           ),
@@ -165,126 +116,43 @@ class _TermPageState extends State<TermPage> {
   }
 
   Future _showExtendOfBranch() {
-    return showDialog(
+    return showMyDialog(
       context: context,
-      barrierColor: Colors.black26,
-      builder: (context) {
-        return AlertDialog(
-          title: Text(
-            "정규 연장 (지점)",
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 28.r,
-            ),
-          ),
-          content: Padding(
-            padding: EdgeInsets.fromLTRB(12.r, 6.r, 12.r, 0),
-            child: branchDropdown(null, "지점을 선택하세요!"),
-          ),
-          actions: [
-            OutlinedButton(
-              onPressed: () {
-                Get.back();
-              },
-              style: OutlinedButton.styleFrom(
-                padding: EdgeInsets.symmetric(
-                  vertical: 12.r,
-                  horizontal: 16.r,
-                ),
-              ),
-              child: Text(
-                "취소",
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 20.r,
-                ),
-              ),
-            ),
-            ElevatedButton(
-              onPressed: () async {
-                try {
-                  await client.extendAllCoursesOfBranch(branch.branchName!);
+      title: "정규 연장 (지점)",
+      contents: [
+        branchDropdown(null, "지점을 선택하세요!"),
+      ],
+      onPressed: () async {
+        try {
+          await client.extendAllCoursesOfBranch(branch.branchName!);
 
-                  Get.back();
-                } catch (e) {
-                  showError(context, e.toString());
-                }
-              },
-              style: ElevatedButton.styleFrom(
-                primary: symbolColor,
-                padding: EdgeInsets.symmetric(
-                  vertical: 12.r,
-                  horizontal: 16.r,
-                ),
-              ),
-              child: Text("등록", style: TextStyle(fontSize: 20.r)),
-            ),
-          ],
-        );
+          Get.back();
+        } catch (e) {
+          showError(e.toString());
+        }
       },
+      action: "등록",
     );
   }
 
   Future _showExtendOfUser() {
-    return showDialog(
+    return showMyDialog(
       context: context,
-      barrierColor: Colors.black26,
-      builder: (context) {
-        return SingleChildScrollView(
-          child: AlertDialog(
-            title: Text(
-              "정규 연장 (수강생)",
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 28.r,
-              ),
-            ),
-            content: Padding(
-              padding: EdgeInsets.fromLTRB(12.r, 6.r, 12.r, 0),
-              child: input("이름", user, "이름을 입력하세요!"),
-            ),
-            actions: [
-              OutlinedButton(
-                onPressed: () {
-                  Get.back();
-                },
-                style: OutlinedButton.styleFrom(
-                  padding: EdgeInsets.symmetric(
-                    vertical: 12.r,
-                    horizontal: 16.r,
-                  ),
-                ),
-                child: Text(
-                  "취소",
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 20.r,
-                  ),
-                ),
-              ),
-              ElevatedButton(
-                onPressed: () async {
-                  try {
-                    await client.extendAllCoursesOfUser(user.text);
+      title: "정규 연장 (수강생)",
+      contents: [
+        textInput("이름", user, "이름을 입력하세요!"),
+      ],
+      onPressed: () async {
+        try {
+          await client.extendAllCoursesOfUser(user.text);
 
-                    Get.back();
-                  } catch (e) {
-                    showError(context, e.toString());
-                  }
-                },
-                style: ElevatedButton.styleFrom(
-                  primary: symbolColor,
-                  padding: EdgeInsets.symmetric(
-                    vertical: 12.r,
-                    horizontal: 16.r,
-                  ),
-                ),
-                child: Text("등록", style: TextStyle(fontSize: 20.r)),
-              ),
-            ],
-          ),
-        );
+          Get.back();
+        } catch (e) {
+          showError(e.toString());
+        }
       },
+      action: "등록",
+      isScrolling: true,
     );
   }
 }

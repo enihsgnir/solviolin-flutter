@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:solviolin_admin/util/constant.dart';
 import 'package:solviolin_admin/util/controller.dart';
 import 'package:solviolin_admin/util/data_source.dart';
 import 'package:solviolin_admin/view/for_teacher/time_slot_for_teacher.dart';
@@ -40,7 +41,7 @@ class _MainForTeacherPageState extends State<MainForTeacherPage> {
     return GestureDetector(
       onTap: () => FocusScope.of(context).unfocus(),
       child: Scaffold(
-        appBar: appBar(
+        appBar: myAppBar(
           "메인",
           actions: [
             IconButton(
@@ -48,11 +49,10 @@ class _MainForTeacherPageState extends State<MainForTeacherPage> {
                 try {
                   await getReservationDataForTeacher(
                     displayDate: _controller.displayDate,
-                    branchName: _controller.profile.branchName,
                     teacherID: _controller.profile.userID,
                   );
                 } catch (e) {
-                  showError(context, e.toString());
+                  showError(e.toString());
                 }
               },
               icon: Icon(CupertinoIcons.refresh, size: 24.r),
@@ -89,11 +89,10 @@ class _MainForTeacherPageState extends State<MainForTeacherPage> {
                   try {
                     await getReservationDataForTeacher(
                       displayDate: _controller.displayDate,
-                      branchName: _controller.profile.branchName,
                       teacherID: _controller.profile.userID,
                     );
                   } catch (e) {
-                    showError(context, e.toString());
+                    showError(e.toString());
                   }
                 }
               },

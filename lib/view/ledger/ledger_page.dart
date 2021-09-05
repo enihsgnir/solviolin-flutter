@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:solviolin_admin/util/data_source.dart';
+import 'package:solviolin_admin/util/constant.dart';
 import 'package:solviolin_admin/view/ledger/ledger_list.dart';
 import 'package:solviolin_admin/view/ledger/ledger_search.dart';
 import 'package:solviolin_admin/widget/single_reusable.dart';
@@ -17,7 +17,7 @@ class _LedgerPageState extends State<LedgerPage> {
     return GestureDetector(
       onTap: () => FocusScope.of(context).unfocus(),
       child: Scaffold(
-        appBar: appBar("매출"),
+        appBar: myAppBar("매출"),
         body: SafeArea(
           child: Column(
             children: [

@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:solviolin_admin/util/constant.dart';
 import 'package:solviolin_admin/util/controller.dart';
 import 'package:solviolin_admin/util/data_source.dart';
 import 'package:solviolin_admin/util/network.dart';
@@ -25,13 +26,13 @@ class _LoadingPageState extends State<LoadingPage> {
       // await _client.logout(); // for test
 
       try {
-        await checkUser();
+        await checkProfile();
       } catch (e) {
         try {
           await _client.logout();
         } catch (e) {} finally {
           Get.offAllNamed("/login");
-          showError(context, e.toString());
+          showError(e.toString());
         }
       }
     });
@@ -79,7 +80,7 @@ class _LoadingPageState extends State<LoadingPage> {
     );
   }
 
-  Future<void> checkUser() async {
+  Future<void> checkProfile() async {
     if (await _client.isLoggedIn()) {
       await getInitialData();
       if (_controller.profile.userType == 2) {
@@ -88,8 +89,11 @@ class _LoadingPageState extends State<LoadingPage> {
         Get.offAllNamed("/menu-teacher");
       }
     } else {
-      await _client.logout();
-      Get.offAllNamed("/login");
+      try {
+        await _client.logout();
+      } catch (e) {} finally {
+        Get.offAllNamed("/login");
+      }
     }
   }
 }

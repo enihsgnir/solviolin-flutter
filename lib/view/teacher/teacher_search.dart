@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:solviolin_admin/util/constant.dart';
 import 'package:solviolin_admin/util/controller.dart';
 import 'package:solviolin_admin/util/data_source.dart';
+import 'package:solviolin_admin/widget/dropdown.dart';
 import 'package:solviolin_admin/widget/single_reusable.dart';
 
 class TeacherSearch extends StatefulWidget {
@@ -25,55 +27,33 @@ class _TeacherSearchState extends State<TeacherSearch> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.fromLTRB(8.r, 8.r, 8.r, 24.r),
-      decoration: BoxDecoration(
-        border: Border.all(color: Colors.grey),
-        borderRadius: BorderRadius.circular(15.r),
-      ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Container(
-            alignment: Alignment.centerLeft,
-            padding: EdgeInsets.fromLTRB(24.r, 6.r, 0, 0),
-            child: input("강사", teacher),
-          ),
-          Row(
-            children: [
-              Container(
-                alignment: Alignment.centerLeft,
-                padding: EdgeInsets.only(left: 24.r),
-                child: branchDropdown(null, "지점을 선택하세요!"),
-              ),
-              Padding(
-                padding: EdgeInsets.only(left: 36.r),
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    primary: symbolColor,
-                  ),
-                  onPressed: () async {
-                    try {
-                      search.text1 = teacher.text == "" ? null : teacher.text;
-                      search.text2 = branch.branchName;
+    return mySearch(
+      padding: EdgeInsets.symmetric(vertical: 16.r),
+      contents: [
+        textInput("강사", teacher),
+        Row(
+          children: [
+            branchDropdown(null, "지점을 선택하세요!"),
+            myActionButton(
+              onPressed: () async {
+                try {
+                  search.text1 = teacher.text == "" ? null : teacher.text;
+                  search.text2 = branch.branchName;
 
-                      await getTeachersData(
-                        teacherID: search.text1,
-                        branchName: search.text2,
-                      );
+                  await getTeachersData(
+                    teacherID: search.text1,
+                    branchName: search.text2,
+                  );
 
-                      search.isSearched = true;
-                    } catch (e) {
-                      showError(context, e.toString());
-                    }
-                  },
-                  child: Text("검색", style: TextStyle(fontSize: 20.r)),
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
+                  search.isSearched = true;
+                } catch (e) {
+                  showError(e.toString());
+                }
+              },
+            ),
+          ],
+        ),
+      ],
     );
   }
 }

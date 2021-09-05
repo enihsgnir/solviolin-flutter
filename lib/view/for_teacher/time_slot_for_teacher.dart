@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:solviolin_admin/util/constant.dart';
 import 'package:solviolin_admin/util/controller.dart';
 import 'package:solviolin_admin/util/data_source.dart';
 import 'package:solviolin_admin/util/network.dart';
@@ -49,11 +50,10 @@ class _TimeSlotForTeacherState extends State<TimeSlotForTeacher> {
               try {
                 await getReservationDataForTeacher(
                   displayDate: controller.displayDate,
-                  branchName: controller.profile.branchName,
                   teacherID: controller.profile.userID,
                 );
               } catch (e) {
-                showError(context, e.toString());
+                showError(e.toString());
               }
             }
           },

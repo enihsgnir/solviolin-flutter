@@ -2,7 +2,6 @@ import 'package:solviolin_admin/util/format.dart';
 
 class User {
   String userID;
-  String userName;
   String userPhone;
   String branchName;
   int userCredit;
@@ -11,7 +10,6 @@ class User {
 
   User({
     required this.userID,
-    required this.userName,
     required this.userPhone,
     required this.branchName,
     required this.userCredit,
@@ -22,7 +20,6 @@ class User {
   factory User.fromJson(Map<String, dynamic> json) {
     return User(
       userID: json["userID"],
-      userName: json["userName"],
       userPhone: json["userPhone"],
       branchName: json["branchName"],
       userCredit: json["userCredit"],

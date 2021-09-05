@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:solviolin_admin/util/data_source.dart';
+import 'package:solviolin_admin/util/constant.dart';
 import 'package:solviolin_admin/view/canceled/canceled_list.dart';
 import 'package:solviolin_admin/view/canceled/canceled_search.dart';
 import 'package:solviolin_admin/widget/single_reusable.dart';
@@ -17,7 +17,7 @@ class _CancelPageState extends State<CancelPage> {
     return GestureDetector(
       onTap: () => FocusScope.of(context).unfocus(),
       child: Scaffold(
-        appBar: appBar("취소 내역"),
+        appBar: myAppBar("취소 내역"),
         body: SafeArea(
           child: Column(
             children: [

@@ -1,8 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:solviolin_admin/util/constant.dart';
 import 'package:solviolin_admin/util/controller.dart';
-import 'package:solviolin_admin/util/data_source.dart';
 import 'package:solviolin_admin/util/network.dart';
 import 'package:solviolin_admin/widget/single_reusable.dart';
 
@@ -34,16 +34,17 @@ class _MenuPageState extends State<MenuPage> {
     Get.put(SearchController(), tag: "Branch");
 
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       body: SafeArea(
         child: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               menu("메인", () => Get.toNamed("/main")),
-              menu("수강생", () => Get.toNamed("/user")),
+              menu("유저", () => Get.toNamed("/user")),
               menu("오픈/클로즈", () => Get.toNamed("/control")),
               menu("학기", () => Get.toNamed("/term")),
-              menu("강사", () => Get.toNamed("/teacher")),
+              menu("강사 세부", () => Get.toNamed("/teacher")),
               menu("지점 등록", _showBranchRegister),
               menu("매출", () => Get.toNamed("/ledger")),
               menu("체크인", () => Get.toNamed("/check-in")),
@@ -76,103 +77,42 @@ class _MenuPageState extends State<MenuPage> {
   }
 
   Future _showBranchRegister() {
-    return showDialog(
+    return showMyDialog(
       context: context,
-      barrierColor: Colors.black26,
-      builder: (context) {
-        return SingleChildScrollView(
-          child: AlertDialog(
-            title: Text(
-              "지점 등록",
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 28.r,
-              ),
-            ),
-            content: Padding(
-              padding: EdgeInsets.fromLTRB(12.r, 6.r, 12.r, 0),
-              child: input("지점명", branch, "지점명을 입력하세요!"),
-            ),
-            actions: [
-              OutlinedButton(
-                onPressed: () {
-                  Get.back();
-                },
-                style: OutlinedButton.styleFrom(
-                  padding: EdgeInsets.fromLTRB(16.r, 12.r, 16.r, 12.r),
-                ),
-                child: Text(
-                  "취소",
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 20.r,
-                  ),
-                ),
-              ),
-              ElevatedButton(
-                onPressed: () async {
-                  try {
-                    await client.registerBranch(branch.text);
+      title: "지점 등록",
+      contents: [
+        textInput("지점명", branch, "지점명을 입력하세요!"),
+      ],
+      onPressed: () async {
+        try {
+          await client.registerBranch(branch.text);
 
-                    _controller.updateBranches(await client.getBranches());
-                    Get.back();
-                  } catch (e) {
-                    showError(context, e.toString());
-                  }
-                },
-                style: ElevatedButton.styleFrom(
-                  primary: symbolColor,
-                  padding: EdgeInsets.fromLTRB(16.r, 12.r, 16.r, 12.r),
-                ),
-                child: Text("등록", style: TextStyle(fontSize: 20.r)),
-              ),
-            ],
-          ),
-        );
+          _controller.updateBranches(await client.getBranches());
+          Get.back();
+        } catch (e) {
+          showError(e.toString());
+        }
       },
+      action: "등록",
+      isScrolling: true,
     );
   }
 
   Future _showLogout() {
-    return showDialog(
+    return showMyDialog(
       context: context,
-      barrierColor: Colors.black26,
-      builder: (context) {
-        return AlertDialog(
-          content: Text(
-            "로그아웃 하시겠습니까?",
-            style: TextStyle(color: Colors.white, fontSize: 20.r),
-          ),
-          actions: [
-            OutlinedButton(
-              onPressed: () {
-                Get.back();
-              },
-              style: OutlinedButton.styleFrom(
-                padding: EdgeInsets.fromLTRB(16.r, 12.r, 16.r, 12.r),
-              ),
-              child: Text(
-                "취소",
-                style: TextStyle(color: Colors.white, fontSize: 20.r),
-              ),
-            ),
-            ElevatedButton(
-              onPressed: () async {
-                try {
-                  client.logout();
-                  Get.offAllNamed("/login");
-                } catch (e) {
-                  showError(context, e.toString());
-                }
-              },
-              style: ElevatedButton.styleFrom(
-                primary: symbolColor,
-                padding: EdgeInsets.fromLTRB(16.r, 12.r, 16.r, 12.r),
-              ),
-              child: Text("확인", style: TextStyle(fontSize: 20.r)),
-            ),
-          ],
-        );
+      contents: [
+        Text(
+          "로그아웃 하시겠습니까?",
+          style: TextStyle(color: Colors.white, fontSize: 20.r),
+        ),
+      ],
+      onPressed: () async {
+        try {
+          client.logout();
+        } catch (e) {} finally {
+          Get.offAllNamed("/login");
+        }
       },
     );
   }

@@ -1,39 +1,216 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:get/get.dart';
-import 'package:intl/intl.dart';
+import 'package:solviolin_admin/util/constant.dart';
 import 'package:solviolin_admin/util/controller.dart';
-import 'package:solviolin_admin/util/data_source.dart';
-import 'package:solviolin_admin/util/format.dart';
 
-DataController _controller = Get.find<DataController>();
-
-Future showError(BuildContext context, String message) {
-  return showCupertinoDialog(
-    context: context,
-    builder: (context) {
-      return CupertinoAlertDialog(
-        title: Text("Error", style: TextStyle(fontSize: 32.r)),
-        content: Text(message, style: TextStyle(fontSize: 20.r)),
-        actions: [
-          CupertinoDialogAction(
-            onPressed: () {
-              Get.back();
-            },
-            child: Text("확인", style: TextStyle(fontSize: 24.r)),
-          ),
-        ],
-      );
-    },
+Future showError(String message) {
+  return Get.dialog(
+    CupertinoAlertDialog(
+      title: Text("Error", style: TextStyle(fontSize: 32.r)),
+      content: Text(message, style: TextStyle(fontSize: 20.r)),
+      actions: [
+        CupertinoDialogAction(
+          onPressed: Get.back,
+          child: Text("확인", style: TextStyle(fontSize: 24.r)),
+        ),
+      ],
+    ),
+    barrierDismissible: false,
+    barrierColor: Colors.black26,
   );
 }
 
-PreferredSizeWidget appBar(String title, {List<Widget>? actions}) {
+Widget mySearch({
+  EdgeInsetsGeometry? padding,
+  required List<Widget> contents,
+}) {
+  return Container(
+    padding: padding ?? EdgeInsets.symmetric(vertical: 8.r),
+    decoration: myDecoration,
+    child: Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: List.generate(
+        contents.length,
+        (index) => Padding(
+          padding: EdgeInsets.fromLTRB(24.r, 3.r, 0, 3.r),
+          child: contents[index],
+        ),
+      ),
+    ),
+  );
+}
+
+Widget myActionButton({
+  required void Function() onPressed,
+  String action = "검색",
+}) {
+  return Padding(
+    padding: EdgeInsets.only(left: 24.r),
+    child: ElevatedButton(
+      onPressed: onPressed,
+      style: ElevatedButton.styleFrom(primary: symbolColor),
+      child: Text(action, style: TextStyle(fontSize: 20.r)),
+    ),
+  );
+}
+
+Widget myCard({
+  List<Widget>? slideActions,
+  EdgeInsetsGeometry? padding,
+  required List<Widget> children,
+}) {
+  return Slidable(
+    actionPane: const SlidableScrollActionPane(),
+    actionExtentRatio: 1 / 5,
+    secondaryActions: slideActions,
+    child: Container(
+      padding: padding ?? EdgeInsets.symmetric(vertical: 16.r),
+      decoration: myDecoration,
+      width: double.infinity,
+      margin: EdgeInsets.symmetric(vertical: 4.r, horizontal: 8.r),
+      child: DefaultTextStyle(
+        style: TextStyle(color: Colors.white, fontSize: 24.r), //TODO
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: children,
+        ),
+      ),
+    ),
+  );
+}
+
+Widget mySlideAction({
+  required IconData icon,
+  required String item,
+  required void Function() onTap,
+  bool borderLeft = false,
+  bool borderRight = false,
+}) {
+  return SlideAction(
+    child: Row(
+      children: [
+        borderLeft
+            ? Container(
+                margin: EdgeInsets.symmetric(vertical: 8.r),
+                color: Colors.white,
+                width: 0.25.r,
+              )
+            : Container(),
+        Expanded(
+          child: Container(
+            width: double.infinity,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(icon, size: 48.r),
+                Text(
+                  item,
+                  style: TextStyle(color: Colors.white, fontSize: 20.r),
+                )
+              ],
+            ),
+          ),
+        ),
+        borderRight
+            ? Container(
+                margin: EdgeInsets.symmetric(vertical: 8.r),
+                color: Colors.white,
+                width: 0.25.r,
+              )
+            : Container(),
+      ],
+    ),
+    onTap: onTap,
+  );
+}
+
+Widget myDialog({
+  String? title,
+  required List<Widget> contents,
+  required void Function() onPressed,
+  required String action,
+}) {
+  return AlertDialog(
+    title: title == null
+        ? null
+        : Text(
+            title,
+            style: TextStyle(color: Colors.white, fontSize: 28.r),
+          ),
+    content: Column(
+      mainAxisSize: MainAxisSize.min,
+      children: List.generate(
+        contents.length,
+        (index) => Padding(
+          padding: EdgeInsets.symmetric(vertical: 3.r, horizontal: 12.r),
+          child: contents[index],
+        ),
+      ),
+    ),
+    actions: [
+      OutlinedButton(
+        onPressed: Get.back,
+        style: OutlinedButton.styleFrom(
+          padding: EdgeInsets.symmetric(vertical: 12.r, horizontal: 16.r),
+        ),
+        child: Text(
+          "취소",
+          style: TextStyle(color: Colors.white, fontSize: 20.r),
+        ),
+      ),
+      ElevatedButton(
+        onPressed: onPressed,
+        style: ElevatedButton.styleFrom(
+          primary: symbolColor,
+          padding: EdgeInsets.symmetric(vertical: 12.r, horizontal: 16.r),
+        ),
+        child: Text(action, style: TextStyle(fontSize: 20.r)),
+      ),
+    ],
+  );
+}
+
+Future showMyDialog({
+  required BuildContext context,
+  String? title,
+  required List<Widget> contents,
+  required void Function() onPressed,
+  String action = "확인",
+  bool isScrolling = false,
+}) {
+  return Get.dialog(
+    isScrolling
+        ? GestureDetector(
+            onTap: () => FocusScope.of(context).unfocus(),
+            child: Column(
+              children: [
+                SingleChildScrollView(
+                  child: myDialog(
+                    title: title,
+                    contents: contents,
+                    onPressed: onPressed,
+                    action: action,
+                  ),
+                ),
+              ],
+            ),
+          )
+        : myDialog(
+            title: title,
+            contents: contents,
+            onPressed: onPressed,
+            action: action,
+          ),
+    barrierColor: Colors.black26,
+  );
+}
+
+PreferredSizeWidget myAppBar(String title, {List<Widget>? actions}) {
   return AppBar(
     leading: IconButton(
-      onPressed: () {
-        Get.back();
-      },
+      onPressed: Get.back,
       icon: Icon(CupertinoIcons.chevron_back, size: 28.r),
     ),
     title: Text(title, style: TextStyle(fontSize: 28.r)),
@@ -48,18 +225,14 @@ Widget label(String item, bool isMandatory) {
       children: [
         TextSpan(
           text: item,
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 20.r,
-          ),
+          style: TextStyle(color: Colors.white, fontSize: 20.r),
         ),
         TextSpan(
           text: isMandatory ? " *" : "",
           style: TextStyle(
-            fontWeight: FontWeight.w500,
-            fontSize: 16.r,
-            backgroundColor: Colors.transparent,
             color: Colors.red,
+            fontSize: 16.r,
+            fontWeight: FontWeight.bold,
           ),
         ),
       ],
@@ -67,7 +240,7 @@ Widget label(String item, bool isMandatory) {
   );
 }
 
-Widget input(
+Widget textInput(
   String item,
   TextEditingController controller, [
   String? validator,
@@ -102,10 +275,10 @@ Widget check({
   bool reverse = false,
   bool isMandatory = false,
 }) {
-  Get.find<CheckController>(tag: tag);
-
   bool trueValue = false;
   bool falseValue = false;
+
+  Get.find<CheckController>(tag: tag);
 
   return GetBuilder<CheckController>(
     tag: tag,
@@ -124,11 +297,11 @@ Widget check({
                   setState(() {
                     trueValue = value!;
 
-                    if (trueValue == true && falseValue == true) {
+                    if (trueValue && falseValue) {
                       controller.updateResult(null);
-                    } else if (trueValue == true && falseValue == false) {
+                    } else if (trueValue && !falseValue) {
                       controller.updateResult(reverse ? 0 : 1);
-                    } else if (trueValue == false && falseValue == true) {
+                    } else if (!trueValue && falseValue) {
                       controller.updateResult(reverse ? 1 : 0);
                     } else {
                       controller.updateResult(null);
@@ -138,10 +311,7 @@ Widget check({
               ),
               Text(
                 trueName,
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 20.r,
-                ),
+                style: TextStyle(color: Colors.white, fontSize: 20.r),
               ),
               Checkbox(
                 value: falseValue,
@@ -149,11 +319,11 @@ Widget check({
                   setState(() {
                     falseValue = value!;
 
-                    if (trueValue == true && falseValue == true) {
+                    if (trueValue && falseValue) {
                       controller.updateResult(null);
-                    } else if (trueValue == true && falseValue == false) {
+                    } else if (trueValue && !falseValue) {
                       controller.updateResult(reverse ? 0 : 1);
-                    } else if (trueValue == false && falseValue == true) {
+                    } else if (!trueValue && falseValue) {
                       controller.updateResult(reverse ? 1 : 0);
                     } else {
                       controller.updateResult(null);
@@ -163,10 +333,7 @@ Widget check({
               ),
               Text(
                 falseName,
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 20.r,
-                ),
+                style: TextStyle(color: Colors.white, fontSize: 20.r),
               ),
             ],
           );
@@ -176,347 +343,54 @@ Widget check({
   );
 }
 
-Widget branchDropdown([
+Widget myRadio<T>({
   String? tag,
-  String? validator,
-]) {
-  Get.find<BranchController>(tag: tag);
+  required String item,
+  required List<String> names,
+  required List<T> values,
+  required T groupValue,
+}) {
+  RadioController<T> radio = Get.find<RadioController<T>>(tag: tag);
+  radio.type = values[0];
 
-  bool isMandatory = validator != null;
-
-  return GetBuilder<BranchController>(
-    tag: tag,
-    builder: (controller) {
-      return Row(
-        children: [
-          Container(
-            width: 110.r,
-            child: label("지점명", isMandatory),
-          ),
-          Container(
-            width: 220.r,
-            child: DropdownButtonFormField<String>(
-              value: controller.branchName,
-              hint: Text("지점명", style: TextStyle(fontSize: 20.r)),
-              icon: Icon(CupertinoIcons.arrowtriangle_down_square, size: 20.r),
-              iconSize: 24.r,
-              elevation: 16,
-              style: TextStyle(color: Colors.white, fontSize: 20.r),
-              validator: (value) {
-                return value == null ? validator : null;
-              },
-              onChanged: (String? value) {
-                controller.updateBranchName(value!);
-              },
-              onSaved: (String? value) {
-                controller.updateBranchName(value!);
-              },
-              items: List<String>.generate(
-                _controller.branches.length,
-                (index) => _controller.branches[index],
-              )
-                  .map<DropdownMenuItem<String>>(
-                      (value) => DropdownMenuItem<String>(
-                            value: value,
-                            child: Text(value),
-                          ))
-                  .toList(),
+  return StatefulBuilder(
+    builder: (context, setState) {
+      return DefaultTextStyle(
+        style: TextStyle(color: Colors.white, fontSize: 20.r),
+        child: Row(
+          children: [
+            Container(
+              width: 120.r,
+              child: label(item, true),
             ),
-          ),
-        ],
-      );
-    },
-  );
-}
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: List.generate(
+                names.length,
+                (index) => Container(
+                  padding: EdgeInsets.symmetric(horizontal: 2.r),
+                  width: 65.r,
+                  child: Column(
+                    children: [
+                      Text(names[index]),
+                      Radio<T>(
+                        value: values[index],
+                        groupValue: groupValue,
+                        onChanged: (value) {
+                          setState(() {
+                            groupValue = value!;
+                          });
 
-Widget workDowDropdown([String? validator]) {
-  Get.find<WorkDowController>();
-
-  bool isMandatory = validator != null;
-
-  return GetBuilder<WorkDowController>(
-    builder: (controller) {
-      return Row(
-        children: [
-          Container(
-            width: 110.r,
-            child: label("요일", isMandatory),
-          ),
-          Container(
-            width: 220.r,
-            child: DropdownButtonFormField<int>(
-              value: controller.workDow,
-              hint: Text("요일", style: TextStyle(fontSize: 20.r)),
-              icon: Icon(CupertinoIcons.arrowtriangle_down_square, size: 20.r),
-              iconSize: 24.r,
-              elevation: 16,
-              style: TextStyle(color: Colors.white, fontSize: 20.r),
-              validator: (value) {
-                return value == null ? validator : null;
-              },
-              onChanged: (int? value) {
-                controller.updateWorkDow(value!);
-              },
-              onSaved: (int? value) {
-                controller.updateWorkDow(value!);
-              },
-              items: List<int>.generate(7, (index) => index)
-                  .map<DropdownMenuItem<int>>((value) => DropdownMenuItem<int>(
-                        value: value,
-                        child: Text(dowToString(value)),
-                      ))
-                  .toList(),
-            ),
-          ),
-        ],
-      );
-    },
-  );
-}
-
-Widget termDropdown([String? validator]) {
-  Get.find<TermController>();
-
-  bool isMandatory = validator != null;
-
-  return GetBuilder<TermController>(
-    builder: (controller) {
-      return Row(
-        children: [
-          Container(
-            width: 110.r,
-            child: label("학기", isMandatory),
-          ),
-          Container(
-            width: 220.r,
-            child: DropdownButtonFormField<int>(
-              value: controller.termID,
-              hint: Text("학기", style: TextStyle(fontSize: 20.r)),
-              icon: Icon(CupertinoIcons.arrowtriangle_down_square, size: 20.r),
-              iconSize: 24.r,
-              elevation: 16,
-              style: TextStyle(color: Colors.white, fontSize: 20.r),
-              validator: (value) {
-                return value == null ? validator : null;
-              },
-              onChanged: (int? value) {
-                controller.updateTermID(value!);
-              },
-              onSaved: (int? value) {
-                controller.updateTermID(value!);
-              },
-              items: _controller.terms
-                  .map<DropdownMenuItem<int>>((value) => DropdownMenuItem<int>(
-                        value: value.id,
-                        child: Text(
-                          DateFormat("yy/MM/dd").format(value.termStart) +
-                              " ~ " +
-                              DateFormat("yy/MM/dd").format(value.termEnd),
-                        ),
-                      ))
-                  .toList(),
-            ),
-          ),
-        ],
-      );
-    },
-  );
-}
-
-Widget pickDateTime(
-  BuildContext context,
-  String item, [
-  String? tag,
-  bool isMandatory = false,
-]) {
-  Get.find<DateTimeController>(tag: tag);
-
-  final DateTime initialDate = DateTime.now();
-  DateTime? newDate;
-  final TimeOfDay initialTime = TimeOfDay.now();
-  TimeOfDay? newTime;
-
-  return GetBuilder<DateTimeController>(
-    tag: tag,
-    builder: (controller) {
-      return Row(
-        children: [
-          Container(
-            width: 110.r,
-            child: label(item, isMandatory),
-          ),
-          Container(
-            width: 220.r,
-            child: InputDecorator(
-              decoration: const InputDecoration(),
-              child: InkWell(
-                child: Text(
-                  controller.dateTime == null
-                      ? "미선택"
-                      : DateFormat("yy/MM/dd HH:mm")
-                          .format(controller.dateTime!),
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 20.r,
+                          radio.type = value!;
+                        },
+                      ),
+                    ],
                   ),
                 ),
-                onTap: () async {
-                  newDate = await showDatePicker(
-                    context: context,
-                    initialDate: controller.date ?? initialDate,
-                    firstDate: DateTime(initialDate.year - 3),
-                    lastDate: DateTime(initialDate.year + 1),
-                    builder: (context, child) {
-                      return Theme(
-                        data: ThemeData.dark().copyWith(
-                          textTheme: TextTheme(
-                            headline5: TextStyle(fontSize: 24.r),
-                            subtitle2: TextStyle(fontSize: 16.r),
-                            caption: TextStyle(fontSize: 16.r),
-                          ),
-                        ),
-                        child: child!,
-                      );
-                    },
-                  );
-
-                  if (newDate != null) {
-                    controller.updateDate(newDate);
-                    newTime = await showTimePicker(
-                      context: context,
-                      initialTime: controller.time ?? initialTime,
-                    );
-
-                    if (newTime != null) {
-                      controller.updateTime(newTime);
-                      controller.updateDateTime(newDate!.add(Duration(
-                        hours: newTime!.hour,
-                        minutes: newTime!.minute,
-                      )));
-                    }
-                  }
-                },
               ),
             ),
-          ),
-        ],
-      );
-    },
-  );
-}
-
-Widget pickDate(
-  BuildContext context,
-  String item, [
-  String? tag,
-  bool isMandatory = false,
-]) {
-  Get.find<DateTimeController>(tag: tag);
-
-  final DateTime initialDate = DateTime.now();
-  DateTime? newDate;
-
-  return GetBuilder<DateTimeController>(
-    tag: tag,
-    builder: (controller) {
-      return Row(
-        children: [
-          Container(
-            width: 110.r,
-            child: label(item, isMandatory),
-          ),
-          Container(
-            width: 220.r,
-            child: InputDecorator(
-              decoration: const InputDecoration(),
-              child: InkWell(
-                child: Text(
-                  controller.date == null
-                      ? "미선택"
-                      : DateFormat("yy/MM/dd").format(controller.date!),
-                  style: TextStyle(color: Colors.white, fontSize: 20.r),
-                ),
-                onTap: () async {
-                  newDate = await showDatePicker(
-                    context: context,
-                    initialDate: controller.date ?? initialDate,
-                    firstDate: DateTime(initialDate.year - 3),
-                    lastDate: DateTime(initialDate.year + 1),
-                    builder: (context, child) {
-                      return Theme(
-                        data: ThemeData.dark().copyWith(
-                          textTheme: TextTheme(
-                            headline5: TextStyle(fontSize: 24.r),
-                            subtitle2: TextStyle(fontSize: 16.r),
-                            caption: TextStyle(fontSize: 16.r),
-                          ),
-                        ),
-                        child: child!,
-                      );
-                    },
-                  );
-
-                  if (newDate != null) {
-                    controller.updateDate(newDate);
-                  }
-                },
-              ),
-            ),
-          ),
-        ],
-      );
-    },
-  );
-}
-
-Widget pickTime(
-  BuildContext context,
-  String item, [
-  String? tag,
-  bool isMandatory = false,
-]) {
-  Get.find<DateTimeController>(tag: tag);
-
-  final TimeOfDay initialTime = TimeOfDay.now();
-  TimeOfDay? newTime;
-
-  return GetBuilder<DateTimeController>(
-    tag: tag,
-    builder: (controller) {
-      return Row(
-        children: [
-          Container(
-            width: 110.r,
-            child: label(item, isMandatory),
-          ),
-          Container(
-            width: 220.r,
-            child: InputDecorator(
-              decoration: const InputDecoration(),
-              child: InkWell(
-                child: Text(
-                  controller.time == null
-                      ? "미선택"
-                      : timeToString(Duration(
-                          hours: controller.time!.hour,
-                          minutes: controller.time!.minute,
-                        )),
-                  style: TextStyle(color: Colors.white, fontSize: 20.r),
-                ),
-                onTap: () async {
-                  newTime = await showTimePicker(
-                    context: context,
-                    initialTime: controller.time ?? initialTime,
-                  );
-
-                  if (newTime != null) {
-                    controller.updateTime(newTime);
-                  }
-                },
-              ),
-            ),
-          ),
-        ],
+          ],
+        ),
       );
     },
   );

@@ -17,13 +17,13 @@ DateTime parseDateTime(String dateTime) {
       _dateTime.hour, _dateTime.minute);
 }
 
-String twoDigits(int n) => n < 10 ? "0$n" : "$n";
+String _twoDigits(int n) => n < 10 ? "0$n" : "$n";
 
 String timeToString(Duration time) {
   String twoDigitMinutes =
-      twoDigits(time.inMinutes.remainder(Duration.minutesPerHour));
+      _twoDigits(time.inMinutes.remainder(Duration.minutesPerHour));
 
-  return "${twoDigits(time.inHours)}:$twoDigitMinutes";
+  return "${_twoDigits(time.inHours)}:$twoDigitMinutes";
 }
 
 String dowToString(int dow) {

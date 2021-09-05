@@ -3,9 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:solviolin_admin/model/regular_schedule.dart';
+import 'package:solviolin_admin/util/constant.dart';
 import 'package:solviolin_admin/util/controller.dart';
 import 'package:solviolin_admin/util/data_source.dart';
 import 'package:solviolin_admin/util/network.dart';
+import 'package:solviolin_admin/widget/dropdown.dart';
+import 'package:solviolin_admin/widget/picker.dart';
 import 'package:solviolin_admin/widget/single_reusable.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
 
@@ -35,6 +38,7 @@ class _TimeSlotState extends State<TimeSlot> {
 
   TextEditingController teacherFree = TextEditingController();
   BranchController branchFree = Get.put(BranchController(), tag: "Free");
+  DateTimeController endFree = Get.put(DateTimeController(), tag: "Free");
   TextEditingController userFree = TextEditingController();
 
   SearchController search = Get.find<SearchController>(tag: "Main");
@@ -65,7 +69,7 @@ class _TimeSlotState extends State<TimeSlot> {
           controller: calendarController,
           onTap: (details) async {
             if (!search.isSearched && !hasBeenShown) {
-              await showError(context, "필터를 사용하여 예약을 검색할 수 있습니다");
+              await showError("필터를 사용하여 예약을 검색할 수 있습니다");
               hasBeenShown = true;
             }
 
@@ -99,7 +103,7 @@ class _TimeSlotState extends State<TimeSlot> {
                   );
                 }
               } catch (e) {
-                showError(context, e.toString());
+                showError(e.toString());
               }
             }
           },
@@ -184,176 +188,94 @@ class _TimeSlotState extends State<TimeSlot> {
   }
 
   Future _showCancelByUser(CalendarTapDetails details) {
-    return showDialog(
+    return showMyDialog(
       context: context,
-      barrierColor: Colors.black26,
-      builder: (context) {
-        return AlertDialog(
-          title: Text(
-            "취소 (수강생)",
-            style: TextStyle(color: Colors.white, fontSize: 28.r),
-          ),
-          content: Text(
-            "수강생의 권한으로 취소하시겠습니까?",
-            style: TextStyle(color: Colors.white, fontSize: 20.r),
-          ),
-          actions: [
-            OutlinedButton(
-              onPressed: () {
-                Get.back();
-              },
-              style: OutlinedButton.styleFrom(
-                padding: EdgeInsets.fromLTRB(16.r, 12.r, 16.r, 12.r),
-              ),
-              child: Text(
-                "취소",
-                style: TextStyle(color: Colors.white, fontSize: 20.r),
-              ),
-            ),
-            ElevatedButton(
-              onPressed: () async {
-                try {
-                  await client.cancelReservation(details.appointments![0].id);
+      title: "취소 (수강생)",
+      contents: [
+        Text(
+          "수강생의 권한으로 취소하시겠습니까?",
+          style: TextStyle(color: Colors.white, fontSize: 20.r),
+        ),
+      ],
+      onPressed: () async {
+        try {
+          await client.cancelReservation(details.appointments![0].id);
 
-                  if (search.isSearched) {
-                    await getReservationData(
-                      displayDate: _controller.displayDate,
-                      branchName: search.text1!,
-                      userID: search.text2,
-                      teacherID: search.text3,
-                    );
-                  }
+          if (search.isSearched) {
+            await getReservationData(
+              displayDate: _controller.displayDate,
+              branchName: search.text1!,
+              userID: search.text2,
+              teacherID: search.text3,
+            );
+          }
 
-                  Get.back();
-                } catch (e) {
-                  showError(context, e.toString());
-                }
-              },
-              style: ElevatedButton.styleFrom(
-                primary: symbolColor,
-                padding: EdgeInsets.fromLTRB(16.r, 12.r, 16.r, 12.r),
-              ),
-              child: Text("확인", style: TextStyle(fontSize: 20.r)),
-            ),
-          ],
-        );
+          Get.back();
+        } catch (e) {
+          showError(e.toString());
+        }
       },
     );
   }
 
   Future _showCancelByAdmin(CalendarTapDetails details) {
-    return showDialog(
+    return showMyDialog(
       context: context,
-      barrierColor: Colors.black26,
-      builder: (context) {
-        return AlertDialog(
-          title: Text(
-            "취소 (관리자)",
-            style: TextStyle(color: Colors.white, fontSize: 28.r),
-          ),
-          content: Text(
-            "관리자의 권한으로 취소하시겠습니까?",
-            style: TextStyle(color: Colors.white, fontSize: 20.r),
-          ),
-          actions: [
-            OutlinedButton(
-              onPressed: () {
-                Get.back();
-              },
-              style: OutlinedButton.styleFrom(
-                padding: EdgeInsets.fromLTRB(16.r, 12.r, 16.r, 12.r),
-              ),
-              child: Text(
-                "취소",
-                style: TextStyle(color: Colors.white, fontSize: 20.r),
-              ),
-            ),
-            ElevatedButton(
-              onPressed: () async {
-                try {
-                  await client
-                      .cancelReservationByAdmin(details.appointments![0].id);
+      title: "취소 (관리자)",
+      contents: [
+        Text(
+          "관리자의 권한으로 취소하시겠습니까?",
+          style: TextStyle(color: Colors.white, fontSize: 20.r),
+        ),
+      ],
+      onPressed: () async {
+        try {
+          await client.cancelReservationByAdmin(details.appointments![0].id);
 
-                  if (search.isSearched) {
-                    await getReservationData(
-                      displayDate: _controller.displayDate,
-                      branchName: search.text1!,
-                      userID: search.text2,
-                      teacherID: search.text3,
-                    );
-                  }
+          if (search.isSearched) {
+            await getReservationData(
+              displayDate: _controller.displayDate,
+              branchName: search.text1!,
+              userID: search.text2,
+              teacherID: search.text3,
+            );
+          }
 
-                  Get.back();
-                } catch (e) {
-                  showError(context, e.toString());
-                }
-              },
-              style: ElevatedButton.styleFrom(
-                primary: symbolColor,
-                padding: EdgeInsets.fromLTRB(16.r, 12.r, 16.r, 12.r),
-              ),
-              child: Text("확인", style: TextStyle(fontSize: 20.r)),
-            ),
-          ],
-        );
+          Get.back();
+        } catch (e) {
+          showError(e.toString());
+        }
       },
     );
   }
 
   Future _showExtendByUser(CalendarTapDetails details) {
-    return showDialog(
+    return showMyDialog(
       context: context,
-      barrierColor: Colors.black26,
-      builder: (context) {
-        return AlertDialog(
-          title: Text(
-            "연장 (수강생)",
-            style: TextStyle(color: Colors.white, fontSize: 28.r),
-          ),
-          content: Text(
-            "수강생의 권한으로 연장하시겠습니까?",
-            style: TextStyle(color: Colors.white, fontSize: 20.r),
-          ),
-          actions: [
-            OutlinedButton(
-              onPressed: () {
-                Get.back();
-              },
-              style: OutlinedButton.styleFrom(
-                padding: EdgeInsets.fromLTRB(16.r, 12.r, 16.r, 12.r),
-              ),
-              child: Text(
-                "취소",
-                style: TextStyle(color: Colors.white, fontSize: 20.r),
-              ),
-            ),
-            ElevatedButton(
-              onPressed: () async {
-                try {
-                  await client.extendReservation(details.appointments![0].id);
+      title: "연장 (수강생)",
+      contents: [
+        Text(
+          "수강생의 권한으로 연장하시겠습니까?",
+          style: TextStyle(color: Colors.white, fontSize: 20.r),
+        ),
+      ],
+      onPressed: () async {
+        try {
+          await client.extendReservation(details.appointments![0].id);
 
-                  if (search.isSearched) {
-                    await getReservationData(
-                      displayDate: _controller.displayDate,
-                      branchName: search.text1!,
-                      userID: search.text2,
-                      teacherID: search.text3,
-                    );
-                  }
+          if (search.isSearched) {
+            await getReservationData(
+              displayDate: _controller.displayDate,
+              branchName: search.text1!,
+              userID: search.text2,
+              teacherID: search.text3,
+            );
+          }
 
-                  Get.back();
-                } catch (e) {
-                  showError(context, e.toString());
-                }
-              },
-              style: ElevatedButton.styleFrom(
-                primary: symbolColor,
-                padding: EdgeInsets.fromLTRB(16.r, 12.r, 16.r, 12.r),
-              ),
-              child: Text("확인", style: TextStyle(fontSize: 20.r)),
-            ),
-          ],
-        );
+          Get.back();
+        } catch (e) {
+          showError(e.toString());
+        }
       },
     );
   }
@@ -384,12 +306,12 @@ class _TimeSlotState extends State<TimeSlot> {
                     child: Row(
                       children: [
                         Container(
-                          width: 240,
+                          width: 240.r,
                           child: Text(
                             "카운트 포함",
                             style: TextStyle(
                               color: Colors.white,
-                              fontSize: 20,
+                              fontSize: 20.r,
                             ),
                           ),
                         ),
@@ -438,7 +360,7 @@ class _TimeSlotState extends State<TimeSlot> {
 
                       Get.back();
                     } catch (e) {
-                      showError(context, e.toString());
+                      showError(e.toString());
                     }
                   },
                   style: ElevatedButton.styleFrom(
@@ -456,64 +378,37 @@ class _TimeSlotState extends State<TimeSlot> {
   }
 
   Future _showDeleteLaterCourse(CalendarTapDetails details) {
-    return showDialog(
+    return showMyDialog(
       context: context,
-      barrierColor: Colors.black26,
-      builder: (context) {
-        return AlertDialog(
-          title: Text(
-            "정규 종료",
-            style: TextStyle(color: Colors.white, fontSize: 28.r),
-          ),
-          content: Text(
-            "종료일: " +
-                DateFormat("yy/MM/dd HH:mm")
-                    .format(details.appointments![0].endDate),
-            style: TextStyle(color: Colors.white, fontSize: 20.r),
-          ),
-          actions: [
-            OutlinedButton(
-              onPressed: () {
-                Get.back();
-              },
-              style: OutlinedButton.styleFrom(
-                padding: EdgeInsets.fromLTRB(16.r, 12.r, 16.r, 12.r),
-              ),
-              child: Text(
-                "취소",
-                style: TextStyle(color: Colors.white, fontSize: 20.r),
-              ),
-            ),
-            ElevatedButton(
-              onPressed: () async {
-                try {
-                  await client.updateEndDateAndDeleteLaterCourse(
-                    details.appointments![0].regularID,
-                    endDate: details.appointments![0].endDate,
-                  );
+      title: "정규 종료",
+      contents: [
+        Text(
+          "종료일: " +
+              DateFormat("yy/MM/dd HH:mm")
+                  .format(details.appointments![0].endDate),
+          style: TextStyle(color: Colors.white, fontSize: 20.r),
+        ),
+      ],
+      onPressed: () async {
+        try {
+          await client.updateEndDateAndDeleteLaterCourse(
+            details.appointments![0].regularID,
+            endDate: details.appointments![0].endDate,
+          );
 
-                  if (search.isSearched) {
-                    await getReservationData(
-                      displayDate: _controller.displayDate,
-                      branchName: search.text1!,
-                      userID: search.text2,
-                      teacherID: search.text3,
-                    );
-                  }
+          if (search.isSearched) {
+            await getReservationData(
+              displayDate: _controller.displayDate,
+              branchName: search.text1!,
+              userID: search.text2,
+              teacherID: search.text3,
+            );
+          }
 
-                  Get.back();
-                } catch (e) {
-                  showError(context, e.toString());
-                }
-              },
-              style: ElevatedButton.styleFrom(
-                primary: symbolColor,
-                padding: EdgeInsets.fromLTRB(16.r, 12.r, 16.r, 12.r),
-              ),
-              child: Text("확인", style: TextStyle(fontSize: 20.r)),
-            ),
-          ],
-        );
+          Get.back();
+        } catch (e) {
+          showError(e.toString());
+        }
       },
     );
   }
@@ -525,34 +420,24 @@ class _TimeSlotState extends State<TimeSlot> {
         return CupertinoActionSheet(
           actions: [
             CupertinoActionSheetAction(
-              onPressed: () {
-                _showReserveRegular(details);
-              },
+              onPressed: () => _showReserveRegular(details),
               child: Text("정규 등록", style: TextStyle(fontSize: 24.r)),
             ),
             CupertinoActionSheetAction(
-              onPressed: () {
-                _showMakeUpByUser(details);
-              },
+              onPressed: () => _showMakeUpByUser(details),
               child: Text("보강 예약 (수강생)", style: TextStyle(fontSize: 24.r)),
             ),
             CupertinoActionSheetAction(
-              onPressed: () {
-                _showMakeUpByAdmin(details);
-              },
+              onPressed: () => _showMakeUpByAdmin(details),
               child: Text("보강 예약 (관리자)", style: TextStyle(fontSize: 24.r)),
             ),
             CupertinoActionSheetAction(
-              onPressed: () {
-                _showFreeCourse(details);
-              },
+              onPressed: () => _showFreeCourse(details),
               child: Text("무료 보강 등록", style: TextStyle(fontSize: 24.r)),
             ),
           ],
           cancelButton: CupertinoActionSheetAction(
-            onPressed: () {
-              Get.back();
-            },
+            onPressed: Get.back,
             isDefaultAction: true,
             child: Text("닫기", style: TextStyle(fontSize: 24.r)),
           ),
@@ -562,353 +447,184 @@ class _TimeSlotState extends State<TimeSlot> {
   }
 
   Future _showReserveRegular(CalendarTapDetails details) {
-    return showDialog(
+    return showMyDialog(
       context: context,
-      barrierColor: Colors.black26,
-      builder: (context) {
-        return SingleChildScrollView(
-          child: AlertDialog(
-            title: Text(
-              "정규 등록",
-              style: TextStyle(color: Colors.white, fontSize: 28.r),
-            ),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  DateFormat("yy/MM/dd HH:mm").format(details.date!) + " ~ ",
-                  style: TextStyle(color: Colors.white, fontSize: 20.r),
-                ),
-                Padding(
-                  padding: EdgeInsets.fromLTRB(12.r, 6.r, 12.r, 0),
-                  child: input("강사", teacherRegular, "강사명을 입력하세요!"),
-                ),
-                Padding(
-                  padding: EdgeInsets.fromLTRB(12.r, 6.r, 12.r, 0),
-                  child: branchDropdown("Regular", "지점을 선택하세요!"),
-                ),
-                Padding(
-                  padding: EdgeInsets.fromLTRB(12.r, 6.r, 12.r, 0),
-                  child: pickTime(context, "종료시각", "Regular", true),
-                ),
-                Padding(
-                  padding: EdgeInsets.fromLTRB(12.r, 6.r, 12.r, 0),
-                  child: input("수강생", userRegular, "이름을 입력하세요!"),
-                ),
-              ],
-            ),
-            actions: [
-              OutlinedButton(
-                onPressed: () {
-                  Get.back();
-                },
-                style: OutlinedButton.styleFrom(
-                  padding: EdgeInsets.fromLTRB(16.r, 12.r, 16.r, 12.r),
-                ),
-                child: Text(
-                  "취소",
-                  style: TextStyle(color: Colors.white, fontSize: 20.r),
-                ),
-              ),
-              ElevatedButton(
-                onPressed: () async {
-                  try {
-                    await client.reserveRegularReservation(
-                      teacherID: teacherRegular.text,
-                      branchName: branchRegular.branchName!,
-                      startDate: details.date!,
-                      endDate: DateUtils.dateOnly(details.date!).add(Duration(
-                        hours: endRegular.time!.hour,
-                        minutes: endRegular.time!.minute,
-                      )),
-                      userID: userRegular.text,
-                    );
+      title: "정규 등록",
+      contents: [
+        Text(
+          DateFormat("yy/MM/dd HH:mm").format(details.date!) + " ~ ",
+          style: TextStyle(color: Colors.white, fontSize: 20.r),
+        ),
+        textInput("강사", teacherRegular, "강사명을 입력하세요!"),
+        branchDropdown("Regular", "지점을 선택하세요!"),
+        pickTime(context, "종료시각", "Regular", true),
+        textInput("수강생", userRegular, "이름을 입력하세요!"),
+      ],
+      onPressed: () async {
+        try {
+          await client.reserveRegularReservation(
+            teacherID: teacherRegular.text,
+            branchName: branchRegular.branchName!,
+            startDate: details.date!,
+            endDate: DateUtils.dateOnly(details.date!).add(Duration(
+              hours: endRegular.time!.hour,
+              minutes: endRegular.time!.minute,
+            )),
+            userID: userRegular.text,
+          );
 
-                    if (search.isSearched) {
-                      await getReservationData(
-                        displayDate: _controller.displayDate,
-                        branchName: search.text1!,
-                        userID: search.text2,
-                        teacherID: search.text3,
-                      );
-                    }
+          if (search.isSearched) {
+            await getReservationData(
+              displayDate: _controller.displayDate,
+              branchName: search.text1!,
+              userID: search.text2,
+              teacherID: search.text3,
+            );
+          }
 
-                    Get.back();
-                  } catch (e) {
-                    showError(context, e.toString());
-                  }
-                },
-                style: ElevatedButton.styleFrom(
-                  primary: symbolColor,
-                  padding: EdgeInsets.fromLTRB(16.r, 12.r, 16.r, 12.r),
-                ),
-                child: Text("등록", style: TextStyle(fontSize: 20.r)),
-              ),
-            ],
-          ),
-        );
+          Get.back();
+        } catch (e) {
+          showError(e.toString());
+        }
       },
+      action: "등록",
+      isScrolling: true,
     );
   }
 
   Future _showMakeUpByUser(CalendarTapDetails details) {
-    return showDialog(
+    return showMyDialog(
       context: context,
-      barrierColor: Colors.black26,
-      builder: (context) {
-        return SingleChildScrollView(
-          child: AlertDialog(
-            title: Text(
-              "보강 예약 (수강생)",
-              style: TextStyle(color: Colors.white, fontSize: 28.r),
-            ),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  DateFormat("yy/MM/dd HH:mm").format(details.date!) + " ~ ",
-                  style: TextStyle(color: Colors.white, fontSize: 20.r),
-                ),
-                Padding(
-                  padding: EdgeInsets.fromLTRB(12.r, 6.r, 12.r, 0),
-                  child: input("강사", teacherUser, "강사명을 입력하세요!"),
-                ),
-                Padding(
-                  padding: EdgeInsets.fromLTRB(12.r, 6.r, 12.r, 0),
-                  child: branchDropdown("User", "지점을 선택하세요!"),
-                ),
-                Padding(
-                  padding: EdgeInsets.fromLTRB(12.r, 6.r, 12.r, 0),
-                  child: input("수강생", userUser, "이름을 입력하세요!"),
-                ),
-              ],
-            ),
-            actions: [
-              OutlinedButton(
-                onPressed: () {
-                  Get.back();
-                },
-                style: OutlinedButton.styleFrom(
-                  padding: EdgeInsets.fromLTRB(16.r, 12.r, 16.r, 12.r),
-                ),
-                child: Text(
-                  "취소",
-                  style: TextStyle(color: Colors.white, fontSize: 20.r),
-                ),
-              ),
-              ElevatedButton(
-                onPressed: () async {
-                  try {
-                    RegularSchedule regular = (await client
-                        .getRegularSchedulesByAdmin(userUser.text))[0];
+      title: "보강 예약 (수강생)",
+      contents: [
+        Text(
+          DateFormat("yy/MM/dd HH:mm").format(details.date!) + " ~ ",
+          style: TextStyle(color: Colors.white, fontSize: 20.r),
+        ),
+        textInput("강사", teacherUser, "강사명을 입력하세요!"),
+        branchDropdown("User", "지점을 선택하세요!"),
+        textInput("수강생", userUser, "이름을 입력하세요!"),
+      ],
+      onPressed: () async {
+        try {
+          RegularSchedule regular =
+              (await client.getRegularSchedulesByAdmin(userUser.text))[0];
 
-                    await client.makeUpReservation(
-                      teacherID: teacherUser.text,
-                      branchName: branchUser.branchName!,
-                      startDate: details.date!,
-                      endDate: details.date!
-                          .add(regular.endTime - regular.startTime),
-                      userID: userUser.text,
-                    );
+          await client.makeUpReservation(
+            teacherID: teacherUser.text,
+            branchName: branchUser.branchName!,
+            startDate: details.date!,
+            endDate: details.date!.add(regular.endTime - regular.startTime),
+            userID: userUser.text,
+          );
 
-                    if (search.isSearched) {
-                      await getReservationData(
-                        displayDate: _controller.displayDate,
-                        branchName: search.text1!,
-                        userID: search.text2,
-                        teacherID: search.text3,
-                      );
-                    }
+          if (search.isSearched) {
+            await getReservationData(
+              displayDate: _controller.displayDate,
+              branchName: search.text1!,
+              userID: search.text2,
+              teacherID: search.text3,
+            );
+          }
 
-                    Get.back();
-                  } catch (e) {
-                    showError(context, e.toString());
-                  }
-                },
-                style: ElevatedButton.styleFrom(
-                  primary: symbolColor,
-                  padding: EdgeInsets.fromLTRB(16.r, 12.r, 16.r, 12.r),
-                ),
-                child: Text("등록", style: TextStyle(fontSize: 20.r)),
-              ),
-            ],
-          ),
-        );
+          Get.back();
+        } catch (e) {
+          showError(e.toString());
+        }
       },
+      action: "등록",
+      isScrolling: true,
     );
   }
 
   Future _showMakeUpByAdmin(CalendarTapDetails details) {
-    return showDialog(
+    return showMyDialog(
       context: context,
-      barrierColor: Colors.black26,
-      builder: (context) {
-        return SingleChildScrollView(
-          child: AlertDialog(
-            title: Text(
-              "보강 예약 (관리자)",
-              style: TextStyle(color: Colors.white, fontSize: 28.r),
-            ),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  DateFormat("yy/MM/dd HH:mm").format(details.date!) + " ~ ",
-                  style: TextStyle(color: Colors.white, fontSize: 20.r),
-                ),
-                Padding(
-                  padding: EdgeInsets.fromLTRB(12.r, 6.r, 12.r, 0),
-                  child: input("강사", teacherAdmin, "강사명을 입력하세요!"),
-                ),
-                Padding(
-                  padding: EdgeInsets.fromLTRB(12.r, 6.r, 12.r, 0),
-                  child: branchDropdown("Admin", "지점을 선택하세요!"),
-                ),
-                Padding(
-                  padding: EdgeInsets.fromLTRB(12.r, 6.r, 12.r, 0),
-                  child: input("수강생", userAdmin, "이름을 입력하세요!"),
-                ),
-              ],
-            ),
-            actions: [
-              OutlinedButton(
-                onPressed: () {
-                  Get.back();
-                },
-                style: OutlinedButton.styleFrom(
-                  padding: EdgeInsets.fromLTRB(16.r, 12.r, 16.r, 12.r),
-                ),
-                child: Text(
-                  "취소",
-                  style: TextStyle(color: Colors.white, fontSize: 20.r),
-                ),
-              ),
-              ElevatedButton(
-                onPressed: () async {
-                  try {
-                    RegularSchedule regular = (await client
-                        .getRegularSchedulesByAdmin(userAdmin.text))[0];
+      title: "보강 예약 (관리자)",
+      contents: [
+        Text(
+          DateFormat("yy/MM/dd HH:mm").format(details.date!) + " ~ ",
+          style: TextStyle(color: Colors.white, fontSize: 20.r),
+        ),
+        textInput("강사", teacherAdmin, "강사명을 입력하세요!"),
+        branchDropdown("Admin", "지점을 선택하세요!"),
+        textInput("수강생", userAdmin, "이름을 입력하세요!"),
+      ],
+      onPressed: () async {
+        try {
+          RegularSchedule regular =
+              (await client.getRegularSchedulesByAdmin(userAdmin.text))[0];
 
-                    await client.makeUpReservationByAdmin(
-                      teacherID: teacherAdmin.text,
-                      branchName: branchAdmin.branchName!,
-                      startDate: details.date!,
-                      endDate: details.date!
-                          .add(regular.endTime - regular.startTime),
-                      userID: userAdmin.text,
-                    );
+          await client.makeUpReservationByAdmin(
+            teacherID: teacherAdmin.text,
+            branchName: branchAdmin.branchName!,
+            startDate: details.date!,
+            endDate: details.date!.add(regular.endTime - regular.startTime),
+            userID: userAdmin.text,
+          );
 
-                    if (search.isSearched) {
-                      await getReservationData(
-                        displayDate: _controller.displayDate,
-                        branchName: search.text1!,
-                        userID: search.text2,
-                        teacherID: search.text3,
-                      );
-                    }
+          if (search.isSearched) {
+            await getReservationData(
+              displayDate: _controller.displayDate,
+              branchName: search.text1!,
+              userID: search.text2,
+              teacherID: search.text3,
+            );
+          }
 
-                    Get.back();
-                  } catch (e) {
-                    showError(context, e.toString());
-                  }
-                },
-                style: ElevatedButton.styleFrom(
-                  primary: symbolColor,
-                  padding: EdgeInsets.fromLTRB(16.r, 12.r, 16.r, 12.r),
-                ),
-                child: Text("등록", style: TextStyle(fontSize: 20.r)),
-              ),
-            ],
-          ),
-        );
+          Get.back();
+        } catch (e) {
+          showError(e.toString());
+        }
       },
+      action: "등록",
+      isScrolling: true,
     );
   }
 
   Future _showFreeCourse(CalendarTapDetails details) {
-    return showDialog(
+    return showMyDialog(
       context: context,
-      barrierColor: Colors.black26,
-      builder: (context) {
-        return SingleChildScrollView(
-          child: AlertDialog(
-            title: Text(
-              "무료 보강 등록",
-              style: TextStyle(color: Colors.white, fontSize: 28.r),
-            ),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  DateFormat("yy/MM/dd HH:mm").format(details.date!) + " ~ ",
-                  style: TextStyle(color: Colors.white, fontSize: 20.r),
-                ),
-                Padding(
-                  padding: EdgeInsets.fromLTRB(12.r, 6.r, 12.r, 0),
-                  child: input("강사", teacherFree, "강사명을 입력하세요!"),
-                ),
-                Padding(
-                  padding: EdgeInsets.fromLTRB(12.r, 6.r, 12.r, 0),
-                  child: branchDropdown("Free", "지점을 선택하세요!"),
-                ),
-                Padding(
-                  padding: EdgeInsets.fromLTRB(12.r, 6.r, 12.r, 0),
-                  child: input("수강생", userFree, "이름을 입력하세요!"),
-                ),
-              ],
-            ),
-            actions: [
-              OutlinedButton(
-                onPressed: () {
-                  Get.back();
-                },
-                style: OutlinedButton.styleFrom(
-                  padding: EdgeInsets.fromLTRB(16.r, 12.r, 16.r, 12.r),
-                ),
-                child: Text(
-                  "취소",
-                  style: TextStyle(color: Colors.white, fontSize: 20.r),
-                ),
-              ),
-              ElevatedButton(
-                onPressed: () async {
-                  try {
-                    RegularSchedule regular = (await client
-                        .getRegularSchedulesByAdmin(userFree.text))[0];
+      title: "무료 보강 등록",
+      contents: [
+        Text(
+          DateFormat("yy/MM/dd HH:mm").format(details.date!) + " ~ ",
+          style: TextStyle(color: Colors.white, fontSize: 20.r),
+        ),
+        textInput("강사", teacherFree, "강사명을 입력하세요!"),
+        branchDropdown("Free", "지점을 선택하세요!"),
+        pickTime(context, "종료시각", "Free", true),
+        textInput("수강생", userFree, "이름을 입력하세요!"),
+      ],
+      onPressed: () async {
+        try {
+          await client.reserveFreeCourse(
+            teacherID: teacherFree.text,
+            branchName: branchFree.branchName!,
+            startDate: details.date!,
+            endDate: DateUtils.dateOnly(details.date!).add(Duration(
+              hours: endFree.time!.hour,
+              minutes: endFree.time!.minute,
+            )),
+            userID: userFree.text,
+          );
 
-                    await client.reserveFreeCourse(
-                      teacherID: teacherFree.text,
-                      branchName: branchFree.branchName!,
-                      startDate: details.date!,
-                      endDate: details.date!
-                          .add(regular.endTime - regular.startTime),
-                      userID: userFree.text,
-                    );
+          if (search.isSearched) {
+            await getReservationData(
+              displayDate: _controller.displayDate,
+              branchName: search.text1!,
+              userID: search.text2,
+              teacherID: search.text3,
+            );
+          }
 
-                    if (search.isSearched) {
-                      await getReservationData(
-                        displayDate: _controller.displayDate,
-                        branchName: search.text1!,
-                        userID: search.text2,
-                        teacherID: search.text3,
-                      );
-                    }
-
-                    Get.back();
-                  } catch (e) {
-                    showError(context, e.toString());
-                  }
-                },
-                style: ElevatedButton.styleFrom(
-                  primary: symbolColor,
-                  padding: EdgeInsets.fromLTRB(16.r, 12.r, 16.r, 12.r),
-                ),
-                child: Text("등록", style: TextStyle(fontSize: 20.r)),
-              ),
-            ],
-          ),
-        );
+          Get.back();
+        } catch (e) {
+          showError(e.toString());
+        }
       },
+      action: "등록",
+      isScrolling: true,
     );
   }
 }

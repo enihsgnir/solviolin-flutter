@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:solviolin_admin/model/change.dart';
+import 'package:solviolin_admin/util/constant.dart';
 import 'package:solviolin_admin/util/controller.dart';
-import 'package:solviolin_admin/util/data_source.dart';
 
 class ChangedReservation extends StatefulWidget {
   const ChangedReservation({Key? key}) : super(key: key);
@@ -27,10 +27,7 @@ class _ChangedReservationState extends State<ChangedReservation> {
             return Container(
               width: double.infinity,
               padding: EdgeInsets.symmetric(vertical: 8.r),
-              decoration: BoxDecoration(
-                border: Border.all(color: Colors.grey),
-                borderRadius: BorderRadius.circular(15.r),
-              ),
+              decoration: myDecoration,
               margin: EdgeInsets.fromLTRB(8.r, 4.r, 8.r, 4.r),
               child: DefaultTextStyle(
                 style: TextStyle(color: Colors.white, fontSize: 24.r),

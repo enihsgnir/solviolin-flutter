@@ -4,6 +4,7 @@ import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:solviolin_admin/model/reservation.dart';
+import 'package:solviolin_admin/util/constant.dart';
 import 'package:solviolin_admin/util/controller.dart';
 import 'package:solviolin_admin/util/data_source.dart';
 import 'package:solviolin_admin/util/network.dart';
@@ -37,87 +38,32 @@ class _HistoryReservedState extends State<HistoryReserved> {
         return Slidable(
           actionPane: SlidableScrollActionPane(),
           secondaryActions: [
-            SlideAction(
-              child: Row(
-                children: [
-                  Expanded(
-                    child: InkWell(
-                      child: Container(
-                        width: double.infinity,
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(CupertinoIcons.delete_left, size: 48.r),
-                            Text(
-                              "취소",
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 20.r,
-                              ),
-                            )
-                          ],
-                        ),
-                      ),
-                      onTap: () async {
-                        reservation.bookingStatus.abs() == 2
-                            ? showError(context, "이미 취소된 수업입니다.")
-                            : await showModalCancel(context, reservation);
-                      },
-                    ),
-                  ),
-                  Container(
-                    margin: EdgeInsets.symmetric(vertical: 8.r),
-                    color: Colors.white,
-                    width: 0.25.r,
-                  ),
-                ],
-              ),
+            mySlideAction(
+              icon: CupertinoIcons.delete_left,
+              item: "취소",
+              onTap: () async {
+                reservation.bookingStatus.abs() == 2
+                    ? showError("이미 취소된 수업입니다.")
+                    : await showModalCancel(context, reservation);
+              },
+              borderRight: true,
             ),
-            SlideAction(
-              child: Row(
-                children: [
-                  Container(
-                    margin: EdgeInsets.symmetric(vertical: 8.r),
-                    color: Colors.white,
-                    width: 0.25.r,
-                  ),
-                  Expanded(
-                    child: InkWell(
-                      child: Container(
-                        width: double.infinity,
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(Icons.more_time, size: 48.r),
-                            Text(
-                              "연장",
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 20.r,
-                              ),
-                            )
-                          ],
-                        ),
-                      ),
-                      onTap: () async {
-                        reservation.bookingStatus.abs() == 3
-                            ? showError(context, "이미 연장된 수업입니다.")
-                            : await showModalExtend(context, reservation);
-                      },
-                    ),
-                  ),
-                ],
-              ),
+            mySlideAction(
+              icon: Icons.more_time,
+              item: "연장",
+              onTap: () async {
+                reservation.bookingStatus.abs() == 3
+                    ? showError("이미 연장된 수업입니다.")
+                    : await showModalExtend(context, reservation);
+              },
+              borderLeft: true,
             ),
           ],
           actionExtentRatio: 1 / 5,
           child: Container(
             width: double.infinity,
             padding: EdgeInsets.symmetric(vertical: 8.r),
-            decoration: BoxDecoration(
-              border: Border.all(color: Colors.grey),
-              borderRadius: BorderRadius.circular(15.r),
-            ),
+            decoration: myDecoration,
             margin: EdgeInsets.fromLTRB(8.r, 4.r, 8.r, 4.r),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -188,7 +134,7 @@ class _HistoryReservedState extends State<HistoryReserved> {
                   await getUserDetailData(detail.user!);
                 } catch (e) {
                   Get.back();
-                  showError(context, e.toString());
+                  showError(e.toString());
                 }
               },
               isDestructiveAction: true,
@@ -235,7 +181,7 @@ class _HistoryReservedState extends State<HistoryReserved> {
                   await getUserDetailData(detail.user!);
                 } catch (e) {
                   Get.back();
-                  showError(context, e.toString());
+                  showError(e.toString());
                 }
               },
               child: Text("수업 연장", style: TextStyle(fontSize: 24.r)),
