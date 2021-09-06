@@ -4,7 +4,8 @@ import 'package:get/get.dart';
 import 'package:solviolin_admin/util/constant.dart';
 import 'package:solviolin_admin/util/controller.dart';
 import 'package:solviolin_admin/util/network.dart';
-import 'package:solviolin_admin/widget/single_reusable.dart';
+import 'package:solviolin_admin/widget/dialog.dart';
+import 'package:solviolin_admin/widget/input.dart';
 
 class MenuPage extends StatefulWidget {
   const MenuPage({Key? key}) : super(key: key);
@@ -81,7 +82,7 @@ class _MenuPageState extends State<MenuPage> {
       context: context,
       title: "지점 등록",
       contents: [
-        textInput("지점명", branch, "지점명을 입력하세요!"),
+        myTextInput("지점명", branch, "지점명을 입력하세요!"),
       ],
       onPressed: () async {
         try {

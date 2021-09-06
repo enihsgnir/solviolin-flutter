@@ -4,8 +4,10 @@ import 'package:solviolin_admin/util/constant.dart';
 import 'package:solviolin_admin/util/controller.dart';
 import 'package:solviolin_admin/util/data_source.dart';
 import 'package:solviolin_admin/util/network.dart';
+import 'package:solviolin_admin/widget/dialog.dart';
 import 'package:solviolin_admin/widget/dropdown.dart';
-import 'package:solviolin_admin/widget/single_reusable.dart';
+import 'package:solviolin_admin/widget/input.dart';
+import 'package:solviolin_admin/widget/search.dart';
 
 class LedgerSearch extends StatefulWidget {
   const LedgerSearch({Key? key}) : super(key: key);
@@ -35,7 +37,7 @@ class _LedgerSearchState extends State<LedgerSearch> {
         branchDropdown(null, "지점을 선택하세요!"),
         Row(
           children: [
-            textInput("수강생", user, "이름을 입력하세요!"),
+            myTextInput("수강생", user, "이름을 입력하세요!"),
             myActionButton(
               onPressed: () async {
                 try {

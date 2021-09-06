@@ -6,7 +6,7 @@ import 'package:solviolin_admin/util/constant.dart';
 import 'package:solviolin_admin/util/controller.dart';
 import 'package:solviolin_admin/util/data_source.dart';
 import 'package:solviolin_admin/util/network.dart';
-import 'package:solviolin_admin/widget/single_reusable.dart';
+import 'package:solviolin_admin/widget/dialog.dart';
 
 class LoadingPage extends StatefulWidget {
   const LoadingPage({Key? key}) : super(key: key);

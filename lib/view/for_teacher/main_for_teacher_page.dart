@@ -6,7 +6,8 @@ import 'package:solviolin_admin/util/constant.dart';
 import 'package:solviolin_admin/util/controller.dart';
 import 'package:solviolin_admin/util/data_source.dart';
 import 'package:solviolin_admin/view/for_teacher/time_slot_for_teacher.dart';
-import 'package:solviolin_admin/widget/single_reusable.dart';
+import 'package:solviolin_admin/widget/dialog.dart';
+import 'package:solviolin_admin/widget/single.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
 
 class MainForTeacherPage extends StatefulWidget {

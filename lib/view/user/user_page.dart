@@ -7,8 +7,10 @@ import 'package:solviolin_admin/util/data_source.dart';
 import 'package:solviolin_admin/util/network.dart';
 import 'package:solviolin_admin/view/user/user_list.dart';
 import 'package:solviolin_admin/view/user/user_search.dart';
+import 'package:solviolin_admin/widget/dialog.dart';
 import 'package:solviolin_admin/widget/dropdown.dart';
-import 'package:solviolin_admin/widget/single_reusable.dart';
+import 'package:solviolin_admin/widget/input.dart';
+import 'package:solviolin_admin/widget/single.dart';
 
 class UserPage extends StatefulWidget {
   const UserPage({Key? key}) : super(key: key);
@@ -51,11 +53,7 @@ class _UserPageState extends State<UserPage> {
                 padding: EdgeInsets.all(8.r),
                 child: UserSearch(),
               ),
-              Container(
-                margin: EdgeInsets.fromLTRB(8.r, 4.r, 8.r, 4.r),
-                color: Colors.grey,
-                height: 0.5,
-              ),
+              myDivider(),
               Expanded(
                 child: UserList(),
               ),
@@ -75,10 +73,10 @@ class _UserPageState extends State<UserPage> {
       context: context,
       title: "유저 신규 등록",
       contents: [
-        textInput("아이디", id, "아이디를 입력하세요!"),
-        textInput("비밀번호", pw, "비밀번호를 입력하세요!"),
-        textInput("이름", name, "이름을 입력하세요!"),
-        textInput("전화번호", phone, "전화번호를 입력하세요!"),
+        myTextInput("아이디", id, "아이디를 입력하세요!"),
+        myTextInput("비밀번호", pw, "비밀번호를 입력하세요!"),
+        myTextInput("이름", name, "이름을 입력하세요!"),
+        myTextInput("전화번호", phone, "전화번호를 입력하세요!"),
         myRadio<UserType>(
           tag: "Register",
           item: "구분",

@@ -7,7 +7,8 @@ import 'package:solviolin_admin/util/constant.dart';
 import 'package:solviolin_admin/util/controller.dart';
 import 'package:solviolin_admin/util/data_source.dart';
 import 'package:solviolin_admin/util/network.dart';
-import 'package:solviolin_admin/widget/single_reusable.dart';
+import 'package:solviolin_admin/widget/dialog.dart';
+import 'package:solviolin_admin/widget/item_list.dart';
 
 class ControlList extends StatefulWidget {
   const ControlList({Key? key}) : super(key: key);
@@ -32,7 +33,7 @@ class _ControlListState extends State<ControlList> {
           itemBuilder: (context, index) {
             Control control = controller.controls[index];
 
-            return myCard(
+            return mySlidableCard(
               slideActions: [
                 mySlideAction(
                   icon: CupertinoIcons.delete,

@@ -5,7 +5,8 @@ import 'package:solviolin_admin/model/user.dart';
 import 'package:solviolin_admin/util/constant.dart';
 import 'package:solviolin_admin/util/controller.dart';
 import 'package:solviolin_admin/util/data_source.dart';
-import 'package:solviolin_admin/widget/single_reusable.dart';
+import 'package:solviolin_admin/widget/dialog.dart';
+import 'package:solviolin_admin/widget/item_list.dart';
 
 class UserList extends StatefulWidget {
   const UserList({Key? key}) : super(key: key);
@@ -29,7 +30,7 @@ class _UserListState extends State<UserList> {
             User user = controller.users[index];
 
             return InkWell(
-              child: myCard(
+              child: myNormalCard(
                 padding: EdgeInsets.symmetric(vertical: 8.r),
                 children: [
                   Text("${user.userID} / ${user.branchName}"),

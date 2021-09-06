@@ -4,7 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:solviolin_admin/util/constant.dart';
 import 'package:solviolin_admin/util/controller.dart';
 import 'package:solviolin_admin/util/format.dart';
-import 'package:solviolin_admin/widget/single_reusable.dart';
+import 'package:solviolin_admin/widget/input.dart';
 
 Widget pickDateTime(
   BuildContext context,
@@ -14,7 +14,7 @@ Widget pickDateTime(
 ]) {
   final DateTime initialDate = DateTime.now();
   DateTime? newDate;
-  final TimeOfDay initialTime = TimeOfDay.now();
+  final TimeOfDay initialTime = TimeOfDay.now(); //TODO: to Duration
   TimeOfDay? newTime;
 
   Get.find<DateTimeController>(tag: tag);

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:solviolin_admin/model/regular_schedule.dart';
 import 'package:solviolin_admin/util/constant.dart';
 import 'package:solviolin_admin/util/controller.dart';
 import 'package:solviolin_admin/util/data_source.dart';
@@ -8,9 +7,13 @@ import 'package:solviolin_admin/util/format.dart';
 import 'package:solviolin_admin/util/network.dart';
 import 'package:solviolin_admin/view/user_detail/changed_reservation.dart';
 import 'package:solviolin_admin/view/user_detail/history_reserved.dart';
+import 'package:solviolin_admin/widget/dialog.dart';
 import 'package:solviolin_admin/widget/dropdown.dart';
+import 'package:solviolin_admin/widget/input.dart';
+import 'package:solviolin_admin/widget/search.dart';
 import 'package:solviolin_admin/widget/picker.dart';
-import 'package:solviolin_admin/widget/single_reusable.dart';
+import 'package:solviolin_admin/widget/single.dart';
+import 'package:solviolin_admin/widget/swipeable_list.dart';
 
 class UserDetailPage extends StatefulWidget {
   const UserDetailPage({Key? key}) : super(key: key);
@@ -22,25 +25,24 @@ class UserDetailPage extends StatefulWidget {
 class _UserDetailPageState extends State<UserDetailPage>
     with TickerProviderStateMixin {
   late TabController tabController;
-  int currentPage = 0;
 
-  DataController _controller = Get.find<DataController>();
+  var _controller = Get.find<DataController>();
 
-  Client client = Get.find<Client>();
-  DateTimeController end = Get.put(DateTimeController());
+  var client = Get.find<Client>();
+  var end = Get.put(DateTimeController());
 
-  TextEditingController amount = TextEditingController();
-  BranchController expend = Get.put(BranchController(), tag: "Expend");
-  TermController term = Get.put(TermController());
+  var amount = TextEditingController();
+  var expend = Get.put(BranchController(), tag: "Expend");
+  var term = Get.put(TermController());
 
-  BranchController update = Get.put(BranchController(), tag: "Update");
-  TextEditingController phone = TextEditingController();
-  CheckController status = Get.put(CheckController(), tag: "Update");
-  TextEditingController credit = TextEditingController();
-  TextEditingController name = TextEditingController();
+  var update = Get.put(BranchController(), tag: "Update");
+  var phone = TextEditingController();
+  var status = Get.put(CheckController(), tag: "Update");
+  var credit = TextEditingController();
+  var name = TextEditingController();
 
-  SearchController search = Get.find<SearchController>(tag: "User");
-  DetailController detail = Get.find<DetailController>();
+  var search = Get.find<SearchController>(tag: "User");
+  var detail = Get.find<DetailController>();
 
   @override
   void initState() {
@@ -68,185 +70,112 @@ class _UserDetailPageState extends State<UserDetailPage>
           builder: (controller) {
             return Column(
               children: [
-                Stack(
-                  alignment: Alignment.bottomCenter,
-                  children: [
-                    Container(
-                      height: 225.r,
-                      child: PageView.builder(
-                        controller: PageController(),
-                        physics: const ClampingScrollPhysics(),
-                        onPageChanged: (page) {
-                          setState(() {
-                            currentPage = page;
-                          });
-                        },
-                        itemCount: controller.regularSchedules.length,
-                        itemBuilder: (context, index) {
-                          RegularSchedule regular =
-                              controller.regularSchedules[index];
+                swipeableList(
+                  itemCount: controller.regularSchedules.length,
+                  itemBuilder: (context, index) {
+                    var regular = controller.regularSchedules[index];
 
-                          return DefaultTextStyle(
-                            style: TextStyle(fontSize: 28.r),
-                            child: Container(
-                              decoration: myDecoration,
-                              margin: EdgeInsets.all(8.r),
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: [
-                                  Container(
-                                    alignment: Alignment.centerLeft,
-                                    padding: EdgeInsets.fromLTRB(
-                                        24.r, 12.r, 24.r, 0),
-                                    width: double.infinity,
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Text(regular.userID),
-                                        ElevatedButton(
-                                          style: ElevatedButton.styleFrom(
-                                            primary: symbolColor,
-                                          ),
-                                          onPressed: () => showMyDialog(
-                                            context: context,
-                                            title: "정규 종료",
-                                            contents: [
-                                              pickDateTime(
-                                                  context, "종료일", null, true),
-                                            ],
-                                            onPressed: () async {
-                                              try {
-                                                await client
-                                                    .updateEndDateAndDeleteLaterCourse(
-                                                  regular.id,
-                                                  endDate: end.date!,
-                                                );
-                                                await getUsersData(
-                                                  branchName: search.text1,
-                                                  userID: search.text2,
-                                                  isPaid: search.number1,
-                                                  status: search.number2,
-                                                );
-                                                await getUserDetailData(
-                                                    detail.user!);
-
-                                                Get.back();
-                                              } catch (e) {
-                                                showError(e.toString());
-                                              }
-                                            },
-                                          ),
-                                          child: Text(
-                                            "정규 종료",
-                                            style: TextStyle(fontSize: 20.r),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  Text(
-                                    regular.teacherID +
-                                        " / ${regular.branchName}",
-                                  ),
-                                  Text(
-                                    "${dowToString(regular.dow)}" +
-                                        " / ${timeToString(regular.startTime)}" +
-                                        " ~ ${timeToString(regular.endTime)}",
-                                  ),
-                                ],
-                              ),
-                            ),
-                          );
-                        },
-                      ),
-                    ),
-                    Stack(
-                      alignment: AlignmentDirectional.topStart,
+                    return mySwipeableCard(
                       children: [
                         Container(
-                          margin: EdgeInsets.only(bottom: 16.r),
+                          padding: EdgeInsets.symmetric(horizontal: 24.r),
+                          width: double.infinity,
                           child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: List<Widget>.generate(
-                              controller.regularSchedules.length,
-                              (index) => index == currentPage
-                                  ? indicator(isActive: true)
-                                  : indicator(isActive: false),
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(regular.userID),
+                              myActionButton(
+                                onPressed: () => showMyDialog(
+                                  context: context,
+                                  title: "정규 종료",
+                                  contents: [
+                                    pickDateTime(context, "종료일", null, true),
+                                  ],
+                                  onPressed: () async {
+                                    try {
+                                      await client
+                                          .updateEndDateAndDeleteLaterCourse(
+                                        regular.id,
+                                        endDate: end.date!,
+                                      );
+                                      await getUsersData(
+                                        branchName: search.text1,
+                                        userID: search.text2,
+                                        isPaid: search.number1,
+                                        status: search.number2,
+                                      );
+                                      await getUserDetailData(detail.user!);
+
+                                      Get.back();
+                                    } catch (e) {
+                                      showError(e.toString());
+                                    }
+                                  },
+                                ),
+                                action: "정규종료",
+                              ),
+                            ],
+                          ),
+                        ),
+                        Text(regular.teacherID + " / ${regular.branchName}"),
+                        Text("${dowToString(regular.dow)}" +
+                            " / ${timeToString(regular.startTime)}" +
+                            " ~ ${timeToString(regular.endTime)}"),
+                      ],
+                    );
+                  },
+                ),
+                myDivider(),
+                Row(
+                  children: [
+                    Expanded(
+                      child: Container(
+                        width: double.infinity,
+                        decoration: BoxDecoration(
+                          border: Border(
+                            right: BorderSide(color: Colors.grey, width: 0.5.r),
+                          ),
+                        ),
+                        child: TextButton(
+                          onPressed: _showExpend,
+                          child: Text(
+                            "원비납부",
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 28.r,
                             ),
                           ),
-                        )
-                      ],
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                      child: Container(
+                        width: double.infinity,
+                        decoration: BoxDecoration(
+                          border: Border(
+                            left: BorderSide(
+                              color: Colors.grey,
+                              width: 0.5.r,
+                            ),
+                          ),
+                        ),
+                        child: TextButton(
+                          onPressed: _showUpdate,
+                          child: Text(
+                            "정보수정",
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 28.r,
+                            ),
+                          ),
+                        ),
+                      ),
                     ),
                   ],
                 ),
-                Container(
-                  margin: EdgeInsets.fromLTRB(8.r, 4.r, 8.r, 4.r),
-                  color: Colors.grey,
-                  height: 0.5,
-                ),
-                Container(
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Flexible(
-                        child: Container(
-                          width: double.infinity,
-                          decoration: BoxDecoration(
-                            border: Border(
-                              right: BorderSide(
-                                color: Colors.grey,
-                                width: 0.5.r,
-                              ),
-                            ),
-                          ),
-                          child: TextButton(
-                            onPressed: _showExpend,
-                            child: Text(
-                              "원비납부",
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 28.r,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                      Flexible(
-                        child: Container(
-                          width: double.infinity,
-                          decoration: BoxDecoration(
-                            border: Border(
-                              left: BorderSide(
-                                color: Colors.grey,
-                                width: 0.5.r,
-                              ),
-                            ),
-                          ),
-                          child: TextButton(
-                            onPressed: _showUpdate,
-                            child: Text(
-                              "정보수정",
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 28.r,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                Container(
-                  margin: EdgeInsets.all(8.r),
-                  color: Colors.grey,
-                  height: 0.5.r,
-                ),
+                myDivider(),
                 TabBar(
                   controller: tabController,
-                  enableFeedback: false,
                   tabs: [
                     Tab(
                       child: Text("지난 달", style: TextStyle(fontSize: 28.r)),
@@ -259,30 +188,14 @@ class _UserDetailPageState extends State<UserDetailPage>
                     ),
                   ],
                 ),
-                Container(
-                  margin: EdgeInsets.all(8.r),
-                  color: Colors.grey,
-                  height: 0.5.r,
-                ),
-                Container(
-                  height: 700.r,
+                myDivider(),
+                Expanded(
                   child: TabBarView(
                     controller: tabController,
                     children: [
-                      Padding(
-                        padding: EdgeInsets.only(top: 4.r),
-                        child:
-                            HistoryReserved(controller.lastMonthReservations),
-                      ),
-                      Padding(
-                        padding: EdgeInsets.only(top: 4.r),
-                        child:
-                            HistoryReserved(controller.thisMonthReservations),
-                      ),
-                      Padding(
-                        padding: EdgeInsets.only(top: 4.r),
-                        child: ChangedReservation(),
-                      ),
+                      HistoryReserved(controller.lastMonthReservations),
+                      HistoryReserved(controller.thisMonthReservations),
+                      ChangedReservation(),
                     ],
                   ),
                 ),
@@ -294,25 +207,12 @@ class _UserDetailPageState extends State<UserDetailPage>
     );
   }
 
-  Widget indicator({required bool isActive}) {
-    return AnimatedContainer(
-      decoration: BoxDecoration(
-        color: isActive ? symbolColor : Colors.grey,
-        shape: BoxShape.circle,
-      ),
-      width: isActive ? 12.r : 8.r,
-      height: isActive ? 12.r : 8.r,
-      margin: EdgeInsets.symmetric(horizontal: 8.r),
-      duration: const Duration(milliseconds: 150),
-    );
-  }
-
   Future _showExpend() {
     return showMyDialog(
       context: context,
       title: "원비납부",
       contents: [
-        textInput("금액", amount, "금액을 입력하세요!"),
+        myTextInput("금액", amount, "금액을 입력하세요!"),
         branchDropdown("Expend", "지점을 선택하세요!"),
         termDropdown("지점을 선택하세요!"),
       ],
@@ -347,15 +247,15 @@ class _UserDetailPageState extends State<UserDetailPage>
       title: "정보수정",
       contents: [
         branchDropdown("Update"),
-        textInput("전화번호", phone),
-        check(
+        myTextInput("전화번호", phone),
+        myCheckBox(
           tag: "Update",
           item: "등록 여부",
           trueName: "등록",
           falseName: "미등록",
         ),
-        textInput("크레딧", credit),
-        textInput("이름", name),
+        myTextInput("크레딧", credit),
+        myTextInput("이름", name),
       ],
       onPressed: () {},
       isScrolling: true,

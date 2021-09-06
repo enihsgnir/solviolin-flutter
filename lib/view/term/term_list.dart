@@ -7,8 +7,9 @@ import 'package:solviolin_admin/model/term.dart';
 import 'package:solviolin_admin/util/constant.dart';
 import 'package:solviolin_admin/util/controller.dart';
 import 'package:solviolin_admin/util/network.dart';
+import 'package:solviolin_admin/widget/dialog.dart';
+import 'package:solviolin_admin/widget/item_list.dart';
 import 'package:solviolin_admin/widget/picker.dart';
-import 'package:solviolin_admin/widget/single_reusable.dart';
 
 class TermList extends StatefulWidget {
   const TermList({Key? key}) : super(key: key);

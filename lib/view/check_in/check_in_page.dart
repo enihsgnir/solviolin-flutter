@@ -5,7 +5,7 @@ import 'package:get/get.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
 import 'package:solviolin_admin/util/constant.dart';
 import 'package:solviolin_admin/util/network.dart';
-import 'package:solviolin_admin/widget/single_reusable.dart';
+import 'package:solviolin_admin/widget/single.dart';
 
 class CheckInPage extends StatefulWidget {
   const CheckInPage({Key? key}) : super(key: key);
@@ -40,7 +40,18 @@ class _CheckInPageState extends State<CheckInPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: myAppBar("체크인"),
+      appBar: myAppBar(
+        "체크인",
+        actions: [
+          IconButton(
+            onPressed: () {
+              //TODO: get history data or implement with future builder?
+              Get.toNamed("/check-in/history");
+            },
+            icon: Icon(Icons.menu, size: 24.r),
+          ),
+        ],
+      ),
       body: Stack(
         alignment: Alignment.center,
         children: [

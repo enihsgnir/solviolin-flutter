@@ -5,9 +5,11 @@ import 'package:solviolin_admin/util/constant.dart';
 import 'package:solviolin_admin/util/controller.dart';
 import 'package:solviolin_admin/util/network.dart';
 import 'package:solviolin_admin/view/term/term_list.dart';
+import 'package:solviolin_admin/widget/dialog.dart';
 import 'package:solviolin_admin/widget/dropdown.dart';
+import 'package:solviolin_admin/widget/input.dart';
 import 'package:solviolin_admin/widget/picker.dart';
-import 'package:solviolin_admin/widget/single_reusable.dart';
+import 'package:solviolin_admin/widget/single.dart';
 
 class TermPage extends StatefulWidget {
   const TermPage({Key? key}) : super(key: key);
@@ -140,7 +142,7 @@ class _TermPageState extends State<TermPage> {
       context: context,
       title: "정규 연장 (수강생)",
       contents: [
-        textInput("이름", user, "이름을 입력하세요!"),
+        myTextInput("이름", user, "이름을 입력하세요!"),
       ],
       onPressed: () async {
         try {

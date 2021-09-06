@@ -3,9 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:solviolin_admin/util/controller.dart';
 import 'package:solviolin_admin/util/data_source.dart';
+import 'package:solviolin_admin/widget/dialog.dart';
 import 'package:solviolin_admin/widget/dropdown.dart';
+import 'package:solviolin_admin/widget/input.dart';
+import 'package:solviolin_admin/widget/search.dart';
 import 'package:solviolin_admin/widget/picker.dart';
-import 'package:solviolin_admin/widget/single_reusable.dart';
 
 class ControlSearch extends StatefulWidget {
   const ControlSearch({Key? key}) : super(key: key);
@@ -34,12 +36,12 @@ class _ControlSearchState extends State<ControlSearch> {
     return mySearch(
       contents: [
         branchDropdown(null, "지점을 선택하세요!"),
-        textInput("강사", teacher),
+        myTextInput("강사", teacher),
         pickDateTime(context, "시작일", "Start"),
         pickDateTime(context, "종료일", "End"),
         Row(
           children: [
-            check(
+            myCheckBox(
               item: "오픈/클로즈",
               trueName: "오픈",
               falseName: "클로즈",

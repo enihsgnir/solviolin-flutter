@@ -7,9 +7,10 @@ import 'package:solviolin_admin/util/constant.dart';
 import 'package:solviolin_admin/util/controller.dart';
 import 'package:solviolin_admin/util/data_source.dart';
 import 'package:solviolin_admin/util/network.dart';
+import 'package:solviolin_admin/widget/dialog.dart';
 import 'package:solviolin_admin/widget/dropdown.dart';
+import 'package:solviolin_admin/widget/input.dart';
 import 'package:solviolin_admin/widget/picker.dart';
-import 'package:solviolin_admin/widget/single_reusable.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
 
 class TimeSlot extends StatefulWidget {
@@ -455,10 +456,10 @@ class _TimeSlotState extends State<TimeSlot> {
           DateFormat("yy/MM/dd HH:mm").format(details.date!) + " ~ ",
           style: TextStyle(color: Colors.white, fontSize: 20.r),
         ),
-        textInput("강사", teacherRegular, "강사명을 입력하세요!"),
+        myTextInput("강사", teacherRegular, "강사명을 입력하세요!"),
         branchDropdown("Regular", "지점을 선택하세요!"),
         pickTime(context, "종료시각", "Regular", true),
-        textInput("수강생", userRegular, "이름을 입력하세요!"),
+        myTextInput("수강생", userRegular, "이름을 입력하세요!"),
       ],
       onPressed: () async {
         try {
@@ -501,9 +502,9 @@ class _TimeSlotState extends State<TimeSlot> {
           DateFormat("yy/MM/dd HH:mm").format(details.date!) + " ~ ",
           style: TextStyle(color: Colors.white, fontSize: 20.r),
         ),
-        textInput("강사", teacherUser, "강사명을 입력하세요!"),
+        myTextInput("강사", teacherUser, "강사명을 입력하세요!"),
         branchDropdown("User", "지점을 선택하세요!"),
-        textInput("수강생", userUser, "이름을 입력하세요!"),
+        myTextInput("수강생", userUser, "이름을 입력하세요!"),
       ],
       onPressed: () async {
         try {
@@ -546,9 +547,9 @@ class _TimeSlotState extends State<TimeSlot> {
           DateFormat("yy/MM/dd HH:mm").format(details.date!) + " ~ ",
           style: TextStyle(color: Colors.white, fontSize: 20.r),
         ),
-        textInput("강사", teacherAdmin, "강사명을 입력하세요!"),
+        myTextInput("강사", teacherAdmin, "강사명을 입력하세요!"),
         branchDropdown("Admin", "지점을 선택하세요!"),
-        textInput("수강생", userAdmin, "이름을 입력하세요!"),
+        myTextInput("수강생", userAdmin, "이름을 입력하세요!"),
       ],
       onPressed: () async {
         try {
@@ -591,10 +592,10 @@ class _TimeSlotState extends State<TimeSlot> {
           DateFormat("yy/MM/dd HH:mm").format(details.date!) + " ~ ",
           style: TextStyle(color: Colors.white, fontSize: 20.r),
         ),
-        textInput("강사", teacherFree, "강사명을 입력하세요!"),
+        myTextInput("강사", teacherFree, "강사명을 입력하세요!"),
         branchDropdown("Free", "지점을 선택하세요!"),
         pickTime(context, "종료시각", "Free", true),
-        textInput("수강생", userFree, "이름을 입력하세요!"),
+        myTextInput("수강생", userFree, "이름을 입력하세요!"),
       ],
       onPressed: () async {
         try {

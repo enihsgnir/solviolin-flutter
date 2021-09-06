@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:solviolin_admin/util/constant.dart';
 import 'package:solviolin_admin/view/canceled/canceled_list.dart';
 import 'package:solviolin_admin/view/canceled/canceled_search.dart';
-import 'package:solviolin_admin/widget/single_reusable.dart';
+import 'package:solviolin_admin/widget/single.dart';
 
 class CancelPage extends StatefulWidget {
   const CancelPage({Key? key}) : super(key: key);
@@ -25,11 +25,7 @@ class _CancelPageState extends State<CancelPage> {
                 padding: EdgeInsets.all(8.r),
                 child: CanceledSearch(),
               ),
-              Container(
-                margin: EdgeInsets.fromLTRB(8.r, 4.r, 8.r, 4.r),
-                color: Colors.grey,
-                height: 0.5,
-              ),
+              myDivider(),
               Expanded(
                 child: CanceledList(),
               ),

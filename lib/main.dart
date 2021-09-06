@@ -10,6 +10,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:solviolin_admin/util/controller.dart';
 import 'package:solviolin_admin/util/network.dart';
 import 'package:solviolin_admin/view/canceled/canceled_page.dart';
+import 'package:solviolin_admin/view/check_in/check_in_history_page.dart';
 import 'package:solviolin_admin/view/check_in/check_in_page.dart';
 import 'package:solviolin_admin/view/control/control_page.dart';
 import 'package:solviolin_admin/view/for_teacher/main_for_teacher_page.dart';
@@ -85,6 +86,7 @@ class _MyAppState extends State<MyApp> {
         GetPage(name: "/teacher/salary", page: () => SalaryPage()),
         GetPage(name: "/ledger", page: () => LedgerPage()),
         GetPage(name: "/check-in", page: () => CheckInPage()),
+        GetPage(name: "/check-in/history", page: () => CheckInHistoryPage()),
         GetPage(name: "/menu-teacher", page: () => MenuForTeacherPage()),
         GetPage(name: "/main-teacher", page: () => MainForTeacherPage()),
       ],

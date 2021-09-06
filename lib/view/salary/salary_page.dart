@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:solviolin_admin/util/constant.dart';
 import 'package:solviolin_admin/view/salary/salaray_list.dart';
 import 'package:solviolin_admin/view/salary/salary_search.dart';
-import 'package:solviolin_admin/widget/single_reusable.dart';
+import 'package:solviolin_admin/widget/single.dart';
 
 class SalaryPage extends StatefulWidget {
   const SalaryPage({Key? key}) : super(key: key);
@@ -25,11 +25,7 @@ class _SalaryPageState extends State<SalaryPage> {
                 padding: EdgeInsets.all(8.r),
                 child: SalarySearch(),
               ),
-              Container(
-                margin: EdgeInsets.fromLTRB(8.r, 4.r, 8.r, 4.r),
-                color: Colors.grey,
-                height: 0.5,
-              ),
+              myDivider(),
               Expanded(
                 child: SalaryList(),
               ),

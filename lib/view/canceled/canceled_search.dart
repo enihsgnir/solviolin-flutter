@@ -3,7 +3,9 @@ import 'package:get/get.dart';
 import 'package:solviolin_admin/util/constant.dart';
 import 'package:solviolin_admin/util/controller.dart';
 import 'package:solviolin_admin/util/network.dart';
-import 'package:solviolin_admin/widget/single_reusable.dart';
+import 'package:solviolin_admin/widget/dialog.dart';
+import 'package:solviolin_admin/widget/input.dart';
+import 'package:solviolin_admin/widget/search.dart';
 
 class CanceledSearch extends StatefulWidget {
   const CanceledSearch({Key? key}) : super(key: key);
@@ -31,7 +33,7 @@ class _CanceledSearchState extends State<CanceledSearch> {
       contents: [
         Row(
           children: [
-            textInput("강사", teacher, "강사명을 입력하세요!"),
+            myTextInput("강사", teacher, "강사명을 입력하세요!"),
             myActionButton(
               onPressed: () async {
                 try {

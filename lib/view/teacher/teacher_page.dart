@@ -7,9 +7,11 @@ import 'package:solviolin_admin/util/data_source.dart';
 import 'package:solviolin_admin/util/network.dart';
 import 'package:solviolin_admin/view/teacher/teacher_list.dart';
 import 'package:solviolin_admin/view/teacher/teacher_search.dart';
+import 'package:solviolin_admin/widget/dialog.dart';
 import 'package:solviolin_admin/widget/dropdown.dart';
+import 'package:solviolin_admin/widget/input.dart';
 import 'package:solviolin_admin/widget/picker.dart';
-import 'package:solviolin_admin/widget/single_reusable.dart';
+import 'package:solviolin_admin/widget/single.dart';
 
 class TeacherPage extends StatefulWidget {
   const TeacherPage({Key? key}) : super(key: key);
@@ -48,11 +50,7 @@ class _TeacherPageState extends State<TeacherPage> {
                 padding: EdgeInsets.all(8.r),
                 child: TeacherSearch(),
               ),
-              Container(
-                margin: EdgeInsets.fromLTRB(8.r, 4.r, 8.r, 4.r),
-                color: Colors.grey,
-                height: 0.5,
-              ),
+              myDivider(),
               Expanded(
                 child: TeacherList(),
               ),
@@ -87,7 +85,7 @@ class _TeacherPageState extends State<TeacherPage> {
       context: context,
       title: "강사 스케줄 등록",
       contents: [
-        textInput("강사", teacher, "강사명을 입력하세요!"),
+        myTextInput("강사", teacher, "강사명을 입력하세요!"),
         branchDropdown("Register", "지점을 선택하세요!"),
         workDowDropdown("요일을 선택하세요!"),
         pickTime(context, "시작시각", "Start", true),

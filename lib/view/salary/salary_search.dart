@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:solviolin_admin/util/controller.dart';
 import 'package:solviolin_admin/util/network.dart';
+import 'package:solviolin_admin/widget/dialog.dart';
 import 'package:solviolin_admin/widget/dropdown.dart';
-import 'package:solviolin_admin/widget/single_reusable.dart';
+import 'package:solviolin_admin/widget/input.dart';
+import 'package:solviolin_admin/widget/search.dart';
 
 class SalarySearch extends StatefulWidget {
   const SalarySearch({Key? key}) : super(key: key);
@@ -34,10 +36,10 @@ class _SalarySearchState extends State<SalarySearch> {
       contents: [
         branchDropdown("Salary", "지점을 선택하세요!"),
         termDropdown("학기를 선택하세요!"),
-        textInput("주간시급", day, "주간시급을 입력하세요!"),
+        myTextInput("주간시급", day, "주간시급을 입력하세요!"),
         Row(
           children: [
-            textInput("야간시급", night, "야간시급을 입력하세요!"),
+            myTextInput("야간시급", night, "야간시급을 입력하세요!"),
             myActionButton(
               onPressed: () async {
                 try {

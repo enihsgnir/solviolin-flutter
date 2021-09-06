@@ -3,8 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:solviolin_admin/util/controller.dart';
 import 'package:solviolin_admin/util/data_source.dart';
+import 'package:solviolin_admin/widget/dialog.dart';
 import 'package:solviolin_admin/widget/dropdown.dart';
-import 'package:solviolin_admin/widget/single_reusable.dart';
+import 'package:solviolin_admin/widget/input.dart';
+import 'package:solviolin_admin/widget/search.dart';
 
 class UserSearch extends StatefulWidget {
   const UserSearch({Key? key}) : super(key: key);
@@ -34,7 +36,7 @@ class _UserSearchState extends State<UserSearch> {
       contents: [
         Row(
           children: [
-            textInput("이름", id),
+            myTextInput("이름", id),
             myActionButton(
               onPressed: () async {
                 try {
@@ -53,7 +55,7 @@ class _UserSearchState extends State<UserSearch> {
           ],
         ),
         branchDropdown(),
-        check(
+        myCheckBox(
           tag: "isPaid",
           item: "결제 여부",
           trueName: "완료",
@@ -68,7 +70,7 @@ class _UserSearchState extends State<UserSearch> {
         ),
         Row(
           children: [
-            check(
+            myCheckBox(
               tag: "status",
               item: "등록 여부",
               trueName: "등록",

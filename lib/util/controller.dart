@@ -228,9 +228,4 @@ class DateTimeController extends GetxController {
 
 class RadioController<T> extends GetxController {
   late T type;
-
-  // void updateType(T data) {
-  //   type = data;
-  //   update();
-  // }
 }

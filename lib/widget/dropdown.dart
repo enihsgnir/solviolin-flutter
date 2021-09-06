@@ -5,7 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:solviolin_admin/util/constant.dart';
 import 'package:solviolin_admin/util/controller.dart';
 import 'package:solviolin_admin/util/format.dart';
-import 'package:solviolin_admin/widget/single_reusable.dart';
+import 'package:solviolin_admin/widget/input.dart';
 
 DataController _controller = Get.find<DataController>();
 
@@ -45,11 +45,10 @@ Widget branchDropdown([
                 controller.updateBranchName(value!);
               },
               items: _controller.branches
-                  .map<DropdownMenuItem<String>>(
-                      (value) => DropdownMenuItem<String>(
-                            value: value,
-                            child: Text(value),
-                          ))
+                  .map<DropdownMenuItem<String>>((value) => DropdownMenuItem(
+                        value: value,
+                        child: Text(value),
+                      ))
                   .toList(),
             ),
           ),
@@ -91,7 +90,7 @@ Widget workDowDropdown([String? validator]) {
                 controller.updateWorkDow(value!);
               },
               items: [for (int i = 0; i < 7; i++) i]
-                  .map<DropdownMenuItem<int>>((value) => DropdownMenuItem<int>(
+                  .map<DropdownMenuItem<int>>((value) => DropdownMenuItem(
                         value: value,
                         child: Text(dowToString(value)),
                       ))
@@ -136,7 +135,7 @@ Widget termDropdown([String? validator]) {
                 controller.updateTermID(value!);
               },
               items: _controller.terms
-                  .map<DropdownMenuItem<int>>((value) => DropdownMenuItem<int>(
+                  .map<DropdownMenuItem<int>>((value) => DropdownMenuItem(
                         value: value.id,
                         child: Text(
                           DateFormat("yy/MM/dd").format(value.termStart) +

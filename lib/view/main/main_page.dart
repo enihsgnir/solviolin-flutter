@@ -7,8 +7,10 @@ import 'package:solviolin_admin/util/controller.dart';
 import 'package:solviolin_admin/util/data_source.dart';
 import 'package:solviolin_admin/util/network.dart';
 import 'package:solviolin_admin/view/main/time_slot.dart';
+import 'package:solviolin_admin/widget/dialog.dart';
 import 'package:solviolin_admin/widget/dropdown.dart';
-import 'package:solviolin_admin/widget/single_reusable.dart';
+import 'package:solviolin_admin/widget/input.dart';
+import 'package:solviolin_admin/widget/single.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
 
 class MainPage extends StatefulWidget {
@@ -143,8 +145,8 @@ class _MainPageState extends State<MainPage> {
       context: context,
       title: "검색",
       contents: [
-        textInput("수강생", user),
-        textInput("강사", teacher),
+        myTextInput("수강생", user),
+        myTextInput("강사", teacher),
         branchDropdown(null, "지점을 선택하세요!"),
       ],
       onPressed: () async {

@@ -6,9 +6,11 @@ import 'package:solviolin_admin/util/data_source.dart';
 import 'package:solviolin_admin/util/network.dart';
 import 'package:solviolin_admin/view/control/control_list.dart';
 import 'package:solviolin_admin/view/control/control_search.dart';
+import 'package:solviolin_admin/widget/dialog.dart';
 import 'package:solviolin_admin/widget/dropdown.dart';
+import 'package:solviolin_admin/widget/input.dart';
 import 'package:solviolin_admin/widget/picker.dart';
-import 'package:solviolin_admin/widget/single_reusable.dart';
+import 'package:solviolin_admin/widget/single.dart';
 
 class ControlPage extends StatefulWidget {
   const ControlPage({Key? key}) : super(key: key);
@@ -51,11 +53,7 @@ class _ControlPageState extends State<ControlPage> {
                 padding: EdgeInsets.all(8.r),
                 child: ControlSearch(),
               ),
-              Container(
-                margin: EdgeInsets.fromLTRB(8.r, 4.r, 8.r, 4.r),
-                color: Colors.grey,
-                height: 0.5,
-              ),
+              myDivider(),
               Expanded(
                 child: ControlList(),
               ),
@@ -75,7 +73,7 @@ class _ControlPageState extends State<ControlPage> {
       context: context,
       title: "오픈/클로즈 등록",
       contents: [
-        textInput("강사", teacher, "강사명을 입력하세요!"),
+        myTextInput("강사", teacher, "강사명을 입력하세요!"),
         branchDropdown("Register", "지점을 선택하세요!"),
         pickDateTime(context, "시작일", "StartRegister", true),
         pickDateTime(context, "종료일", "EndRegister", true),

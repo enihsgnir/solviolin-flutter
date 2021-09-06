@@ -3,7 +3,7 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:solviolin_admin/model/canceled.dart';
 import 'package:solviolin_admin/util/controller.dart';
-import 'package:solviolin_admin/widget/single_reusable.dart';
+import 'package:solviolin_admin/widget/item_list.dart';
 
 class CanceledList extends StatefulWidget {
   const CanceledList({Key? key}) : super(key: key);
@@ -47,7 +47,7 @@ class _CanceledListState extends State<CanceledList> {
             //   ),
             // );
 
-            return myCard(
+            return myNormalCard(
               children: [
                 Text(
                     "${canceled.teacherID} / ${canceled.userID} / ${canceled.branchName}"),

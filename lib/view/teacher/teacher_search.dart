@@ -3,8 +3,10 @@ import 'package:get/get.dart';
 import 'package:solviolin_admin/util/constant.dart';
 import 'package:solviolin_admin/util/controller.dart';
 import 'package:solviolin_admin/util/data_source.dart';
+import 'package:solviolin_admin/widget/dialog.dart';
 import 'package:solviolin_admin/widget/dropdown.dart';
-import 'package:solviolin_admin/widget/single_reusable.dart';
+import 'package:solviolin_admin/widget/input.dart';
+import 'package:solviolin_admin/widget/search.dart';
 
 class TeacherSearch extends StatefulWidget {
   const TeacherSearch({Key? key}) : super(key: key);
@@ -30,7 +32,7 @@ class _TeacherSearchState extends State<TeacherSearch> {
     return mySearch(
       padding: EdgeInsets.symmetric(vertical: 16.r),
       contents: [
-        textInput("강사", teacher),
+        myTextInput("강사", teacher),
         Row(
           children: [
             branchDropdown(null, "지점을 선택하세요!"),

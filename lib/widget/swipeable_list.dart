@@ -1,94 +1,74 @@
-// import 'package:flutter/material.dart';
-// import 'package:solviolin_admin/util/constant.dart';
-// import 'package:solviolin_admin/util/data_source.dart';
+import 'package:flutter/material.dart';
+import 'package:solviolin_admin/util/constant.dart';
 
-// class SwipeableList extends StatefulWidget {
-//   final int currentPage;
-//   final List<dynamic> items;
-//   final Widget content;
-//   final double height;
+Widget swipeableList({
+  required int itemCount,
+  required Widget Function(BuildContext, int) itemBuilder,
+}) {
+  int currentPage = 0;
 
-//   const SwipeableList({
-//     Key? key,
-//     required this.currentPage,
-//     required this.items,
-//     required this.content,
-//     required this.height,
-//   }) : super(key: key);
+  return StatefulBuilder(
+    builder: (context, setState) {
+      return Stack(
+        alignment: Alignment.bottomCenter,
+        children: [
+          Container(
+            height: 225.r, //TODO: shrinkwrap to child
+            child: PageView.builder(
+              onPageChanged: (page) {
+                setState(() {
+                  currentPage = page;
+                });
+              },
+              itemCount: itemCount,
+              itemBuilder: itemBuilder,
+            ),
+          ),
+          Container(
+            margin: EdgeInsets.only(bottom: 16.r),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min,
+              children: List.generate(
+                itemCount,
+                (index) => _indicator(isActive: index == currentPage),
+              ),
+            ),
+          ),
+        ],
+      );
+    },
+  );
+}
 
-//   @override
-//   _SwipeableListState createState() => _SwipeableListState();
-// }
+Widget mySwipeableCard({
+  EdgeInsetsGeometry? padding,
+  required List<Widget> children,
+}) {
+  return Container(
+    padding: padding ?? EdgeInsets.symmetric(vertical: 16.r),
+    decoration: myDecoration,
+    width: double.infinity,
+    margin: EdgeInsets.all(8.r),
+    child: DefaultTextStyle(
+      style: TextStyle(fontSize: 28.r),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: children,
+      ),
+    ),
+  );
+}
 
-// class _SwipeableListState extends State<SwipeableList> {
-//   late int _currentPage;
-
-//   @override
-//   void initState() {
-//     super.initState();
-//     _currentPage = widget.currentPage;
-//   }
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Stack(
-//       alignment: Alignment.bottomCenter,
-//       children: [
-//         Container(
-//           height: widget.height,
-//           child: PageView.builder(
-//             controller: PageController(),
-//             physics: ClampingScrollPhysics(),
-//             onPageChanged: (page) {
-//               setState(() {
-//                 _currentPage = page;
-//               });
-//             },
-//             itemCount: widget.items.length,
-//             itemBuilder: (context, index) {
-//               return DefaultTextStyle(
-//                 style: TextStyle(fontSize: 28.r),
-//                 child: Container(
-//                   decoration: myDecoration,
-//                   margin: EdgeInsets.all(8.r),
-//                   child: widget.content,
-//                 ),
-//               );
-//             },
-//           ),
-//         ),
-//         Stack(
-//           alignment: AlignmentDirectional.topStart,
-//           children: [
-//             Container(
-//               margin: EdgeInsets.only(bottom: 16.r),
-//               child: Row(
-//                 mainAxisSize: MainAxisSize.min,
-//                 mainAxisAlignment: MainAxisAlignment.center,
-//                 children: List<Widget>.generate(
-//                   widget.items.length,
-//                   (index) => index == _currentPage
-//                       ? indicator(isActive: true)
-//                       : indicator(isActive: false),
-//                 ),
-//               ),
-//             )
-//           ],
-//         ),
-//       ],
-//     );
-//   }
-
-//   Widget indicator({required bool isActive}) {
-//     return AnimatedContainer(
-//       decoration: BoxDecoration(
-//         color: isActive ? symbolColor : Colors.grey,
-//         shape: BoxShape.circle,
-//       ),
-//       width: isActive ? 12.r : 8.r,
-//       height: isActive ? 12.r : 8.r,
-//       margin: EdgeInsets.symmetric(horizontal: 8.r),
-//       duration: const Duration(milliseconds: 150),
-//     );
-//   }
-// }
+Widget _indicator({required bool isActive}) {
+  return AnimatedContainer(
+    decoration: BoxDecoration(
+      color: isActive ? symbolColor : Colors.grey,
+      shape: BoxShape.circle,
+    ),
+    width: isActive ? 12.r : 8.r,
+    height: isActive ? 12.r : 8.r,
+    margin: EdgeInsets.symmetric(horizontal: 8.r),
+    duration: const Duration(milliseconds: 150),
+  );
+}
