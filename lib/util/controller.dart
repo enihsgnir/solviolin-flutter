@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:solviolin_admin/model/canceled.dart';
 import 'package:solviolin_admin/model/change.dart';
+import 'package:solviolin_admin/model/check_in.dart';
 import 'package:solviolin_admin/model/control.dart';
 import 'package:solviolin_admin/model/ledger.dart';
 import 'package:solviolin_admin/model/profile.dart';
@@ -40,6 +41,7 @@ class DataController extends GetxController {
   List<Salary> salaries = [];
   List<Ledger> ledgers = [];
   late String totalLeger;
+  List<CheckIn> checkInHistories = [];
 
   void updateRatio(double data) {
     ratio = data;
@@ -136,96 +138,77 @@ class DataController extends GetxController {
     update();
   }
 
-  void updateTotalLedger(String data) {
-    totalLeger = data;
+  void updateCheckInHistories(List<CheckIn> data) {
+    checkInHistories = data;
     update();
   }
 }
 
-class SearchController extends GetxController {
+class CacheController extends GetxController {
   bool isSearched = false;
 
-  String? text1;
-  String? text2;
-  String? text3;
+  Map<int, DateTime?> dateTime = {};
+  Map<int, DateTime?> date = {};
+  Map<int, TimeOfDay?> time = {};
 
-  DateTime? dateTime1;
-  DateTime? dateTime2;
+  Map<int, int?> number = {};
+  Map<int, int?> check = {};
 
-  // Duration? time1;
-  // Duration? time2;
+  User? userDetail;
 
-  int? number1;
-  int? number2;
-  int? number3;
-}
-
-class DetailController extends GetxController {
-  User? user;
-
-  void updateUser(User data) {
-    user = data;
-    update();
-  }
-}
-
-class BranchController extends GetxController {
   String? branchName;
-
-  void updateBranchName(String data) {
-    branchName = data;
-    update();
-  }
-}
-
-class WorkDowController extends GetxController {
   int? workDow;
-
-  void updateWorkDow(int data) {
-    workDow = data;
-    update();
-  }
-}
-
-class TermController extends GetxController {
   int? termID;
 
-  void updateTermID(int data) {
-    termID = data;
-    update();
+  var edit1 = TextEditingController();
+  var edit2 = TextEditingController();
+  var edit3 = TextEditingController();
+  var edit4 = TextEditingController();
+
+  Map<Type, dynamic> type = {};
+
+  void reset() {
+    dateTime = {};
+    date = {};
+    time = {};
+    number = {};
+    check = {};
+
+    branchName = null;
+    workDow = null;
+    termID = null;
+
+    edit1.text = "";
+    edit2.text = "";
+    edit3.text = "";
+    edit4.text = "";
+
+    type = {};
+  }
+
+  @override
+  void onClose() {
+    edit1.dispose();
+    edit2.dispose();
+    edit3.dispose();
+    edit4.dispose();
+    super.onClose();
   }
 }
 
-class CheckController extends GetxController {
-  int? result;
-
-  void updateResult(int? data) {
-    result = data;
-    update();
-  }
+enum UserType {
+  student,
+  teacher,
+  admin,
 }
 
-class DateTimeController extends GetxController {
-  DateTime? date;
-  TimeOfDay? time;
-  DateTime? dateTime;
-
-  void updateDate(DateTime? data) {
-    date = data;
-    update();
-  }
-
-  void updateTime(TimeOfDay? data) {
-    time = data;
-    update();
-  }
-
-  void updateDateTime(DateTime? data) {
-    dateTime = data;
-    update();
-  }
+enum Status {
+  open,
+  close,
 }
 
-class RadioController<T> extends GetxController {
-  late T type;
+enum CancelInClose {
+  none,
+  cancel,
+  delete,
 }

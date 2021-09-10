@@ -6,6 +6,7 @@ import 'package:intl/intl.dart';
 import 'package:pretty_dio_logger/pretty_dio_logger.dart';
 import 'package:solviolin_admin/model/canceled.dart';
 import 'package:solviolin_admin/model/change.dart';
+import 'package:solviolin_admin/model/check_in.dart';
 import 'package:solviolin_admin/model/control.dart';
 import 'package:solviolin_admin/model/ledger.dart';
 import 'package:solviolin_admin/model/profile.dart';
@@ -205,7 +206,7 @@ class Client {
         }..removeWhere((key, value) => value == null),
       );
       if (response.statusCode == 200) {
-        return List<User>.generate(
+        return List.generate(
           response.data.length,
           (index) => User.fromJson(response.data[index]),
         );
@@ -279,7 +280,7 @@ class Client {
     if (await isLoggedIn()) {
       Response response = await dio.get("/term");
       if (response.statusCode == 200) {
-        return List<Term>.generate(
+        return List.generate(
           response.data.length,
           (index) => Term.fromJson(response.data[index]),
         );
@@ -292,7 +293,7 @@ class Client {
     if (await isLoggedIn()) {
       Response response = await dio.get("/term/$take");
       if (response.statusCode == 200) {
-        return List<Term>.generate(
+        return List.generate(
           response.data.length,
           (index) => Term.fromJson(response.data[index]),
         );
@@ -338,7 +339,7 @@ class Client {
         }..removeWhere((key, value) => value == null),
       );
       if (response.statusCode == 200) {
-        return List<Teacher>.generate(
+        return List.generate(
           response.data.length,
           (index) => Teacher.fromJson(response.data[index]),
         );
@@ -360,7 +361,7 @@ class Client {
         }..removeWhere((key, value) => value == null),
       );
       if (response.statusCode == 200) {
-        return List<TeacherInfo>.generate(
+        return List.generate(
           response.data.length,
           (index) => TeacherInfo.fromJson(response.data[index]),
         );
@@ -388,7 +389,7 @@ class Client {
         }..removeWhere((key, value) => value == null),
       );
       if (response.statusCode == 201) {
-        return List<Control>.generate(
+        return List.generate(
           response.data.length,
           (index) => Control.fromJson(response.data[index]),
         );
@@ -495,8 +496,8 @@ class Client {
     }
   }
 
-  Future<void> extendReservationByAdmin({
-    required int id,
+  Future<void> extendReservationByAdmin(
+    int id, {
     required int count,
   }) async {
     if (await isLoggedIn()) {
@@ -525,7 +526,7 @@ class Client {
         }..removeWhere((key, value) => value == null),
       );
       if (response.statusCode == 201) {
-        return List<Reservation>.generate(
+        return List.generate(
           response.data.length,
           (index) => Reservation.fromJson(response.data[index]),
         );
@@ -543,7 +544,7 @@ class Client {
         "range": range,
       });
       if (response.statusCode == 201) {
-        return List<Change>.generate(
+        return List.generate(
           response.data.length,
           (index) => Change.fromJson(response.data[index]),
         );
@@ -566,7 +567,7 @@ class Client {
         "nightTimeCost": nightTimeCost,
       });
       if (response.statusCode == 201) {
-        return List<Salary>.generate(
+        return List.generate(
           response.data.length,
           (index) => Salary.fromList(response.data[index]),
         );
@@ -579,7 +580,7 @@ class Client {
     if (await isLoggedIn()) {
       Response response = await dio.get("/reservation/canceled/$teacherID");
       if (response.statusCode == 200) {
-        return List<Canceled>.generate(
+        return List.generate(
           response.data.length,
           (index) => Canceled.fromJson(response.data[index]),
         );
@@ -647,7 +648,7 @@ class Client {
     if (await isLoggedIn()) {
       Response response = await dio.get("/regular-schedule/$userID");
       if (response.statusCode == 200) {
-        return List<RegularSchedule>.generate(
+        return List.generate(
           response.data.length,
           (index) => RegularSchedule.fromJson(response.data[index]),
         );
@@ -668,7 +669,7 @@ class Client {
     if (await isLoggedIn()) {
       Response response = await dio.get("/branch");
       if (response.statusCode == 200) {
-        return List<String>.generate(
+        return List.generate(
           response.data.length,
           (index) => response.data[index]["branchName"],
         );
@@ -683,6 +684,30 @@ class Client {
         "branchCode": branchCode,
       });
     }
+  }
+
+  Future<List<CheckIn>> getCheckInHistories({
+    required String branchName,
+    DateTime? startDate,
+    DateTime? endDate,
+  }) async {
+    if (await isLoggedIn()) {
+      Response response = await dio.post(
+        "/check-in/search",
+        data: {
+          "branchName": branchName,
+          "startDate": startDate?.toIso8601String(),
+          "endDate": endDate?.toIso8601String(),
+        }..removeWhere((key, value) => value == null),
+      );
+      if (response.statusCode == 201) {
+        return List.generate(
+          response.data.length,
+          (index) => CheckIn.fromJson(response.data[index]),
+        );
+      }
+    }
+    throw "체크인 이력을 불러올 수 없습니다.";
   }
 
   Future<void> registerLedger({
@@ -713,7 +738,7 @@ class Client {
         "userID": userID,
       });
       if (response.statusCode == 200) {
-        return List<Ledger>.generate(
+        return List.generate(
           response.data.length,
           (index) => Ledger.fromJson(response.data[index]),
         );
@@ -771,7 +796,7 @@ class NetworkException extends DioError {
     if (options.queryParameters.isNotEmpty) {
       message += "\n${options.queryParameters}";
     }
-    if (options.data != null) {
+    if (options.data != null && options.path != "/auth/login") {
       message += "\n${options.data}";
     }
 

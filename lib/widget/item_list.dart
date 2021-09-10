@@ -12,7 +12,7 @@ Widget myNormalCard({
     width: double.infinity,
     margin: EdgeInsets.symmetric(vertical: 4.r, horizontal: 8.r),
     child: DefaultTextStyle(
-      style: TextStyle(fontSize: 24.r), //TODO: apply with ListView
+      style: TextStyle(fontSize: 24.r),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: children,
@@ -36,7 +36,7 @@ Widget mySlidableCard({
       width: double.infinity,
       margin: EdgeInsets.symmetric(vertical: 4.r, horizontal: 8.r),
       child: DefaultTextStyle(
-        style: TextStyle(fontSize: 24.r), //TODO: apply with ListView
+        style: TextStyle(fontSize: 24.r),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: children,
@@ -47,6 +47,7 @@ Widget mySlidableCard({
 }
 
 Widget mySlideAction({
+  required BuildContext context,
   required IconData icon,
   required String item,
   required void Function() onTap,
@@ -70,10 +71,7 @@ Widget mySlideAction({
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Icon(icon, size: 48.r),
-                Text(
-                  item,
-                  style: TextStyle(color: Colors.white, fontSize: 20.r),
-                )
+                Text(item, style: contentStyle)
               ],
             ),
           ),
@@ -87,6 +85,9 @@ Widget mySlideAction({
             : Container(),
       ],
     ),
-    onTap: onTap,
+    onTap: () {
+      FocusScope.of(context).unfocus();
+      onTap();
+    },
   );
 }

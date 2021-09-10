@@ -37,9 +37,12 @@ Widget myDialog({
       mainAxisSize: MainAxisSize.min,
       children: List.generate(
         contents.length,
-        (index) => Padding(
-          padding: EdgeInsets.symmetric(vertical: 3.r, horizontal: 12.r),
-          child: contents[index],
+        (index) => DefaultTextStyle(
+          style: contentStyle,
+          child: Padding(
+            padding: EdgeInsets.symmetric(vertical: 3.r, horizontal: 12.r),
+            child: contents[index],
+          ),
         ),
       ),
     ),
@@ -49,10 +52,7 @@ Widget myDialog({
         style: OutlinedButton.styleFrom(
           padding: EdgeInsets.symmetric(vertical: 12.r, horizontal: 16.r),
         ),
-        child: Text(
-          "취소",
-          style: TextStyle(color: Colors.white, fontSize: 20.r),
-        ),
+        child: Text("취소", style: contentStyle),
       ),
       ElevatedButton(
         onPressed: onPressed,
@@ -74,29 +74,47 @@ Future showMyDialog({
   String action = "확인",
   bool isScrolling = false,
 }) {
-  return Get.dialog(
-    isScrolling
-        ? GestureDetector(
-            onTap: () => FocusScope.of(context).unfocus(),
-            child: Column(
-              children: [
-                SingleChildScrollView(
-                  child: myDialog(
-                    title: title,
-                    contents: contents,
-                    onPressed: onPressed,
-                    action: action,
-                  ),
-                ),
-              ],
-            ),
-          )
-        : myDialog(
-            title: title,
-            contents: contents,
-            onPressed: onPressed,
-            action: action,
+  var dialog = myDialog(
+    title: title,
+    contents: contents,
+    onPressed: onPressed,
+    action: action,
+  );
+
+  if (isScrolling) {
+    dialog = GestureDetector(
+      onTap: () => FocusScope.of(context).unfocus(),
+      child: Column(
+        children: [
+          SingleChildScrollView(
+            child: dialog,
           ),
+        ],
+      ),
+    );
+  }
+
+  return showDialog(
+    context: context,
     barrierColor: Colors.black26,
+    builder: (context) {
+      return dialog;
+    },
+  );
+}
+
+Future showLoading() {
+  return Get.dialog(
+    Center(
+      child: Container(
+        width: 80.r,
+        height: 80.r,
+        child: CircularProgressIndicator(
+          backgroundColor: Colors.grey,
+        ),
+      ),
+    ),
+    barrierDismissible: false,
+    barrierColor: Colors.black12,
   );
 }

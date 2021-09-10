@@ -1,11 +1,12 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:solviolin_admin/util/constant.dart';
 import 'package:solviolin_admin/util/controller.dart';
+import 'package:solviolin_admin/util/format.dart';
 import 'package:solviolin_admin/util/network.dart';
 import 'package:solviolin_admin/widget/dialog.dart';
 import 'package:solviolin_admin/widget/input.dart';
+import 'package:solviolin_admin/widget/single.dart';
 
 class MenuPage extends StatefulWidget {
   const MenuPage({Key? key}) : super(key: key);
@@ -15,10 +16,10 @@ class MenuPage extends StatefulWidget {
 }
 
 class _MenuPageState extends State<MenuPage> {
-  Client client = Get.find<Client>();
-  DataController _controller = Get.find<DataController>();
+  var _client = Get.find<Client>();
+  var _controller = Get.find<DataController>();
 
-  TextEditingController branch = TextEditingController();
+  var branch = TextEditingController();
 
   @override
   void dispose() {
@@ -28,12 +29,6 @@ class _MenuPageState extends State<MenuPage> {
 
   @override
   Widget build(BuildContext context) {
-    Get.put(SearchController(), tag: "Main");
-    Get.put(SearchController(), tag: "User");
-    Get.put(SearchController(), tag: "Control");
-    Get.put(SearchController(), tag: "Teacher");
-    Get.put(SearchController(), tag: "Branch");
-
     return Scaffold(
       resizeToAvoidBottomInset: false,
       body: SafeArea(
@@ -49,6 +44,7 @@ class _MenuPageState extends State<MenuPage> {
               menu("지점 등록", _showBranchRegister),
               menu("매출", () => Get.toNamed("/ledger")),
               menu("체크인", () => Get.toNamed("/check-in")),
+              menu("체크인 이력", () => Get.toNamed("/check-in/history")),
               menu("로그아웃", _showLogout, true),
             ],
           ),
@@ -57,27 +53,9 @@ class _MenuPageState extends State<MenuPage> {
     );
   }
 
-  Widget menu(String name, void Function() onPressed,
-      [bool isDestructive = false]) {
-    return ElevatedButton(
-      onPressed: onPressed,
-      style: ElevatedButton.styleFrom(
-        primary: isDestructive ? Colors.red : symbolColor,
-        textStyle: TextStyle(color: Colors.white, fontSize: 22.r),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(15.r),
-        ),
-      ),
-      child: Container(
-        alignment: Alignment.center,
-        width: 135.r,
-        height: 60.r,
-        child: Text(name),
-      ),
-    );
-  }
-
   Future _showBranchRegister() {
+    branch.text = "";
+
     return showMyDialog(
       context: context,
       title: "지점 등록",
@@ -86,9 +64,9 @@ class _MenuPageState extends State<MenuPage> {
       ],
       onPressed: () async {
         try {
-          await client.registerBranch(branch.text);
+          await _client.registerBranch(textEdit(branch)!);
 
-          _controller.updateBranches(await client.getBranches());
+          _controller.updateBranches(await _client.getBranches());
           Get.back();
         } catch (e) {
           showError(e.toString());
@@ -103,14 +81,11 @@ class _MenuPageState extends State<MenuPage> {
     return showMyDialog(
       context: context,
       contents: [
-        Text(
-          "로그아웃 하시겠습니까?",
-          style: TextStyle(color: Colors.white, fontSize: 20.r),
-        ),
+        Text("로그아웃 하시겠습니까?"),
       ],
       onPressed: () async {
         try {
-          client.logout();
+          _client.logout();
         } catch (e) {} finally {
           Get.offAllNamed("/login");
         }

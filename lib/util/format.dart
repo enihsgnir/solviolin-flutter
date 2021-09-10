@@ -42,9 +42,15 @@ String dowToString(int dow) {
   return days[dow]!;
 }
 
+String? textEdit(TextEditingController edit) =>
+    edit.text == "" ? null : edit.text;
+
 // int getFirstDayOffset(DateTime date) {
 //   final int weekdayFromMonday = DateTime(date.year, date.month).weekday - 1;
 //   int firstDayOfWeekIndex = 0;
 //   firstDayOfWeekIndex = (firstDayOfWeekIndex - 1) % 7;
 //   return (weekdayFromMonday - firstDayOfWeekIndex) % 7;
 // }
+
+Duration timeOfDayToDuration(TimeOfDay time) =>
+    Duration(hours: time.hour, minutes: time.minute);

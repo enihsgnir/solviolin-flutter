@@ -14,3 +14,5 @@ BoxDecoration myDecoration = BoxDecoration(
   border: Border.all(color: Colors.grey),
   borderRadius: BorderRadius.circular(15.r),
 );
+
+TextStyle contentStyle = TextStyle(color: Colors.white, fontSize: 20.r);

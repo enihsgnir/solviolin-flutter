@@ -9,21 +9,21 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:solviolin_admin/util/controller.dart';
 import 'package:solviolin_admin/util/network.dart';
-import 'package:solviolin_admin/view/canceled/canceled_page.dart';
+import 'package:solviolin_admin/view/canceled_page.dart';
 import 'package:solviolin_admin/view/check_in/check_in_history_page.dart';
 import 'package:solviolin_admin/view/check_in/check_in_page.dart';
-import 'package:solviolin_admin/view/control/control_page.dart';
+import 'package:solviolin_admin/view/control_page.dart';
 import 'package:solviolin_admin/view/for_teacher/main_for_teacher_page.dart';
 import 'package:solviolin_admin/view/for_teacher/menu_for_teacher_page.dart';
-import 'package:solviolin_admin/view/ledger/ledger_page.dart';
+import 'package:solviolin_admin/view/ledger_page.dart';
 import 'package:solviolin_admin/view/loading_page.dart';
 import 'package:solviolin_admin/view/login_page.dart';
 import 'package:solviolin_admin/view/main/main_page.dart';
 import 'package:solviolin_admin/view/menu_page.dart';
-import 'package:solviolin_admin/view/salary/salary_page.dart';
-import 'package:solviolin_admin/view/teacher/teacher_page.dart';
-import 'package:solviolin_admin/view/term/term_page.dart';
-import 'package:solviolin_admin/view/user/user_page.dart';
+import 'package:solviolin_admin/view/salary_page.dart';
+import 'package:solviolin_admin/view/teacher_page.dart';
+import 'package:solviolin_admin/view/term_page.dart';
+import 'package:solviolin_admin/view/user_page.dart';
 import 'package:solviolin_admin/view/user_detail/user_detail_page.dart';
 
 void main() {

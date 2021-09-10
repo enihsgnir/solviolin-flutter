@@ -18,9 +18,9 @@ class MainForTeacherPage extends StatefulWidget {
 }
 
 class _MainForTeacherPageState extends State<MainForTeacherPage> {
-  DataController _controller = Get.find<DataController>();
+  var _controller = Get.find<DataController>();
 
-  CalendarController calendarController = Get.put(CalendarController());
+  var _calendar = Get.put(CalendarController(), tag: "/teacher");
 
   @override
   void initState() {
@@ -60,7 +60,7 @@ class _MainForTeacherPageState extends State<MainForTeacherPage> {
             ),
             IconButton(
               onPressed: () async {
-                final DateTime initialDate = DateTime.now();
+                final initialDate = DateTime.now();
                 DateTime? newDate;
 
                 newDate = await showDatePicker(
@@ -85,7 +85,7 @@ class _MainForTeacherPageState extends State<MainForTeacherPage> {
                 if (newDate != null &&
                     !isSameWeek(newDate, _controller.displayDate)) {
                   _controller.updateDisplayDate(newDate);
-                  calendarController.displayDate = newDate;
+                  _calendar.displayDate = newDate;
 
                   try {
                     await getReservationDataForTeacher(
@@ -102,13 +102,9 @@ class _MainForTeacherPageState extends State<MainForTeacherPage> {
           ],
         ),
         body: SafeArea(
-          child: GetBuilder<DataController>(
-            builder: (controller) {
-              return Container(
-                height: double.infinity,
-                child: TimeSlotForTeacher(),
-              );
-            },
+          child: Container(
+            height: double.infinity,
+            child: TimeSlotForTeacher(),
           ),
         ),
       ),

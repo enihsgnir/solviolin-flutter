@@ -5,7 +5,7 @@ import 'package:get/get.dart';
 import 'package:solviolin_admin/util/constant.dart';
 import 'package:solviolin_admin/util/controller.dart';
 import 'package:solviolin_admin/util/data_source.dart';
-import 'package:solviolin_admin/util/network.dart';
+import 'package:solviolin_admin/util/format.dart';
 import 'package:solviolin_admin/view/main/time_slot.dart';
 import 'package:solviolin_admin/widget/dialog.dart';
 import 'package:solviolin_admin/widget/dropdown.dart';
@@ -21,16 +21,11 @@ class MainPage extends StatefulWidget {
 }
 
 class _MainPageState extends State<MainPage> {
-  Client client = Get.find<Client>();
-  DataController _controller = Get.find<DataController>();
+  var _controller = Get.find<DataController>();
 
-  TextEditingController user = TextEditingController();
-  TextEditingController teacher = TextEditingController();
-  BranchController branch = Get.put(BranchController());
+  var _calendar = Get.put(CalendarController(), tag: "/admin");
 
-  SearchController search = Get.find<SearchController>(tag: "Main");
-
-  CalendarController calendarController = Get.put(CalendarController());
+  var search = Get.put(CacheController(), tag: "/search");
 
   @override
   void initState() {
@@ -43,9 +38,6 @@ class _MainPageState extends State<MainPage> {
 
   @override
   void dispose() {
-    user.dispose();
-    teacher.dispose();
-
     SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
     super.dispose();
   }
@@ -55,6 +47,7 @@ class _MainPageState extends State<MainPage> {
     return GestureDetector(
       onTap: () => FocusScope.of(context).unfocus(),
       child: Scaffold(
+        resizeToAvoidBottomInset: false,
         appBar: myAppBar(
           "메인",
           actions: [
@@ -64,9 +57,9 @@ class _MainPageState extends State<MainPage> {
                   if (search.isSearched) {
                     await getReservationData(
                       displayDate: _controller.displayDate,
-                      branchName: search.text1!,
-                      userID: search.text2,
-                      teacherID: search.text3,
+                      branchName: search.branchName!,
+                      userID: textEdit(search.edit1),
+                      teacherID: textEdit(search.edit2),
                     );
                   }
                 } catch (e) {
@@ -81,7 +74,7 @@ class _MainPageState extends State<MainPage> {
             ),
             IconButton(
               onPressed: () async {
-                final DateTime initialDate = DateTime.now();
+                final initialDate = DateTime.now();
                 DateTime? newDate;
 
                 newDate = await showDatePicker(
@@ -106,15 +99,15 @@ class _MainPageState extends State<MainPage> {
                 if (newDate != null &&
                     !isSameWeek(newDate, _controller.displayDate)) {
                   _controller.updateDisplayDate(newDate);
-                  calendarController.displayDate = newDate;
+                  _calendar.displayDate = newDate;
 
                   try {
                     if (search.isSearched) {
                       await getReservationData(
                         displayDate: _controller.displayDate,
-                        branchName: search.text1!,
-                        userID: search.text2,
-                        teacherID: search.text3,
+                        branchName: search.branchName!,
+                        userID: textEdit(search.edit1),
+                        teacherID: textEdit(search.edit2),
                       );
                     }
                   } catch (e) {
@@ -127,13 +120,9 @@ class _MainPageState extends State<MainPage> {
           ],
         ),
         body: SafeArea(
-          child: GetBuilder<DataController>(
-            builder: (controller) {
-              return Container(
-                height: double.infinity,
-                child: TimeSlot(),
-              );
-            },
+          child: Container(
+            height: double.infinity,
+            child: TimeSlot(),
           ),
         ),
       ),
@@ -145,21 +134,17 @@ class _MainPageState extends State<MainPage> {
       context: context,
       title: "검색",
       contents: [
-        myTextInput("수강생", user),
-        myTextInput("강사", teacher),
-        branchDropdown(null, "지점을 선택하세요!"),
+        myTextInput("수강생", search.edit1),
+        myTextInput("강사", search.edit2),
+        branchDropdown("/search", "지점을 선택하세요!"),
       ],
       onPressed: () async {
         try {
-          search.text1 = branch.branchName;
-          search.text2 = user.text == "" ? null : user.text;
-          search.text3 = teacher.text == "" ? null : teacher.text;
-
           await getReservationData(
             displayDate: _controller.displayDate,
-            branchName: search.text1!,
-            userID: search.text2,
-            teacherID: search.text3,
+            branchName: search.branchName!,
+            userID: textEdit(search.edit1),
+            teacherID: textEdit(search.edit2),
           );
 
           search.isSearched = true;

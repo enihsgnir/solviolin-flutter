@@ -6,20 +6,21 @@ import 'package:solviolin_admin/util/controller.dart';
 import 'package:solviolin_admin/util/format.dart';
 import 'package:solviolin_admin/widget/input.dart';
 
-Widget pickDateTime(
-  BuildContext context,
-  String item, [
+Widget pickDateTime({
+  required BuildContext context,
+  required String item,
   String? tag,
+  int index = 0,
   bool isMandatory = false,
-]) {
-  final DateTime initialDate = DateTime.now();
+}) {
+  final initialDate = DateTime.now();
   DateTime? newDate;
-  final TimeOfDay initialTime = TimeOfDay.now(); //TODO: to Duration
+  final initialTime = TimeOfDay.now();
   TimeOfDay? newTime;
 
-  Get.find<DateTimeController>(tag: tag);
+  Get.find<CacheController>(tag: tag);
 
-  return GetBuilder<DateTimeController>(
+  return GetBuilder<CacheController>(
     tag: tag,
     builder: (controller) {
       return Row(
@@ -34,16 +35,16 @@ Widget pickDateTime(
               decoration: const InputDecoration(),
               child: InkWell(
                 child: Text(
-                  controller.dateTime == null
+                  controller.dateTime[index] == null
                       ? "미선택"
                       : DateFormat("yy/MM/dd HH:mm")
-                          .format(controller.dateTime!),
-                  style: TextStyle(color: Colors.white, fontSize: 20.r),
+                          .format(controller.dateTime[index]!),
+                  style: contentStyle,
                 ),
                 onTap: () async {
                   newDate = await showDatePicker(
                     context: context,
-                    initialDate: controller.date ?? initialDate,
+                    initialDate: controller.date[index] ?? initialDate,
                     firstDate: DateTime(initialDate.year - 3),
                     lastDate: DateTime(initialDate.year + 1),
                     builder: (context, child) {
@@ -61,18 +62,15 @@ Widget pickDateTime(
                   );
 
                   if (newDate != null) {
-                    controller.updateDate(newDate);
                     newTime = await showTimePicker(
                       context: context,
-                      initialTime: controller.time ?? initialTime,
+                      initialTime: controller.time[index] ?? initialTime,
                     );
 
                     if (newTime != null) {
-                      controller.updateTime(newTime);
-                      controller.updateDateTime(newDate!.add(Duration(
-                        hours: newTime!.hour,
-                        minutes: newTime!.minute,
-                      )));
+                      controller.dateTime[index] =
+                          newDate!.add(timeOfDayToDuration(newTime!));
+                      controller.update();
                     }
                   }
                 },
@@ -85,18 +83,19 @@ Widget pickDateTime(
   );
 }
 
-Widget pickDate(
-  BuildContext context,
-  String item, [
+Widget pickDate({
+  required BuildContext context,
+  required String item,
   String? tag,
+  int index = 0,
   bool isMandatory = false,
-]) {
-  final DateTime initialDate = DateTime.now();
+}) {
+  final initialDate = DateTime.now();
   DateTime? newDate;
 
-  Get.find<DateTimeController>(tag: tag);
+  Get.find<CacheController>(tag: tag);
 
-  return GetBuilder<DateTimeController>(
+  return GetBuilder<CacheController>(
     tag: tag,
     builder: (controller) {
       return Row(
@@ -111,15 +110,15 @@ Widget pickDate(
               decoration: const InputDecoration(),
               child: InkWell(
                 child: Text(
-                  controller.date == null
+                  controller.date[index] == null
                       ? "미선택"
-                      : DateFormat("yy/MM/dd").format(controller.date!),
-                  style: TextStyle(color: Colors.white, fontSize: 20.r),
+                      : DateFormat("yy/MM/dd").format(controller.date[index]!),
+                  style: contentStyle,
                 ),
                 onTap: () async {
                   newDate = await showDatePicker(
                     context: context,
-                    initialDate: controller.date ?? initialDate,
+                    initialDate: controller.date[index] ?? initialDate,
                     firstDate: DateTime(initialDate.year - 3),
                     lastDate: DateTime(initialDate.year + 1),
                     builder: (context, child) {
@@ -137,7 +136,8 @@ Widget pickDate(
                   );
 
                   if (newDate != null) {
-                    controller.updateDate(newDate);
+                    controller.date[index] = newDate;
+                    controller.update();
                   }
                 },
               ),
@@ -149,18 +149,19 @@ Widget pickDate(
   );
 }
 
-Widget pickTime(
-  BuildContext context,
-  String item, [
+Widget pickTime({
+  required BuildContext context,
+  required String item,
   String? tag,
+  int index = 0,
   bool isMandatory = false,
-]) {
-  final TimeOfDay initialTime = TimeOfDay.now();
+}) {
+  final initialTime = TimeOfDay.now();
   TimeOfDay? newTime;
 
-  Get.find<DateTimeController>(tag: tag);
+  Get.find<CacheController>(tag: tag);
 
-  return GetBuilder<DateTimeController>(
+  return GetBuilder<CacheController>(
     tag: tag,
     builder: (controller) {
       return Row(
@@ -175,22 +176,23 @@ Widget pickTime(
               decoration: const InputDecoration(),
               child: InkWell(
                 child: Text(
-                  controller.time == null
+                  controller.time[index] == null
                       ? "미선택"
                       : timeToString(Duration(
-                          hours: controller.time!.hour,
-                          minutes: controller.time!.minute,
+                          hours: controller.time[index]!.hour,
+                          minutes: controller.time[index]!.minute,
                         )),
-                  style: TextStyle(color: Colors.white, fontSize: 20.r),
+                  style: contentStyle,
                 ),
                 onTap: () async {
                   newTime = await showTimePicker(
                     context: context,
-                    initialTime: controller.time ?? initialTime,
+                    initialTime: controller.time[index] ?? initialTime,
                   );
 
                   if (newTime != null) {
-                    controller.updateTime(newTime);
+                    controller.time[index] = newTime;
+                    controller.update();
                   }
                 },
               ),

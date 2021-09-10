@@ -8,6 +8,7 @@ Widget mySearch({
   return Container(
     padding: padding ?? EdgeInsets.symmetric(vertical: 8.r),
     decoration: myDecoration,
+    margin: EdgeInsets.all(8.r),
     child: Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: List.generate(
@@ -22,13 +23,17 @@ Widget mySearch({
 }
 
 Widget myActionButton({
+  required BuildContext context,
   required void Function() onPressed,
   String action = "검색",
 }) {
   return Padding(
     padding: EdgeInsets.only(left: 24.r),
     child: ElevatedButton(
-      onPressed: onPressed,
+      onPressed: () {
+        FocusScope.of(context).unfocus();
+        onPressed();
+      },
       style: ElevatedButton.styleFrom(primary: symbolColor),
       child: Text(action, style: TextStyle(fontSize: 20.r)),
     ),

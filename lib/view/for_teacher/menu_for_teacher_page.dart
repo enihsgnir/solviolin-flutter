@@ -1,11 +1,11 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:solviolin_admin/util/constant.dart';
 import 'package:solviolin_admin/util/controller.dart';
 import 'package:solviolin_admin/util/data_source.dart';
 import 'package:solviolin_admin/util/network.dart';
 import 'package:solviolin_admin/widget/dialog.dart';
+import 'package:solviolin_admin/widget/single.dart';
 
 class MenuForTeacherPage extends StatefulWidget {
   const MenuForTeacherPage({Key? key}) : super(key: key);
@@ -15,8 +15,8 @@ class MenuForTeacherPage extends StatefulWidget {
 }
 
 class _MenuForTeacherPageState extends State<MenuForTeacherPage> {
-  Client client = Get.find<Client>();
-  DataController _controller = Get.find<DataController>();
+  var _client = Get.find<Client>();
+  var _controller = Get.find<DataController>();
 
   @override
   Widget build(BuildContext context) {
@@ -24,7 +24,7 @@ class _MenuForTeacherPageState extends State<MenuForTeacherPage> {
       body: SafeArea(
         child: Center(
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               menu("메인", () async {
                 try {
@@ -46,41 +46,15 @@ class _MenuForTeacherPageState extends State<MenuForTeacherPage> {
     );
   }
 
-  Widget menu(String name, void Function() onPressed,
-      [bool isDestructive = false]) {
-    return Padding(
-      padding: EdgeInsets.all(24.r),
-      child: ElevatedButton(
-        onPressed: onPressed,
-        style: ElevatedButton.styleFrom(
-          primary: isDestructive ? Colors.red : symbolColor,
-          textStyle: TextStyle(color: Colors.white, fontSize: 22.r),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(15.r),
-          ),
-        ),
-        child: Container(
-          alignment: Alignment.center,
-          width: 135.r,
-          height: 60.r,
-          child: Text(name),
-        ),
-      ),
-    );
-  }
-
   Future _showLogout() {
     return showMyDialog(
       context: context,
       contents: [
-        Text(
-          "로그아웃 하시겠습니까?",
-          style: TextStyle(color: Colors.white, fontSize: 20.r),
-        ),
+        Text("로그아웃 하시겠습니까?"),
       ],
       onPressed: () async {
         try {
-          client.logout();
+          _client.logout();
         } catch (e) {} finally {
           Get.offAllNamed("/login");
         }

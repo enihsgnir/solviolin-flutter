@@ -26,23 +26,13 @@ class _UserDetailPageState extends State<UserDetailPage>
     with TickerProviderStateMixin {
   late TabController tabController;
 
+  var _client = Get.find<Client>();
   var _controller = Get.find<DataController>();
 
-  var client = Get.find<Client>();
-  var end = Get.put(DateTimeController());
-
-  var amount = TextEditingController();
-  var expend = Get.put(BranchController(), tag: "Expend");
-  var term = Get.put(TermController());
-
-  var update = Get.put(BranchController(), tag: "Update");
-  var phone = TextEditingController();
-  var status = Get.put(CheckController(), tag: "Update");
-  var credit = TextEditingController();
-  var name = TextEditingController();
-
-  var search = Get.find<SearchController>(tag: "User");
-  var detail = Get.find<DetailController>();
+  var search = Get.find<CacheController>(tag: "/search");
+  var delete = Get.put(CacheController(), tag: "/delete");
+  var expend = Get.put(CacheController(), tag: "/expend");
+  var update = Get.put(CacheController(), tag: "/update");
 
   @override
   void initState() {
@@ -51,18 +41,7 @@ class _UserDetailPageState extends State<UserDetailPage>
   }
 
   @override
-  void dispose() {
-    amount.dispose();
-    phone.dispose();
-    credit.dispose();
-    name.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
-    Get.find<DataController>();
-
     return Scaffold(
       appBar: myAppBar("유저 상세"),
       body: SafeArea(
@@ -85,33 +64,46 @@ class _UserDetailPageState extends State<UserDetailPage>
                             children: [
                               Text(regular.userID),
                               myActionButton(
-                                onPressed: () => showMyDialog(
-                                  context: context,
-                                  title: "정규 종료",
-                                  contents: [
-                                    pickDateTime(context, "종료일", null, true),
-                                  ],
-                                  onPressed: () async {
-                                    try {
-                                      await client
-                                          .updateEndDateAndDeleteLaterCourse(
-                                        regular.id,
-                                        endDate: end.date!,
-                                      );
-                                      await getUsersData(
-                                        branchName: search.text1,
-                                        userID: search.text2,
-                                        isPaid: search.number1,
-                                        status: search.number2,
-                                      );
-                                      await getUserDetailData(detail.user!);
+                                context: context,
+                                onPressed: () {
+                                  delete.reset();
 
-                                      Get.back();
-                                    } catch (e) {
-                                      showError(e.toString());
-                                    }
-                                  },
-                                ),
+                                  showMyDialog(
+                                    context: context,
+                                    title: "정규 종료",
+                                    contents: [
+                                      pickDateTime(
+                                        context: context,
+                                        item: "종료일",
+                                        tag: "/delete",
+                                        isMandatory: true,
+                                      ),
+                                    ],
+                                    onPressed: () async {
+                                      try {
+                                        await _client
+                                            .updateEndDateAndDeleteLaterCourse(
+                                          regular.id,
+                                          endDate: delete.date[0]!,
+                                        );
+                                        await getUsersData(
+                                          branchName: search.branchName,
+                                          userID: textEdit(search.edit1),
+                                          isPaid: search.check[0],
+                                          userType: UserType.values
+                                              .indexOf(search.type[UserType]),
+                                          status: search.check[1],
+                                        );
+                                        await getUserDetailData(
+                                            search.userDetail!);
+
+                                        Get.back();
+                                      } catch (e) {
+                                        showError(e.toString());
+                                      }
+                                    },
+                                  );
+                                },
                                 action: "정규종료",
                               ),
                             ],
@@ -208,29 +200,32 @@ class _UserDetailPageState extends State<UserDetailPage>
   }
 
   Future _showExpend() {
+    expend.reset();
+
     return showMyDialog(
       context: context,
       title: "원비납부",
       contents: [
-        myTextInput("금액", amount, "금액을 입력하세요!"),
-        branchDropdown("Expend", "지점을 선택하세요!"),
-        termDropdown("지점을 선택하세요!"),
+        myTextInput("금액", expend.edit1, "금액을 입력하세요!"),
+        branchDropdown("/expend", "지점을 선택하세요!"),
+        termDropdown("/expend", "지점을 선택하세요!"),
       ],
       onPressed: () async {
         try {
-          await client.registerLedger(
+          await _client.registerLedger(
             userID: _controller.regularSchedules[0].userID,
-            amount: int.parse(amount.text),
-            termID: term.termID!,
+            amount: int.parse(textEdit(expend.edit1)!),
+            termID: expend.termID!,
             branchName: expend.branchName!,
           );
           await getUsersData(
-            branchName: search.text1,
-            userID: search.text2,
-            isPaid: search.number1,
-            status: search.number2,
+            branchName: search.branchName,
+            userID: textEdit(search.edit1),
+            isPaid: search.check[0],
+            userType: UserType.values.indexOf(search.type[UserType]),
+            status: search.check[1],
           );
-          await getUserDetailData(detail.user!);
+          await getUserDetailData(search.userDetail!);
 
           Get.back();
         } catch (e) {
@@ -242,22 +237,48 @@ class _UserDetailPageState extends State<UserDetailPage>
   }
 
   Future _showUpdate() {
+    update.reset();
+
     return showMyDialog(
       context: context,
       title: "정보수정",
       contents: [
-        branchDropdown("Update"),
-        myTextInput("전화번호", phone),
+        branchDropdown("/update"),
+        myTextInput("전화번호", update.edit1),
         myCheckBox(
-          tag: "Update",
+          tag: "/update",
           item: "등록 여부",
           trueName: "등록",
           falseName: "미등록",
         ),
-        myTextInput("크레딧", credit),
-        myTextInput("이름", name),
+        myTextInput("크레딧", update.edit2),
+        myTextInput("이름", update.edit3),
       ],
-      onPressed: () {},
+      onPressed: () async {
+        try {
+          await _client.updateUserInformation(
+            _controller.regularSchedules[0].userID,
+            userBranch: update.branchName,
+            userPhone: textEdit(update.edit1),
+            status: update.check[0],
+            userCredit: int.parse(textEdit(update.edit2)!),
+            userName: textEdit(update.edit3),
+          );
+
+          await getUsersData(
+            branchName: search.branchName,
+            userID: textEdit(search.edit1),
+            isPaid: search.check[0],
+            userType: UserType.values.indexOf(search.type[UserType]),
+            status: search.check[1],
+          );
+          await getUserDetailData(search.userDetail!);
+
+          Get.back();
+        } catch (e) {
+          showError(e.toString());
+        }
+      },
       isScrolling: true,
     );
   }

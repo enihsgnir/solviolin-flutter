@@ -152,7 +152,7 @@ class ReservationDataSource extends CalendarDataSource {
     final start = DateFormat("HH:mm").format(appointments![index].startDate);
     final end = DateFormat("HH:mm").format(appointments![index].endDate);
     return appointments![index].userID +
-        "\n${appointments![index].teacherID}/${appointments![index].branchName}" +
+        "/\n${appointments![index].teacherID}/${appointments![index].branchName}" +
         "\n$start ~ $end";
   }
 
@@ -215,10 +215,7 @@ Future<void> saveUsersData({
       "유저 정보 목록 저장",
       style: TextStyle(color: Colors.white, fontSize: 24.r),
     ),
-    messageText: Text(
-      file.path,
-      style: TextStyle(color: Colors.white, fontSize: 20.r),
-    ),
+    messageText: Text(file.path, style: contentStyle),
     duration: const Duration(seconds: 10),
   );
 }
@@ -326,15 +323,4 @@ Future<void> getLedgersData({
       int primary = b.paidAt.compareTo(a.paidAt);
       return primary != 0 ? primary : a.userID.compareTo(b.userID);
     }));
-}
-
-//TODO: Implement with FutureBuilder not GetBuilder
-Future<void> getTotalLedgerData({
-  required String branchName,
-  required int termID,
-}) async {
-  // _controller.updateTotalLedger(await _client.getTotalLedger(
-  //   branchName: branchName,
-  //   termID: termID,
-  // ));
 }

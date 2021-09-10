@@ -2,10 +2,10 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-import 'package:solviolin_admin/model/regular_schedule.dart';
 import 'package:solviolin_admin/util/constant.dart';
 import 'package:solviolin_admin/util/controller.dart';
 import 'package:solviolin_admin/util/data_source.dart';
+import 'package:solviolin_admin/util/format.dart';
 import 'package:solviolin_admin/util/network.dart';
 import 'package:solviolin_admin/widget/dialog.dart';
 import 'package:solviolin_admin/widget/dropdown.dart';
@@ -21,44 +21,18 @@ class TimeSlot extends StatefulWidget {
 }
 
 class _TimeSlotState extends State<TimeSlot> {
-  Client client = Get.find<Client>();
-  DataController _controller = Get.find<DataController>();
+  var _client = Get.find<Client>();
+  var _controller = Get.find<DataController>();
 
-  TextEditingController teacherRegular = TextEditingController();
-  BranchController branchRegular = Get.put(BranchController(), tag: "Regular");
-  DateTimeController endRegular = Get.put(DateTimeController(), tag: "Regular");
-  TextEditingController userRegular = TextEditingController();
+  var _calendar = Get.find<CalendarController>(tag: "/admin");
 
-  TextEditingController teacherUser = TextEditingController();
-  BranchController branchUser = Get.put(BranchController(), tag: "User");
-  TextEditingController userUser = TextEditingController();
+  var search = Get.find<CacheController>(tag: "/search");
+  var regular = Get.put(CacheController(), tag: "/regular");
+  var user = Get.put(CacheController(), tag: "/user");
+  var admin = Get.put(CacheController(), tag: "/admin");
+  var free = Get.put(CacheController(), tag: "/free");
 
-  TextEditingController teacherAdmin = TextEditingController();
-  BranchController branchAdmin = Get.put(BranchController(), tag: "Admin");
-  TextEditingController userAdmin = TextEditingController();
-
-  TextEditingController teacherFree = TextEditingController();
-  BranchController branchFree = Get.put(BranchController(), tag: "Free");
-  DateTimeController endFree = Get.put(DateTimeController(), tag: "Free");
-  TextEditingController userFree = TextEditingController();
-
-  SearchController search = Get.find<SearchController>(tag: "Main");
-  bool hasBeenShown = false;
-
-  CalendarController calendarController = Get.find<CalendarController>();
-
-  @override
-  void dispose() {
-    teacherRegular.dispose();
-    userRegular.dispose();
-    teacherUser.dispose();
-    userUser.dispose();
-    teacherAdmin.dispose();
-    userAdmin.dispose();
-    teacherFree.dispose();
-    userFree.dispose();
-    super.dispose();
-  }
+  var hasBeenShown = false;
 
   @override
   Widget build(BuildContext context) {
@@ -67,7 +41,7 @@ class _TimeSlotState extends State<TimeSlot> {
         return SfCalendar(
           view: CalendarView.week,
           dataSource: controller.reservationDataSource,
-          controller: calendarController,
+          controller: _calendar,
           onTap: (details) async {
             if (!search.isSearched && !hasBeenShown) {
               await showError("필터를 사용하여 예약을 검색할 수 있습니다");
@@ -75,14 +49,14 @@ class _TimeSlotState extends State<TimeSlot> {
             }
 
             if (details.targetElement == CalendarElement.viewHeader) {
-              if (calendarController.view == CalendarView.week) {
-                calendarController.view = CalendarView.timelineDay;
+              if (_calendar.view == CalendarView.week) {
+                _calendar.view = CalendarView.timelineDay;
               } else {
-                calendarController.view = CalendarView.week;
+                _calendar.view = CalendarView.week;
               }
 
-              calendarController.displayDate = details.date!;
-              controller.updateDisplayDate(calendarController.displayDate!);
+              _calendar.displayDate = details.date!;
+              controller.updateDisplayDate(_calendar.displayDate!);
             } else if (details.targetElement == CalendarElement.calendarCell) {
               _showEmpty(details);
             } else if (details.targetElement == CalendarElement.appointment) {
@@ -90,17 +64,16 @@ class _TimeSlotState extends State<TimeSlot> {
             }
           },
           onViewChanged: (details) async {
-            if (!isSameWeek(
-                calendarController.displayDate!, controller.displayDate)) {
-              controller.updateDisplayDate(calendarController.displayDate!);
+            if (!isSameWeek(_calendar.displayDate!, controller.displayDate)) {
+              controller.updateDisplayDate(_calendar.displayDate!);
 
               try {
                 if (search.isSearched) {
                   await getReservationData(
-                    displayDate: controller.displayDate,
-                    branchName: search.text1!,
-                    userID: search.text2,
-                    teacherID: search.text3,
+                    displayDate: _controller.displayDate,
+                    branchName: search.branchName!,
+                    userID: textEdit(search.edit1),
+                    teacherID: textEdit(search.edit2),
                   );
                 }
               } catch (e) {
@@ -193,21 +166,18 @@ class _TimeSlotState extends State<TimeSlot> {
       context: context,
       title: "취소 (수강생)",
       contents: [
-        Text(
-          "수강생의 권한으로 취소하시겠습니까?",
-          style: TextStyle(color: Colors.white, fontSize: 20.r),
-        ),
+        Text("수강생의 권한으로 취소하시겠습니까?"),
       ],
       onPressed: () async {
         try {
-          await client.cancelReservation(details.appointments![0].id);
+          await _client.cancelReservation(details.appointments![0].idSearch);
 
           if (search.isSearched) {
             await getReservationData(
               displayDate: _controller.displayDate,
-              branchName: search.text1!,
-              userID: search.text2,
-              teacherID: search.text3,
+              branchName: search.branchName!,
+              userID: textEdit(search.edit1),
+              teacherID: textEdit(search.edit2),
             );
           }
 
@@ -224,21 +194,19 @@ class _TimeSlotState extends State<TimeSlot> {
       context: context,
       title: "취소 (관리자)",
       contents: [
-        Text(
-          "관리자의 권한으로 취소하시겠습니까?",
-          style: TextStyle(color: Colors.white, fontSize: 20.r),
-        ),
+        Text("관리자의 권한으로 취소하시겠습니까?"),
       ],
       onPressed: () async {
         try {
-          await client.cancelReservationByAdmin(details.appointments![0].id);
+          await _client
+              .cancelReservationByAdmin(details.appointments![0].idSearch);
 
           if (search.isSearched) {
             await getReservationData(
               displayDate: _controller.displayDate,
-              branchName: search.text1!,
-              userID: search.text2,
-              teacherID: search.text3,
+              branchName: search.branchName!,
+              userID: textEdit(search.edit1),
+              teacherID: textEdit(search.edit2),
             );
           }
 
@@ -255,21 +223,18 @@ class _TimeSlotState extends State<TimeSlot> {
       context: context,
       title: "연장 (수강생)",
       contents: [
-        Text(
-          "수강생의 권한으로 연장하시겠습니까?",
-          style: TextStyle(color: Colors.white, fontSize: 20.r),
-        ),
+        Text("수강생의 권한으로 연장하시겠습니까?"),
       ],
       onPressed: () async {
         try {
-          await client.extendReservation(details.appointments![0].id);
+          await _client.extendReservation(details.appointments![0].idSearch);
 
           if (search.isSearched) {
             await getReservationData(
               displayDate: _controller.displayDate,
-              branchName: search.text1!,
-              userID: search.text2,
-              teacherID: search.text3,
+              branchName: search.branchName!,
+              userID: textEdit(search.edit1),
+              teacherID: textEdit(search.edit2),
             );
           }
 
@@ -284,96 +249,52 @@ class _TimeSlotState extends State<TimeSlot> {
   Future _showExtendByAdmin(CalendarTapDetails details) {
     bool count = false;
 
-    return showDialog(
+    return showMyDialog(
       context: context,
-      barrierColor: Colors.black26,
-      builder: (context) {
-        return StatefulBuilder(
-          builder: (context, setState) {
-            return AlertDialog(
-              title: Text(
-                "연장 (관리자)",
-                style: TextStyle(color: Colors.white, fontSize: 28.r),
-              ),
-              content: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    "관리자의 권한으로 연장하시겠습니까?",
-                    style: TextStyle(color: Colors.white, fontSize: 20.r),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.fromLTRB(12.r, 6.r, 12.r, 0),
-                    child: Row(
-                      children: [
-                        Container(
-                          width: 240.r,
-                          child: Text(
-                            "카운트 포함",
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 20.r,
-                            ),
-                          ),
-                        ),
-                        Checkbox(
-                          value: count,
-                          onChanged: (value) {
-                            setState(() {
-                              count = value!;
-                            });
-                          },
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-              actions: [
-                OutlinedButton(
-                  onPressed: () {
-                    Get.back();
+      title: "연장 (관리자)",
+      contents: [
+        Text("관리자의 권한으로 연장하시겠습니까?"),
+        Row(
+          children: [
+            Container(
+              width: 120.r,
+              child: label("카운트 포함", true),
+            ),
+            StatefulBuilder(
+              builder: (context, setState) {
+                return Checkbox(
+                  value: count,
+                  onChanged: (value) {
+                    setState(() {
+                      count = value!;
+                    });
                   },
-                  style: OutlinedButton.styleFrom(
-                    padding: EdgeInsets.fromLTRB(16.r, 12.r, 16.r, 12.r),
-                  ),
-                  child: Text(
-                    "취소",
-                    style: TextStyle(color: Colors.white, fontSize: 20.r),
-                  ),
-                ),
-                ElevatedButton(
-                  onPressed: () async {
-                    try {
-                      await client.extendReservationByAdmin(
-                        id: details.appointments![0].id,
-                        count: count ? 1 : 0,
-                      );
+                );
+              },
+            ),
+          ],
+        ),
+      ],
+      onPressed: () async {
+        try {
+          await _client.extendReservationByAdmin(
+            details.appointments![0].idSearch,
+            count: count ? 1 : 0,
+          );
 
-                      if (search.isSearched) {
-                        await getReservationData(
-                          displayDate: _controller.displayDate,
-                          branchName: search.text1!,
-                          userID: search.text2,
-                          teacherID: search.text3,
-                        );
-                      }
-
-                      Get.back();
-                    } catch (e) {
-                      showError(e.toString());
-                    }
-                  },
-                  style: ElevatedButton.styleFrom(
-                    primary: symbolColor,
-                    padding: EdgeInsets.fromLTRB(16.r, 12.r, 16.r, 12.r),
-                  ),
-                  child: Text("확인", style: TextStyle(fontSize: 20.r)),
-                ),
-              ],
+          if (search.isSearched) {
+            await getReservationData(
+              displayDate: _controller.displayDate,
+              branchName: search.branchName!,
+              userID: textEdit(search.edit1),
+              teacherID: textEdit(search.edit2),
             );
-          },
-        );
+          }
+
+          Get.back();
+        } catch (e) {
+          showError(e.toString());
+        }
       },
     );
   }
@@ -383,16 +304,13 @@ class _TimeSlotState extends State<TimeSlot> {
       context: context,
       title: "정규 종료",
       contents: [
-        Text(
-          "종료일: " +
-              DateFormat("yy/MM/dd HH:mm")
-                  .format(details.appointments![0].endDate),
-          style: TextStyle(color: Colors.white, fontSize: 20.r),
-        ),
+        Text("종료일: " +
+            DateFormat("yy/MM/dd HH:mm")
+                .format(details.appointments![0].endDate)),
       ],
       onPressed: () async {
         try {
-          await client.updateEndDateAndDeleteLaterCourse(
+          await _client.updateEndDateAndDeleteLaterCourse(
             details.appointments![0].regularID,
             endDate: details.appointments![0].endDate,
           );
@@ -400,9 +318,9 @@ class _TimeSlotState extends State<TimeSlot> {
           if (search.isSearched) {
             await getReservationData(
               displayDate: _controller.displayDate,
-              branchName: search.text1!,
-              userID: search.text2,
-              teacherID: search.text3,
+              branchName: search.branchName!,
+              userID: textEdit(search.edit1),
+              teacherID: textEdit(search.edit2),
             );
           }
 
@@ -448,38 +366,46 @@ class _TimeSlotState extends State<TimeSlot> {
   }
 
   Future _showReserveRegular(CalendarTapDetails details) {
+    regular.reset();
+
+    if (search.isSearched) {
+      regular.edit1.text = search.edit2.text;
+      regular.branchName = search.branchName;
+      regular.edit2.text = search.edit1.text;
+    }
+
     return showMyDialog(
       context: context,
       title: "정규 등록",
       contents: [
-        Text(
-          DateFormat("yy/MM/dd HH:mm").format(details.date!) + " ~ ",
-          style: TextStyle(color: Colors.white, fontSize: 20.r),
+        Text(DateFormat("yy/MM/dd HH:mm").format(details.date!) + " ~ "),
+        myTextInput("강사", regular.edit1, "강사명을 입력하세요!"),
+        branchDropdown("/regular", "지점을 선택하세요!"),
+        pickTime(
+          context: context,
+          item: "종료시각",
+          tag: "/regular",
+          isMandatory: true,
         ),
-        myTextInput("강사", teacherRegular, "강사명을 입력하세요!"),
-        branchDropdown("Regular", "지점을 선택하세요!"),
-        pickTime(context, "종료시각", "Regular", true),
-        myTextInput("수강생", userRegular, "이름을 입력하세요!"),
+        myTextInput("수강생", regular.edit2, "이름을 입력하세요!"),
       ],
       onPressed: () async {
         try {
-          await client.reserveRegularReservation(
-            teacherID: teacherRegular.text,
-            branchName: branchRegular.branchName!,
+          await _client.reserveRegularReservation(
+            teacherID: textEdit(regular.edit1)!,
+            branchName: regular.branchName!,
             startDate: details.date!,
-            endDate: DateUtils.dateOnly(details.date!).add(Duration(
-              hours: endRegular.time!.hour,
-              minutes: endRegular.time!.minute,
-            )),
-            userID: userRegular.text,
+            endDate: DateUtils.dateOnly(details.date!)
+                .add(timeOfDayToDuration(regular.time[0]!)),
+            userID: textEdit(regular.edit2)!,
           );
 
           if (search.isSearched) {
             await getReservationData(
               displayDate: _controller.displayDate,
-              branchName: search.text1!,
-              userID: search.text2,
-              teacherID: search.text3,
+              branchName: search.branchName!,
+              userID: textEdit(search.edit1),
+              teacherID: textEdit(search.edit2),
             );
           }
 
@@ -494,37 +420,46 @@ class _TimeSlotState extends State<TimeSlot> {
   }
 
   Future _showMakeUpByUser(CalendarTapDetails details) {
+    user.reset();
+
+    if (search.isSearched) {
+      regular.edit1.text = search.edit2.text;
+      regular.branchName = search.branchName;
+      regular.edit2.text = search.edit1.text;
+    }
+
     return showMyDialog(
       context: context,
       title: "보강 예약 (수강생)",
       contents: [
-        Text(
-          DateFormat("yy/MM/dd HH:mm").format(details.date!) + " ~ ",
-          style: TextStyle(color: Colors.white, fontSize: 20.r),
+        Text(DateFormat("yy/MM/dd HH:mm").format(details.date!) + " ~ "),
+        myTextInput("강사", user.edit1, "강사명을 입력하세요!"),
+        branchDropdown("/user", "지점을 선택하세요!"),
+        pickTime(
+          context: context,
+          item: "종료시각",
+          tag: "/user",
+          isMandatory: true,
         ),
-        myTextInput("강사", teacherUser, "강사명을 입력하세요!"),
-        branchDropdown("User", "지점을 선택하세요!"),
-        myTextInput("수강생", userUser, "이름을 입력하세요!"),
+        myTextInput("수강생", user.edit2, "이름을 입력하세요!"),
       ],
       onPressed: () async {
         try {
-          RegularSchedule regular =
-              (await client.getRegularSchedulesByAdmin(userUser.text))[0];
-
-          await client.makeUpReservation(
-            teacherID: teacherUser.text,
-            branchName: branchUser.branchName!,
+          await _client.makeUpReservation(
+            teacherID: textEdit(user.edit1)!,
+            branchName: user.branchName!,
             startDate: details.date!,
-            endDate: details.date!.add(regular.endTime - regular.startTime),
-            userID: userUser.text,
+            endDate: DateUtils.dateOnly(details.date!)
+                .add(timeOfDayToDuration(user.time[0]!)),
+            userID: textEdit(user.edit2)!,
           );
 
           if (search.isSearched) {
             await getReservationData(
               displayDate: _controller.displayDate,
-              branchName: search.text1!,
-              userID: search.text2,
-              teacherID: search.text3,
+              branchName: search.branchName!,
+              userID: textEdit(search.edit1),
+              teacherID: textEdit(search.edit2),
             );
           }
 
@@ -539,37 +474,46 @@ class _TimeSlotState extends State<TimeSlot> {
   }
 
   Future _showMakeUpByAdmin(CalendarTapDetails details) {
+    admin.reset();
+
+    if (search.isSearched) {
+      regular.edit1.text = search.edit2.text;
+      regular.branchName = search.branchName;
+      regular.edit2.text = search.edit1.text;
+    }
+
     return showMyDialog(
       context: context,
       title: "보강 예약 (관리자)",
       contents: [
-        Text(
-          DateFormat("yy/MM/dd HH:mm").format(details.date!) + " ~ ",
-          style: TextStyle(color: Colors.white, fontSize: 20.r),
+        Text(DateFormat("yy/MM/dd HH:mm").format(details.date!) + " ~ "),
+        myTextInput("강사", admin.edit1, "강사명을 입력하세요!"),
+        branchDropdown("/admin", "지점을 선택하세요!"),
+        pickTime(
+          context: context,
+          item: "종료시각",
+          tag: "/admin",
+          isMandatory: true,
         ),
-        myTextInput("강사", teacherAdmin, "강사명을 입력하세요!"),
-        branchDropdown("Admin", "지점을 선택하세요!"),
-        myTextInput("수강생", userAdmin, "이름을 입력하세요!"),
+        myTextInput("수강생", admin.edit2, "이름을 입력하세요!"),
       ],
       onPressed: () async {
         try {
-          RegularSchedule regular =
-              (await client.getRegularSchedulesByAdmin(userAdmin.text))[0];
-
-          await client.makeUpReservationByAdmin(
-            teacherID: teacherAdmin.text,
-            branchName: branchAdmin.branchName!,
+          await _client.makeUpReservationByAdmin(
+            teacherID: textEdit(admin.edit1)!,
+            branchName: admin.branchName!,
             startDate: details.date!,
-            endDate: details.date!.add(regular.endTime - regular.startTime),
-            userID: userAdmin.text,
+            endDate: DateUtils.dateOnly(details.date!)
+                .add(timeOfDayToDuration(admin.time[0]!)),
+            userID: textEdit(admin.edit2)!,
           );
 
           if (search.isSearched) {
             await getReservationData(
               displayDate: _controller.displayDate,
-              branchName: search.text1!,
-              userID: search.text2,
-              teacherID: search.text3,
+              branchName: search.branchName!,
+              userID: textEdit(search.edit1),
+              teacherID: textEdit(search.edit2),
             );
           }
 
@@ -584,38 +528,46 @@ class _TimeSlotState extends State<TimeSlot> {
   }
 
   Future _showFreeCourse(CalendarTapDetails details) {
+    free.reset();
+
+    if (search.isSearched) {
+      regular.edit1.text = search.edit2.text;
+      regular.branchName = search.branchName;
+      regular.edit2.text = search.edit1.text;
+    }
+
     return showMyDialog(
       context: context,
       title: "무료 보강 등록",
       contents: [
-        Text(
-          DateFormat("yy/MM/dd HH:mm").format(details.date!) + " ~ ",
-          style: TextStyle(color: Colors.white, fontSize: 20.r),
+        Text(DateFormat("yy/MM/dd HH:mm").format(details.date!) + " ~ "),
+        myTextInput("강사", free.edit1, "강사명을 입력하세요!"),
+        branchDropdown("/free", "지점을 선택하세요!"),
+        pickTime(
+          context: context,
+          item: "종료시각",
+          tag: "/free",
+          isMandatory: true,
         ),
-        myTextInput("강사", teacherFree, "강사명을 입력하세요!"),
-        branchDropdown("Free", "지점을 선택하세요!"),
-        pickTime(context, "종료시각", "Free", true),
-        myTextInput("수강생", userFree, "이름을 입력하세요!"),
+        myTextInput("수강생", free.edit2, "이름을 입력하세요!"),
       ],
       onPressed: () async {
         try {
-          await client.reserveFreeCourse(
-            teacherID: teacherFree.text,
-            branchName: branchFree.branchName!,
+          await _client.reserveFreeCourse(
+            teacherID: textEdit(free.edit1)!,
+            branchName: free.branchName!,
             startDate: details.date!,
-            endDate: DateUtils.dateOnly(details.date!).add(Duration(
-              hours: endFree.time!.hour,
-              minutes: endFree.time!.minute,
-            )),
-            userID: userFree.text,
+            endDate: DateUtils.dateOnly(details.date!)
+                .add(timeOfDayToDuration(free.time[0]!)),
+            userID: textEdit(free.edit2)!,
           );
 
           if (search.isSearched) {
             await getReservationData(
               displayDate: _controller.displayDate,
-              branchName: search.text1!,
-              userID: search.text2,
-              teacherID: search.text3,
+              branchName: search.branchName!,
+              userID: textEdit(search.edit1),
+              teacherID: textEdit(search.edit2),
             );
           }
 

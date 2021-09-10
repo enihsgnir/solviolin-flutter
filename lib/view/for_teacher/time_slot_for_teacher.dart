@@ -4,7 +4,6 @@ import 'package:get/get.dart';
 import 'package:solviolin_admin/util/constant.dart';
 import 'package:solviolin_admin/util/controller.dart';
 import 'package:solviolin_admin/util/data_source.dart';
-import 'package:solviolin_admin/util/network.dart';
 import 'package:solviolin_admin/widget/dialog.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
 
@@ -16,9 +15,7 @@ class TimeSlotForTeacher extends StatefulWidget {
 }
 
 class _TimeSlotForTeacherState extends State<TimeSlotForTeacher> {
-  Client client = Get.find<Client>();
-
-  CalendarController calendarController = Get.find<CalendarController>();
+  var _calendar = Get.find<CalendarController>(tag: "/teacher");
 
   @override
   Widget build(BuildContext context) {
@@ -29,23 +26,22 @@ class _TimeSlotForTeacherState extends State<TimeSlotForTeacher> {
         return SfCalendar(
           view: CalendarView.week,
           dataSource: controller.reservationDataSource,
-          controller: calendarController,
+          controller: _calendar,
           onTap: (details) async {
             if (details.targetElement == CalendarElement.viewHeader) {
-              if (calendarController.view == CalendarView.week) {
-                calendarController.view = CalendarView.timelineDay;
+              if (_calendar.view == CalendarView.week) {
+                _calendar.view = CalendarView.timelineDay;
               } else {
-                calendarController.view = CalendarView.week;
+                _calendar.view = CalendarView.week;
               }
 
-              calendarController.displayDate = details.date!;
-              controller.updateDisplayDate(calendarController.displayDate!);
+              _calendar.displayDate = details.date!;
+              controller.updateDisplayDate(_calendar.displayDate!);
             }
           },
           onViewChanged: (details) async {
-            if (!isSameWeek(
-                calendarController.displayDate!, controller.displayDate)) {
-              controller.updateDisplayDate(calendarController.displayDate!);
+            if (!isSameWeek(_calendar.displayDate!, controller.displayDate)) {
+              controller.updateDisplayDate(_calendar.displayDate!);
 
               try {
                 await getReservationDataForTeacher(

@@ -9,145 +9,98 @@ import 'package:solviolin_admin/widget/input.dart';
 
 DataController _controller = Get.find<DataController>();
 
+Widget _myDropdown<T>({
+  required String title,
+  T? value,
+  String? validator,
+  void Function(T?)? onChanged,
+  required List<DropdownMenuItem<T>> items,
+}) {
+  return Row(
+    children: [
+      Container(
+        width: 110.r,
+        child: label(title, validator != null),
+      ),
+      Container(
+        width: 220.r,
+        child: DropdownButtonFormField<T>(
+          value: value,
+          hint: Text(title, style: TextStyle(fontSize: 20.r)),
+          icon: Icon(CupertinoIcons.arrowtriangle_down_square, size: 20.r),
+          iconSize: 24.r,
+          elevation: 16,
+          style: contentStyle,
+          validator: (value) => value == null ? validator : null,
+          onChanged: onChanged,
+          onSaved: onChanged,
+          items: items,
+        ),
+      ),
+    ],
+  );
+}
+
 Widget branchDropdown([
   String? tag,
   String? validator,
 ]) {
-  bool isMandatory = validator != null;
+  var _cache = Get.find<CacheController>(tag: tag);
 
-  Get.find<BranchController>(tag: tag);
-
-  return GetBuilder<BranchController>(
-    tag: tag,
-    builder: (controller) {
-      return Row(
-        children: [
-          Container(
-            width: 110.r,
-            child: label("지점명", isMandatory),
-          ),
-          Container(
-            width: 220.r,
-            child: DropdownButtonFormField<String>(
-              value: controller.branchName,
-              hint: Text("지점명", style: TextStyle(fontSize: 20.r)),
-              icon: Icon(CupertinoIcons.arrowtriangle_down_square, size: 20.r),
-              iconSize: 24.r,
-              elevation: 16,
-              style: TextStyle(color: Colors.white, fontSize: 20.r),
-              validator: (value) {
-                return value == null ? validator : null;
-              },
-              onChanged: (value) {
-                controller.updateBranchName(value!);
-              },
-              onSaved: (value) {
-                controller.updateBranchName(value!);
-              },
-              items: _controller.branches
-                  .map<DropdownMenuItem<String>>((value) => DropdownMenuItem(
-                        value: value,
-                        child: Text(value),
-                      ))
-                  .toList(),
-            ),
-          ),
-        ],
-      );
-    },
+  return _myDropdown<String>(
+    title: "지점명",
+    value: _cache.branchName,
+    validator: validator,
+    onChanged: (value) => _cache.branchName = value,
+    items: _controller.branches
+        .map<DropdownMenuItem<String>>((value) => DropdownMenuItem(
+              value: value,
+              child: Text(value),
+            ))
+        .toList(),
   );
 }
 
-Widget workDowDropdown([String? validator]) {
-  bool isMandatory = validator != null;
+Widget workDowDropdown([
+  String? tag,
+  String? validator,
+]) {
+  var _cache = Get.find<CacheController>(tag: tag);
 
-  Get.find<WorkDowController>();
-
-  return GetBuilder<WorkDowController>(
-    builder: (controller) {
-      return Row(
-        children: [
-          Container(
-            width: 110.r,
-            child: label("요일", isMandatory),
-          ),
-          Container(
-            width: 220.r,
-            child: DropdownButtonFormField<int>(
-              value: controller.workDow,
-              hint: Text("요일", style: TextStyle(fontSize: 20.r)),
-              icon: Icon(CupertinoIcons.arrowtriangle_down_square, size: 20.r),
-              iconSize: 24.r,
-              elevation: 16,
-              style: TextStyle(color: Colors.white, fontSize: 20.r),
-              validator: (value) {
-                return value == null ? validator : null;
-              },
-              onChanged: (value) {
-                controller.updateWorkDow(value!);
-              },
-              onSaved: (value) {
-                controller.updateWorkDow(value!);
-              },
-              items: [for (int i = 0; i < 7; i++) i]
-                  .map<DropdownMenuItem<int>>((value) => DropdownMenuItem(
-                        value: value,
-                        child: Text(dowToString(value)),
-                      ))
-                  .toList(),
-            ),
-          ),
-        ],
-      );
-    },
+  return _myDropdown<int>(
+    title: "요일",
+    value: _cache.workDow,
+    validator: validator,
+    onChanged: (value) => _cache.workDow = value,
+    items: [for (int i = 0; i < 7; i++) i]
+        .map<DropdownMenuItem<int>>((value) => DropdownMenuItem(
+              value: value,
+              child: Text(dowToString(value)),
+            ))
+        .toList(),
   );
 }
 
-Widget termDropdown([String? validator]) {
-  bool isMandatory = validator != null;
+Widget termDropdown([
+  String? tag,
+  String? validator,
+]) {
+  var _cache = Get.find<CacheController>(tag: tag);
 
-  Get.find<TermController>();
-
-  return GetBuilder<TermController>(
-    builder: (controller) {
-      return Row(
-        children: [
-          Container(
-            width: 110.r,
-            child: label("학기", isMandatory),
-          ),
-          Container(
-            width: 220.r,
-            child: DropdownButtonFormField<int>(
-              value: controller.termID,
-              hint: Text("학기", style: TextStyle(fontSize: 20.r)),
-              icon: Icon(CupertinoIcons.arrowtriangle_down_square, size: 20.r),
-              iconSize: 24.r,
-              elevation: 16,
-              style: TextStyle(color: Colors.white, fontSize: 20.r),
-              validator: (value) {
-                return value == null ? validator : null;
-              },
-              onChanged: (value) {
-                controller.updateTermID(value!);
-              },
-              onSaved: (value) {
-                controller.updateTermID(value!);
-              },
-              items: _controller.terms
-                  .map<DropdownMenuItem<int>>((value) => DropdownMenuItem(
-                        value: value.id,
-                        child: Text(
-                          DateFormat("yy/MM/dd").format(value.termStart) +
-                              " ~ " +
-                              DateFormat("yy/MM/dd").format(value.termEnd),
-                        ),
-                      ))
-                  .toList(),
-            ),
-          ),
-        ],
-      );
-    },
+  return _myDropdown<int>(
+    title: "학기",
+    value: _cache.termID,
+    validator: validator,
+    onChanged: (value) => _cache.termID = value,
+    items: _controller.terms
+        .map<DropdownMenuItem<int>>((value) => DropdownMenuItem(
+              value: value.id,
+              child: Text(
+                DateFormat("yy/MM/dd").format(value.termStart) +
+                    " ~ " +
+                    DateFormat("yy/MM/dd").format(value.termEnd),
+              ),
+            ))
+        .toList(),
   );
 }

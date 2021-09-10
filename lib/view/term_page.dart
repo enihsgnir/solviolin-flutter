@@ -1,0 +1,239 @@
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:intl/intl.dart';
+import 'package:solviolin_admin/util/constant.dart';
+import 'package:solviolin_admin/util/controller.dart';
+import 'package:solviolin_admin/util/format.dart';
+import 'package:solviolin_admin/util/network.dart';
+import 'package:solviolin_admin/widget/dialog.dart';
+import 'package:solviolin_admin/widget/dropdown.dart';
+import 'package:solviolin_admin/widget/input.dart';
+import 'package:solviolin_admin/widget/item_list.dart';
+import 'package:solviolin_admin/widget/picker.dart';
+import 'package:solviolin_admin/widget/single.dart';
+
+class TermPage extends StatefulWidget {
+  const TermPage({Key? key}) : super(key: key);
+
+  @override
+  _TermPageState createState() => _TermPageState();
+}
+
+class _TermPageState extends State<TermPage> {
+  var _client = Get.find<Client>();
+  var _controller = Get.find<DataController>();
+
+  var register = Get.put(CacheController(), tag: "/register");
+  var update = Get.put(CacheController(), tag: "/update");
+  var extend = Get.put(CacheController(), tag: "/extend");
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () => FocusScope.of(context).unfocus(),
+      child: Scaffold(
+        appBar: myAppBar("학기"),
+        body: SafeArea(
+          child: _termList(),
+        ),
+        floatingActionButton: Padding(
+          padding: EdgeInsets.all(32.r),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              FloatingActionButton(
+                child: Icon(Icons.menu, size: 36.r),
+                heroTag: null,
+                onPressed: _showMenu,
+              ),
+              FloatingActionButton(
+                child: Icon(Icons.add, size: 36.r),
+                heroTag: null,
+                onPressed: _showRegister,
+              ),
+            ],
+          ),
+        ),
+        floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+      ),
+    );
+  }
+
+  Widget _termList() {
+    return GetBuilder<DataController>(
+      builder: (controller) {
+        return ListView.builder(
+          itemCount: controller.terms.length,
+          itemBuilder: (context, index) {
+            var term = controller.terms[index];
+
+            return mySlidableCard(
+              slideActions: [
+                mySlideAction(
+                    context: context,
+                    icon: CupertinoIcons.pencil,
+                    item: "수정",
+                    onTap: () {
+                      update.reset();
+
+                      showMyDialog(
+                        context: context,
+                        title: "학기 수정",
+                        contents: [
+                          pickDate(
+                            context: context,
+                            item: "시작일",
+                            tag: "/update",
+                            index: 0,
+                            isMandatory: true,
+                          ),
+                          pickDate(
+                            context: context,
+                            item: "종료일",
+                            tag: "/update",
+                            index: 1,
+                            isMandatory: true,
+                          ),
+                        ],
+                        onPressed: () async {
+                          try {
+                            await _client.modifyTerm(
+                              term.id,
+                              termStart: update.date[0]!,
+                              termEnd: update.date[1]!,
+                            );
+
+                            Get.back();
+                          } catch (e) {
+                            showError(e.toString());
+                          }
+                        },
+                      );
+                    }),
+              ],
+              children: [
+                Text("시작: " + DateFormat("yy/MM/dd").format(term.termStart)),
+                Text("종료: " + DateFormat("yy/MM/dd").format(term.termEnd)),
+                Text("ID: ${term.id}"),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+
+  Future _showRegister() {
+    FocusScope.of(context).unfocus();
+    register.reset();
+
+    return showMyDialog(
+      context: context,
+      title: "학기 등록",
+      contents: [
+        pickDate(
+          context: context,
+          item: "시작일",
+          tag: "/register",
+          index: 0,
+          isMandatory: true,
+        ),
+        pickDate(
+          context: context,
+          item: "종료일",
+          tag: "/register",
+          index: 1,
+          isMandatory: true,
+        ),
+      ],
+      onPressed: () async {
+        try {
+          await _client.registerTerm(
+            termStart: register.date[0]!,
+            termEnd: register.date[1]!,
+          );
+
+          _controller.updateTerms(await _client.getTerms(10));
+
+          Get.back();
+        } catch (e) {
+          showError(e.toString());
+        }
+      },
+      action: "등록",
+    );
+  }
+
+  Future _showMenu() {
+    FocusScope.of(context).unfocus();
+
+    return showCupertinoModalPopup(
+      context: context,
+      builder: (context) {
+        return CupertinoActionSheet(
+          actions: [
+            CupertinoActionSheetAction(
+              onPressed: _showExtendOfBranch,
+              child: Text("정규 연장 (지점)", style: TextStyle(fontSize: 24.r)),
+            ),
+            CupertinoActionSheetAction(
+              onPressed: _showExtendOfUser,
+              child: Text("정규 연장 (수강생)", style: TextStyle(fontSize: 24.r)),
+            ),
+          ],
+          cancelButton: CupertinoActionSheetAction(
+            onPressed: Get.back,
+            isDefaultAction: true,
+            child: Text("닫기", style: TextStyle(fontSize: 24.r)),
+          ),
+        );
+      },
+    );
+  }
+
+  Future _showExtendOfBranch() {
+    extend.reset();
+
+    return showMyDialog(
+      context: context,
+      title: "정규 연장 (지점)",
+      contents: [
+        branchDropdown("/extend", "지점을 선택하세요!"),
+      ],
+      onPressed: () async {
+        try {
+          await _client.extendAllCoursesOfBranch(extend.branchName!);
+
+          Get.back();
+        } catch (e) {
+          showError(e.toString());
+        }
+      },
+      action: "등록",
+    );
+  }
+
+  Future _showExtendOfUser() {
+    extend.reset();
+
+    return showMyDialog(
+      context: context,
+      title: "정규 연장 (수강생)",
+      contents: [
+        myTextInput("이름", extend.edit1, "이름을 입력하세요!"),
+      ],
+      onPressed: () async {
+        try {
+          await _client.extendAllCoursesOfUser(textEdit(extend.edit1)!);
+
+          Get.back();
+        } catch (e) {
+          showError(e.toString());
+        }
+      },
+      action: "등록",
+      isScrolling: true,
+    );
+  }
+}

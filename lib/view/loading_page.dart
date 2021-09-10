@@ -16,8 +16,8 @@ class LoadingPage extends StatefulWidget {
 }
 
 class _LoadingPageState extends State<LoadingPage> {
-  Client _client = Get.find<Client>();
-  DataController _controller = Get.find<DataController>();
+  var _client = Get.find<Client>();
+  var _controller = Get.find<DataController>();
 
   @override
   void initState() {

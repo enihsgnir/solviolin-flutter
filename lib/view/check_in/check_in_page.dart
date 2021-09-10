@@ -15,9 +15,9 @@ class CheckInPage extends StatefulWidget {
 }
 
 class _CheckInPageState extends State<CheckInPage> {
-  Client _client = Get.find<Client>();
+  var _client = Get.find<Client>();
 
-  final GlobalKey qrKey = GlobalKey(debugLabel: "QR");
+  final qrKey = GlobalKey(debugLabel: "QR");
   Barcode? result;
   QRViewController? qrController;
 
@@ -40,18 +40,7 @@ class _CheckInPageState extends State<CheckInPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: myAppBar(
-        "체크인",
-        actions: [
-          IconButton(
-            onPressed: () {
-              //TODO: get history data or implement with future builder?
-              Get.toNamed("/check-in/history");
-            },
-            icon: Icon(Icons.menu, size: 24.r),
-          ),
-        ],
-      ),
+      appBar: myAppBar("체크인"),
       body: Stack(
         alignment: Alignment.center,
         children: [

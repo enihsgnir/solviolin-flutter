@@ -1,12 +1,12 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:solviolin_admin/model/reservation.dart';
 import 'package:solviolin_admin/util/constant.dart';
 import 'package:solviolin_admin/util/controller.dart';
 import 'package:solviolin_admin/util/data_source.dart';
+import 'package:solviolin_admin/util/format.dart';
 import 'package:solviolin_admin/util/network.dart';
 import 'package:solviolin_admin/widget/dialog.dart';
 import 'package:solviolin_admin/widget/item_list.dart';
@@ -24,22 +24,21 @@ class HistoryReserved extends StatefulWidget {
 }
 
 class _HistoryReservedState extends State<HistoryReserved> {
-  Client _client = Get.find<Client>();
+  var _client = Get.find<Client>();
 
-  SearchController search = Get.find<SearchController>(tag: "User");
-  DetailController detail = Get.find<DetailController>();
+  var search = Get.find<CacheController>(tag: "/search");
 
   @override
   Widget build(BuildContext context) {
     return ListView.builder(
       itemCount: widget.reservations.length,
       itemBuilder: (context, index) {
-        Reservation reservation = widget.reservations[index];
+        var reservation = widget.reservations[index];
 
-        return Slidable(
-          actionPane: SlidableScrollActionPane(),
-          secondaryActions: [
+        return mySlidableCard(
+          slideActions: [
             mySlideAction(
+              context: context,
               icon: CupertinoIcons.delete_left,
               item: "취소",
               onTap: () async {
@@ -50,6 +49,7 @@ class _HistoryReservedState extends State<HistoryReserved> {
               borderRight: true,
             ),
             mySlideAction(
+              context: context,
               icon: Icons.more_time,
               item: "연장",
               onTap: () async {
@@ -60,49 +60,39 @@ class _HistoryReservedState extends State<HistoryReserved> {
               borderLeft: true,
             ),
           ],
-          actionExtentRatio: 1 / 5,
-          child: Container(
-            width: double.infinity,
-            padding: EdgeInsets.symmetric(vertical: 8.r),
-            decoration: myDecoration,
-            margin: EdgeInsets.fromLTRB(8.r, 4.r, 8.r, 4.r),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  "${reservation.teacherID} / ${reservation.branchName}",
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 24.r,
-                    decoration: reservation.bookingStatus.abs() == 2
-                        ? TextDecoration.lineThrough
-                        : null,
-                  ),
-                ),
-                Text(
-                  DateFormat("yy/MM/dd HH:mm").format(reservation.startDate) +
-                      " ~ " +
-                      DateFormat("HH:mm").format(reservation.endDate),
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 24.r,
-                    decoration: reservation.bookingStatus.abs() == 2
-                        ? TextDecoration.lineThrough
-                        : null,
-                  ),
-                ),
-                Container(
-                  alignment: Alignment.centerRight,
-                  padding: EdgeInsets.only(right: 24.r),
-                  width: double.infinity,
-                  child: Text(
-                    _statusToString(reservation.bookingStatus),
-                    style: TextStyle(color: Colors.red, fontSize: 20.r),
-                  ),
-                ),
-              ],
+          children: [
+            Text(
+              "${reservation.teacherID} / ${reservation.branchName}",
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 24.r,
+                decoration: reservation.bookingStatus.abs() == 2
+                    ? TextDecoration.lineThrough
+                    : null,
+              ),
             ),
-          ),
+            Text(
+              DateFormat("yy/MM/dd HH:mm").format(reservation.startDate) +
+                  " ~ " +
+                  DateFormat("HH:mm").format(reservation.endDate),
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 24.r,
+                decoration: reservation.bookingStatus.abs() == 2
+                    ? TextDecoration.lineThrough
+                    : null,
+              ),
+            ),
+            Container(
+              alignment: Alignment.centerRight,
+              padding: EdgeInsets.only(right: 24.r),
+              width: double.infinity,
+              child: Text(
+                _statusToString(reservation.bookingStatus),
+                style: TextStyle(color: Colors.red, fontSize: 20.r),
+              ),
+            ),
+          ],
         );
       },
     );
@@ -127,12 +117,13 @@ class _HistoryReservedState extends State<HistoryReserved> {
                   await _client.cancelReservation(reservation.id);
 
                   await getUsersData(
-                    branchName: search.text1,
-                    userID: search.text2,
-                    isPaid: search.number1,
-                    status: search.number2,
+                    branchName: search.branchName,
+                    userID: textEdit(search.edit1),
+                    isPaid: search.check[0],
+                    userType: UserType.values.indexOf(search.type[UserType]),
+                    status: search.check[1],
                   );
-                  await getUserDetailData(detail.user!);
+                  await getUserDetailData(search.userDetail!);
                 } catch (e) {
                   Get.back();
                   showError(e.toString());
@@ -174,12 +165,13 @@ class _HistoryReservedState extends State<HistoryReserved> {
                   await _client.extendReservation(reservation.id);
 
                   await getUsersData(
-                    branchName: search.text1,
-                    userID: search.text2,
-                    isPaid: search.number1,
-                    status: search.number2,
+                    branchName: search.branchName,
+                    userID: textEdit(search.edit1),
+                    isPaid: search.check[0],
+                    userType: UserType.values.indexOf(search.type[UserType]),
+                    status: search.check[1],
                   );
-                  await getUserDetailData(detail.user!);
+                  await getUserDetailData(search.userDetail!);
                 } catch (e) {
                   Get.back();
                   showError(e.toString());

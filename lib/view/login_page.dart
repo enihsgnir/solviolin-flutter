@@ -14,11 +14,11 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  Client _client = Get.find<Client>();
-  DataController _controller = Get.find<DataController>();
+  var _client = Get.find<Client>();
+  var _controller = Get.find<DataController>();
 
-  TextEditingController id = TextEditingController();
-  TextEditingController pw = TextEditingController();
+  var id = TextEditingController();
+  var pw = TextEditingController();
 
   @override
   void dispose() {
@@ -68,7 +68,7 @@ class _LoginPageState extends State<LoginPage> {
                       borderSide: const BorderSide(color: Colors.white),
                     ),
                   ),
-                  style: TextStyle(color: Colors.white, fontSize: 20.r),
+                  style: contentStyle,
                   validator: (value) {
                     return value == null ? "아이디를 입력해주세요" : null;
                   },
@@ -88,7 +88,7 @@ class _LoginPageState extends State<LoginPage> {
                       borderSide: const BorderSide(color: Colors.white),
                     ),
                   ),
-                  style: TextStyle(color: Colors.white, fontSize: 20.r),
+                  style: contentStyle,
                   obscureText: true,
                   validator: (value) {
                     return value == null ? "비밀번호를 입력해주세요" : null;
@@ -101,6 +101,8 @@ class _LoginPageState extends State<LoginPage> {
                 margin: EdgeInsets.all(16.r),
                 child: TextButton(
                   onPressed: () async {
+                    FocusScope.of(context).unfocus();
+
                     try {
                       await getInitialData(false, id.text, pw.text);
                       if (_controller.profile.userType == 2) {
@@ -109,12 +111,11 @@ class _LoginPageState extends State<LoginPage> {
                         Get.offAllNamed("/menu-teacher");
                       }
                     } catch (e) {
-                      Get.put(DataController());
                       try {
                         await _client.logout();
                       } catch (e) {} finally {
-                        Get.offAllNamed("/login");
                         showError(e.toString());
+                        pw.text = "";
                       }
                     }
                   },
@@ -126,11 +127,7 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                   child: Text(
                     "로그인",
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 24.r,
-                      fontWeight: FontWeight.bold,
-                    ),
+                    style: TextStyle(color: Colors.white, fontSize: 24.r),
                   ),
                 ),
               )

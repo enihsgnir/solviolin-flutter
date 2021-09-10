@@ -7,10 +7,7 @@ Widget label(String item, bool isMandatory) {
   return RichText(
     text: TextSpan(
       children: [
-        TextSpan(
-          text: item,
-          style: TextStyle(color: Colors.white, fontSize: 20.r),
-        ),
+        TextSpan(text: item, style: contentStyle),
         TextSpan(
           text: isMandatory ? " *" : "",
           style: TextStyle(
@@ -29,13 +26,11 @@ Widget myTextInput(
   TextEditingController controller, [
   String? validator,
 ]) {
-  bool isMandatory = validator != null;
-
   return Row(
     children: [
       Container(
         width: 110.r,
-        child: label(item, isMandatory),
+        child: label(item, validator != null),
       ),
       Container(
         width: 220.r,
@@ -44,7 +39,7 @@ Widget myTextInput(
           validator: (value) {
             return value == "" ? validator : null;
           },
-          style: TextStyle(color: Colors.white, fontSize: 20.r),
+          style: contentStyle,
         ),
       ),
     ],
@@ -53,75 +48,65 @@ Widget myTextInput(
 
 Widget myCheckBox({
   String? tag,
+  int index = 0,
   required String item,
   required String trueName,
   required String falseName,
-  bool reverse = false,
+  bool isReversed = false,
   bool isMandatory = false,
 }) {
-  bool trueValue = false;
-  bool falseValue = false;
+  bool _trueValue = false;
+  bool _falseValue = false;
 
-  Get.find<CheckController>(tag: tag);
+  var _cache = Get.find<CacheController>(tag: tag);
 
-  return GetBuilder<CheckController>(
-    tag: tag,
-    builder: (controller) {
-      return StatefulBuilder(
-        builder: (context, setState) {
-          return Row(
-            children: [
-              Container(
-                width: 120.r,
-                child: label(item, isMandatory),
-              ),
-              Checkbox(
-                value: trueValue,
-                onChanged: (value) {
-                  setState(() {
-                    trueValue = value!;
+  return StatefulBuilder(
+    builder: (context, setState) {
+      return Row(
+        children: [
+          Container(
+            width: 120.r,
+            child: label(item, isMandatory),
+          ),
+          Checkbox(
+            value: _trueValue,
+            onChanged: (value) {
+              setState(() {
+                _trueValue = value!;
 
-                    if (trueValue && falseValue) {
-                      controller.updateResult(null);
-                    } else if (trueValue && !falseValue) {
-                      controller.updateResult(reverse ? 0 : 1);
-                    } else if (!trueValue && falseValue) {
-                      controller.updateResult(reverse ? 1 : 0);
-                    } else {
-                      controller.updateResult(null);
-                    }
-                  });
-                },
-              ),
-              Text(
-                trueName,
-                style: TextStyle(color: Colors.white, fontSize: 20.r),
-              ),
-              Checkbox(
-                value: falseValue,
-                onChanged: (value) {
-                  setState(() {
-                    falseValue = value!;
+                if (_trueValue && _falseValue) {
+                  _cache.check[index] = null;
+                } else if (_trueValue && !_falseValue) {
+                  _cache.check[index] = isReversed ? 0 : 1;
+                } else if (!_trueValue && _falseValue) {
+                  _cache.check[index] = isReversed ? 1 : 0;
+                } else {
+                  _cache.check[index] = null;
+                }
+              });
+            },
+          ),
+          Text(trueName, style: contentStyle),
+          Checkbox(
+            value: _falseValue,
+            onChanged: (value) {
+              setState(() {
+                _falseValue = value!;
 
-                    if (trueValue && falseValue) {
-                      controller.updateResult(null);
-                    } else if (trueValue && !falseValue) {
-                      controller.updateResult(reverse ? 0 : 1);
-                    } else if (!trueValue && falseValue) {
-                      controller.updateResult(reverse ? 1 : 0);
-                    } else {
-                      controller.updateResult(null);
-                    }
-                  });
-                },
-              ),
-              Text(
-                falseName,
-                style: TextStyle(color: Colors.white, fontSize: 20.r),
-              ),
-            ],
-          );
-        },
+                if (_trueValue && _falseValue) {
+                  _cache.check[index] = null;
+                } else if (_trueValue && !_falseValue) {
+                  _cache.check[index] = isReversed ? 0 : 1;
+                } else if (!_trueValue && _falseValue) {
+                  _cache.check[index] = isReversed ? 1 : 0;
+                } else {
+                  _cache.check[index] = null;
+                }
+              });
+            },
+          ),
+          Text(falseName, style: contentStyle),
+        ],
       );
     },
   );
@@ -134,13 +119,13 @@ Widget myRadio<T>({
   required List<T> values,
   required T groupValue,
 }) {
-  RadioController<T> radio = Get.find<RadioController<T>>(tag: tag);
-  radio.type = values[0];
+  var _cache = Get.find<CacheController>(tag: tag);
+  _cache.type[T] = groupValue;
 
   return StatefulBuilder(
     builder: (context, setState) {
       return DefaultTextStyle(
-        style: TextStyle(color: Colors.white, fontSize: 20.r),
+        style: contentStyle,
         child: Row(
           children: [
             Container(
@@ -165,7 +150,7 @@ Widget myRadio<T>({
                             groupValue = value!;
                           });
 
-                          radio.type = value!;
+                          _cache.type[T] = value!;
                         },
                       ),
                     ],
