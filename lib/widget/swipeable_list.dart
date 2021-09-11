@@ -2,10 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:solviolin_admin/util/constant.dart';
 
 Widget swipeableList({
+  double? height,
   required int itemCount,
   required Widget Function(BuildContext, int) itemBuilder,
 }) {
-  int currentPage = 0;
+  var currentPage = 0;
 
   return StatefulBuilder(
     builder: (context, setState) {
@@ -13,7 +14,7 @@ Widget swipeableList({
         alignment: Alignment.bottomCenter,
         children: [
           Container(
-            height: 225.r, //TODO: shrinkwrap to child
+            height: height ?? 225.r, //TODO: shrinkwrap to child
             child: PageView.builder(
               onPageChanged: (page) {
                 setState(() {

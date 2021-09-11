@@ -56,7 +56,7 @@ class _SalaryPageState extends State<SalaryPage> {
             myTextInput("야간시급", search.edit2, "야간시급을 입력하세요!"),
             myActionButton(
               context: context,
-              onPressed: () async {
+              onPressed: () => showLoading(() async {
                 try {
                   _controller.updateSalaries(await _client.getSalaries(
                     branchName: search.branchName!,
@@ -67,7 +67,7 @@ class _SalaryPageState extends State<SalaryPage> {
                 } catch (e) {
                   showError(e.toString());
                 }
-              },
+              }),
             ),
           ],
         ),

@@ -62,7 +62,7 @@ class _MenuPageState extends State<MenuPage> {
       contents: [
         myTextInput("지점명", branch, "지점명을 입력하세요!"),
       ],
-      onPressed: () async {
+      onPressed: () => showLoading(() async {
         try {
           await _client.registerBranch(textEdit(branch)!);
 
@@ -71,7 +71,7 @@ class _MenuPageState extends State<MenuPage> {
         } catch (e) {
           showError(e.toString());
         }
-      },
+      }),
       action: "등록",
       isScrolling: true,
     );
@@ -83,13 +83,14 @@ class _MenuPageState extends State<MenuPage> {
       contents: [
         Text("로그아웃 하시겠습니까?"),
       ],
-      onPressed: () async {
+      onPressed: () => showLoading(() async {
         try {
-          _client.logout();
-        } catch (e) {} finally {
+          await _client.logout();
+        } catch (_) {
+        } finally {
           Get.offAllNamed("/login");
         }
-      },
+      }),
     );
   }
 }

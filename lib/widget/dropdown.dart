@@ -95,11 +95,9 @@ Widget termDropdown([
     items: _controller.terms
         .map<DropdownMenuItem<int>>((value) => DropdownMenuItem(
               value: value.id,
-              child: Text(
-                DateFormat("yy/MM/dd").format(value.termStart) +
-                    " ~ " +
-                    DateFormat("yy/MM/dd").format(value.termEnd),
-              ),
+              child: Text(DateFormat("yy/MM/dd").format(value.termStart) +
+                  " ~ " +
+                  DateFormat("yy/MM/dd").format(value.termEnd)),
             ))
         .toList(),
   );

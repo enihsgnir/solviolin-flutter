@@ -3,8 +3,8 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:solviolin_admin/util/constant.dart';
 import 'package:solviolin_admin/util/controller.dart';
+import 'package:solviolin_admin/util/data_source.dart';
 import 'package:solviolin_admin/util/format.dart';
-import 'package:solviolin_admin/util/network.dart';
 import 'package:solviolin_admin/widget/dialog.dart';
 import 'package:solviolin_admin/widget/input.dart';
 import 'package:solviolin_admin/widget/item_list.dart';
@@ -19,9 +19,6 @@ class CancelPage extends StatefulWidget {
 }
 
 class _CancelPageState extends State<CancelPage> {
-  var _client = Get.find<Client>();
-  var _controller = Get.find<DataController>();
-
   var search = Get.put(CacheController(), tag: "/search");
 
   @override
@@ -54,15 +51,13 @@ class _CancelPageState extends State<CancelPage> {
             myTextInput("강사", search.edit1, "강사명을 입력하세요!"),
             myActionButton(
               context: context,
-              onPressed: () async {
+              onPressed: () => showLoading(() async {
                 try {
-                  _controller.updateCanceledReservations(await _client
-                      .getCanceledReservations(textEdit(search.edit1)!)
-                    ..sort((a, b) => a.startDate.compareTo(b.startDate)));
+                  await getCanceledData(textEdit(search.edit1)!);
                 } catch (e) {
                   showError(e.toString());
                 }
-              },
+              }),
             ),
           ],
         ),

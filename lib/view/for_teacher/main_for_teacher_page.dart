@@ -46,7 +46,7 @@ class _MainForTeacherPageState extends State<MainForTeacherPage> {
           "메인",
           actions: [
             IconButton(
-              onPressed: () async {
+              onPressed: () => showLoading(() async {
                 try {
                   await getReservationDataForTeacher(
                     displayDate: _controller.displayDate,
@@ -55,7 +55,7 @@ class _MainForTeacherPageState extends State<MainForTeacherPage> {
                 } catch (e) {
                   showError(e.toString());
                 }
-              },
+              }),
               icon: Icon(CupertinoIcons.refresh, size: 24.r),
             ),
             IconButton(
@@ -87,14 +87,16 @@ class _MainForTeacherPageState extends State<MainForTeacherPage> {
                   _controller.updateDisplayDate(newDate);
                   _calendar.displayDate = newDate;
 
-                  try {
-                    await getReservationDataForTeacher(
-                      displayDate: _controller.displayDate,
-                      teacherID: _controller.profile.userID,
-                    );
-                  } catch (e) {
-                    showError(e.toString());
-                  }
+                  showLoading(() async {
+                    try {
+                      await getReservationDataForTeacher(
+                        displayDate: _controller.displayDate,
+                        teacherID: _controller.profile.userID,
+                      );
+                    } catch (e) {
+                      showError(e.toString());
+                    }
+                  });
                 }
               },
               icon: Icon(Icons.calendar_today, size: 24.r),

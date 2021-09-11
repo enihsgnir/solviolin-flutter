@@ -44,7 +44,7 @@ class _HistoryReservedState extends State<HistoryReserved> {
               onTap: () async {
                 reservation.bookingStatus.abs() == 2
                     ? showError("이미 취소된 수업입니다.")
-                    : await showModalCancel(context, reservation);
+                    : await _showModalCancel(context, reservation);
               },
               borderRight: true,
             ),
@@ -55,7 +55,7 @@ class _HistoryReservedState extends State<HistoryReserved> {
               onTap: () async {
                 reservation.bookingStatus.abs() == 3
                     ? showError("이미 연장된 수업입니다.")
-                    : await showModalExtend(context, reservation);
+                    : await _showModalExtend(context, reservation);
               },
               borderLeft: true,
             ),
@@ -98,13 +98,13 @@ class _HistoryReservedState extends State<HistoryReserved> {
     );
   }
 
-  Future showModalCancel(BuildContext context, Reservation reservation) {
+  Future _showModalCancel(BuildContext context, Reservation reservation) {
     return showCupertinoModalPopup(
       context: context,
       builder: (context) {
         return CupertinoActionSheet(
           title: Text(
-            DateFormat("HH:mm").format(reservation.startDate) +
+            DateFormat("yy/MM/dd HH:mm").format(reservation.startDate) +
                 " ~ " +
                 DateFormat("HH:mm").format(reservation.endDate),
             style: TextStyle(fontSize: 24.r),
@@ -112,7 +112,7 @@ class _HistoryReservedState extends State<HistoryReserved> {
           message: Text("수업을 취소 하시겠습니까?", style: TextStyle(fontSize: 24.r)),
           actions: [
             CupertinoActionSheetAction(
-              onPressed: () async {
+              onPressed: () => showLoading(() async {
                 try {
                   await _client.cancelReservation(reservation.id);
 
@@ -124,19 +124,18 @@ class _HistoryReservedState extends State<HistoryReserved> {
                     status: search.check[1],
                   );
                   await getUserDetailData(search.userDetail!);
-                } catch (e) {
+
                   Get.back();
+                } catch (e) {
                   showError(e.toString());
                 }
-              },
+              }),
               isDestructiveAction: true,
               child: Text("수업 취소", style: TextStyle(fontSize: 24.r)),
             ),
           ],
           cancelButton: CupertinoActionSheetAction(
-            onPressed: () {
-              Get.back();
-            },
+            onPressed: Get.back,
             isDefaultAction: true,
             child: Text("닫기", style: TextStyle(fontSize: 24.r)),
           ),
@@ -145,7 +144,7 @@ class _HistoryReservedState extends State<HistoryReserved> {
     );
   }
 
-  Future showModalExtend(BuildContext context, Reservation reservation) {
+  Future _showModalExtend(BuildContext context, Reservation reservation) {
     return showCupertinoModalPopup(
       context: context,
       builder: (context) {
@@ -160,7 +159,7 @@ class _HistoryReservedState extends State<HistoryReserved> {
           message: Text("수업을 15분 연장 하시겠습니까?", style: TextStyle(fontSize: 24.r)),
           actions: [
             CupertinoActionSheetAction(
-              onPressed: () async {
+              onPressed: () => showLoading(() async {
                 try {
                   await _client.extendReservation(reservation.id);
 
@@ -172,18 +171,17 @@ class _HistoryReservedState extends State<HistoryReserved> {
                     status: search.check[1],
                   );
                   await getUserDetailData(search.userDetail!);
-                } catch (e) {
+
                   Get.back();
+                } catch (e) {
                   showError(e.toString());
                 }
-              },
+              }),
               child: Text("수업 연장", style: TextStyle(fontSize: 24.r)),
             ),
           ],
           cancelButton: CupertinoActionSheetAction(
-            onPressed: () {
-              Get.back();
-            },
+            onPressed: Get.back,
             isDefaultAction: true,
             child: Text("닫기", style: TextStyle(fontSize: 24.r)),
           ),
@@ -191,18 +189,18 @@ class _HistoryReservedState extends State<HistoryReserved> {
       },
     );
   }
+}
 
-  String _statusToString(int bookingStatus) {
-    Map<int, String> status = {
-      0: "정규",
-      1: "보강",
-      2: "취소",
-      3: "연장",
-      -1: "보강(관리자)",
-      -2: "취소(관리자)",
-      -3: "연장(관리자)",
-    };
+String _statusToString(int bookingStatus) {
+  Map<int, String> status = {
+    0: "정규",
+    1: "보강",
+    2: "취소",
+    3: "연장",
+    -1: "보강(관리자)",
+    -2: "취소(관리자)",
+    -3: "연장(관리자)",
+  };
 
-    return status[bookingStatus]!;
-  }
+  return status[bookingStatus]!;
 }

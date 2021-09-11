@@ -25,16 +25,7 @@ class _LoadingPageState extends State<LoadingPage> {
     Future.delayed(const Duration(seconds: 1), () async {
       // await _client.logout(); // for test
 
-      try {
-        await checkProfile();
-      } catch (e) {
-        try {
-          await _client.logout();
-        } catch (e) {} finally {
-          Get.offAllNamed("/login");
-          showError(e.toString());
-        }
-      }
+      await _checkProfile();
     });
   }
 
@@ -56,8 +47,8 @@ class _LoadingPageState extends State<LoadingPage> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Container(
-                height: 180.r,
                 width: 180.r,
+                height: 180.r,
                 decoration: const BoxDecoration(
                   image: const DecorationImage(
                     image: const AssetImage("assets/solviolin_logo.png"),
@@ -80,18 +71,29 @@ class _LoadingPageState extends State<LoadingPage> {
     );
   }
 
-  Future<void> checkProfile() async {
+  Future<void> _checkProfile() async {
     if (await _client.isLoggedIn()) {
-      await getInitialData();
-      if (_controller.profile.userType == 2) {
-        Get.offAllNamed("/menu");
-      } else if (_controller.profile.userType == 1) {
-        Get.offAllNamed("/menu-teacher");
+      try {
+        await getInitialData();
+        if (_controller.profile.userType == 2) {
+          Get.offAllNamed("/menu");
+        } else if (_controller.profile.userType == 1) {
+          Get.offAllNamed("/menu-teacher");
+        }
+      } catch (e) {
+        try {
+          await _client.logout();
+        } catch (_) {
+        } finally {
+          Get.offAllNamed("/login");
+          showError(e.toString());
+        }
       }
     } else {
       try {
         await _client.logout();
-      } catch (e) {} finally {
+      } catch (_) {
+      } finally {
         Get.offAllNamed("/login");
       }
     }

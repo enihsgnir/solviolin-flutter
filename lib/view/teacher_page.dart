@@ -77,7 +77,7 @@ class _TeacherPageState extends State<TeacherPage> {
             branchDropdown("/search", "지점을 선택하세요!"),
             myActionButton(
               context: context,
-              onPressed: () async {
+              onPressed: () => showLoading(() async {
                 try {
                   await getTeachersData(
                     teacherID: textEdit(search.edit1),
@@ -88,7 +88,7 @@ class _TeacherPageState extends State<TeacherPage> {
                 } catch (e) {
                   showError(e.toString());
                 }
-              },
+              }),
             ),
           ],
         ),
@@ -118,7 +118,7 @@ class _TeacherPageState extends State<TeacherPage> {
                     contents: [
                       Text("정말 삭제하시겠습니까?"),
                     ],
-                    onPressed: () async {
+                    onPressed: () => showLoading(() async {
                       try {
                         await _client.deleteTeacher(teacher.id);
 
@@ -131,7 +131,7 @@ class _TeacherPageState extends State<TeacherPage> {
                       } catch (e) {
                         showError(e.toString());
                       }
-                    },
+                    }),
                   ),
                 ),
               ],
@@ -174,7 +174,7 @@ class _TeacherPageState extends State<TeacherPage> {
           isMandatory: true,
         ),
       ],
-      onPressed: () async {
+      onPressed: () => showLoading(() async {
         try {
           await _client.registerTeacher(
             teacherID: textEdit(register.edit1)!,
@@ -195,7 +195,7 @@ class _TeacherPageState extends State<TeacherPage> {
         } catch (e) {
           showError(e.toString());
         }
-      },
+      }),
       action: "등록",
       isScrolling: true,
     );
@@ -225,9 +225,7 @@ class _TeacherPageState extends State<TeacherPage> {
             ),
           ],
           cancelButton: CupertinoActionSheetAction(
-            onPressed: () {
-              Get.back();
-            },
+            onPressed: Get.back,
             isDefaultAction: true,
             child: Text("닫기", style: TextStyle(fontSize: 24.r)),
           ),

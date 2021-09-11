@@ -60,7 +60,7 @@ Widget myDialog({
           primary: symbolColor,
           padding: EdgeInsets.symmetric(vertical: 12.r, horizontal: 16.r),
         ),
-        child: Text(action, style: TextStyle(fontSize: 20.r)),
+        child: Text(action, style: contentStyle),
       ),
     ],
   );
@@ -103,18 +103,19 @@ Future showMyDialog({
   );
 }
 
-Future showLoading() {
-  return Get.dialog(
-    Center(
+Future<void> showLoading(Future<void> Function() asyncFunction) {
+  return Get.showOverlay<void>(
+    asyncFunction: asyncFunction,
+    loadingWidget: Center(
       child: Container(
-        width: 80.r,
-        height: 80.r,
+        width: 90.r,
+        height: 90.r,
         child: CircularProgressIndicator(
           backgroundColor: Colors.grey,
         ),
       ),
     ),
-    barrierDismissible: false,
-    barrierColor: Colors.black12,
+    opacityColor: Colors.black12,
+    opacity: 1,
   );
 }

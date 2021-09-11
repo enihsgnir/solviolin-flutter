@@ -16,6 +16,7 @@ import 'package:solviolin_admin/model/user.dart';
 import 'package:solviolin_admin/util/data_source.dart';
 
 class DataController extends GetxController {
+  //TODO: remove some unnecessary functions
   late final double ratio;
 
   late Profile profile;
@@ -151,7 +152,6 @@ class CacheController extends GetxController {
   Map<int, DateTime?> date = {};
   Map<int, TimeOfDay?> time = {};
 
-  Map<int, int?> number = {};
   Map<int, int?> check = {};
 
   User? userDetail;
@@ -171,7 +171,6 @@ class CacheController extends GetxController {
     dateTime = {};
     date = {};
     time = {};
-    number = {};
     check = {};
 
     branchName = null;
@@ -202,7 +201,7 @@ enum UserType {
   admin,
 }
 
-enum Status {
+enum ControlStatus {
   open,
   close,
 }

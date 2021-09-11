@@ -60,18 +60,19 @@ class _UserPageState extends State<UserPage> {
             myTextInput("이름", search.edit1),
             myActionButton(
               context: context,
-              onPressed: () async {
+              onPressed: () => showLoading(() async {
                 try {
                   await saveUsersData(
                     branchName: search.branchName,
                     userID: textEdit(search.edit1),
                     isPaid: search.check[0],
+                    userType: UserType.values.indexOf(search.type[UserType]),
                     status: search.check[1],
                   );
                 } catch (e) {
                   showError(e.toString());
                 }
-              },
+              }),
               action: "저장",
             ),
           ],
@@ -102,7 +103,7 @@ class _UserPageState extends State<UserPage> {
             ),
             myActionButton(
               context: context,
-              onPressed: () async {
+              onPressed: () => showLoading(() async {
                 try {
                   await getUsersData(
                     branchName: search.branchName,
@@ -116,7 +117,7 @@ class _UserPageState extends State<UserPage> {
                 } catch (e) {
                   showError(e.toString());
                 }
-              },
+              }),
             ),
           ],
         ),
@@ -145,16 +146,18 @@ class _UserPageState extends State<UserPage> {
                   Text("결제일: ${_ledgerToString(user.paidAt)}"),
                 ],
               ),
-              onTap: () async {
+              onTap: () {
                 FocusScope.of(context).unfocus();
 
-                try {
-                  await getUserDetailData(user);
-                  search.userDetail = user;
-                  Get.toNamed("/user/detail");
-                } catch (e) {
-                  showError(e.toString());
-                }
+                showLoading(() async {
+                  try {
+                    await getUserDetailData(user);
+                    search.userDetail = user;
+                    Get.toNamed("/user/detail");
+                  } catch (e) {
+                    showError(e.toString());
+                  }
+                });
               },
             );
           },
@@ -202,7 +205,7 @@ class _UserPageState extends State<UserPage> {
               style: TextStyle(color: Colors.red, fontSize: 16.r),
             ),
           ],
-          onPressed: () async {
+          onPressed: () => showLoading(() async {
             try {
               await _client.registerUser(
                 userID: textEdit(register.edit1)!,
@@ -228,7 +231,7 @@ class _UserPageState extends State<UserPage> {
             } catch (e) {
               showError(e.toString());
             }
-          },
+          }),
         );
       },
       action: "등록",

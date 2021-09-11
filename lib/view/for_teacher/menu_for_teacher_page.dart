@@ -26,16 +26,19 @@ class _MenuForTeacherPageState extends State<MenuForTeacherPage> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              menu("메인", () async {
-                try {
-                  await getReservationDataForTeacher(
-                    displayDate: _controller.displayDate,
-                    teacherID: _controller.profile.userID,
-                  );
-                  Get.toNamed("/main-teacher");
-                } catch (e) {
-                  showError(e.toString());
-                }
+              menu("메인", () {
+                showLoading(() async {
+                  try {
+                    await getReservationDataForTeacher(
+                      displayDate: _controller.displayDate,
+                      teacherID: _controller.profile.userID,
+                    );
+
+                    Get.toNamed("/main-teacher");
+                  } catch (e) {
+                    showError(e.toString());
+                  }
+                });
               }),
               menu("체크인", () => Get.toNamed("/check-in")),
               menu("로그아웃", _showLogout, true),
@@ -52,13 +55,14 @@ class _MenuForTeacherPageState extends State<MenuForTeacherPage> {
       contents: [
         Text("로그아웃 하시겠습니까?"),
       ],
-      onPressed: () async {
+      onPressed: () => showLoading(() async {
         try {
-          _client.logout();
-        } catch (e) {} finally {
+          await _client.logout();
+        } catch (_) {
+        } finally {
           Get.offAllNamed("/login");
         }
-      },
+      }),
     );
   }
 }

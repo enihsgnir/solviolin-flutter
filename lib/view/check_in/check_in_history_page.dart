@@ -26,8 +26,7 @@ class _CheckInHistoryPageState extends State<CheckInHistoryPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: myAppBar(
-          "체크인 이력"), //TODO: get history data or implement with future builder?
+      appBar: myAppBar("체크인 이력"),
       body: SafeArea(
         child: Column(
           children: [
@@ -62,7 +61,7 @@ class _CheckInHistoryPageState extends State<CheckInHistoryPage> {
             ),
             myActionButton(
               context: context,
-              onPressed: () async {
+              onPressed: () => showLoading(() async {
                 try {
                   _controller
                       .updateCheckInHistories(await _client.getCheckInHistories(
@@ -73,7 +72,7 @@ class _CheckInHistoryPageState extends State<CheckInHistoryPage> {
                 } catch (e) {
                   showError(e.toString());
                 }
-              },
+              }),
             ),
           ],
         ),

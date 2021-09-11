@@ -69,9 +69,7 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                   ),
                   style: contentStyle,
-                  validator: (value) {
-                    return value == null ? "아이디를 입력해주세요" : null;
-                  },
+                  validator: (value) => value == null ? "아이디를 입력해주세요" : null,
                 ),
               ),
               Padding(
@@ -90,9 +88,7 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                   style: contentStyle,
                   obscureText: true,
-                  validator: (value) {
-                    return value == null ? "비밀번호를 입력해주세요" : null;
-                  },
+                  validator: (value) => value == null ? "비밀번호를 입력해주세요" : null,
                 ),
               ),
               Container(
@@ -100,24 +96,27 @@ class _LoginPageState extends State<LoginPage> {
                 height: 60.r,
                 margin: EdgeInsets.all(16.r),
                 child: TextButton(
-                  onPressed: () async {
+                  onPressed: () {
                     FocusScope.of(context).unfocus();
 
-                    try {
-                      await getInitialData(false, id.text, pw.text);
-                      if (_controller.profile.userType == 2) {
-                        Get.offAllNamed("/menu");
-                      } else if (_controller.profile.userType == 1) {
-                        Get.offAllNamed("/menu-teacher");
-                      }
-                    } catch (e) {
+                    showLoading(() async {
                       try {
-                        await _client.logout();
-                      } catch (e) {} finally {
-                        showError(e.toString());
-                        pw.text = "";
+                        await getInitialData(false, id.text, pw.text);
+                        if (_controller.profile.userType == 2) {
+                          Get.offAllNamed("/menu");
+                        } else if (_controller.profile.userType == 1) {
+                          Get.offAllNamed("/menu-teacher");
+                        }
+                      } catch (e) {
+                        try {
+                          await _client.logout();
+                        } catch (_) {
+                        } finally {
+                          showError(e.toString());
+                          pw.text = "";
+                        }
                       }
-                    }
+                    });
                   },
                   style: TextButton.styleFrom(
                     backgroundColor: symbolColor,

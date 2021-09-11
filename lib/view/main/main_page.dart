@@ -52,20 +52,13 @@ class _MainPageState extends State<MainPage> {
           "메인",
           actions: [
             IconButton(
-              onPressed: () async {
+              onPressed: () => showLoading(() async {
                 try {
-                  if (search.isSearched) {
-                    await getReservationData(
-                      displayDate: _controller.displayDate,
-                      branchName: search.branchName!,
-                      userID: textEdit(search.edit1),
-                      teacherID: textEdit(search.edit2),
-                    );
-                  }
+                  await _getSearchedReservationsData();
                 } catch (e) {
                   showError(e.toString());
                 }
-              },
+              }),
               icon: Icon(CupertinoIcons.refresh, size: 24.r),
             ),
             IconButton(
@@ -101,18 +94,13 @@ class _MainPageState extends State<MainPage> {
                   _controller.updateDisplayDate(newDate);
                   _calendar.displayDate = newDate;
 
-                  try {
-                    if (search.isSearched) {
-                      await getReservationData(
-                        displayDate: _controller.displayDate,
-                        branchName: search.branchName!,
-                        userID: textEdit(search.edit1),
-                        teacherID: textEdit(search.edit2),
-                      );
+                  showLoading(() async {
+                    try {
+                      await _getSearchedReservationsData();
+                    } catch (e) {
+                      showError(e.toString());
                     }
-                  } catch (e) {
-                    showError(e.toString());
-                  }
+                  });
                 }
               },
               icon: Icon(Icons.calendar_today, size: 24.r),
@@ -138,7 +126,7 @@ class _MainPageState extends State<MainPage> {
         myTextInput("강사", search.edit2),
         branchDropdown("/search", "지점을 선택하세요!"),
       ],
-      onPressed: () async {
+      onPressed: () => showLoading(() async {
         try {
           await getReservationData(
             displayDate: _controller.displayDate,
@@ -152,9 +140,20 @@ class _MainPageState extends State<MainPage> {
         } catch (e) {
           showError(e.toString());
         }
-      },
+      }),
       action: "검색",
       isScrolling: true,
     );
+  }
+
+  Future<void> _getSearchedReservationsData() async {
+    if (search.isSearched) {
+      await getReservationData(
+        displayDate: _controller.displayDate,
+        branchName: search.branchName!,
+        userID: textEdit(search.edit1),
+        teacherID: textEdit(search.edit2),
+      );
+    }
   }
 }

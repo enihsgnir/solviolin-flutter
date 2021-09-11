@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 import 'package:solviolin_admin/util/constant.dart';
 import 'package:solviolin_admin/util/controller.dart';
 import 'package:solviolin_admin/util/data_source.dart';
 import 'package:solviolin_admin/util/format.dart';
 import 'package:solviolin_admin/util/network.dart';
-import 'package:solviolin_admin/view/user_detail/changed_reservation.dart';
 import 'package:solviolin_admin/view/user_detail/history_reserved.dart';
 import 'package:solviolin_admin/widget/dialog.dart';
 import 'package:solviolin_admin/widget/dropdown.dart';
 import 'package:solviolin_admin/widget/input.dart';
+import 'package:solviolin_admin/widget/item_list.dart';
 import 'package:solviolin_admin/widget/search.dart';
 import 'package:solviolin_admin/widget/picker.dart';
 import 'package:solviolin_admin/widget/single.dart';
@@ -79,7 +80,7 @@ class _UserDetailPageState extends State<UserDetailPage>
                                         isMandatory: true,
                                       ),
                                     ],
-                                    onPressed: () async {
+                                    onPressed: () => showLoading(() async {
                                       try {
                                         await _client
                                             .updateEndDateAndDeleteLaterCourse(
@@ -101,7 +102,7 @@ class _UserDetailPageState extends State<UserDetailPage>
                                       } catch (e) {
                                         showError(e.toString());
                                       }
-                                    },
+                                    }),
                                   );
                                 },
                                 action: "정규종료",
@@ -145,10 +146,7 @@ class _UserDetailPageState extends State<UserDetailPage>
                         width: double.infinity,
                         decoration: BoxDecoration(
                           border: Border(
-                            left: BorderSide(
-                              color: Colors.grey,
-                              width: 0.5.r,
-                            ),
+                            left: BorderSide(color: Colors.grey, width: 0.5.r),
                           ),
                         ),
                         child: TextButton(
@@ -187,7 +185,7 @@ class _UserDetailPageState extends State<UserDetailPage>
                     children: [
                       HistoryReserved(controller.lastMonthReservations),
                       HistoryReserved(controller.thisMonthReservations),
-                      ChangedReservation(),
+                      _changedList(),
                     ],
                   ),
                 ),
@@ -196,6 +194,31 @@ class _UserDetailPageState extends State<UserDetailPage>
           },
         ),
       ),
+    );
+  }
+
+  Widget _changedList() {
+    return GetBuilder<DataController>(
+      builder: (controller) {
+        return ListView.builder(
+          itemCount: controller.changes.length,
+          itemBuilder: (context, index) {
+            var change = controller.changes[index];
+
+            return myNormalCard(
+              children: [
+                Text("${change.teacherID} / ${change.branchName}"),
+                Text("변경 전: " +
+                    DateFormat("yy/MM/dd HH:mm").format(change.fromDate)),
+                Text(change.toDate == null
+                    ? "변경 사항이 없습니다."
+                    : "변경 후: " +
+                        DateFormat("yy/MM/dd HH:mm").format(change.toDate!)),
+              ],
+            );
+          },
+        );
+      },
     );
   }
 
@@ -210,7 +233,7 @@ class _UserDetailPageState extends State<UserDetailPage>
         branchDropdown("/expend", "지점을 선택하세요!"),
         termDropdown("/expend", "지점을 선택하세요!"),
       ],
-      onPressed: () async {
+      onPressed: () => showLoading(() async {
         try {
           await _client.registerLedger(
             userID: _controller.regularSchedules[0].userID,
@@ -231,7 +254,7 @@ class _UserDetailPageState extends State<UserDetailPage>
         } catch (e) {
           showError(e.toString());
         }
-      },
+      }),
       isScrolling: true,
     );
   }
@@ -254,7 +277,7 @@ class _UserDetailPageState extends State<UserDetailPage>
         myTextInput("크레딧", update.edit2),
         myTextInput("이름", update.edit3),
       ],
-      onPressed: () async {
+      onPressed: () => showLoading(() async {
         try {
           await _client.updateUserInformation(
             _controller.regularSchedules[0].userID,
@@ -278,7 +301,7 @@ class _UserDetailPageState extends State<UserDetailPage>
         } catch (e) {
           showError(e.toString());
         }
-      },
+      }),
       isScrolling: true,
     );
   }

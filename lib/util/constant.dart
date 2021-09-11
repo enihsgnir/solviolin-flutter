@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:solviolin_admin/util/controller.dart';
 
-DataController _controller = Get.find<DataController>();
-
 extension RFS on num {
-  double get r => this * _controller.ratio; //'r'esponsible font size
+  double get r {
+    var _controller = Get.find<DataController>();
+
+    return this * _controller.ratio;
+  } //'r'esponsible font size
 }
 
 Color symbolColor = const Color.fromRGBO(96, 128, 104, 100);

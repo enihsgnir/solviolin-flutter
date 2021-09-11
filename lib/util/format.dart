@@ -3,15 +3,15 @@ import 'package:flutter/material.dart';
 DateTime parseDateOnly(String date) => DateUtils.dateOnly(DateTime.parse(date));
 
 Duration parseTimeOnly(String time) {
-  List<String> times = time.split(":");
-  int hours = int.parse(times[0]);
-  int minutes = int.parse(times[1]);
+  var times = time.split(":");
+  var hours = int.parse(times[0]);
+  var minutes = int.parse(times[1]);
 
   return Duration(hours: hours, minutes: minutes);
 }
 
 DateTime parseDateTime(String dateTime) {
-  DateTime _dateTime = DateTime.parse(dateTime);
+  var _dateTime = DateTime.parse(dateTime);
 
   return DateTime(_dateTime.year, _dateTime.month, _dateTime.day,
       _dateTime.hour, _dateTime.minute);
@@ -20,14 +20,17 @@ DateTime parseDateTime(String dateTime) {
 String _twoDigits(int n) => n < 10 ? "0$n" : "$n";
 
 String timeToString(Duration time) {
-  String twoDigitMinutes =
+  var twoDigitMinutes =
       _twoDigits(time.inMinutes.remainder(Duration.minutesPerHour));
 
   return "${_twoDigits(time.inHours)}:$twoDigitMinutes";
 }
 
+Duration timeOfDayToDuration(TimeOfDay time) =>
+    Duration(hours: time.hour, minutes: time.minute);
+
 String dowToString(int dow) {
-  Map<int, String> days = {
+  var days = {
     -1: "Null",
     0: "SUN",
     1: "MON",
@@ -45,12 +48,11 @@ String dowToString(int dow) {
 String? textEdit(TextEditingController edit) =>
     edit.text == "" ? null : edit.text;
 
-// int getFirstDayOffset(DateTime date) {
-//   final int weekdayFromMonday = DateTime(date.year, date.month).weekday - 1;
-//   int firstDayOfWeekIndex = 0;
-//   firstDayOfWeekIndex = (firstDayOfWeekIndex - 1) % 7;
-//   return (weekdayFromMonday - firstDayOfWeekIndex) % 7;
-// }
+// TODO: unused
+int getFirstDayOffset(DateTime date) {
+  final weekdayFromMonday = DateTime(date.year, date.month).weekday - 1;
+  var firstDayOfWeekIndex = 0;
+  firstDayOfWeekIndex = (firstDayOfWeekIndex - 1) % 7;
 
-Duration timeOfDayToDuration(TimeOfDay time) =>
-    Duration(hours: time.hour, minutes: time.minute);
+  return (weekdayFromMonday - firstDayOfWeekIndex) % 7;
+}

@@ -27,7 +27,7 @@ class _TimeSlotForTeacherState extends State<TimeSlotForTeacher> {
           view: CalendarView.week,
           dataSource: controller.reservationDataSource,
           controller: _calendar,
-          onTap: (details) async {
+          onTap: (details) {
             if (details.targetElement == CalendarElement.viewHeader) {
               if (_calendar.view == CalendarView.week) {
                 _calendar.view = CalendarView.timelineDay;
@@ -39,18 +39,20 @@ class _TimeSlotForTeacherState extends State<TimeSlotForTeacher> {
               controller.updateDisplayDate(_calendar.displayDate!);
             }
           },
-          onViewChanged: (details) async {
+          onViewChanged: (details) {
             if (!isSameWeek(_calendar.displayDate!, controller.displayDate)) {
               controller.updateDisplayDate(_calendar.displayDate!);
 
-              try {
-                await getReservationDataForTeacher(
-                  displayDate: controller.displayDate,
-                  teacherID: controller.profile.userID,
-                );
-              } catch (e) {
-                showError(e.toString());
-              }
+              showLoading(() async {
+                try {
+                  await getReservationDataForTeacher(
+                    displayDate: controller.displayDate,
+                    teacherID: controller.profile.userID,
+                  );
+                } catch (e) {
+                  showError(e.toString());
+                }
+              });
             }
           },
           headerStyle: CalendarHeaderStyle(

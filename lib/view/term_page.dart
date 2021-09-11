@@ -96,7 +96,7 @@ class _TermPageState extends State<TermPage> {
                             isMandatory: true,
                           ),
                         ],
-                        onPressed: () async {
+                        onPressed: () => showLoading(() async {
                           try {
                             await _client.modifyTerm(
                               term.id,
@@ -108,7 +108,7 @@ class _TermPageState extends State<TermPage> {
                           } catch (e) {
                             showError(e.toString());
                           }
-                        },
+                        }),
                       );
                     }),
               ],
@@ -147,7 +147,7 @@ class _TermPageState extends State<TermPage> {
           isMandatory: true,
         ),
       ],
-      onPressed: () async {
+      onPressed: () => showLoading(() async {
         try {
           await _client.registerTerm(
             termStart: register.date[0]!,
@@ -160,7 +160,7 @@ class _TermPageState extends State<TermPage> {
         } catch (e) {
           showError(e.toString());
         }
-      },
+      }),
       action: "등록",
     );
   }
@@ -201,7 +201,7 @@ class _TermPageState extends State<TermPage> {
       contents: [
         branchDropdown("/extend", "지점을 선택하세요!"),
       ],
-      onPressed: () async {
+      onPressed: () => showLoading(() async {
         try {
           await _client.extendAllCoursesOfBranch(extend.branchName!);
 
@@ -209,7 +209,7 @@ class _TermPageState extends State<TermPage> {
         } catch (e) {
           showError(e.toString());
         }
-      },
+      }),
       action: "등록",
     );
   }
@@ -223,7 +223,7 @@ class _TermPageState extends State<TermPage> {
       contents: [
         myTextInput("이름", extend.edit1, "이름을 입력하세요!"),
       ],
-      onPressed: () async {
+      onPressed: () => showLoading(() async {
         try {
           await _client.extendAllCoursesOfUser(textEdit(extend.edit1)!);
 
@@ -231,7 +231,7 @@ class _TermPageState extends State<TermPage> {
         } catch (e) {
           showError(e.toString());
         }
-      },
+      }),
       action: "등록",
       isScrolling: true,
     );

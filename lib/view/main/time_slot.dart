@@ -63,22 +63,17 @@ class _TimeSlotState extends State<TimeSlot> {
               _showReserved(details);
             }
           },
-          onViewChanged: (details) async {
+          onViewChanged: (details) {
             if (!isSameWeek(_calendar.displayDate!, controller.displayDate)) {
               controller.updateDisplayDate(_calendar.displayDate!);
 
-              try {
-                if (search.isSearched) {
-                  await getReservationData(
-                    displayDate: _controller.displayDate,
-                    branchName: search.branchName!,
-                    userID: textEdit(search.edit1),
-                    teacherID: textEdit(search.edit2),
-                  );
+              showLoading(() async {
+                try {
+                  await _getSearchedReservationsData();
+                } catch (e) {
+                  showError(e.toString());
                 }
-              } catch (e) {
-                showError(e.toString());
-              }
+              });
             }
           },
           headerStyle: CalendarHeaderStyle(
@@ -119,40 +114,28 @@ class _TimeSlotState extends State<TimeSlot> {
         return CupertinoActionSheet(
           actions: [
             CupertinoActionSheetAction(
-              onPressed: () {
-                _showCancelByUser(details);
-              },
+              onPressed: () => _showCancelByUser(details),
               child: Text("취소 (수강생)", style: TextStyle(fontSize: 24.r)),
             ),
             CupertinoActionSheetAction(
-              onPressed: () {
-                _showCancelByAdmin(details);
-              },
+              onPressed: () => _showCancelByAdmin(details),
               child: Text("취소 (관리자)", style: TextStyle(fontSize: 24.r)),
             ),
             CupertinoActionSheetAction(
-              onPressed: () {
-                _showExtendByUser(details);
-              },
+              onPressed: () => _showExtendByUser(details),
               child: Text("연장 (수강생)", style: TextStyle(fontSize: 24.r)),
             ),
             CupertinoActionSheetAction(
-              onPressed: () {
-                _showExtendByAdmin(details);
-              },
+              onPressed: () => _showExtendByAdmin(details),
               child: Text("연장 (관리자)", style: TextStyle(fontSize: 24.r)),
             ),
             CupertinoActionSheetAction(
-              onPressed: () {
-                _showDeleteLaterCourse(details);
-              },
+              onPressed: () => _showDeleteLaterCourse(details),
               child: Text("정규 종료", style: TextStyle(fontSize: 24.r)),
             ),
           ],
           cancelButton: CupertinoActionSheetAction(
-            onPressed: () {
-              Get.back();
-            },
+            onPressed: Get.back,
             isDefaultAction: true,
             child: Text("닫기", style: TextStyle(fontSize: 24.r)),
           ),
@@ -168,24 +151,17 @@ class _TimeSlotState extends State<TimeSlot> {
       contents: [
         Text("수강생의 권한으로 취소하시겠습니까?"),
       ],
-      onPressed: () async {
+      onPressed: () => showLoading(() async {
         try {
           await _client.cancelReservation(details.appointments![0].idSearch);
 
-          if (search.isSearched) {
-            await getReservationData(
-              displayDate: _controller.displayDate,
-              branchName: search.branchName!,
-              userID: textEdit(search.edit1),
-              teacherID: textEdit(search.edit2),
-            );
-          }
+          await _getSearchedReservationsData();
 
           Get.back();
         } catch (e) {
           showError(e.toString());
         }
-      },
+      }),
     );
   }
 
@@ -196,25 +172,18 @@ class _TimeSlotState extends State<TimeSlot> {
       contents: [
         Text("관리자의 권한으로 취소하시겠습니까?"),
       ],
-      onPressed: () async {
+      onPressed: () => showLoading(() async {
         try {
           await _client
               .cancelReservationByAdmin(details.appointments![0].idSearch);
 
-          if (search.isSearched) {
-            await getReservationData(
-              displayDate: _controller.displayDate,
-              branchName: search.branchName!,
-              userID: textEdit(search.edit1),
-              teacherID: textEdit(search.edit2),
-            );
-          }
+          await _getSearchedReservationsData();
 
           Get.back();
         } catch (e) {
           showError(e.toString());
         }
-      },
+      }),
     );
   }
 
@@ -225,29 +194,22 @@ class _TimeSlotState extends State<TimeSlot> {
       contents: [
         Text("수강생의 권한으로 연장하시겠습니까?"),
       ],
-      onPressed: () async {
+      onPressed: () => showLoading(() async {
         try {
           await _client.extendReservation(details.appointments![0].idSearch);
 
-          if (search.isSearched) {
-            await getReservationData(
-              displayDate: _controller.displayDate,
-              branchName: search.branchName!,
-              userID: textEdit(search.edit1),
-              teacherID: textEdit(search.edit2),
-            );
-          }
+          await _getSearchedReservationsData();
 
           Get.back();
         } catch (e) {
           showError(e.toString());
         }
-      },
+      }),
     );
   }
 
   Future _showExtendByAdmin(CalendarTapDetails details) {
-    bool count = false;
+    var count = false;
 
     return showMyDialog(
       context: context,
@@ -275,27 +237,20 @@ class _TimeSlotState extends State<TimeSlot> {
           ],
         ),
       ],
-      onPressed: () async {
+      onPressed: () => showLoading(() async {
         try {
           await _client.extendReservationByAdmin(
             details.appointments![0].idSearch,
             count: count ? 1 : 0,
           );
 
-          if (search.isSearched) {
-            await getReservationData(
-              displayDate: _controller.displayDate,
-              branchName: search.branchName!,
-              userID: textEdit(search.edit1),
-              teacherID: textEdit(search.edit2),
-            );
-          }
+          await _getSearchedReservationsData();
 
           Get.back();
         } catch (e) {
           showError(e.toString());
         }
-      },
+      }),
     );
   }
 
@@ -308,27 +263,20 @@ class _TimeSlotState extends State<TimeSlot> {
             DateFormat("yy/MM/dd HH:mm")
                 .format(details.appointments![0].endDate)),
       ],
-      onPressed: () async {
+      onPressed: () => showLoading(() async {
         try {
           await _client.updateEndDateAndDeleteLaterCourse(
             details.appointments![0].regularID,
             endDate: details.appointments![0].endDate,
           );
 
-          if (search.isSearched) {
-            await getReservationData(
-              displayDate: _controller.displayDate,
-              branchName: search.branchName!,
-              userID: textEdit(search.edit1),
-              teacherID: textEdit(search.edit2),
-            );
-          }
+          await _getSearchedReservationsData();
 
           Get.back();
         } catch (e) {
           showError(e.toString());
         }
-      },
+      }),
     );
   }
 
@@ -389,7 +337,7 @@ class _TimeSlotState extends State<TimeSlot> {
         ),
         myTextInput("수강생", regular.edit2, "이름을 입력하세요!"),
       ],
-      onPressed: () async {
+      onPressed: () => showLoading(() async {
         try {
           await _client.reserveRegularReservation(
             teacherID: textEdit(regular.edit1)!,
@@ -400,20 +348,13 @@ class _TimeSlotState extends State<TimeSlot> {
             userID: textEdit(regular.edit2)!,
           );
 
-          if (search.isSearched) {
-            await getReservationData(
-              displayDate: _controller.displayDate,
-              branchName: search.branchName!,
-              userID: textEdit(search.edit1),
-              teacherID: textEdit(search.edit2),
-            );
-          }
+          await _getSearchedReservationsData();
 
           Get.back();
         } catch (e) {
           showError(e.toString());
         }
-      },
+      }),
       action: "등록",
       isScrolling: true,
     );
@@ -443,7 +384,7 @@ class _TimeSlotState extends State<TimeSlot> {
         ),
         myTextInput("수강생", user.edit2, "이름을 입력하세요!"),
       ],
-      onPressed: () async {
+      onPressed: () => showLoading(() async {
         try {
           await _client.makeUpReservation(
             teacherID: textEdit(user.edit1)!,
@@ -454,20 +395,13 @@ class _TimeSlotState extends State<TimeSlot> {
             userID: textEdit(user.edit2)!,
           );
 
-          if (search.isSearched) {
-            await getReservationData(
-              displayDate: _controller.displayDate,
-              branchName: search.branchName!,
-              userID: textEdit(search.edit1),
-              teacherID: textEdit(search.edit2),
-            );
-          }
+          await _getSearchedReservationsData();
 
           Get.back();
         } catch (e) {
           showError(e.toString());
         }
-      },
+      }),
       action: "등록",
       isScrolling: true,
     );
@@ -497,7 +431,7 @@ class _TimeSlotState extends State<TimeSlot> {
         ),
         myTextInput("수강생", admin.edit2, "이름을 입력하세요!"),
       ],
-      onPressed: () async {
+      onPressed: () => showLoading(() async {
         try {
           await _client.makeUpReservationByAdmin(
             teacherID: textEdit(admin.edit1)!,
@@ -508,20 +442,13 @@ class _TimeSlotState extends State<TimeSlot> {
             userID: textEdit(admin.edit2)!,
           );
 
-          if (search.isSearched) {
-            await getReservationData(
-              displayDate: _controller.displayDate,
-              branchName: search.branchName!,
-              userID: textEdit(search.edit1),
-              teacherID: textEdit(search.edit2),
-            );
-          }
+          await _getSearchedReservationsData();
 
           Get.back();
         } catch (e) {
           showError(e.toString());
         }
-      },
+      }),
       action: "등록",
       isScrolling: true,
     );
@@ -551,7 +478,7 @@ class _TimeSlotState extends State<TimeSlot> {
         ),
         myTextInput("수강생", free.edit2, "이름을 입력하세요!"),
       ],
-      onPressed: () async {
+      onPressed: () => showLoading(() async {
         try {
           await _client.reserveFreeCourse(
             teacherID: textEdit(free.edit1)!,
@@ -562,22 +489,26 @@ class _TimeSlotState extends State<TimeSlot> {
             userID: textEdit(free.edit2)!,
           );
 
-          if (search.isSearched) {
-            await getReservationData(
-              displayDate: _controller.displayDate,
-              branchName: search.branchName!,
-              userID: textEdit(search.edit1),
-              teacherID: textEdit(search.edit2),
-            );
-          }
+          await _getSearchedReservationsData();
 
           Get.back();
         } catch (e) {
           showError(e.toString());
         }
-      },
+      }),
       action: "등록",
       isScrolling: true,
     );
+  }
+
+  Future<void> _getSearchedReservationsData() async {
+    if (search.isSearched) {
+      await getReservationData(
+        displayDate: _controller.displayDate,
+        branchName: search.branchName!,
+        userID: textEdit(search.edit1),
+        teacherID: textEdit(search.edit2),
+      );
+    }
   }
 }

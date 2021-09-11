@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
 import 'package:solviolin_admin/util/constant.dart';
 import 'package:solviolin_admin/util/network.dart';
+import 'package:solviolin_admin/widget/dialog.dart';
 import 'package:solviolin_admin/widget/single.dart';
 
 class CheckInPage extends StatefulWidget {
@@ -49,31 +50,35 @@ class _CheckInPageState extends State<CheckInPage> {
             onQRViewCreated: (controller) {
               qrController = controller;
               controller.scannedDataStream.listen((scanData) {
-                setState(() async {
+                setState(() {
                   result = scanData;
                   controller.pauseCamera();
-                  try {
-                    await _client.checkIn(result!.code);
-                    controller.stopCamera();
-                    Get.back();
-                  } catch (e) {
-                    Get.snackbar(
-                      "",
-                      "",
-                      snackPosition: SnackPosition.BOTTOM,
-                      titleText: Text(
-                        "Error",
-                        style: TextStyle(fontSize: 28.r),
-                      ),
-                      messageText: Text(
-                        e.toString(),
-                        style: TextStyle(color: Colors.red, fontSize: 24.r),
-                      ),
-                    );
-                    Future.delayed(const Duration(seconds: 2), () {
-                      controller.resumeCamera();
-                    });
-                  }
+
+                  showLoading(() async {
+                    try {
+                      await _client.checkIn(result!.code);
+
+                      controller.stopCamera();
+                      Get.back();
+                    } catch (e) {
+                      Get.snackbar(
+                        "",
+                        "",
+                        snackPosition: SnackPosition.BOTTOM,
+                        titleText: Text(
+                          "Error",
+                          style: TextStyle(fontSize: 28.r),
+                        ),
+                        messageText: Text(
+                          e.toString(),
+                          style: TextStyle(color: Colors.red, fontSize: 24.r),
+                        ),
+                      );
+                      Future.delayed(const Duration(seconds: 2), () {
+                        controller.resumeCamera();
+                      });
+                    }
+                  });
                 });
               });
             },

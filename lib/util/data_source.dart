@@ -17,16 +17,16 @@ import 'package:syncfusion_flutter_calendar/calendar.dart';
 Client _client = Get.find<Client>();
 DataController _controller = Get.find<DataController>();
 
+//TODO: remove some unnecessary functions
+
 Future<void> getInitialData([
   bool isLoggedIn = true,
   String? userID,
   String? userPassword,
 ]) async {
-  if (isLoggedIn == true) {
-    _controller.updateProfile(await _client.getProfile());
-  } else {
-    _controller.updateProfile(await _client.login(userID!, userPassword!));
-  }
+  isLoggedIn
+      ? _controller.updateProfile(await _client.getProfile())
+      : _controller.updateProfile(await _client.login(userID!, userPassword!));
 
   _controller.updateCurrentTerm(await _client.getCurrentTerm()
     ..sort((a, b) => a.termStart.compareTo(b.termStart)));
@@ -127,7 +127,7 @@ class ReservationDataSource extends CalendarDataSource {
   ReservationDataSource() {
     appointments = _controller.reservations;
 
-    resources = List<CalendarResource>.generate(
+    resources = List.generate(
       _controller.teacherInfos.length,
       (index) => CalendarResource(
         displayName: _controller.teacherInfos[index].teacherID,
@@ -191,19 +191,21 @@ Future<void> saveUsersData({
   String? branchName,
   String? userID,
   int? isPaid,
+  int? userType,
   int? status,
 }) async {
   final directory = Platform.isIOS
       ? await getApplicationDocumentsDirectory()
       : await getExternalStorageDirectory();
   final path = directory?.path;
-  final file = File("$path/users_list.json");
+  final file = File("$path/users_list_" +
+      "${DateFormat("yy_MM_dd_HH_mm").format(DateTime.now())}.json");
 
   final data = await _client.getRawUsers(
     branchName: branchName,
     userID: userID,
     isPaid: isPaid,
-    userType: 0,
+    userType: userType,
     status: status,
   );
   file.writeAsString(json.encode(data));
@@ -211,12 +213,12 @@ Future<void> saveUsersData({
   Get.snackbar(
     "",
     "",
+    duration: const Duration(seconds: 10),
     titleText: Text(
       "유저 정보 목록 저장",
       style: TextStyle(color: Colors.white, fontSize: 24.r),
     ),
     messageText: Text(file.path, style: contentStyle),
-    duration: const Duration(seconds: 10),
   );
 }
 
@@ -227,10 +229,11 @@ Future<void> getUserDetailData(User user) async {
     _controller.updateRegularSchedules(
         await _client.getRegularSchedulesByAdmin(user.userID)
           ..sort((a, b) {
-            int primary = a.dow.compareTo(b.dow);
+            var primary = a.dow.compareTo(b.dow);
+
             return primary != 0 ? primary : a.startTime.compareTo(b.startTime);
           }));
-  } catch (e) {
+  } catch (_) {
     _controller.updateRegularSchedules([
       RegularSchedule(
         id: -1,
@@ -264,7 +267,8 @@ Future<void> getUserDetailData(User user) async {
 
   _controller.updateChanges(await _client.getChangesWithID(user.userID)
     ..sort((a, b) {
-      int primary = a.fromDate.compareTo(b.fromDate);
+      var primary = a.fromDate.compareTo(b.fromDate);
+
       return primary != 0
           ? primary
           : a.toDate == null || b.toDate == null
@@ -299,14 +303,21 @@ Future<void> getTeachersData({
     branchName: branchName,
   )
     ..sort((a, b) {
-      int primary = a.teacherID.compareTo(b.teacherID);
-      int secondary = a.workDow.compareTo(b.workDow);
+      var primary = a.teacherID.compareTo(b.teacherID);
+      var secondary = a.workDow.compareTo(b.workDow);
+
       return primary != 0
           ? primary
           : secondary != 0
               ? secondary
               : a.startTime.compareTo(b.startTime);
     }));
+}
+
+Future<void> getCanceledData(String teacherID) async {
+  _controller.updateCanceledReservations(
+      await _client.getCanceledReservations(teacherID)
+        ..sort((a, b) => a.startDate.compareTo(b.startDate)));
 }
 
 Future<void> getLedgersData({
@@ -320,7 +331,8 @@ Future<void> getLedgersData({
     userID: userID,
   )
     ..sort((a, b) {
-      int primary = b.paidAt.compareTo(a.paidAt);
+      var primary = b.paidAt.compareTo(a.paidAt);
+
       return primary != 0 ? primary : a.userID.compareTo(b.userID);
     }));
 }

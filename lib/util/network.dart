@@ -19,9 +19,11 @@ import 'package:solviolin_admin/model/term.dart';
 import 'package:solviolin_admin/model/user.dart';
 import 'package:solviolin_admin/util/format.dart';
 
+//TODO: add comments
+
 class Client {
-  final Dio dio = Dio();
-  final FlutterSecureStorage storage = Get.find<FlutterSecureStorage>();
+  final dio = Dio();
+  final storage = Get.find<FlutterSecureStorage>();
 
   Client() {
     dio.options.connectTimeout = 5000;
@@ -42,19 +44,17 @@ class Client {
         return handler.next(options);
       },
       onResponse: (response, handler) async {
-        bool containsAccess = await storage.containsKey(key: "accessToken");
-        bool containsRefresh = await storage.containsKey(key: "refreshToken");
+        var accessT = await isLoggedIn(); //TODO: touch up implemented
+        var refreshT = await storage.containsKey(key: "refreshToken");
 
-        if (response.statusCode == 401 && containsAccess && containsRefresh) {
+        if (response.statusCode == 401 && accessT && refreshT) {
           try {
             await refresh();
             return handler.next(await retry(response.requestOptions));
           } on NetworkException catch (e) {
             return handler.reject(e);
           }
-        } else if (response.statusCode == 401 &&
-            !containsAccess &&
-            containsRefresh) {
+        } else if (response.statusCode == 401 && !accessT && refreshT) {
           Get.offAllNamed("/login");
           await logout();
 
@@ -92,10 +92,10 @@ class Client {
   }
 
   Future<void> refresh() async {
-    String? refreshToken = await storage.read(key: "refreshToken");
+    var refreshToken = await storage.read(key: "refreshToken");
     if (refreshToken != null) {
       await storage.delete(key: "accessToken");
-      Response response = await dio.post("/auth/refresh", data: {
+      var response = await dio.post("/auth/refresh", data: {
         "refreshToken": refreshToken,
       });
       if (response.statusCode == 201) {
@@ -130,7 +130,7 @@ class Client {
   }
 
   Future<Profile> login(String userID, String userPassword) async {
-    Response response = await dio.post("/auth/login", data: {
+    var response = await dio.post("/auth/login", data: {
       "userID": userID,
       "userPassword": userPassword,
     });
@@ -142,24 +142,34 @@ class Client {
             key: "refreshToken", value: response.data["refresh_token"]);
         return Profile.fromJson(response.data);
       } else {
-        throw "수강생은 로그인할 수 없습니다.";
+        throw NetworkException._(
+          message: "수강생은 로그인할 수 없습니다.",
+          options: response.requestOptions,
+        );
       }
     }
-    throw "내 정보를 불러올 수 없습니다.";
+    throw NetworkException._(
+      message: "내 정보를 불러올 수 없습니다.",
+      options: response.requestOptions,
+    );
   }
 
   Future<Profile> getProfile() async {
-    if (await isLoggedIn()) {
-      Response response = await dio.get("/auth/profile");
-      if (response.statusCode == 200) {
-        if (response.data["userType"] != 0) {
-          return Profile.fromJson(response.data);
-        } else {
-          throw "수강생은 로그인할 수 없습니다.";
-        }
+    var response = await dio.get("/auth/profile");
+    if (response.statusCode == 200) {
+      if (response.data["userType"] != 0) {
+        return Profile.fromJson(response.data);
+      } else {
+        throw NetworkException._(
+          message: "수강생은 로그인할 수 없습니다.",
+          options: response.requestOptions,
+        );
       }
     }
-    throw "내 정보를 불러올 수 없습니다.";
+    throw NetworkException._(
+      message: "내 정보를 불러올 수 없습니다.",
+      options: response.requestOptions,
+    );
   }
 
   Future<void> registerUser({
@@ -171,20 +181,18 @@ class Client {
     required String userBranch,
     String? token,
   }) async {
-    if (await isLoggedIn()) {
-      await dio.post(
-        "/user",
-        data: {
-          "userID": userID,
-          "userPassword": userPassword,
-          "userName": userName,
-          "userPhone": userPhone,
-          "userType": userType,
-          "userBranch": userBranch,
-          "token": token,
-        }..removeWhere((key, value) => value == null),
-      );
-    }
+    await dio.post(
+      "/user",
+      data: {
+        "userID": userID,
+        "userPassword": userPassword,
+        "userName": userName,
+        "userPhone": userPhone,
+        "userType": userType,
+        "userBranch": userBranch,
+        "token": token,
+      }..removeWhere((key, value) => value == null),
+    );
   }
 
   Future<List<User>> getUsers({
@@ -194,25 +202,26 @@ class Client {
     int? userType,
     int? status,
   }) async {
-    if (await isLoggedIn()) {
-      Response response = await dio.get(
-        "/user",
-        queryParameters: {
-          "branchName": branchName,
-          "userID": userID,
-          "isPaid": isPaid,
-          "userType": userType,
-          "status": status,
-        }..removeWhere((key, value) => value == null),
+    var response = await dio.get(
+      "/user",
+      queryParameters: {
+        "branchName": branchName,
+        "userID": userID,
+        "isPaid": isPaid,
+        "userType": userType,
+        "status": status,
+      }..removeWhere((key, value) => value == null),
+    );
+    if (response.statusCode == 200) {
+      return List.generate(
+        response.data.length,
+        (index) => User.fromJson(response.data[index]),
       );
-      if (response.statusCode == 200) {
-        return List.generate(
-          response.data.length,
-          (index) => User.fromJson(response.data[index]),
-        );
-      }
     }
-    throw "유저 목록을 불러올 수 없습니다.";
+    throw NetworkException._(
+      message: "유저 목록을 불러올 수 없습니다.",
+      options: response.requestOptions,
+    );
   }
 
   Future<List<dynamic>> getRawUsers({
@@ -222,22 +231,23 @@ class Client {
     int? userType,
     int? status,
   }) async {
-    if (await isLoggedIn()) {
-      Response response = await dio.get(
-        "/user",
-        queryParameters: {
-          "branchName": branchName,
-          "userID": userID,
-          "isPaid": isPaid,
-          "userType": userType,
-          "status": status,
-        }..removeWhere((key, value) => value == null),
-      );
-      if (response.statusCode == 200) {
-        return response.data;
-      }
+    var response = await dio.get(
+      "/user",
+      queryParameters: {
+        "branchName": branchName,
+        "userID": userID,
+        "isPaid": isPaid,
+        "userType": userType,
+        "status": status,
+      }..removeWhere((key, value) => value == null),
+    );
+    if (response.statusCode == 200) {
+      return response.data;
     }
-    throw "유저 목록을 불러올 수 없습니다.";
+    throw NetworkException._(
+      message: "유저 목록을 불러올 수 없습니다.",
+      options: response.requestOptions,
+    );
   }
 
   Future<void> updateUserInformation(
@@ -249,57 +259,55 @@ class Client {
     int? status,
     String? token,
   }) async {
-    if (await isLoggedIn()) {
-      await dio.patch(
-        "/user/$userID",
-        data: {
-          "userName": userName,
-          "userPhone": userPhone,
-          "userBranch": userBranch,
-          "userCredit": userCredit,
-          "status": status,
-          "token": token,
-        }..removeWhere((key, value) => value == null),
-      );
-    }
+    await dio.patch(
+      "/user/$userID",
+      data: {
+        "userName": userName,
+        "userPhone": userPhone,
+        "userBranch": userBranch,
+        "userCredit": userCredit,
+        "status": status,
+        "token": token,
+      }..removeWhere((key, value) => value == null),
+    );
   }
 
   Future<void> registerTerm({
     required DateTime termStart,
     required DateTime termEnd,
   }) async {
-    if (await isLoggedIn()) {
-      await dio.post("/term", data: {
-        "termStart": termStart.toIso8601String(),
-        "termEnd": termEnd.toIso8601String(),
-      });
-    }
+    await dio.post("/term", data: {
+      "termStart": termStart.toIso8601String(),
+      "termEnd": termEnd.toIso8601String(),
+    });
   }
 
   Future<List<Term>> getCurrentTerm() async {
-    if (await isLoggedIn()) {
-      Response response = await dio.get("/term");
-      if (response.statusCode == 200) {
-        return List.generate(
-          response.data.length,
-          (index) => Term.fromJson(response.data[index]),
-        );
-      }
+    var response = await dio.get("/term");
+    if (response.statusCode == 200) {
+      return List.generate(
+        response.data.length,
+        (index) => Term.fromJson(response.data[index]),
+      );
     }
-    throw "현재 학기 목록을 불러올 수 없습니다.";
+    throw NetworkException._(
+      message: "현재 학기 목록을 불러올 수 없습니다.",
+      options: response.requestOptions,
+    );
   }
 
   Future<List<Term>> getTerms(int take) async {
-    if (await isLoggedIn()) {
-      Response response = await dio.get("/term/$take");
-      if (response.statusCode == 200) {
-        return List.generate(
-          response.data.length,
-          (index) => Term.fromJson(response.data[index]),
-        );
-      }
+    var response = await dio.get("/term/$take");
+    if (response.statusCode == 200) {
+      return List.generate(
+        response.data.length,
+        (index) => Term.fromJson(response.data[index]),
+      );
     }
-    throw "학기 목록을 불러올 수 없습니다.";
+    throw NetworkException._(
+      message: "학기 목록을 불러올 수 없습니다.",
+      options: response.requestOptions,
+    );
   }
 
   Future<void> registerTeacher({
@@ -309,65 +317,63 @@ class Client {
     required Duration startTime,
     required Duration endTime,
   }) async {
-    if (await isLoggedIn()) {
-      await dio.post("/teacher", data: {
-        "teacherID": teacherID,
-        "teacherBranch": teacherBranch,
-        "workDow": workDow,
-        "startTime": timeToString(startTime),
-        "endTime": timeToString(endTime),
-      });
-    }
+    await dio.post("/teacher", data: {
+      "teacherID": teacherID,
+      "teacherBranch": teacherBranch,
+      "workDow": workDow,
+      "startTime": timeToString(startTime),
+      "endTime": timeToString(endTime),
+    });
   }
 
   Future<void> deleteTeacher(int id) async {
-    if (await isLoggedIn()) {
-      await dio.delete("/teacher/$id");
-    }
+    await dio.delete("/teacher/$id");
   }
 
   Future<List<Teacher>> getTeachers({
     String? teacherID,
     String? branchName,
   }) async {
-    if (await isLoggedIn()) {
-      Response response = await dio.get(
-        "/teacher/search",
-        queryParameters: {
-          "teacherID": teacherID,
-          "branchName": branchName,
-        }..removeWhere((key, value) => value == null),
+    var response = await dio.get(
+      "/teacher/search",
+      queryParameters: {
+        "teacherID": teacherID,
+        "branchName": branchName,
+      }..removeWhere((key, value) => value == null),
+    );
+    if (response.statusCode == 200) {
+      return List.generate(
+        response.data.length,
+        (index) => Teacher.fromJson(response.data[index]),
       );
-      if (response.statusCode == 200) {
-        return List.generate(
-          response.data.length,
-          (index) => Teacher.fromJson(response.data[index]),
-        );
-      }
     }
-    throw "강사 스케줄 목록을 불러올 수 없습니다.";
+    throw NetworkException._(
+      message: "강사 스케줄 목록을 불러올 수 없습니다.",
+      options: response.requestOptions,
+    );
   }
 
   Future<List<TeacherInfo>> getTeacherInfos({
     String? branchName,
     int? workDow,
   }) async {
-    if (await isLoggedIn()) {
-      Response response = await dio.get(
-        "/teacher/search/name",
-        queryParameters: {
-          "branchName": branchName,
-          "workDow": workDow,
-        }..removeWhere((key, value) => value == null),
+    var response = await dio.get(
+      "/teacher/search/name",
+      queryParameters: {
+        "branchName": branchName,
+        "workDow": workDow,
+      }..removeWhere((key, value) => value == null),
+    );
+    if (response.statusCode == 200) {
+      return List.generate(
+        response.data.length,
+        (index) => TeacherInfo.fromJson(response.data[index]),
       );
-      if (response.statusCode == 200) {
-        return List.generate(
-          response.data.length,
-          (index) => TeacherInfo.fromJson(response.data[index]),
-        );
-      }
     }
-    throw "강사 정보 목록을 불러올 수 없습니다.";
+    throw NetworkException._(
+      message: "강사 정보 목록을 불러올 수 없습니다.",
+      options: response.requestOptions,
+    );
   }
 
   Future<List<Control>> getControls({
@@ -377,25 +383,26 @@ class Client {
     DateTime? endDate,
     int? status,
   }) async {
-    if (await isLoggedIn()) {
-      Response response = await dio.post(
-        "/control/search",
-        data: {
-          "branchName": branchName,
-          "teacherID": teacherID,
-          "startDate": startDate?.toIso8601String(),
-          "endDate": endDate?.toIso8601String(),
-          "status": status,
-        }..removeWhere((key, value) => value == null),
+    var response = await dio.post(
+      "/control/search",
+      data: {
+        "branchName": branchName,
+        "teacherID": teacherID,
+        "startDate": startDate?.toIso8601String(),
+        "endDate": endDate?.toIso8601String(),
+        "status": status,
+      }..removeWhere((key, value) => value == null),
+    );
+    if (response.statusCode == 201) {
+      return List.generate(
+        response.data.length,
+        (index) => Control.fromJson(response.data[index]),
       );
-      if (response.statusCode == 201) {
-        return List.generate(
-          response.data.length,
-          (index) => Control.fromJson(response.data[index]),
-        );
-      }
     }
-    throw "컨트롤 정보를 불러올 수 없습니다.";
+    throw NetworkException._(
+      message: "컨트롤 정보를 불러올 수 없습니다.",
+      options: response.requestOptions,
+    );
   }
 
   Future<void> registerControl({
@@ -406,34 +413,26 @@ class Client {
     required int status,
     required int cancelInClose,
   }) async {
-    if (await isLoggedIn()) {
-      await dio.post("/control", data: {
-        "teacherID": teacherID,
-        "branchName": branchName,
-        "controlStart": controlStart.toIso8601String(),
-        "controlEnd": controlEnd.toIso8601String(),
-        "status": status,
-        "cancelInClose": cancelInClose,
-      });
-    }
+    await dio.post("/control", data: {
+      "teacherID": teacherID,
+      "branchName": branchName,
+      "controlStart": controlStart.toIso8601String(),
+      "controlEnd": controlEnd.toIso8601String(),
+      "status": status,
+      "cancelInClose": cancelInClose,
+    });
   }
 
   Future<void> deleteControl(int id) async {
-    if (await isLoggedIn()) {
-      await dio.delete("/control/$id");
-    }
+    await dio.delete("/control/$id");
   }
 
   Future<void> cancelReservation(int id) async {
-    if (await isLoggedIn()) {
-      await dio.patch("/reservation/user/cancel/$id");
-    }
+    await dio.patch("/reservation/user/cancel/$id");
   }
 
   Future<void> cancelReservationByAdmin(int id) async {
-    if (await isLoggedIn()) {
-      await dio.patch("/reservation/admin/cancel/$id");
-    }
+    await dio.patch("/reservation/admin/cancel/$id");
   }
 
   Future<void> makeUpReservation({
@@ -443,15 +442,13 @@ class Client {
     required DateTime endDate,
     required String userID,
   }) async {
-    if (await isLoggedIn()) {
-      await dio.post("/reservation/user", data: {
-        "teacherID": teacherID,
-        "branchName": branchName,
-        "startDate": startDate.toIso8601String(),
-        "endDate": endDate.toIso8601String(),
-        "userID": userID,
-      });
-    }
+    await dio.post("/reservation/user", data: {
+      "teacherID": teacherID,
+      "branchName": branchName,
+      "startDate": startDate.toIso8601String(),
+      "endDate": endDate.toIso8601String(),
+      "userID": userID,
+    });
   }
 
   Future<void> makeUpReservationByAdmin({
@@ -461,15 +458,13 @@ class Client {
     required DateTime endDate,
     required String userID,
   }) async {
-    if (await isLoggedIn()) {
-      await dio.post("/reservation/admin", data: {
-        "teacherID": teacherID,
-        "branchName": branchName,
-        "startDate": startDate.toIso8601String(),
-        "endDate": endDate.toIso8601String(),
-        "userID": userID,
-      });
-    }
+    await dio.post("/reservation/admin", data: {
+      "teacherID": teacherID,
+      "branchName": branchName,
+      "startDate": startDate.toIso8601String(),
+      "endDate": endDate.toIso8601String(),
+      "userID": userID,
+    });
   }
 
   Future<void> reserveFreeCourse({
@@ -479,30 +474,24 @@ class Client {
     required DateTime endDate,
     required String userID,
   }) async {
-    if (await isLoggedIn()) {
-      await dio.post("/reservation/free", data: {
-        "teacherID": teacherID,
-        "branchName": branchName,
-        "startDate": startDate.toIso8601String(),
-        "endDate": endDate.toIso8601String(),
-        "userID": userID,
-      });
-    }
+    await dio.post("/reservation/free", data: {
+      "teacherID": teacherID,
+      "branchName": branchName,
+      "startDate": startDate.toIso8601String(),
+      "endDate": endDate.toIso8601String(),
+      "userID": userID,
+    });
   }
 
   Future<void> extendReservation(int id) async {
-    if (await isLoggedIn()) {
-      await dio.patch("/reservation/user/extend/$id");
-    }
+    await dio.patch("/reservation/user/extend/$id");
   }
 
   Future<void> extendReservationByAdmin(
     int id, {
     required int count,
   }) async {
-    if (await isLoggedIn()) {
-      await dio.patch("/reservation/admin/extend/$id/$count");
-    }
+    await dio.patch("/reservation/admin/extend/$id/$count");
   }
 
   Future<List<Reservation>> getReservations({
@@ -513,44 +502,46 @@ class Client {
     String? userID,
     required List<int> bookingStatus,
   }) async {
-    if (await isLoggedIn()) {
-      Response response = await dio.post(
-        "/reservation/search",
-        data: {
-          "branchName": branchName,
-          "teacherID": teacherID,
-          "startDate": startDate?.toIso8601String(),
-          "endDate": endDate?.toIso8601String(),
-          "userID": userID,
-          "bookingStatus": bookingStatus,
-        }..removeWhere((key, value) => value == null),
+    var response = await dio.post(
+      "/reservation/search",
+      data: {
+        "branchName": branchName,
+        "teacherID": teacherID,
+        "startDate": startDate?.toIso8601String(),
+        "endDate": endDate?.toIso8601String(),
+        "userID": userID,
+        "bookingStatus": bookingStatus,
+      }..removeWhere((key, value) => value == null),
+    );
+    if (response.statusCode == 201) {
+      return List.generate(
+        response.data.length,
+        (index) => Reservation.fromJson(response.data[index]),
       );
-      if (response.statusCode == 201) {
-        return List.generate(
-          response.data.length,
-          (index) => Reservation.fromJson(response.data[index]),
-        );
-      }
     }
-    throw "예약 내역을 불러올 수 없습니다.";
+    throw NetworkException._(
+      message: "예약 내역을 불러올 수 없습니다.",
+      options: response.requestOptions,
+    );
   }
 
   Future<List<Change>> getChangesWithID(
     String userID, {
     String range = "both",
   }) async {
-    if (await isLoggedIn()) {
-      Response response = await dio.post("/reservation/changes/$userID", data: {
-        "range": range,
-      });
-      if (response.statusCode == 201) {
-        return List.generate(
-          response.data.length,
-          (index) => Change.fromJson(response.data[index]),
-        );
-      }
+    var response = await dio.post("/reservation/changes/$userID", data: {
+      "range": range,
+    });
+    if (response.statusCode == 201) {
+      return List.generate(
+        response.data.length,
+        (index) => Change.fromJson(response.data[index]),
+      );
     }
-    throw "변경 내역을 불러올 수 없습니다.";
+    throw NetworkException._(
+      message: "변경 내역을 불러올 수 없습니다.",
+      options: response.requestOptions,
+    );
   }
 
   Future<List<Salary>> getSalaries({
@@ -559,34 +550,36 @@ class Client {
     required int dayTimeCost,
     required int nightTimeCost,
   }) async {
-    if (await isLoggedIn()) {
-      Response response = await dio.post("/reservation/salary", data: {
-        "branchName": branchName,
-        "termID": termID,
-        "dayTimeCost": dayTimeCost,
-        "nightTimeCost": nightTimeCost,
-      });
-      if (response.statusCode == 201) {
-        return List.generate(
-          response.data.length,
-          (index) => Salary.fromList(response.data[index]),
-        );
-      }
+    var response = await dio.post("/reservation/salary", data: {
+      "branchName": branchName,
+      "termID": termID,
+      "dayTimeCost": dayTimeCost,
+      "nightTimeCost": nightTimeCost,
+    });
+    if (response.statusCode == 201) {
+      return List.generate(
+        response.data.length,
+        (index) => Salary.fromList(response.data[index]),
+      );
     }
-    throw "급여 목록을 불러올 수 없습니다.";
+    throw NetworkException._(
+      message: "급여 목록을 불러올 수 없습니다.",
+      options: response.requestOptions,
+    );
   }
 
   Future<List<Canceled>> getCanceledReservations(String teacherID) async {
-    if (await isLoggedIn()) {
-      Response response = await dio.get("/reservation/canceled/$teacherID");
-      if (response.statusCode == 200) {
-        return List.generate(
-          response.data.length,
-          (index) => Canceled.fromJson(response.data[index]),
-        );
-      }
+    var response = await dio.get("/reservation/canceled/$teacherID");
+    if (response.statusCode == 200) {
+      return List.generate(
+        response.data.length,
+        (index) => Canceled.fromJson(response.data[index]),
+      );
     }
-    throw "취소 내역을 불러올 수 없습니다.";
+    throw NetworkException._(
+      message: "취소 내역을 불러올 수 없습니다.",
+      options: response.requestOptions,
+    );
   }
 
   Future<void> reserveRegularReservation({
@@ -596,38 +589,30 @@ class Client {
     required DateTime endDate,
     required String userID,
   }) async {
-    if (await isLoggedIn()) {
-      await dio.post("/reservation/regular", data: {
-        "teacherID": teacherID,
-        "branchName": branchName,
-        "startDate": startDate.toIso8601String(),
-        "endDate": endDate.toIso8601String(),
-        "userID": userID,
-      });
-    }
+    await dio.post("/reservation/regular", data: {
+      "teacherID": teacherID,
+      "branchName": branchName,
+      "startDate": startDate.toIso8601String(),
+      "endDate": endDate.toIso8601String(),
+      "userID": userID,
+    });
   }
 
   Future<void> updateEndDateAndDeleteLaterCourse(
     int id, {
     required DateTime endDate,
   }) async {
-    if (await isLoggedIn()) {
-      await dio.patch("/reservation/regular/$id", data: {
-        "endDate": endDate.toIso8601String(),
-      });
-    }
+    await dio.patch("/reservation/regular/$id", data: {
+      "endDate": endDate.toIso8601String(),
+    });
   }
 
   Future<void> extendAllCoursesOfBranch(String branch) async {
-    if (await isLoggedIn()) {
-      await dio.post("/reservation/regular/extend/$branch");
-    }
+    await dio.post("/reservation/regular/extend/$branch");
   }
 
   Future<void> extendAllCoursesOfUser(String userID) async {
-    if (await isLoggedIn()) {
-      await dio.post("/reservation/regular/extend/user/$userID");
-    }
+    await dio.post("/reservation/regular/extend/user/$userID");
   }
 
   Future<void> modifyTerm(
@@ -635,55 +620,51 @@ class Client {
     required DateTime termStart,
     required DateTime termEnd,
   }) async {
-    if (await isLoggedIn()) {
-      await dio.patch("/reservation/term/$id", data: {
-        "termStart": termStart.toIso8601String(),
-        "termEnd": termEnd.toIso8601String(),
-      });
-    }
+    await dio.patch("/reservation/term/$id", data: {
+      "termStart": termStart.toIso8601String(),
+      "termEnd": termEnd.toIso8601String(),
+    });
   }
 
   Future<List<RegularSchedule>> getRegularSchedulesByAdmin(
       String userID) async {
-    if (await isLoggedIn()) {
-      Response response = await dio.get("/regular-schedule/$userID");
-      if (response.statusCode == 200) {
-        return List.generate(
-          response.data.length,
-          (index) => RegularSchedule.fromJson(response.data[index]),
-        );
-      }
+    var response = await dio.get("/regular-schedule/$userID");
+    if (response.statusCode == 200) {
+      return List.generate(
+        response.data.length,
+        (index) => RegularSchedule.fromJson(response.data[index]),
+      );
     }
-    throw "해당 유저의 정규 예약 정보를 불러올 수 없습니다.";
+    throw NetworkException._(
+      message: "해당 유저의 정규 예약 정보를 불러올 수 없습니다.",
+      options: response.requestOptions,
+    );
   }
 
   Future<void> registerBranch(String branchName) async {
-    if (await isLoggedIn()) {
-      await dio.post("/branch", data: {
-        "branchName": branchName,
-      });
-    }
+    await dio.post("/branch", data: {
+      "branchName": branchName,
+    });
   }
 
   Future<List<String>> getBranches() async {
-    if (await isLoggedIn()) {
-      Response response = await dio.get("/branch");
-      if (response.statusCode == 200) {
-        return List.generate(
-          response.data.length,
-          (index) => response.data[index]["branchName"],
-        );
-      }
+    var response = await dio.get("/branch");
+    if (response.statusCode == 200) {
+      return List.generate(
+        response.data.length,
+        (index) => response.data[index]["branchName"],
+      );
     }
-    throw "지점 정보를 불러올 수 없습니다.";
+    throw NetworkException._(
+      message: "지점 정보를 불러올 수 없습니다.",
+      options: response.requestOptions,
+    );
   }
 
   Future<void> checkIn(String branchCode) async {
-    if (await isLoggedIn()) {
-      await dio.post("/check-in", data: {
-        "branchCode": branchCode,
-      });
-    }
+    await dio.post("/check-in", data: {
+      "branchCode": branchCode,
+    });
   }
 
   Future<List<CheckIn>> getCheckInHistories({
@@ -691,23 +672,24 @@ class Client {
     DateTime? startDate,
     DateTime? endDate,
   }) async {
-    if (await isLoggedIn()) {
-      Response response = await dio.post(
-        "/check-in/search",
-        data: {
-          "branchName": branchName,
-          "startDate": startDate?.toIso8601String(),
-          "endDate": endDate?.toIso8601String(),
-        }..removeWhere((key, value) => value == null),
+    var response = await dio.post(
+      "/check-in/search",
+      data: {
+        "branchName": branchName,
+        "startDate": startDate?.toIso8601String(),
+        "endDate": endDate?.toIso8601String(),
+      }..removeWhere((key, value) => value == null),
+    );
+    if (response.statusCode == 201) {
+      return List.generate(
+        response.data.length,
+        (index) => CheckIn.fromJson(response.data[index]),
       );
-      if (response.statusCode == 201) {
-        return List.generate(
-          response.data.length,
-          (index) => CheckIn.fromJson(response.data[index]),
-        );
-      }
     }
-    throw "체크인 이력을 불러올 수 없습니다.";
+    throw NetworkException._(
+      message: "체크인 이력을 불러올 수 없습니다.",
+      options: response.requestOptions,
+    );
   }
 
   Future<void> registerLedger({
@@ -716,14 +698,12 @@ class Client {
     required int termID,
     required String branchName,
   }) async {
-    if (await isLoggedIn()) {
-      await dio.post("/ledger", data: {
-        "userID": userID,
-        "amount": amount,
-        "termID": termID,
-        "branchName": branchName,
-      });
-    }
+    await dio.post("/ledger", data: {
+      "userID": userID,
+      "amount": amount,
+      "termID": termID,
+      "branchName": branchName,
+    });
   }
 
   Future<List<Ledger>> getLedgers({
@@ -731,41 +711,43 @@ class Client {
     required int termID,
     required String userID,
   }) async {
-    if (await isLoggedIn()) {
-      Response response = await dio.get("/ledger", queryParameters: {
-        "branchName": branchName,
-        "termID": termID,
-        "userID": userID,
-      });
-      if (response.statusCode == 200) {
-        return List.generate(
-          response.data.length,
-          (index) => Ledger.fromJson(response.data[index]),
-        );
-      }
+    var response = await dio.get("/ledger", queryParameters: {
+      "branchName": branchName,
+      "termID": termID,
+      "userID": userID,
+    });
+    if (response.statusCode == 200) {
+      return List.generate(
+        response.data.length,
+        (index) => Ledger.fromJson(response.data[index]),
+      );
     }
-    throw "매출 정보를 불러올 수 없습니다.";
+    throw NetworkException._(
+      message: "매출 목록을 불러올 수 없습니다.",
+      options: response.requestOptions,
+    );
   }
 
   Future<String> getTotalLedger({
     required String branchName,
     required int termID,
   }) async {
-    if (await isLoggedIn()) {
-      Response response = await dio.get("/ledger/total", queryParameters: {
-        "branchName": branchName,
-        "termID": termID,
-      });
-      if (response.statusCode == 200) {
-        var total = response.data;
-        if (total is String) {
-          total = num.parse(total);
-        }
-
-        return NumberFormat("#,###원").format(total);
+    var response = await dio.get("/ledger/total", queryParameters: {
+      "branchName": branchName,
+      "termID": termID,
+    });
+    if (response.statusCode == 200) {
+      var total = response.data;
+      if (total is String) {
+        total = num.parse(total);
       }
+
+      return NumberFormat("#,###원").format(total);
     }
-    throw "총 매출 정보를 불러올 수 없습니다.";
+    throw NetworkException._(
+      message: "총 매출 정보를 불러올 수 없습니다.",
+      options: response.requestOptions,
+    );
   }
 }
 

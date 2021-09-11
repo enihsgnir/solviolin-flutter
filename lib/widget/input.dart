@@ -36,9 +36,7 @@ Widget myTextInput(
         width: 220.r,
         child: TextFormField(
           controller: controller,
-          validator: (value) {
-            return value == "" ? validator : null;
-          },
+          validator: (value) => value == "" ? validator : null,
           style: contentStyle,
         ),
       ),

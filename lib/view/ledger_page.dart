@@ -55,21 +55,18 @@ class _LedgerPageState extends State<LedgerPage> {
             myTextInput("수강생", search.edit1, "이름을 입력하세요!"),
             myActionButton(
               context: context,
-              onPressed: () async {
+              onPressed: () => showLoading(() async {
                 try {
-                  showLoading();
                   _controller.totalLeger = await _client.getTotalLedger(
                     branchName: search.branchName!,
                     termID: search.termID!,
                   );
-                  Get.back();
 
                   _showTotal();
                 } catch (e) {
-                  Get.back(); //TODO: manage showLoading()
                   showError(e.toString());
                 }
-              },
+              }),
               action: "합계",
             ),
           ],
@@ -79,7 +76,7 @@ class _LedgerPageState extends State<LedgerPage> {
             termDropdown("/search", "학기를 선택하세요!"),
             myActionButton(
               context: context,
-              onPressed: () async {
+              onPressed: () => showLoading(() async {
                 try {
                   await getLedgersData(
                     branchName: search.branchName!,
@@ -89,7 +86,7 @@ class _LedgerPageState extends State<LedgerPage> {
                 } catch (e) {
                   showError(e.toString());
                 }
-              },
+              }),
             ),
           ],
         ),

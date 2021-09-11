@@ -81,7 +81,7 @@ class _ControlPageState extends State<ControlPage> {
             ),
             myActionButton(
               context: context,
-              onPressed: () async {
+              onPressed: () => showLoading(() async {
                 try {
                   await getControlsData(
                     branchName: search.branchName!,
@@ -95,7 +95,7 @@ class _ControlPageState extends State<ControlPage> {
                 } catch (e) {
                   showError(e.toString());
                 }
-              },
+              }),
             ),
           ],
         ),
@@ -125,7 +125,7 @@ class _ControlPageState extends State<ControlPage> {
                     contents: [
                       Text("정말 삭제하시겠습니까?"),
                     ],
-                    onPressed: () async {
+                    onPressed: () => showLoading(() async {
                       try {
                         await _client.deleteControl(control.id);
 
@@ -141,7 +141,7 @@ class _ControlPageState extends State<ControlPage> {
                       } catch (e) {
                         showError(e.toString());
                       }
-                    },
+                    }),
                   ),
                 ),
               ],
@@ -184,12 +184,12 @@ class _ControlPageState extends State<ControlPage> {
           index: 1,
           isMandatory: true,
         ),
-        myRadio<Status>(
+        myRadio<ControlStatus>(
           tag: "/register",
           item: "오픈/클로즈",
           names: ["오픈", "클로즈"],
-          values: Status.values,
-          groupValue: Status.open,
+          values: ControlStatus.values,
+          groupValue: ControlStatus.open,
         ),
         myRadio<CancelInClose>(
           tag: "/register",
@@ -199,14 +199,14 @@ class _ControlPageState extends State<ControlPage> {
           groupValue: CancelInClose.none,
         ),
       ],
-      onPressed: () async {
+      onPressed: () => showLoading(() async {
         try {
           await _client.registerControl(
             teacherID: textEdit(search.edit1)!,
             branchName: search.branchName!,
             controlStart: search.dateTime[0]!,
             controlEnd: search.dateTime[1]!,
-            status: Status.values.indexOf(search.type[Status]),
+            status: ControlStatus.values.indexOf(search.type[ControlStatus]),
             cancelInClose:
                 CancelInClose.values.indexOf(search.type[CancelInClose]),
           );
@@ -225,7 +225,7 @@ class _ControlPageState extends State<ControlPage> {
         } catch (e) {
           showError(e.toString());
         }
-      },
+      }),
       action: "등록",
       isScrolling: true,
     );

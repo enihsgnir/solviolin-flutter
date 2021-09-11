@@ -35,7 +35,7 @@ Widget myActionButton({
         onPressed();
       },
       style: ElevatedButton.styleFrom(primary: symbolColor),
-      child: Text(action, style: TextStyle(fontSize: 20.r)),
+      child: Text(action, style: contentStyle),
     ),
   );
 }
