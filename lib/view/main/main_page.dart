@@ -1,10 +1,11 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:solviolin/util/data_source.dart';
+import 'package:solviolin/util/constant.dart';
 import 'package:solviolin/view/main/calendar_reserved.dart';
 import 'package:solviolin/view/main/grid_available.dart';
 import 'package:solviolin/view/main/my_reservation.dart';
 import 'package:solviolin/view/main/user_profile.dart';
+import 'package:solviolin/widget/single.dart';
 
 class MainPage extends StatefulWidget {
   const MainPage({Key? key}) : super(key: key);
@@ -24,20 +25,12 @@ class _MainPageState extends State<MainPage> {
               padding: EdgeInsets.fromLTRB(8.r, 16.r, 8.r, 0),
               child: UserProfile(),
             ),
-            Container(
-              margin: EdgeInsets.fromLTRB(8.r, 8.r, 8.r, 0),
-              color: Colors.grey,
-              height: 0.5,
-            ),
+            myDivider(),
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 8.r),
               child: CalendarReserved(),
             ),
-            Container(
-              margin: EdgeInsets.all(8.r),
-              color: Colors.grey,
-              height: 0.5,
-            ),
+            myDivider(),
             MyReservation(),
             GridAvailable(),
           ],

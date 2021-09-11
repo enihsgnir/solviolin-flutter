@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:solviolin/util/constant.dart';
 import 'package:solviolin/util/controller.dart';
 import 'package:solviolin/util/data_source.dart';
+import 'package:solviolin/widget/dialog.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 class CalendarReserved extends StatefulWidget {
@@ -13,13 +15,19 @@ class CalendarReserved extends StatefulWidget {
 }
 
 class _CalendarReservedState extends State<CalendarReserved> {
-  DateTime _focusedDay = kToday;
+  var todayZ = DateTime.now();
+  late DateTime todayKST;
   late DateTime _selectedDay;
+  late DateTime _focusedDay;
+
+  var events = getEvents();
 
   @override
   void initState() {
     super.initState();
-    _selectedDay = _focusedDay;
+    todayKST = todayZ.add(const Duration(hours: 9));
+    _selectedDay = todayZ;
+    _focusedDay = todayZ;
   }
 
   @override
@@ -30,10 +38,10 @@ class _CalendarReservedState extends State<CalendarReserved> {
       builder: (controller) {
         return TableCalendar(
           focusedDay: _focusedDay,
-          firstDay: DateTime(kToday.year, kToday.month - 5, 1),
+          firstDay: DateTime(todayKST.year, todayKST.month - 5, 1),
           lastDay: controller.currentTerm[0].termEnd
               .add(const Duration(hours: 23, minutes: 59, seconds: 59)),
-          currentDay: DateTime.now().add(const Duration(hours: 9)),
+          currentDay: todayKST,
           weekendDays: const [DateTime.sunday],
           availableCalendarFormats: const {CalendarFormat.month: "Month"},
           pageJumpingEnabled: true,
@@ -56,28 +64,30 @@ class _CalendarReservedState extends State<CalendarReserved> {
             dowTextFormatter: (date, locale) =>
                 DateFormat.E(locale).format(date)[0],
             weekdayStyle: TextStyle(
-              color: const Color(0xFF4F4F4F),
+              color: Colors.white54,
               fontSize: 18.r,
             ),
             weekendStyle: TextStyle(color: Colors.red, fontSize: 20.r),
           ),
           calendarStyle: CalendarStyle(
             todayTextStyle: TextStyle(
-              color: kToday.weekday == 7 ? const Color(0xFFFAFAFA) : Colors.red,
+              color: Colors.black87,
               fontSize: 22.r,
+              fontWeight: FontWeight.bold,
             ),
             todayDecoration: BoxDecoration(
-              color: kToday.weekday == 7 ? Colors.red : const Color(0xFFFAFAFA),
+              color: Colors.green.withOpacity(0.5),
               shape: BoxShape.circle,
             ),
             selectedTextStyle: TextStyle(
-              color: _selectedDay.weekday == 7
-                  ? Colors.red
-                  : const Color(0xFFFAFAFA),
+              color: _getSelectedTextColor(),
               fontSize: 22.r,
+              fontWeight: isSameDay(_selectedDay, todayKST)
+                  ? FontWeight.bold
+                  : FontWeight.normal,
             ),
-            selectedDecoration: const BoxDecoration(
-              color: const Color.fromRGBO(227, 214, 208, 0.15),
+            selectedDecoration: BoxDecoration(
+              color: _getSelectedDecorationColor(),
               shape: BoxShape.circle,
             ),
             outsideTextStyle: TextStyle(
@@ -88,7 +98,7 @@ class _CalendarReservedState extends State<CalendarReserved> {
               color: Colors.grey.withOpacity(0.1),
               fontSize: 18.r,
             ),
-            holidayTextStyle: TextStyle(color: Colors.white, fontSize: 22.r),
+            holidayTextStyle: TextStyle(color: Colors.white70, fontSize: 22.r),
             holidayDecoration: BoxDecoration(
               color: symbolColor,
               shape: BoxShape.circle,
@@ -97,34 +107,79 @@ class _CalendarReservedState extends State<CalendarReserved> {
             defaultTextStyle: TextStyle(color: Colors.white70, fontSize: 22.r),
           ),
           selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
-          holidayPredicate: (day) => getEvents().containsKey(day),
-          onDaySelected: (selectedDay, focusedDay) async {
+          holidayPredicate: (day) => events.containsKey(day),
+          onDaySelected: (selectedDay, focusedDay) {
             if (!isSameDay(_selectedDay, selectedDay)) {
               setState(() {
+                todayZ = DateTime.now();
+                todayKST = todayZ.add(const Duration(hours: 9));
                 _selectedDay = selectedDay;
                 _focusedDay = focusedDay;
               });
+              controller.update();
             }
 
-            if (selectedDay.isAfter(kToday) || isSameDay(selectedDay, kToday)) {
-              await getSelectedDayData(selectedDay);
+            if (selectedDay.isAfter(todayZ) || isSameDay(selectedDay, todayZ)) {
+              showLoading(() async {
+                try {
+                  await getSelectedDayData(selectedDay);
+
+                  setState(() {
+                    events = getEvents();
+                  });
+                } catch (e) {
+                  showError(e.toString());
+                }
+              });
             }
 
             controller.updateDays(selectedDay, focusedDay);
-            controller.resetCurrentPage();
           },
-          onPageChanged: (focusedDay) async {
+          onPageChanged: (focusedDay) {
+            todayZ = DateTime.now();
+            todayKST = todayZ.add(const Duration(hours: 9));
             _selectedDay = focusedDay;
             _focusedDay = focusedDay;
+            controller.update();
 
-            await getSelectedDayData(focusedDay);
-            await getChangedPageData(focusedDay);
+            showLoading(() async {
+              try {
+                await getSelectedDayData(focusedDay);
+                await getChangedPageData(focusedDay);
+
+                setState(() {
+                  events = getEvents();
+                });
+              } catch (e) {
+                showError(e.toString());
+              }
+            });
 
             controller.updateDays(focusedDay, focusedDay);
-            controller.resetCurrentPage();
           },
         );
       },
     );
+  }
+
+  //TODO: touch up detail colors
+  Color _getSelectedTextColor() {
+    if (isSameDay(_selectedDay, todayKST)) {
+      return Colors.black87;
+    } else if (events.containsKey(_selectedDay)) {
+      return Colors.white70;
+    } else if (_selectedDay.weekday == 7) {
+      return Colors.red[400]!;
+    }
+    return const Color(0xFFFAFAFA);
+  }
+
+  Color _getSelectedDecorationColor() {
+    if (isSameDay(_selectedDay, todayKST)) {
+      return Colors.green[300]!.withOpacity(0.5);
+    } else if (events.containsKey(_selectedDay)) {
+      return symbolColor.withOpacity(0.25);
+    }
+    return const Color.fromRGBO(227, 214, 208, 0.15);
   }
 }

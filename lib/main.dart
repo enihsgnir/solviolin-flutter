@@ -9,12 +9,12 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:solviolin/util/controller.dart';
 import 'package:solviolin/util/network.dart';
+import 'package:solviolin/view/check_in_page.dart';
 import 'package:solviolin/view/history/history_page.dart';
 import 'package:solviolin/view/loading_page.dart';
 import 'package:solviolin/view/login_page.dart';
 import 'package:solviolin/view/main/main_page.dart';
 import 'package:solviolin/view/metronome_page.dart';
-import 'package:solviolin/view/qrcode_scan_page.dart';
 
 void main() {
   LicenseRegistry.addLicense(() async* {
@@ -67,7 +67,7 @@ class _MyAppState extends State<MyApp> {
         GetPage(name: "/login", page: () => LoginPage()),
         GetPage(name: "/main", page: () => MainPage()),
         GetPage(name: "/history", page: () => HistoryPage()),
-        GetPage(name: "/scan", page: () => QRCodeScanPage()),
+        GetPage(name: "/check-in", page: () => CheckInPage()),
         GetPage(name: "/metronome", page: () => MetronomePage()),
       ],
     );

@@ -5,8 +5,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:quiver/async.dart';
-import 'package:solviolin/util/data_source.dart';
-import 'package:solviolin/widget/single_reusable.dart';
+import 'package:solviolin/util/constant.dart';
+import 'package:solviolin/widget/single.dart';
 
 class MetronomePage extends StatefulWidget {
   const MetronomePage({Key? key}) : super(key: key);
@@ -18,9 +18,10 @@ class MetronomePage extends StatefulWidget {
 class _MetronomePageState extends State<MetronomePage> {
   late Metronome metronome;
   StreamSubscription<DateTime>? subscription;
-  bool isPlaying = false;
 
-  int _index = 21;
+  final player = Get.put(AudioCache());
+
+  var _index = 21;
   List<int> tempos = []
     ..addAll(List.generate(10, (index) => 40 + 2 * index))
     ..addAll(List.generate(4, (index) => 60 + 3 * index))
@@ -28,7 +29,7 @@ class _MetronomePageState extends State<MetronomePage> {
     ..addAll(List.generate(4, (index) => 120 + 6 * index))
     ..addAll(List.generate(9, (index) => 144 + 8 * index));
 
-  final AudioCache player = Get.put(AudioCache());
+  var _isPlaying = false;
 
   @override
   void initState() {
@@ -48,30 +49,25 @@ class _MetronomePageState extends State<MetronomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: appBar("메트로놈"),
+      appBar: myAppBar("메트로놈"),
       body: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Container(
-            height: 172.r,
-          ),
           Container(
             padding: EdgeInsets.all(16.r),
             alignment: Alignment.center,
-            width: 216.r,
-            height: 108.r,
+            width: 220.r,
+            height: 110.r,
             child: Text(
               "Tempo",
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 54.r,
-              ),
+              style: TextStyle(color: Colors.white, fontSize: 54.r),
             ),
           ),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               ElevatedButton(
-                onPressed: () => count(CountType.decrease),
+                onPressed: () => _count(CountType.decrease),
                 style: ElevatedButton.styleFrom(
                   primary: symbolColor,
                   shape: CircleBorder(),
@@ -83,19 +79,20 @@ class _MetronomePageState extends State<MetronomePage> {
               ),
               Container(
                 alignment: Alignment.center,
-                width: 216.r,
-                height: 162.r,
+                width: 220.r,
+                height: 160.r,
                 child: InkWell(
                   child: Text(
                     "${tempos[_index]}",
                     style: TextStyle(color: Colors.white, fontSize: 108.r),
                   ),
-                  onTap: select,
+                  onTap: _select,
+                  borderRadius: BorderRadius.circular(15.r),
                   enableFeedback: false,
                 ),
               ),
               ElevatedButton(
-                onPressed: () => count(CountType.increase),
+                onPressed: () => _count(CountType.increase),
                 style: ElevatedButton.styleFrom(
                   primary: symbolColor,
                   shape: CircleBorder(),
@@ -110,17 +107,17 @@ class _MetronomePageState extends State<MetronomePage> {
           Padding(
             padding: EdgeInsets.all(32.r),
             child: OutlinedButton(
-              onPressed: play,
+              onPressed: _play,
               style: OutlinedButton.styleFrom(
                 primary: Colors.white,
                 shape: CircleBorder(),
                 enableFeedback: false,
               ),
               child: Icon(
-                isPlaying
+                _isPlaying
                     ? Icons.pause_circle_outline_rounded
                     : Icons.play_circle_outline_rounded,
-                size: 162.r,
+                size: 160.r,
               ),
             ),
           ),
@@ -129,24 +126,24 @@ class _MetronomePageState extends State<MetronomePage> {
     );
   }
 
-  void play() async {
+  void _play() {
     setState(() {
-      if (isPlaying) {
+      if (_isPlaying) {
         subscription?.cancel();
-        isPlaying = false;
+        _isPlaying = false;
       } else {
         subscription = metronome
             .listen((event) => player.play("metronome_sound_sample.mp3"));
-        isPlaying = true;
+        _isPlaying = true;
       }
     });
   }
 
-  void count(CountType type) {
+  void _count(CountType type) {
     setState(() {
-      if (isPlaying) {
+      if (_isPlaying) {
         subscription?.cancel();
-        isPlaying = false;
+        _isPlaying = false;
       }
 
       if (type == CountType.increase && _index < tempos.length - 1) {
@@ -159,7 +156,7 @@ class _MetronomePageState extends State<MetronomePage> {
     });
   }
 
-  Future select() {
+  Future _select() {
     return showModalBottomSheet(
       context: context,
       builder: (context) {
@@ -170,16 +167,17 @@ class _MetronomePageState extends State<MetronomePage> {
             itemExtent: 52.r,
             onSelectedItemChanged: (index) {
               setState(() {
-                if (isPlaying) {
+                if (_isPlaying) {
                   subscription?.cancel();
-                  isPlaying = false;
+                  _isPlaying = false;
                 }
+
                 _index = index;
                 metronome = Metronome.epoch(Duration(
                     microseconds: (60 * 1000 * 1000 / tempos[_index]).round()));
               });
             },
-            children: List<Container>.generate(
+            children: List.generate(
               tempos.length,
               (index) => Container(
                 alignment: Alignment.center,

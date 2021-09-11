@@ -2,10 +2,11 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:solviolin/util/constant.dart';
 import 'package:solviolin/util/controller.dart';
 import 'package:solviolin/util/data_source.dart';
 import 'package:solviolin/util/network.dart';
-import 'package:solviolin/widget/single_reusable.dart';
+import 'package:solviolin/widget/dialog.dart';
 
 class LoadingPage extends StatefulWidget {
   const LoadingPage({Key? key}) : super(key: key);
@@ -15,8 +16,8 @@ class LoadingPage extends StatefulWidget {
 }
 
 class _LoadingPageState extends State<LoadingPage> {
-  Client _client = Get.find<Client>();
-  DataController _controller = Get.find<DataController>();
+  var _client = Get.find<Client>();
+  var _controller = Get.find<DataController>();
 
   @override
   void initState() {
@@ -24,13 +25,7 @@ class _LoadingPageState extends State<LoadingPage> {
     Future.delayed(const Duration(seconds: 1), () async {
       // await _client.logout(); // for test
 
-      try {
-        await checkUser();
-      } catch (e) {
-        await _client.logout();
-        Get.offAllNamed("/login");
-        showError(context, e.toString());
-      }
+      await _checkProfile();
     });
   }
 
@@ -76,13 +71,27 @@ class _LoadingPageState extends State<LoadingPage> {
     );
   }
 
-  Future<void> checkUser() async {
+  Future<void> _checkProfile() async {
     if (await _client.isLoggedIn()) {
-      await getInitialData();
-      Get.offAllNamed("/main");
+      try {
+        await getInitialData();
+        Get.offAllNamed("/main");
+      } catch (e) {
+        try {
+          await _client.logout();
+        } catch (_) {
+        } finally {
+          Get.offAllNamed("/login");
+          showError(e.toString());
+        }
+      }
     } else {
-      await _client.logout();
-      Get.offAllNamed("/login");
+      try {
+        await _client.logout();
+      } catch (_) {
+      } finally {
+        Get.offAllNamed("/login");
+      }
     }
   }
 }

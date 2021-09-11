@@ -4,9 +4,9 @@ import 'package:solviolin/model/profile.dart';
 import 'package:solviolin/model/regular_schedule.dart';
 import 'package:solviolin/model/reservation.dart';
 import 'package:solviolin/model/term.dart';
-import 'package:solviolin/util/data_source.dart';
 
 class DataController extends GetxController {
+  //TODO: remove some unnecessary functions
   late final double ratio;
 
   late Profile profile;
@@ -16,13 +16,12 @@ class DataController extends GetxController {
   late List<Reservation> myValidReservations;
   late List<Term> currentTerm;
 
-  DateTime selectedDay = kToday;
+  DateTime selectedDay = DateTime.now();
   late DateTime focusedDay;
 
   late List<Reservation> thisMonthReservations;
   late List<Reservation> lastMonthReservations;
   late List<Change> changes;
-  int currentPage = 0;
 
   void updateRatio(double data) {
     ratio = data;
@@ -72,16 +71,6 @@ class DataController extends GetxController {
 
   void updateChanges(List<Change> data) {
     changes = data;
-    update();
-  }
-
-  void updateCurrentPage(int data) {
-    currentPage = data;
-    update();
-  }
-
-  void resetCurrentPage() {
-    currentPage = 0;
     update();
   }
 }
