@@ -135,7 +135,6 @@ class _HistoryPageState extends State<HistoryPage>
 
   Future _showLogout() {
     return showMyDialog(
-      context: context,
       contents: [
         Text("로그아웃 하시겠습니까?"),
       ],

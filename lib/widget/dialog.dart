@@ -67,23 +67,19 @@ Widget myDialog({
 }
 
 Future showMyDialog({
-  required BuildContext context,
   String? title,
   required List<Widget> contents,
   required void Function() onPressed,
   String action = "확인",
 }) {
-  return showDialog(
-    context: context,
+  return Get.dialog(
+    myDialog(
+      title: title,
+      contents: contents,
+      onPressed: onPressed,
+      action: action,
+    ),
     barrierColor: Colors.black26,
-    builder: (context) {
-      return myDialog(
-        title: title,
-        contents: contents,
-        onPressed: onPressed,
-        action: action,
-      );
-    },
   );
 }
 
