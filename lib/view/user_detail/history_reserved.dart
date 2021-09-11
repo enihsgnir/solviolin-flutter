@@ -98,6 +98,7 @@ class _HistoryReservedState extends State<HistoryReserved> {
     );
   }
 
+  //TODO: remove duplicated widgets
   Future _showModalCancel(BuildContext context, Reservation reservation) {
     return showCupertinoModalPopup(
       context: context,
@@ -131,7 +132,29 @@ class _HistoryReservedState extends State<HistoryReserved> {
                 }
               }),
               isDestructiveAction: true,
-              child: Text("수업 취소", style: TextStyle(fontSize: 24.r)),
+              child: Text("취소 (수강생)", style: TextStyle(fontSize: 24.r)),
+            ),
+            CupertinoActionSheetAction(
+              onPressed: () => showLoading(() async {
+                try {
+                  await _client.cancelReservationByAdmin(reservation.id);
+
+                  await getUsersData(
+                    branchName: search.branchName,
+                    userID: textEdit(search.edit1),
+                    isPaid: search.check[0],
+                    userType: UserType.values.indexOf(search.type[UserType]),
+                    status: search.check[1],
+                  );
+                  await getUserDetailData(search.userDetail!);
+
+                  Get.back();
+                } catch (e) {
+                  showError(e.toString());
+                }
+              }),
+              isDestructiveAction: true,
+              child: Text("취소 (관리자)", style: TextStyle(fontSize: 24.r)),
             ),
           ],
           cancelButton: CupertinoActionSheetAction(
@@ -177,7 +200,56 @@ class _HistoryReservedState extends State<HistoryReserved> {
                   showError(e.toString());
                 }
               }),
-              child: Text("수업 연장", style: TextStyle(fontSize: 24.r)),
+              child: Text("연장 (수강생)", style: TextStyle(fontSize: 24.r)),
+            ),
+            CupertinoActionSheetAction(
+              onPressed: () => showLoading(() async {
+                try {
+                  await _client.extendReservationByAdmin(
+                    reservation.id,
+                    count: 1,
+                  );
+
+                  await getUsersData(
+                    branchName: search.branchName,
+                    userID: textEdit(search.edit1),
+                    isPaid: search.check[0],
+                    userType: UserType.values.indexOf(search.type[UserType]),
+                    status: search.check[1],
+                  );
+                  await getUserDetailData(search.userDetail!);
+
+                  Get.back();
+                } catch (e) {
+                  showError(e.toString());
+                }
+              }),
+              child: Text("연장 (관리자, 카운트 포함)", style: TextStyle(fontSize: 24.r)),
+            ),
+            CupertinoActionSheetAction(
+              onPressed: () => showLoading(() async {
+                try {
+                  await _client.extendReservationByAdmin(
+                    reservation.id,
+                    count: 0,
+                  );
+
+                  await getUsersData(
+                    branchName: search.branchName,
+                    userID: textEdit(search.edit1),
+                    isPaid: search.check[0],
+                    userType: UserType.values.indexOf(search.type[UserType]),
+                    status: search.check[1],
+                  );
+                  await getUserDetailData(search.userDetail!);
+
+                  Get.back();
+                } catch (e) {
+                  showError(e.toString());
+                }
+              }),
+              child:
+                  Text("연장 (관리자, 카운트 미포함)", style: TextStyle(fontSize: 24.r)),
             ),
           ],
           cancelButton: CupertinoActionSheetAction(

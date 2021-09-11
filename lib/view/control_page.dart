@@ -120,7 +120,6 @@ class _ControlPageState extends State<ControlPage> {
                   icon: CupertinoIcons.delete,
                   item: "삭제",
                   onTap: () => showMyDialog(
-                    context: context,
                     title: "오픈/클로즈 삭제",
                     contents: [
                       Text("정말 삭제하시겠습니까?"),
@@ -165,7 +164,6 @@ class _ControlPageState extends State<ControlPage> {
     register.reset();
 
     return showMyDialog(
-      context: context,
       title: "오픈/클로즈 등록",
       contents: [
         myTextInput("강사", register.edit1, "강사명을 입력하세요!"),

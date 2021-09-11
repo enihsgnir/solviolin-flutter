@@ -30,7 +30,7 @@ class _UserPageState extends State<UserPage> {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () => FocusScope.of(context).unfocus(),
+      onTap: () => FocusScope.of(context).unfocus(), //TODO: Get.focusScope
       child: Scaffold(
         appBar: myAppBar("유저"),
         body: SafeArea(
@@ -171,7 +171,6 @@ class _UserPageState extends State<UserPage> {
     register.reset();
 
     return showMyDialog(
-      context: context,
       title: "유저 신규 등록",
       contents: [
         myTextInput("아이디", register.edit1, "아이디를 입력하세요!"),
@@ -191,7 +190,6 @@ class _UserPageState extends State<UserPage> {
         FocusScope.of(context).unfocus();
 
         showMyDialog(
-          context: context,
           title: "입력하신 정보가 맞습니까?",
           contents: [
             Text("아이디: " + register.edit1.text),

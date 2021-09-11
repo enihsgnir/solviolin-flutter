@@ -67,7 +67,6 @@ Widget myDialog({
 }
 
 Future showMyDialog({
-  required BuildContext context,
   String? title,
   required List<Widget> contents,
   required void Function() onPressed,
@@ -83,23 +82,17 @@ Future showMyDialog({
 
   if (isScrolling) {
     dialog = GestureDetector(
-      onTap: () => FocusScope.of(context).unfocus(),
-      child: Column(
-        children: [
-          SingleChildScrollView(
-            child: dialog,
-          ),
-        ],
+      onTap: () => FocusScope.of(Get.overlayContext!).unfocus(),
+      child: SingleChildScrollView(
+        child: dialog,
       ),
     );
   }
 
-  return showDialog(
-    context: context,
+  return Get.dialog(
+    dialog,
     barrierColor: Colors.black26,
-    builder: (context) {
-      return dialog;
-    },
+    //TODO: not barrierDismissible because of GestureDetector and unfocusing
   );
 }
 

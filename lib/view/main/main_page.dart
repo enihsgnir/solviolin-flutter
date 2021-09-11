@@ -89,18 +89,19 @@ class _MainPageState extends State<MainPage> {
                   },
                 );
 
-                if (newDate != null &&
-                    !isSameWeek(newDate, _controller.displayDate)) {
+                if (newDate != null) {
                   _controller.updateDisplayDate(newDate);
                   _calendar.displayDate = newDate;
 
-                  showLoading(() async {
-                    try {
-                      await _getSearchedReservationsData();
-                    } catch (e) {
-                      showError(e.toString());
-                    }
-                  });
+                  if (!isSameWeek(newDate, _controller.displayDate)) {
+                    showLoading(() async {
+                      try {
+                        await _getSearchedReservationsData();
+                      } catch (e) {
+                        showError(e.toString());
+                      }
+                    });
+                  }
                 }
               },
               icon: Icon(Icons.calendar_today, size: 24.r),
@@ -119,7 +120,6 @@ class _MainPageState extends State<MainPage> {
 
   Future _showSearch() {
     return showMyDialog(
-      context: context,
       title: "검색",
       contents: [
         myTextInput("수강생", search.edit1),

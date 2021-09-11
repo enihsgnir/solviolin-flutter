@@ -96,7 +96,6 @@ class _LedgerPageState extends State<LedgerPage> {
 
   Future _showTotal() {
     return showMyDialog(
-      context: context,
       title: "총 매출",
       contents: [
         Text(_controller.totalLeger),

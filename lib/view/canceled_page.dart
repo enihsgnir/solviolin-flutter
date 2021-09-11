@@ -19,7 +19,7 @@ class CancelPage extends StatefulWidget {
 }
 
 class _CancelPageState extends State<CancelPage> {
-  var search = Get.put(CacheController(), tag: "/search");
+  var search = Get.put(CacheController(), tag: "/search/canceled");
 
   @override
   Widget build(BuildContext context) {

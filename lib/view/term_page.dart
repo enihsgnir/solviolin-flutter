@@ -78,7 +78,6 @@ class _TermPageState extends State<TermPage> {
                       update.reset();
 
                       showMyDialog(
-                        context: context,
                         title: "학기 수정",
                         contents: [
                           pickDate(
@@ -129,7 +128,6 @@ class _TermPageState extends State<TermPage> {
     register.reset();
 
     return showMyDialog(
-      context: context,
       title: "학기 등록",
       contents: [
         pickDate(
@@ -196,7 +194,6 @@ class _TermPageState extends State<TermPage> {
     extend.reset();
 
     return showMyDialog(
-      context: context,
       title: "정규 연장 (지점)",
       contents: [
         branchDropdown("/extend", "지점을 선택하세요!"),
@@ -218,7 +215,6 @@ class _TermPageState extends State<TermPage> {
     extend.reset();
 
     return showMyDialog(
-      context: context,
       title: "정규 연장 (수강생)",
       contents: [
         myTextInput("이름", extend.edit1, "이름을 입력하세요!"),

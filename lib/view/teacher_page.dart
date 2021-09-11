@@ -113,7 +113,6 @@ class _TeacherPageState extends State<TeacherPage> {
                   icon: CupertinoIcons.delete,
                   item: "삭제",
                   onTap: () => showMyDialog(
-                    context: context,
                     title: "강사 스케줄 삭제",
                     contents: [
                       Text("정말 삭제하시겠습니까?"),
@@ -136,6 +135,7 @@ class _TeacherPageState extends State<TeacherPage> {
                 ),
               ],
               children: [
+                Text("ID: ${teacher.id}"),
                 Text("${teacher.teacherID} / ${teacher.branchName}"),
                 Text("${dowToString(teacher.workDow)}" +
                     " / ${timeToString(teacher.startTime)}" +
@@ -153,7 +153,6 @@ class _TeacherPageState extends State<TeacherPage> {
     register.reset();
 
     return showMyDialog(
-      context: context,
       title: "강사 스케줄 등록",
       contents: [
         myTextInput("강사", register.edit1, "강사명을 입력하세요!"),

@@ -82,21 +82,22 @@ class _MainForTeacherPageState extends State<MainForTeacherPage> {
                   },
                 );
 
-                if (newDate != null &&
-                    !isSameWeek(newDate, _controller.displayDate)) {
+                if (newDate != null) {
                   _controller.updateDisplayDate(newDate);
                   _calendar.displayDate = newDate;
 
-                  showLoading(() async {
-                    try {
-                      await getReservationDataForTeacher(
-                        displayDate: _controller.displayDate,
-                        teacherID: _controller.profile.userID,
-                      );
-                    } catch (e) {
-                      showError(e.toString());
-                    }
-                  });
+                  if (!isSameWeek(newDate, _controller.displayDate)) {
+                    showLoading(() async {
+                      try {
+                        await getReservationDataForTeacher(
+                          displayDate: _controller.displayDate,
+                          teacherID: _controller.profile.userID,
+                        );
+                      } catch (e) {
+                        showError(e.toString());
+                      }
+                    });
+                  }
                 }
               },
               icon: Icon(Icons.calendar_today, size: 24.r),

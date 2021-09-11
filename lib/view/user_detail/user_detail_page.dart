@@ -70,7 +70,6 @@ class _UserDetailPageState extends State<UserDetailPage>
                                   delete.reset();
 
                                   showMyDialog(
-                                    context: context,
                                     title: "정규 종료",
                                     contents: [
                                       pickDateTime(
@@ -226,7 +225,6 @@ class _UserDetailPageState extends State<UserDetailPage>
     expend.reset();
 
     return showMyDialog(
-      context: context,
       title: "원비납부",
       contents: [
         myTextInput("금액", expend.edit1, "금액을 입력하세요!"),
@@ -263,7 +261,6 @@ class _UserDetailPageState extends State<UserDetailPage>
     update.reset();
 
     return showMyDialog(
-      context: context,
       title: "정보수정",
       contents: [
         branchDropdown("/update"),

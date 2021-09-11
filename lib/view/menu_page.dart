@@ -46,7 +46,7 @@ class _MenuPageState extends State<MenuPage> {
               menu("체크인", () => Get.toNamed("/check-in")),
               menu("체크인 이력", () => Get.toNamed("/check-in/history")),
               menu("로그아웃", _showLogout, true),
-            ],
+            ], //TODO: touch up number of menus, especially branch-register
           ),
         ),
       ),
@@ -57,7 +57,6 @@ class _MenuPageState extends State<MenuPage> {
     branch.text = "";
 
     return showMyDialog(
-      context: context,
       title: "지점 등록",
       contents: [
         myTextInput("지점명", branch, "지점명을 입력하세요!"),
@@ -79,7 +78,6 @@ class _MenuPageState extends State<MenuPage> {
 
   Future _showLogout() {
     return showMyDialog(
-      context: context,
       contents: [
         Text("로그아웃 하시겠습니까?"),
       ],

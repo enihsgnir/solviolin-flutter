@@ -22,7 +22,7 @@ class _SalaryPageState extends State<SalaryPage> {
   var _client = Get.find<Client>();
   var _controller = Get.find<DataController>();
 
-  var search = Get.put(CacheController(), tag: "/search");
+  var search = Get.put(CacheController(), tag: "/search/salary");
 
   @override
   Widget build(BuildContext context) {
@@ -48,8 +48,8 @@ class _SalaryPageState extends State<SalaryPage> {
   Widget _salarySearch() {
     return mySearch(
       contents: [
-        branchDropdown("/search", "지점을 선택하세요!"),
-        termDropdown("/search", "학기를 선택하세요!"),
+        branchDropdown("/search/salary", "지점을 선택하세요!"),
+        termDropdown("/search/salary", "학기를 선택하세요!"),
         myTextInput("주간시급", search.edit1, "주간시급을 입력하세요!"),
         Row(
           children: [

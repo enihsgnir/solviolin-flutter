@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:solviolin_admin/util/constant.dart';
@@ -21,6 +22,7 @@ Widget label(String item, bool isMandatory) {
   );
 }
 
+//TODO: add number keypad type with keyboardType: TextInputType.number
 Widget myTextInput(
   String item,
   TextEditingController controller, [
@@ -35,6 +37,7 @@ Widget myTextInput(
       Container(
         width: 220.r,
         child: TextFormField(
+          keyboardType: TextInputType.name,
           controller: controller,
           validator: (value) => value == "" ? validator : null,
           style: contentStyle,

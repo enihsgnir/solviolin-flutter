@@ -146,7 +146,6 @@ class _TimeSlotState extends State<TimeSlot> {
 
   Future _showCancelByUser(CalendarTapDetails details) {
     return showMyDialog(
-      context: context,
       title: "취소 (수강생)",
       contents: [
         Text("수강생의 권한으로 취소하시겠습니까?"),
@@ -167,7 +166,6 @@ class _TimeSlotState extends State<TimeSlot> {
 
   Future _showCancelByAdmin(CalendarTapDetails details) {
     return showMyDialog(
-      context: context,
       title: "취소 (관리자)",
       contents: [
         Text("관리자의 권한으로 취소하시겠습니까?"),
@@ -189,7 +187,6 @@ class _TimeSlotState extends State<TimeSlot> {
 
   Future _showExtendByUser(CalendarTapDetails details) {
     return showMyDialog(
-      context: context,
       title: "연장 (수강생)",
       contents: [
         Text("수강생의 권한으로 연장하시겠습니까?"),
@@ -212,7 +209,6 @@ class _TimeSlotState extends State<TimeSlot> {
     var count = false;
 
     return showMyDialog(
-      context: context,
       title: "연장 (관리자)",
       contents: [
         Text("관리자의 권한으로 연장하시겠습니까?"),
@@ -256,7 +252,6 @@ class _TimeSlotState extends State<TimeSlot> {
 
   Future _showDeleteLaterCourse(CalendarTapDetails details) {
     return showMyDialog(
-      context: context,
       title: "정규 종료",
       contents: [
         Text("종료일: " +
@@ -323,7 +318,6 @@ class _TimeSlotState extends State<TimeSlot> {
     }
 
     return showMyDialog(
-      context: context,
       title: "정규 등록",
       contents: [
         Text(DateFormat("yy/MM/dd HH:mm").format(details.date!) + " ~ "),
@@ -370,7 +364,6 @@ class _TimeSlotState extends State<TimeSlot> {
     }
 
     return showMyDialog(
-      context: context,
       title: "보강 예약 (수강생)",
       contents: [
         Text(DateFormat("yy/MM/dd HH:mm").format(details.date!) + " ~ "),
@@ -417,7 +410,6 @@ class _TimeSlotState extends State<TimeSlot> {
     }
 
     return showMyDialog(
-      context: context,
       title: "보강 예약 (관리자)",
       contents: [
         Text(DateFormat("yy/MM/dd HH:mm").format(details.date!) + " ~ "),
@@ -464,7 +456,6 @@ class _TimeSlotState extends State<TimeSlot> {
     }
 
     return showMyDialog(
-      context: context,
       title: "무료 보강 등록",
       contents: [
         Text(DateFormat("yy/MM/dd HH:mm").format(details.date!) + " ~ "),
