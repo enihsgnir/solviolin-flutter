@@ -21,11 +21,11 @@ class MainPage extends StatefulWidget {
 }
 
 class _MainPageState extends State<MainPage> {
-  var _controller = Get.find<DataController>();
+  var _data = Get.find<DataController>();
 
   var _calendar = Get.put(CalendarController(), tag: "/admin");
 
-  var search = Get.put(CacheController(), tag: "/search");
+  var search = Get.find<CacheController>(tag: "/search/main");
 
   @override
   void initState() {
@@ -45,7 +45,7 @@ class _MainPageState extends State<MainPage> {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () => FocusScope.of(context).unfocus(),
+      onTap: () => FocusScope.of(context).requestFocus(FocusNode()),
       child: Scaffold(
         resizeToAvoidBottomInset: false,
         appBar: myAppBar(
@@ -72,7 +72,7 @@ class _MainPageState extends State<MainPage> {
 
                 newDate = await showDatePicker(
                   context: context,
-                  initialDate: _controller.displayDate,
+                  initialDate: _data.displayDate,
                   firstDate: DateTime(initialDate.year - 3),
                   lastDate: DateTime(initialDate.year + 1),
                   builder: (context, child) {
@@ -90,10 +90,10 @@ class _MainPageState extends State<MainPage> {
                 );
 
                 if (newDate != null) {
-                  _controller.updateDisplayDate(newDate);
+                  _data.updateDisplayDate(newDate);
                   _calendar.displayDate = newDate;
 
-                  if (!isSameWeek(newDate, _controller.displayDate)) {
+                  if (!isSameWeek(newDate, _data.displayDate)) {
                     showLoading(() async {
                       try {
                         await _getSearchedReservationsData();
@@ -124,12 +124,12 @@ class _MainPageState extends State<MainPage> {
       contents: [
         myTextInput("수강생", search.edit1),
         myTextInput("강사", search.edit2),
-        branchDropdown("/search", "지점을 선택하세요!"),
+        branchDropdown("/search/main", "지점을 선택하세요!"),
       ],
       onPressed: () => showLoading(() async {
         try {
           await getReservationData(
-            displayDate: _controller.displayDate,
+            displayDate: _data.displayDate,
             branchName: search.branchName!,
             userID: textEdit(search.edit1),
             teacherID: textEdit(search.edit2),
@@ -142,18 +142,23 @@ class _MainPageState extends State<MainPage> {
         }
       }),
       action: "검색",
-      isScrolling: true,
+      isScrollable: true,
     );
   }
 
   Future<void> _getSearchedReservationsData() async {
     if (search.isSearched) {
       await getReservationData(
-        displayDate: _controller.displayDate,
+        displayDate: _data.displayDate,
         branchName: search.branchName!,
         userID: textEdit(search.edit1),
         teacherID: textEdit(search.edit2),
       );
+    } else {
+      await showMySnackbar(
+        title: "알림",
+        message: "검색값이 없습니다.",
+      ); //TODO: hasBeenShown
     }
   }
 }

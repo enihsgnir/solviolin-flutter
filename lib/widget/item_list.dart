@@ -86,7 +86,7 @@ Widget mySlideAction({
       ],
     ),
     onTap: () {
-      FocusScope.of(context).unfocus();
+      FocusScope.of(context).requestFocus(FocusNode());
       onTap();
     },
   );

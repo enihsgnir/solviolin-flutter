@@ -3,8 +3,8 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:solviolin_admin/util/constant.dart';
 import 'package:solviolin_admin/util/controller.dart';
-import 'package:solviolin_admin/util/data_source.dart';
 import 'package:solviolin_admin/util/format.dart';
+import 'package:solviolin_admin/util/network.dart';
 import 'package:solviolin_admin/widget/dialog.dart';
 import 'package:solviolin_admin/widget/input.dart';
 import 'package:solviolin_admin/widget/item_list.dart';
@@ -19,12 +19,15 @@ class CancelPage extends StatefulWidget {
 }
 
 class _CancelPageState extends State<CancelPage> {
-  var search = Get.put(CacheController(), tag: "/search/canceled");
+  var _client = Get.find<Client>();
+  var _data = Get.find<DataController>();
+
+  var search = Get.find<CacheController>(tag: "/search/canceled");
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () => FocusScope.of(context).unfocus(),
+      onTap: () => FocusScope.of(context).requestFocus(FocusNode()),
       child: Scaffold(
         appBar: myAppBar("취소 내역"),
         body: SafeArea(
@@ -53,7 +56,10 @@ class _CancelPageState extends State<CancelPage> {
               context: context,
               onPressed: () => showLoading(() async {
                 try {
-                  await getCanceledData(textEdit(search.edit1)!);
+                  _data.canceledReservations = await _client
+                      .getCanceledReservations(textEdit(search.edit1)!)
+                    ..sort((a, b) => a.startDate.compareTo(b.startDate));
+                  _data.update();
                 } catch (e) {
                   showError(e.toString());
                 }

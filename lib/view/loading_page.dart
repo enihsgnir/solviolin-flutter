@@ -17,7 +17,7 @@ class LoadingPage extends StatefulWidget {
 
 class _LoadingPageState extends State<LoadingPage> {
   var _client = Get.find<Client>();
-  var _controller = Get.find<DataController>();
+  var _data = Get.find<DataController>();
 
   @override
   void initState() {
@@ -32,10 +32,9 @@ class _LoadingPageState extends State<LoadingPage> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    _controller.updateRatio(
-      min(MediaQuery.of(context).size.width / 540,
-          MediaQuery.of(context).size.height / 1152),
-    );
+    _data.ratio = min(MediaQuery.of(context).size.width / 540,
+        MediaQuery.of(context).size.height / 1152);
+    _data.update();
   }
 
   @override
@@ -75,9 +74,9 @@ class _LoadingPageState extends State<LoadingPage> {
     if (await _client.isLoggedIn()) {
       try {
         await getInitialData();
-        if (_controller.profile.userType == 2) {
+        if (_data.profile.userType == 2) {
           Get.offAllNamed("/menu");
-        } else if (_controller.profile.userType == 1) {
+        } else if (_data.profile.userType == 1) {
           Get.offAllNamed("/menu-teacher");
         }
       } catch (e) {

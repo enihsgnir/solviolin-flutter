@@ -4,6 +4,10 @@ import 'package:get/get.dart';
 import 'package:solviolin_admin/util/constant.dart';
 
 Future showError(String message) {
+  if (message == "Null check operator used on a null value") {
+    message = "필수 항목을 입력하세요";
+  } //TODO: custom error message
+
   return Get.dialog(
     CupertinoAlertDialog(
       title: Text("Error", style: TextStyle(fontSize: 32.r)),
@@ -71,7 +75,7 @@ Future showMyDialog({
   required List<Widget> contents,
   required void Function() onPressed,
   String action = "확인",
-  bool isScrolling = false,
+  bool isScrollable = false,
 }) {
   var dialog = myDialog(
     title: title,
@@ -80,9 +84,10 @@ Future showMyDialog({
     action: action,
   );
 
-  if (isScrolling) {
+  if (isScrollable) {
     dialog = GestureDetector(
-      onTap: () => FocusScope.of(Get.overlayContext!).unfocus(),
+      //TODO: Get.focusScope
+      onTap: () => FocusScope.of(Get.overlayContext!).requestFocus(FocusNode()),
       child: SingleChildScrollView(
         child: dialog,
       ),
@@ -110,5 +115,22 @@ Future<void> showLoading(Future<void> Function() asyncFunction) {
     ),
     opacityColor: Colors.black12,
     opacity: 1,
+  );
+}
+
+Future<void> showMySnackbar({
+  String? title,
+  String? message,
+}) async {
+  return Get.snackbar(
+    "",
+    "",
+    titleText: title == null
+        ? null
+        : Text(
+            title,
+            style: TextStyle(color: Colors.white, fontSize: 24.r),
+          ),
+    messageText: message == null ? null : Text(message, style: contentStyle),
   );
 }

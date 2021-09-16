@@ -20,14 +20,14 @@ class SalaryPage extends StatefulWidget {
 
 class _SalaryPageState extends State<SalaryPage> {
   var _client = Get.find<Client>();
-  var _controller = Get.find<DataController>();
+  var _data = Get.find<DataController>();
 
-  var search = Get.put(CacheController(), tag: "/search/salary");
+  var search = Get.find<CacheController>(tag: "/search/salary");
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () => FocusScope.of(context).unfocus(),
+      onTap: () => FocusScope.of(context).requestFocus(FocusNode()),
       child: Scaffold(
         appBar: myAppBar("급여 계산"),
         body: SafeArea(
@@ -50,20 +50,22 @@ class _SalaryPageState extends State<SalaryPage> {
       contents: [
         branchDropdown("/search/salary", "지점을 선택하세요!"),
         termDropdown("/search/salary", "학기를 선택하세요!"),
-        myTextInput("주간시급", search.edit1, "주간시급을 입력하세요!"),
+        myTextInput("주간시급", search.edit1, "주간시급을 입력하세요!", TextInputType.number),
         Row(
           children: [
-            myTextInput("야간시급", search.edit2, "야간시급을 입력하세요!"),
+            myTextInput(
+                "야간시급", search.edit2, "야간시급을 입력하세요!", TextInputType.number),
             myActionButton(
               context: context,
               onPressed: () => showLoading(() async {
                 try {
-                  _controller.updateSalaries(await _client.getSalaries(
+                  _data.salaries = await _client.getSalaries(
                     branchName: search.branchName!,
                     termID: search.termID!,
                     dayTimeCost: int.parse(textEdit(search.edit1)!),
                     nightTimeCost: int.parse(textEdit(search.edit2)!),
-                  ));
+                  );
+                  _data.update();
                 } catch (e) {
                   showError(e.toString());
                 }

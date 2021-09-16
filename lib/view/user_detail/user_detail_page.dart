@@ -28,9 +28,9 @@ class _UserDetailPageState extends State<UserDetailPage>
   late TabController tabController;
 
   var _client = Get.find<Client>();
-  var _controller = Get.find<DataController>();
+  var _data = Get.find<DataController>();
 
-  var search = Get.find<CacheController>(tag: "/search");
+  var search = Get.find<CacheController>(tag: "/search/user");
   var delete = Get.put(CacheController(), tag: "/delete");
   var expend = Get.put(CacheController(), tag: "/expend");
   var update = Get.put(CacheController(), tag: "/update");
@@ -223,18 +223,19 @@ class _UserDetailPageState extends State<UserDetailPage>
 
   Future _showExpend() {
     expend.reset();
+    expend.branchName = search.userDetail!.branchName;
 
     return showMyDialog(
       title: "원비납부",
       contents: [
-        myTextInput("금액", expend.edit1, "금액을 입력하세요!"),
+        myTextInput("금액", expend.edit1, "금액을 입력하세요!", TextInputType.number),
         branchDropdown("/expend", "지점을 선택하세요!"),
         termDropdown("/expend", "지점을 선택하세요!"),
       ],
       onPressed: () => showLoading(() async {
         try {
           await _client.registerLedger(
-            userID: _controller.regularSchedules[0].userID,
+            userID: _data.regularSchedules[0].userID,
             amount: int.parse(textEdit(expend.edit1)!),
             termID: expend.termID!,
             branchName: expend.branchName!,
@@ -253,7 +254,7 @@ class _UserDetailPageState extends State<UserDetailPage>
           showError(e.toString());
         }
       }),
-      isScrolling: true,
+      isScrollable: true,
     );
   }
 
@@ -264,20 +265,20 @@ class _UserDetailPageState extends State<UserDetailPage>
       title: "정보수정",
       contents: [
         branchDropdown("/update"),
-        myTextInput("전화번호", update.edit1),
+        myTextInput("전화번호", update.edit1, null, TextInputType.number),
         myCheckBox(
           tag: "/update",
           item: "등록 여부",
           trueName: "등록",
           falseName: "미등록",
         ),
-        myTextInput("크레딧", update.edit2),
+        myTextInput("크레딧", update.edit2, null, TextInputType.number),
         myTextInput("이름", update.edit3),
       ],
       onPressed: () => showLoading(() async {
         try {
           await _client.updateUserInformation(
-            _controller.regularSchedules[0].userID,
+            _data.regularSchedules[0].userID,
             userBranch: update.branchName,
             userPhone: textEdit(update.edit1),
             status: update.check[0],
@@ -299,7 +300,7 @@ class _UserDetailPageState extends State<UserDetailPage>
           showError(e.toString());
         }
       }),
-      isScrolling: true,
+      isScrollable: true,
     );
   }
 }

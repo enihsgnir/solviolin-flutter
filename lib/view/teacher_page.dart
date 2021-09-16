@@ -24,13 +24,13 @@ class TeacherPage extends StatefulWidget {
 class _TeacherPageState extends State<TeacherPage> {
   var _client = Get.find<Client>();
 
-  var search = Get.put(CacheController(), tag: "/search");
+  var search = Get.find<CacheController>(tag: "/search/teacher");
   var register = Get.put(CacheController(), tag: "/register");
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () => FocusScope.of(context).unfocus(),
+      onTap: () => FocusScope.of(context).requestFocus(FocusNode()),
       child: Scaffold(
         appBar: myAppBar("강사 세부"),
         body: SafeArea(
@@ -74,7 +74,7 @@ class _TeacherPageState extends State<TeacherPage> {
         myTextInput("강사", search.edit1),
         Row(
           children: [
-            branchDropdown("/search", "지점을 선택하세요!"),
+            branchDropdown("/search/teacher"),
             myActionButton(
               context: context,
               onPressed: () => showLoading(() async {
@@ -149,7 +149,7 @@ class _TeacherPageState extends State<TeacherPage> {
   }
 
   Future _showRegister() {
-    FocusScope.of(context).unfocus();
+    FocusScope.of(context).requestFocus(FocusNode());
     register.reset();
 
     return showMyDialog(
@@ -196,12 +196,12 @@ class _TeacherPageState extends State<TeacherPage> {
         }
       }),
       action: "등록",
-      isScrolling: true,
+      isScrollable: true,
     );
   }
 
   Future _showMenu() {
-    FocusScope.of(context).unfocus();
+    FocusScope.of(context).requestFocus(FocusNode());
 
     return showCupertinoModalPopup(
       context: context,

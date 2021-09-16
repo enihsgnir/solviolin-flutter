@@ -22,11 +22,12 @@ Widget label(String item, bool isMandatory) {
   );
 }
 
-//TODO: add number keypad type with keyboardType: TextInputType.number
+//TODO: FormatException when int.parse
 Widget myTextInput(
   String item,
   TextEditingController controller, [
   String? validator,
+  TextInputType? keyboardType,
 ]) {
   return Row(
     children: [
@@ -37,10 +38,10 @@ Widget myTextInput(
       Container(
         width: 220.r,
         child: TextFormField(
-          keyboardType: TextInputType.name,
           controller: controller,
-          validator: (value) => value == "" ? validator : null,
+          keyboardType: keyboardType,
           style: contentStyle,
+          validator: (value) => value == "" ? validator : null,
         ),
       ),
     ],
@@ -56,10 +57,19 @@ Widget myCheckBox({
   bool isReversed = false,
   bool isMandatory = false,
 }) {
-  bool _trueValue = false;
-  bool _falseValue = false;
-
   var _cache = Get.find<CacheController>(tag: tag);
+  var _check = _cache.check[index];
+
+  var _trueValue = false;
+  var _falseValue = false;
+
+  if (_check == 1) {
+    _trueValue = isReversed ? false : true;
+    _falseValue = !_trueValue;
+  } else if (_check == 0) {
+    _trueValue = isReversed ? true : false;
+    _falseValue = !_trueValue;
+  }
 
   return StatefulBuilder(
     builder: (context, setState) {
@@ -76,6 +86,8 @@ Widget myCheckBox({
                 _trueValue = value!;
 
                 if (_trueValue && _falseValue) {
+                  _trueValue = true;
+                  _falseValue = false;
                   _cache.check[index] = null;
                 } else if (_trueValue && !_falseValue) {
                   _cache.check[index] = isReversed ? 0 : 1;
@@ -95,6 +107,8 @@ Widget myCheckBox({
                 _falseValue = value!;
 
                 if (_trueValue && _falseValue) {
+                  _trueValue = false;
+                  _falseValue = true;
                   _cache.check[index] = null;
                 } else if (_trueValue && !_falseValue) {
                   _cache.check[index] = isReversed ? 0 : 1;
@@ -121,7 +135,9 @@ Widget myRadio<T>({
   required T groupValue,
 }) {
   var _cache = Get.find<CacheController>(tag: tag);
-  _cache.type[T] = groupValue;
+  _cache.type[T] == null
+      ? _cache.type[T] = groupValue
+      : groupValue = _cache.type[T];
 
   return StatefulBuilder(
     builder: (context, setState) {

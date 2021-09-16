@@ -36,12 +36,14 @@ Widget pickDateTime({
               child: InkWell(
                 child: Text(
                   controller.dateTime[index] == null
-                      ? "미선택"
+                      ? "선택"
                       : DateFormat("yy/MM/dd HH:mm")
                           .format(controller.dateTime[index]!),
                   style: contentStyle,
                 ),
                 onTap: () async {
+                  FocusScope.of(Get.overlayContext!).requestFocus(FocusNode());
+
                   newDate = await showDatePicker(
                     context: context,
                     initialDate: controller.date[index] ?? initialDate,
@@ -111,11 +113,13 @@ Widget pickDate({
               child: InkWell(
                 child: Text(
                   controller.date[index] == null
-                      ? "미선택"
+                      ? "선택"
                       : DateFormat("yy/MM/dd").format(controller.date[index]!),
                   style: contentStyle,
                 ),
                 onTap: () async {
+                  FocusScope.of(Get.overlayContext!).requestFocus(FocusNode());
+
                   newDate = await showDatePicker(
                     context: context,
                     initialDate: controller.date[index] ?? initialDate,
@@ -177,7 +181,7 @@ Widget pickTime({
               child: InkWell(
                 child: Text(
                   controller.time[index] == null
-                      ? "미선택"
+                      ? "선택"
                       : timeToString(Duration(
                           hours: controller.time[index]!.hour,
                           minutes: controller.time[index]!.minute,
@@ -185,6 +189,8 @@ Widget pickTime({
                   style: contentStyle,
                 ),
                 onTap: () async {
+                  FocusScope.of(Get.overlayContext!).requestFocus(FocusNode());
+
                   newTime = await showTimePicker(
                     context: context,
                     initialTime: controller.time[index] ?? initialTime,

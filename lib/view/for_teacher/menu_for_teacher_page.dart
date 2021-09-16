@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:solviolin_admin/util/constant.dart';
 import 'package:solviolin_admin/util/controller.dart';
 import 'package:solviolin_admin/util/data_source.dart';
 import 'package:solviolin_admin/util/network.dart';
@@ -16,7 +17,7 @@ class MenuForTeacherPage extends StatefulWidget {
 
 class _MenuForTeacherPageState extends State<MenuForTeacherPage> {
   var _client = Get.find<Client>();
-  var _controller = Get.find<DataController>();
+  var _data = Get.find<DataController>();
 
   @override
   Widget build(BuildContext context) {
@@ -24,14 +25,14 @@ class _MenuForTeacherPageState extends State<MenuForTeacherPage> {
       body: SafeArea(
         child: Center(
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
               menu("메인", () {
                 showLoading(() async {
                   try {
                     await getReservationDataForTeacher(
-                      displayDate: _controller.displayDate,
-                      teacherID: _controller.profile.userID,
+                      displayDate: _data.displayDate,
+                      teacherID: _data.profile.userID,
                     );
 
                     Get.toNamed("/main-teacher");
@@ -42,7 +43,12 @@ class _MenuForTeacherPageState extends State<MenuForTeacherPage> {
               }),
               menu("체크인", () => Get.toNamed("/check-in")),
               menu("로그아웃", _showLogout, true),
-            ],
+            ]
+                .map((e) => Padding(
+                      padding: EdgeInsets.symmetric(vertical: 24.r),
+                      child: e,
+                    ))
+                .toList(),
           ),
         ),
       ),

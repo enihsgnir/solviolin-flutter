@@ -1,6 +1,8 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:solviolin_admin/util/constant.dart';
 import 'package:solviolin_admin/util/controller.dart';
 import 'package:solviolin_admin/util/data_source.dart';
 import 'package:solviolin_admin/util/format.dart';
@@ -21,14 +23,14 @@ class LedgerPage extends StatefulWidget {
 
 class _LedgerPageState extends State<LedgerPage> {
   var _client = Get.find<Client>();
-  var _controller = Get.find<DataController>();
+  var _data = Get.find<DataController>();
 
-  var search = Get.put(CacheController(), tag: "/search");
+  var search = Get.find<CacheController>(tag: "/search/ledger");
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () => FocusScope.of(context).unfocus(),
+      onTap: () => FocusScope.of(context).requestFocus(FocusNode()),
       child: Scaffold(
         appBar: myAppBar("매출"),
         body: SafeArea(
@@ -49,22 +51,24 @@ class _LedgerPageState extends State<LedgerPage> {
   Widget _ledgerSearch() {
     return mySearch(
       contents: [
-        branchDropdown("/search", "지점을 선택하세요!"),
+        branchDropdown("/search/ledger"),
         Row(
           children: [
-            myTextInput("수강생", search.edit1, "이름을 입력하세요!"),
+            myTextInput("수강생", search.edit1),
             myActionButton(
               context: context,
               onPressed: () => showLoading(() async {
                 try {
-                  _controller.totalLeger = await _client.getTotalLedger(
+                  _data.totalLeger = await _client.getTotalLedger(
                     branchName: search.branchName!,
                     termID: search.termID!,
                   );
 
                   _showTotal();
                 } catch (e) {
-                  showError(e.toString());
+                  e.toString() == "Null check operator used on a null value"
+                      ? showError("지점/학기는 필수 입력 항목입니다")
+                      : showError(e.toString());
                 }
               }),
               action: "합계",
@@ -73,15 +77,15 @@ class _LedgerPageState extends State<LedgerPage> {
         ),
         Row(
           children: [
-            termDropdown("/search", "학기를 선택하세요!"),
+            termDropdown("/search/ledger"),
             myActionButton(
               context: context,
               onPressed: () => showLoading(() async {
                 try {
                   await getLedgersData(
-                    branchName: search.branchName!,
-                    termID: search.termID!,
-                    userID: textEdit(search.edit1)!,
+                    branchName: search.branchName,
+                    termID: search.termID,
+                    userID: textEdit(search.edit1),
                   );
                 } catch (e) {
                   showError(e.toString());
@@ -98,7 +102,7 @@ class _LedgerPageState extends State<LedgerPage> {
     return showMyDialog(
       title: "총 매출",
       contents: [
-        Text(_controller.totalLeger),
+        Text(_data.totalLeger),
       ],
       onPressed: Get.back,
     );
@@ -107,21 +111,60 @@ class _LedgerPageState extends State<LedgerPage> {
   Widget _ledgerList() {
     return GetBuilder<DataController>(
       builder: (controller) {
-        return ListView.builder(
-          itemCount: controller.ledgers.length,
-          itemBuilder: (context, index) {
-            var ledger = controller.ledgers[index];
+        return controller.ledgers.length == 0
+            ? DefaultTextStyle(
+                style: TextStyle(color: Colors.red, fontSize: 20.r),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text("합계 조회 시 지점/학기는"),
+                    Text("필수 입력 항목입니다"),
+                  ],
+                ),
+              )
+            : ListView.builder(
+                itemCount: controller.ledgers.length,
+                itemBuilder: (context, index) {
+                  var ledger = controller.ledgers[index];
 
-            return myNormalCard(
-              children: [
-                Text("${ledger.userID} / ${ledger.branchName}"),
-                Text(NumberFormat("#,###원").format(ledger.amount)),
-                Text("결제일자: " +
-                    DateFormat("yy/MM/dd HH:mm").format(ledger.paidAt)),
-              ],
-            );
-          },
-        );
+                  return mySlidableCard(
+                    slideActions: [
+                      mySlideAction(
+                        context: context,
+                        icon: CupertinoIcons.delete,
+                        item: "삭제",
+                        onTap: () => showMyDialog(
+                          title: "매출 삭제",
+                          contents: [
+                            Text("정말 삭제하시겠습니까?"),
+                          ],
+                          onPressed: () => showLoading(() async {
+                            try {
+                              await _client.deleteLedger(ledger.id);
+
+                              await getLedgersData(
+                                branchName: search.branchName,
+                                termID: search.termID,
+                                userID: textEdit(search.edit1),
+                              );
+
+                              Get.back();
+                            } catch (e) {
+                              showError(e.toString());
+                            }
+                          }),
+                        ),
+                      ),
+                    ],
+                    children: [
+                      Text("${ledger.userID} / ${ledger.branchName}"),
+                      Text(NumberFormat("#,###원").format(ledger.amount)),
+                      Text("결제일자: " +
+                          DateFormat("yy/MM/dd HH:mm").format(ledger.paidAt)),
+                    ],
+                  );
+                },
+              );
       },
     );
   }

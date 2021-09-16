@@ -224,7 +224,7 @@ class Client {
     );
   }
 
-  Future<List<dynamic>> getRawUsers({
+  Future<List<dynamic>> getJsonUsers({
     String? branchName,
     String? userID,
     int? isPaid,
@@ -433,22 +433,6 @@ class Client {
 
   Future<void> cancelReservationByAdmin(int id) async {
     await dio.patch("/reservation/admin/cancel/$id");
-  }
-
-  Future<void> makeUpReservation({
-    required String teacherID,
-    required String branchName,
-    required DateTime startDate,
-    required DateTime endDate,
-    required String userID,
-  }) async {
-    await dio.post("/reservation/user", data: {
-      "teacherID": teacherID,
-      "branchName": branchName,
-      "startDate": startDate.toIso8601String(),
-      "endDate": endDate.toIso8601String(),
-      "userID": userID,
-    });
   }
 
   Future<void> makeUpReservationByAdmin({
@@ -707,15 +691,18 @@ class Client {
   }
 
   Future<List<Ledger>> getLedgers({
-    required String branchName,
-    required int termID,
-    required String userID,
+    String? branchName,
+    int? termID,
+    String? userID,
   }) async {
-    var response = await dio.get("/ledger", queryParameters: {
-      "branchName": branchName,
-      "termID": termID,
-      "userID": userID,
-    });
+    var response = await dio.get(
+      "/ledger",
+      queryParameters: {
+        "branchName": branchName,
+        "termID": termID,
+        "userID": userID,
+      }..removeWhere((key, value) => value == null),
+    );
     if (response.statusCode == 200) {
       return List.generate(
         response.data.length,
@@ -726,6 +713,10 @@ class Client {
       message: "매출 목록을 불러올 수 없습니다.",
       options: response.requestOptions,
     );
+  }
+
+  Future<void> deleteLedger(int id) async {
+    await dio.delete("/ledger/$id");
   }
 
   Future<String> getTotalLedger({
@@ -778,7 +769,9 @@ class NetworkException extends DioError {
     if (options.queryParameters.isNotEmpty) {
       message += "\n${options.queryParameters}";
     }
-    if (options.data != null && options.path != "/auth/login") {
+    if (options.data != null &&
+        options.path != "/auth/refresh" &&
+        options.path != "/auth/login") {
       message += "\n${options.data}";
     }
 

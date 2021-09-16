@@ -18,7 +18,7 @@ class MainForTeacherPage extends StatefulWidget {
 }
 
 class _MainForTeacherPageState extends State<MainForTeacherPage> {
-  var _controller = Get.find<DataController>();
+  var _data = Get.find<DataController>();
 
   var _calendar = Get.put(CalendarController(), tag: "/teacher");
 
@@ -40,7 +40,7 @@ class _MainForTeacherPageState extends State<MainForTeacherPage> {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () => FocusScope.of(context).unfocus(),
+      onTap: () => FocusScope.of(context).requestFocus(FocusNode()),
       child: Scaffold(
         appBar: myAppBar(
           "메인",
@@ -49,8 +49,8 @@ class _MainForTeacherPageState extends State<MainForTeacherPage> {
               onPressed: () => showLoading(() async {
                 try {
                   await getReservationDataForTeacher(
-                    displayDate: _controller.displayDate,
-                    teacherID: _controller.profile.userID,
+                    displayDate: _data.displayDate,
+                    teacherID: _data.profile.userID,
                   );
                 } catch (e) {
                   showError(e.toString());
@@ -65,7 +65,7 @@ class _MainForTeacherPageState extends State<MainForTeacherPage> {
 
                 newDate = await showDatePicker(
                   context: context,
-                  initialDate: _controller.displayDate,
+                  initialDate: _data.displayDate,
                   firstDate: DateTime(initialDate.year - 3),
                   lastDate: DateTime(initialDate.year + 1),
                   builder: (context, child) {
@@ -83,15 +83,15 @@ class _MainForTeacherPageState extends State<MainForTeacherPage> {
                 );
 
                 if (newDate != null) {
-                  _controller.updateDisplayDate(newDate);
+                  _data.updateDisplayDate(newDate);
                   _calendar.displayDate = newDate;
 
-                  if (!isSameWeek(newDate, _controller.displayDate)) {
+                  if (!isSameWeek(newDate, _data.displayDate)) {
                     showLoading(() async {
                       try {
                         await getReservationDataForTeacher(
-                          displayDate: _controller.displayDate,
-                          teacherID: _controller.profile.userID,
+                          displayDate: _data.displayDate,
+                          teacherID: _data.profile.userID,
                         );
                       } catch (e) {
                         showError(e.toString());

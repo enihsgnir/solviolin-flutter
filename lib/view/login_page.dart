@@ -15,7 +15,7 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
   var _client = Get.find<Client>();
-  var _controller = Get.find<DataController>();
+  var _data = Get.find<DataController>();
 
   var id = TextEditingController();
   var pw = TextEditingController();
@@ -30,7 +30,7 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () => FocusScope.of(context).unfocus(),
+      onTap: () => FocusScope.of(context).requestFocus(FocusNode()),
       child: Scaffold(
         body: SafeArea(
           child: Column(
@@ -97,14 +97,14 @@ class _LoginPageState extends State<LoginPage> {
                 margin: EdgeInsets.all(16.r),
                 child: TextButton(
                   onPressed: () {
-                    FocusScope.of(context).unfocus();
+                    FocusScope.of(context).requestFocus(FocusNode());
 
                     showLoading(() async {
                       try {
                         await getInitialData(false, id.text, pw.text);
-                        if (_controller.profile.userType == 2) {
+                        if (_data.profile.userType == 2) {
                           Get.offAllNamed("/menu");
-                        } else if (_controller.profile.userType == 1) {
+                        } else if (_data.profile.userType == 1) {
                           Get.offAllNamed("/menu-teacher");
                         }
                       } catch (e) {

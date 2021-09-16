@@ -26,7 +26,7 @@ class HistoryReserved extends StatefulWidget {
 class _HistoryReservedState extends State<HistoryReserved> {
   var _client = Get.find<Client>();
 
-  var search = Get.find<CacheController>(tag: "/search");
+  var search = Get.find<CacheController>(tag: "/search/user");
 
   @override
   Widget build(BuildContext context) {
@@ -117,15 +117,7 @@ class _HistoryReservedState extends State<HistoryReserved> {
                 try {
                   await _client.cancelReservation(reservation.id);
 
-                  await getUsersData(
-                    branchName: search.branchName,
-                    userID: textEdit(search.edit1),
-                    isPaid: search.check[0],
-                    userType: UserType.values.indexOf(search.type[UserType]),
-                    status: search.check[1],
-                  );
-                  await getUserDetailData(search.userDetail!);
-
+                  await _getSearchedUsersData();
                   Get.back();
                 } catch (e) {
                   showError(e.toString());
@@ -139,15 +131,7 @@ class _HistoryReservedState extends State<HistoryReserved> {
                 try {
                   await _client.cancelReservationByAdmin(reservation.id);
 
-                  await getUsersData(
-                    branchName: search.branchName,
-                    userID: textEdit(search.edit1),
-                    isPaid: search.check[0],
-                    userType: UserType.values.indexOf(search.type[UserType]),
-                    status: search.check[1],
-                  );
-                  await getUserDetailData(search.userDetail!);
-
+                  await _getSearchedUsersData();
                   Get.back();
                 } catch (e) {
                   showError(e.toString());
@@ -186,15 +170,7 @@ class _HistoryReservedState extends State<HistoryReserved> {
                 try {
                   await _client.extendReservation(reservation.id);
 
-                  await getUsersData(
-                    branchName: search.branchName,
-                    userID: textEdit(search.edit1),
-                    isPaid: search.check[0],
-                    userType: UserType.values.indexOf(search.type[UserType]),
-                    status: search.check[1],
-                  );
-                  await getUserDetailData(search.userDetail!);
-
+                  await _getSearchedUsersData();
                   Get.back();
                 } catch (e) {
                   showError(e.toString());
@@ -210,15 +186,7 @@ class _HistoryReservedState extends State<HistoryReserved> {
                     count: 1,
                   );
 
-                  await getUsersData(
-                    branchName: search.branchName,
-                    userID: textEdit(search.edit1),
-                    isPaid: search.check[0],
-                    userType: UserType.values.indexOf(search.type[UserType]),
-                    status: search.check[1],
-                  );
-                  await getUserDetailData(search.userDetail!);
-
+                  await _getSearchedUsersData();
                   Get.back();
                 } catch (e) {
                   showError(e.toString());
@@ -234,15 +202,7 @@ class _HistoryReservedState extends State<HistoryReserved> {
                     count: 0,
                   );
 
-                  await getUsersData(
-                    branchName: search.branchName,
-                    userID: textEdit(search.edit1),
-                    isPaid: search.check[0],
-                    userType: UserType.values.indexOf(search.type[UserType]),
-                    status: search.check[1],
-                  );
-                  await getUserDetailData(search.userDetail!);
-
+                  await _getSearchedUsersData();
                   Get.back();
                 } catch (e) {
                   showError(e.toString());
@@ -260,6 +220,17 @@ class _HistoryReservedState extends State<HistoryReserved> {
         );
       },
     );
+  }
+
+  Future<void> _getSearchedUsersData() async {
+    await getUsersData(
+      branchName: search.branchName,
+      userID: textEdit(search.edit1),
+      isPaid: search.check[0],
+      userType: UserType.values.indexOf(search.type[UserType]),
+      status: search.check[1],
+    );
+    await getUserDetailData(search.userDetail!);
   }
 }
 

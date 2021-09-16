@@ -18,7 +18,7 @@ class CheckIn {
       id: json["id"],
       userID: json["userID"],
       branchName: json["branchName"],
-      createdAt: parseDateTime(json["createdAt"]),
+      createdAt: parseDateTime(json["createdAt"]).add(const Duration(hours: 9)),
     );
   }
 }

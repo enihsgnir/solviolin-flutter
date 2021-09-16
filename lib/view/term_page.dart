@@ -22,7 +22,7 @@ class TermPage extends StatefulWidget {
 
 class _TermPageState extends State<TermPage> {
   var _client = Get.find<Client>();
-  var _controller = Get.find<DataController>();
+  var _data = Get.find<DataController>();
 
   var register = Get.put(CacheController(), tag: "/register");
   var update = Get.put(CacheController(), tag: "/update");
@@ -31,7 +31,7 @@ class _TermPageState extends State<TermPage> {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () => FocusScope.of(context).unfocus(),
+      onTap: () => FocusScope.of(context).requestFocus(FocusNode()),
       child: Scaffold(
         appBar: myAppBar("학기"),
         body: SafeArea(
@@ -124,7 +124,7 @@ class _TermPageState extends State<TermPage> {
   }
 
   Future _showRegister() {
-    FocusScope.of(context).unfocus();
+    FocusScope.of(context).requestFocus(FocusNode());
     register.reset();
 
     return showMyDialog(
@@ -152,7 +152,8 @@ class _TermPageState extends State<TermPage> {
             termEnd: register.date[1]!,
           );
 
-          _controller.updateTerms(await _client.getTerms(10));
+          _data.terms = await _client.getTerms(10);
+          _data.update();
 
           Get.back();
         } catch (e) {
@@ -164,7 +165,7 @@ class _TermPageState extends State<TermPage> {
   }
 
   Future _showMenu() {
-    FocusScope.of(context).unfocus();
+    FocusScope.of(context).requestFocus(FocusNode());
 
     return showCupertinoModalPopup(
       context: context,
@@ -229,7 +230,7 @@ class _TermPageState extends State<TermPage> {
         }
       }),
       action: "등록",
-      isScrolling: true,
+      isScrollable: true,
     );
   }
 }

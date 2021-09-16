@@ -15,7 +15,7 @@ import 'package:solviolin_admin/util/network.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
 
 Client _client = Get.find<Client>();
-DataController _controller = Get.find<DataController>();
+DataController _data = Get.find<DataController>();
 
 //TODO: remove some unnecessary functions
 
@@ -25,17 +25,19 @@ Future<void> getInitialData([
   String? userPassword,
 ]) async {
   isLoggedIn
-      ? _controller.updateProfile(await _client.getProfile())
-      : _controller.updateProfile(await _client.login(userID!, userPassword!));
+      ? _data.profile = await _client.getProfile()
+      : _data.profile = await _client.login(userID!, userPassword!);
 
-  _controller.updateCurrentTerm(await _client.getCurrentTerm()
-    ..sort((a, b) => a.termStart.compareTo(b.termStart)));
+  _data.currentTerm = await _client.getCurrentTerm()
+    ..sort((a, b) => a.termStart.compareTo(b.termStart));
 
-  _controller.updateTerms(await _client.getTerms(10)
-    ..sort((a, b) => b.termStart.compareTo(a.termStart)));
+  _data.terms = await _client.getTerms(10)
+    ..sort((a, b) => b.termStart.compareTo(a.termStart));
 
-  _controller.updateBranches(await _client.getBranches()
-    ..sort((a, b) => a.compareTo(b)));
+  _data.branches = await _client.getBranches()
+    ..sort((a, b) => a.compareTo(b));
+
+  _data.update();
 }
 
 Future<void> getReservationData({
@@ -50,27 +52,24 @@ Future<void> getReservationData({
   final last =
       first.add(const Duration(days: 6, hours: 23, minutes: 59, seconds: 59));
 
-  _controller.updateTeacherInfos(await _client.getTeacherInfos(
+  _data.teacherInfos = await _client.getTeacherInfos(
     branchName: branchName,
   )
-    ..sort((a, b) => a.teacherID.compareTo(b.teacherID)));
+    ..sort((a, b) => a.teacherID.compareTo(b.teacherID));
 
-  _controller.updateReservations(await _client.getReservations(
+  _data.reservations = await _client.getReservations(
     branchName: branchName,
+    teacherID: teacherID,
     startDate: first,
     endDate: last,
     userID: userID,
     bookingStatus: [-3, -1, 0, 1, 3],
   )
-    ..sort((a, b) => a.startDate.compareTo(b.startDate)));
+    ..sort((a, b) => a.startDate.compareTo(b.startDate));
 
-  if (teacherID != null) {
-    _controller.updateReservations(_controller.reservations
-        .where((element) => element.teacherID == teacherID)
-        .toList());
-  }
+  _data.reservationDataSource = ReservationDataSource();
 
-  _controller.updateReservationDataSource(ReservationDataSource());
+  _data.update();
 }
 
 Future<void> getReservationDataForTeacher({
@@ -83,33 +82,35 @@ Future<void> getReservationDataForTeacher({
   final last =
       first.add(const Duration(days: 6, hours: 23, minutes: 59, seconds: 59));
 
-  _controller.updateTeacherInfos(
-    [TeacherInfo(teacherID: teacherID, color: symbolColor)],
+  _data.teacherInfos = [
+    TeacherInfo(teacherID: teacherID, color: symbolColor),
+  ];
+
+  _data.teachers = await _client.getTeachers(
+    teacherID: teacherID,
   );
 
-  _controller.updateTeachers(await _client.getTeachers(
-    teacherID: teacherID,
-  ));
-
   var _branches = List.generate(
-    _controller.teachers.length,
-    (index) => _controller.teachers[index].branchName,
+    _data.teachers.length,
+    (index) => _data.teachers[index].branchName,
   ).toSet().toList();
 
   List<Reservation> _reservations = [];
-  _branches.forEach((element) async {
+  await Future.forEach<String>(_branches, (element) async {
     _reservations.addAll(await _client.getReservations(
       branchName: element,
+      teacherID: teacherID,
       startDate: first,
       endDate: last,
       bookingStatus: [-3, -1, 0, 1, 3],
     )
-      ..sort((a, b) => a.startDate.compareTo(b.startDate))
-      ..removeWhere((element) => element.teacherID != teacherID));
+      ..sort((a, b) => a.startDate.compareTo(b.startDate)));
   });
-  _controller.updateReservations(_reservations);
+  _data.reservations = _reservations;
 
-  _controller.updateReservationDataSource(ReservationDataSource());
+  _data.reservationDataSource = ReservationDataSource();
+
+  _data.update();
 }
 
 bool isSameWeek(DateTime newDate, DateTime oldDate) {
@@ -125,14 +126,14 @@ bool isSameWeek(DateTime newDate, DateTime oldDate) {
 
 class ReservationDataSource extends CalendarDataSource {
   ReservationDataSource() {
-    appointments = _controller.reservations;
+    appointments = _data.reservations;
 
     resources = List.generate(
-      _controller.teacherInfos.length,
+      _data.teacherInfos.length,
       (index) => CalendarResource(
-        displayName: _controller.teacherInfos[index].teacherID,
+        displayName: _data.teacherInfos[index].teacherID,
         id: index,
-        color: _controller.teacherInfos[index].color ?? Colors.transparent,
+        color: _data.teacherInfos[index].color ?? Colors.transparent,
       ),
     )..add(CalendarResource(
         displayName: "Others",
@@ -151,9 +152,8 @@ class ReservationDataSource extends CalendarDataSource {
   String getSubject(int index) {
     final start = DateFormat("HH:mm").format(appointments![index].startDate);
     final end = DateFormat("HH:mm").format(appointments![index].endDate);
-    return appointments![index].userID +
-        "/\n${appointments![index].teacherID}/${appointments![index].branchName}" +
-        "\n$start ~ $end";
+
+    return appointments![index].userID + "\n$start ~ $end";
   }
 
   @override
@@ -162,8 +162,8 @@ class ReservationDataSource extends CalendarDataSource {
   @override
   List<Object> getResourceIds(int index) {
     var teacherIDs = List.generate(
-      _controller.teacherInfos.length,
-      (index) => _controller.teacherInfos[index].teacherID,
+      _data.teacherInfos.length,
+      (index) => _data.teacherInfos[index].teacherID,
     );
 
     return [teacherIDs.indexOf(appointments![index].teacherID)];
@@ -177,14 +177,15 @@ Future<void> getUsersData({
   int? userType,
   int? status,
 }) async {
-  _controller.updateUsers(await _client.getUsers(
+  _data.users = await _client.getUsers(
     branchName: branchName,
     userID: userID,
     isPaid: isPaid,
     userType: userType,
     status: status,
   )
-    ..sort((a, b) => a.userID.compareTo(b.userID)));
+    ..sort((a, b) => a.userID.compareTo(b.userID));
+  _data.update();
 }
 
 Future<void> saveUsersData({
@@ -201,7 +202,7 @@ Future<void> saveUsersData({
   final file = File("$path/users_list_" +
       "${DateFormat("yy_MM_dd_HH_mm").format(DateTime.now())}.json");
 
-  final data = await _client.getRawUsers(
+  final data = await _client.getJsonUsers(
     branchName: branchName,
     userID: userID,
     isPaid: isPaid,
@@ -226,15 +227,15 @@ Future<void> getUserDetailData(User user) async {
   final today = DateTime.now();
 
   try {
-    _controller.updateRegularSchedules(
+    _data.regularSchedules =
         await _client.getRegularSchedulesByAdmin(user.userID)
           ..sort((a, b) {
             var primary = a.dow.compareTo(b.dow);
 
             return primary != 0 ? primary : a.startTime.compareTo(b.startTime);
-          }));
+          });
   } catch (_) {
-    _controller.updateRegularSchedules([
+    _data.regularSchedules = [
       RegularSchedule(
         id: -1,
         startTime: const Duration(hours: 0, minutes: 0),
@@ -244,28 +245,28 @@ Future<void> getUserDetailData(User user) async {
         teacherID: "Null",
         branchName: user.branchName,
       )
-    ]);
+    ];
   }
 
-  _controller.updateThisMonthReservations(await _client.getReservations(
+  _data.thisMonthReservations = await _client.getReservations(
     branchName: user.branchName,
     startDate: DateTime(today.year, today.month, 1),
     endDate: DateTime(today.year, today.month + 1, 0, 23, 59, 59),
     userID: user.userID,
     bookingStatus: [-3, -2, -1, 0, 1, 2, 3],
   )
-    ..sort((a, b) => a.startDate.compareTo(b.startDate)));
+    ..sort((a, b) => a.startDate.compareTo(b.startDate));
 
-  _controller.updateLastMonthReservations(await _client.getReservations(
+  _data.lastMonthReservations = await _client.getReservations(
     branchName: user.branchName,
     startDate: DateTime(today.year, today.month - 1, 1),
     endDate: DateTime(today.year, today.month, 0, 23, 59, 59),
     userID: user.userID,
     bookingStatus: [-3, -2, -1, 0, 1, 2, 3],
   )
-    ..sort((a, b) => a.startDate.compareTo(b.startDate)));
+    ..sort((a, b) => a.startDate.compareTo(b.startDate));
 
-  _controller.updateChanges(await _client.getChangesWithID(user.userID)
+  _data.changes = await _client.getChangesWithID(user.userID)
     ..sort((a, b) {
       var primary = a.fromDate.compareTo(b.fromDate);
 
@@ -274,7 +275,9 @@ Future<void> getUserDetailData(User user) async {
           : a.toDate == null || b.toDate == null
               ? 0
               : a.toDate!.compareTo(b.toDate!);
-    }));
+    });
+
+  _data.update();
 }
 
 Future<void> getControlsData({
@@ -284,21 +287,23 @@ Future<void> getControlsData({
   DateTime? endDate,
   int? status,
 }) async {
-  _controller.updateControls(await _client.getControls(
+  _data.controls = await _client.getControls(
     branchName: branchName,
     teacherID: teacherID,
     startDate: startDate,
     endDate: endDate?.add(const Duration(hours: 23, minutes: 59, seconds: 59)),
     status: status,
   )
-    ..sort((a, b) => a.controlStart.compareTo(b.controlStart)));
+    ..sort((a, b) => a.controlStart.compareTo(b.controlStart));
+
+  _data.update();
 }
 
 Future<void> getTeachersData({
   String? teacherID,
   String? branchName,
 }) async {
-  _controller.updateTeachers(await _client.getTeachers(
+  _data.teachers = await _client.getTeachers(
     teacherID: teacherID,
     branchName: branchName,
   )
@@ -311,21 +316,17 @@ Future<void> getTeachersData({
           : secondary != 0
               ? secondary
               : a.startTime.compareTo(b.startTime);
-    }));
-}
+    });
 
-Future<void> getCanceledData(String teacherID) async {
-  _controller.updateCanceledReservations(
-      await _client.getCanceledReservations(teacherID)
-        ..sort((a, b) => a.startDate.compareTo(b.startDate)));
+  _data.update();
 }
 
 Future<void> getLedgersData({
-  required String branchName,
-  required int termID,
-  required String userID,
+  String? branchName,
+  int? termID,
+  String? userID,
 }) async {
-  _controller.updateLedgers(await _client.getLedgers(
+  _data.ledgers = await _client.getLedgers(
     branchName: branchName,
     termID: termID,
     userID: userID,
@@ -334,5 +335,6 @@ Future<void> getLedgersData({
       var primary = b.paidAt.compareTo(a.paidAt);
 
       return primary != 0 ? primary : a.userID.compareTo(b.userID);
-    }));
+    });
+  _data.update();
 }

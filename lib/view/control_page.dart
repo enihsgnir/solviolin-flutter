@@ -25,13 +25,13 @@ class ControlPage extends StatefulWidget {
 class _ControlPageState extends State<ControlPage> {
   var _client = Get.find<Client>();
 
-  var search = Get.put(CacheController(), tag: "/search");
+  var search = Get.find<CacheController>(tag: "/search/control");
   var register = Get.put(CacheController(), tag: "/register");
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () => FocusScope.of(context).unfocus(),
+      onTap: () => FocusScope.of(context).requestFocus(FocusNode()),
       child: Scaffold(
         appBar: myAppBar("오픈/클로즈"),
         body: SafeArea(
@@ -56,24 +56,24 @@ class _ControlPageState extends State<ControlPage> {
   Widget _controlSearch() {
     return mySearch(
       contents: [
-        branchDropdown("/search", "지점을 선택하세요!"),
+        branchDropdown("/search/control", "지점을 선택하세요!"),
         myTextInput("강사", search.edit1),
         pickDateTime(
           context: context,
           item: "시작일",
-          tag: "/search",
+          tag: "/search/control",
           index: 0,
         ),
         pickDateTime(
           context: context,
           item: "종료일",
-          tag: "/search",
+          tag: "/search/control",
           index: 1,
         ),
         Row(
           children: [
             myCheckBox(
-              tag: "/search",
+              tag: "/search/control",
               item: "오픈/클로즈",
               trueName: "오픈",
               falseName: "클로즈",
@@ -160,7 +160,7 @@ class _ControlPageState extends State<ControlPage> {
   }
 
   Future _showRegister() {
-    FocusScope.of(context).unfocus();
+    FocusScope.of(context).requestFocus(FocusNode());
     register.reset();
 
     return showMyDialog(
@@ -225,7 +225,7 @@ class _ControlPageState extends State<ControlPage> {
         }
       }),
       action: "등록",
-      isScrolling: true,
+      isScrollable: true,
     );
   }
 }

@@ -17,7 +17,7 @@ class MenuPage extends StatefulWidget {
 
 class _MenuPageState extends State<MenuPage> {
   var _client = Get.find<Client>();
-  var _controller = Get.find<DataController>();
+  var _data = Get.find<DataController>();
 
   var branch = TextEditingController();
 
@@ -29,6 +29,15 @@ class _MenuPageState extends State<MenuPage> {
 
   @override
   Widget build(BuildContext context) {
+    Get.put(CacheController(), tag: "/search/main");
+    Get.put(CacheController(), tag: "/search/user");
+    Get.put(CacheController(), tag: "/search/control");
+    Get.put(CacheController(), tag: "/search/teacher");
+    Get.put(CacheController(), tag: "/search/canceled");
+    Get.put(CacheController(), tag: "/search/salary");
+    Get.put(CacheController(), tag: "/search/ledger");
+    Get.put(CacheController(), tag: "/search/check-in");
+
     return Scaffold(
       resizeToAvoidBottomInset: false,
       body: SafeArea(
@@ -65,14 +74,15 @@ class _MenuPageState extends State<MenuPage> {
         try {
           await _client.registerBranch(textEdit(branch)!);
 
-          _controller.updateBranches(await _client.getBranches());
+          _data.branches = await _client.getBranches();
+          _data.update();
           Get.back();
         } catch (e) {
           showError(e.toString());
         }
       }),
       action: "등록",
-      isScrolling: true,
+      isScrollable: true,
     );
   }
 

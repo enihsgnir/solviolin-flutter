@@ -19,9 +19,9 @@ class CheckInHistoryPage extends StatefulWidget {
 
 class _CheckInHistoryPageState extends State<CheckInHistoryPage> {
   var _client = Get.find<Client>();
-  var _controller = Get.find<DataController>();
+  var _data = Get.find<DataController>();
 
-  var search = Get.put(CacheController(), tag: "/search");
+  var search = Get.find<CacheController>(tag: "/search/check-in");
 
   @override
   Widget build(BuildContext context) {
@@ -44,11 +44,11 @@ class _CheckInHistoryPageState extends State<CheckInHistoryPage> {
   Widget _checkInHistorySearch() {
     return mySearch(
       contents: [
-        branchDropdown("/search", "지점을 선택하세요!"),
+        branchDropdown("/search/check-in", "지점을 선택하세요!"),
         pickDate(
           context: context,
           item: "시작일",
-          tag: "/search",
+          tag: "/search/check-in",
           index: 0,
         ),
         Row(
@@ -56,19 +56,24 @@ class _CheckInHistoryPageState extends State<CheckInHistoryPage> {
             pickDate(
               context: context,
               item: "종료일",
-              tag: "/search",
+              tag: "/search/check-in",
               index: 1,
             ),
             myActionButton(
               context: context,
               onPressed: () => showLoading(() async {
                 try {
-                  _controller
-                      .updateCheckInHistories(await _client.getCheckInHistories(
+                  _data.checkInHistories = await _client.getCheckInHistories(
                     branchName: search.branchName!,
                     startDate: search.dateTime[0],
                     endDate: search.dateTime[1],
-                  ));
+                  )
+                    ..sort((a, b) {
+                      var primary = b.createdAt.compareTo(a.createdAt);
+
+                      return primary != 0 ? primary : b.id.compareTo(a.id);
+                    }); //TODO: touch up unnecessary body
+                  _data.update();
                 } catch (e) {
                   showError(e.toString());
                 }

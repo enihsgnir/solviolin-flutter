@@ -24,13 +24,13 @@ class UserPage extends StatefulWidget {
 class _UserPageState extends State<UserPage> {
   var _client = Get.find<Client>();
 
-  var search = Get.put(CacheController(), tag: "/search");
+  var search = Get.find<CacheController>(tag: "/search/user");
   var register = Get.put(CacheController(), tag: "/register");
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () => FocusScope.of(context).unfocus(), //TODO: Get.focusScope
+      onTap: () => FocusScope.of(context).requestFocus(FocusNode()),
       child: Scaffold(
         appBar: myAppBar("유저"),
         body: SafeArea(
@@ -77,16 +77,16 @@ class _UserPageState extends State<UserPage> {
             ),
           ],
         ),
-        branchDropdown("/search"),
+        branchDropdown("/search/user"),
         myCheckBox(
-          tag: "/search",
+          tag: "/search/user",
           index: 0,
           item: "결제 여부",
           trueName: "완료",
           falseName: "미완료",
         ),
         myRadio<UserType>(
-          tag: "/search",
+          tag: "/search/user",
           item: "구분",
           names: ["수강생", "강사", "관리자"],
           values: UserType.values,
@@ -95,7 +95,7 @@ class _UserPageState extends State<UserPage> {
         Row(
           children: [
             myCheckBox(
-              tag: "/search",
+              tag: "/search/user",
               index: 1,
               item: "등록 여부",
               trueName: "등록",
@@ -111,6 +111,11 @@ class _UserPageState extends State<UserPage> {
                     isPaid: search.check[0],
                     userType: UserType.values.indexOf(search.type[UserType]),
                     status: search.check[1],
+                  );
+
+                  await showMySnackbar(
+                    title: "로딩 성공",
+                    message: "유저 목록을 불러왔습니다.",
                   );
 
                   search.isSearched = true;
@@ -130,44 +135,58 @@ class _UserPageState extends State<UserPage> {
 
     return GetBuilder<DataController>(
       builder: (controller) {
-        return ListView.builder(
-          itemCount: controller.users.length,
-          itemBuilder: (context, index) {
-            var user = controller.users[index];
+        return controller.users.length == 0
+            ? DefaultTextStyle(
+                style: TextStyle(color: Colors.red, fontSize: 20.r),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text("유저 목록 파일 저장 경로"),
+                    Text("\nAndroid: 내장 메모리/Android/data/"),
+                    Text("/com.solviolin.solviolin_admin/files/"),
+                    Text("\niOS: 나의 iPhone (또는 나의 iPad)/"),
+                    Text("솔바이올린(관리자)/"),
+                  ], //TODO:
+                ),
+              )
+            : ListView.builder(
+                itemCount: controller.users.length,
+                itemBuilder: (context, index) {
+                  var user = controller.users[index];
 
-            return InkWell(
-              child: myNormalCard(
-                padding: EdgeInsets.symmetric(vertical: 8.r),
-                children: [
-                  Text("${user.userID} / ${user.branchName}"),
-                  Text(_parsePhoneNumber(user.userPhone)),
-                  Text("${user.status == 0 ? "미등록" : "등록"}" +
-                      " / 크레딧: ${user.userCredit}"),
-                  Text("결제일: ${_ledgerToString(user.paidAt)}"),
-                ],
-              ),
-              onTap: () {
-                FocusScope.of(context).unfocus();
+                  return InkWell(
+                    child: myNormalCard(
+                      padding: EdgeInsets.symmetric(vertical: 8.r),
+                      children: [
+                        Text("${user.userID} / ${user.branchName}"),
+                        Text(_parsePhoneNumber(user.userPhone)),
+                        Text("${user.status == 0 ? "미등록" : "등록"}" +
+                            " / 크레딧: ${user.userCredit}"),
+                        Text("결제일: ${_ledgerToString(user.paidAt)}"),
+                      ],
+                    ),
+                    onTap: () {
+                      FocusScope.of(context).requestFocus(FocusNode());
 
-                showLoading(() async {
-                  try {
-                    await getUserDetailData(user);
-                    search.userDetail = user;
-                    Get.toNamed("/user/detail");
-                  } catch (e) {
-                    showError(e.toString());
-                  }
-                });
-              },
-            );
-          },
-        );
+                      showLoading(() async {
+                        try {
+                          await getUserDetailData(user);
+                          search.userDetail = user;
+                          Get.toNamed("/user/detail");
+                        } catch (e) {
+                          showError(e.toString());
+                        }
+                      });
+                    },
+                  );
+                },
+              );
       },
     );
   }
 
   Future _showUserRegister() {
-    FocusScope.of(context).unfocus();
+    FocusScope.of(context).requestFocus(FocusNode());
     register.reset();
 
     return showMyDialog(
@@ -176,7 +195,8 @@ class _UserPageState extends State<UserPage> {
         myTextInput("아이디", register.edit1, "아이디를 입력하세요!"),
         myTextInput("비밀번호", register.edit2, "비밀번호를 입력하세요!"),
         myTextInput("이름", register.edit3, "이름을 입력하세요!"),
-        myTextInput("전화번호", register.edit4, "전화번호를 입력하세요!"),
+        myTextInput(
+            "전화번호", register.edit4, "전화번호를 입력하세요!", TextInputType.number),
         myRadio<UserType>(
           tag: "/register",
           item: "구분",
@@ -187,7 +207,7 @@ class _UserPageState extends State<UserPage> {
         branchDropdown("/register", "지점을 선택하세요!"),
       ],
       onPressed: () {
-        FocusScope.of(context).unfocus();
+        FocusScope.of(context).requestFocus(FocusNode());
 
         showMyDialog(
           title: "입력하신 정보가 맞습니까?",
@@ -233,7 +253,7 @@ class _UserPageState extends State<UserPage> {
         );
       },
       action: "등록",
-      isScrolling: true,
+      isScrollable: true,
     );
   }
 }

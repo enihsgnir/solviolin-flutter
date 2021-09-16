@@ -16,7 +16,6 @@ import 'package:solviolin_admin/model/user.dart';
 import 'package:solviolin_admin/util/data_source.dart';
 
 class DataController extends GetxController {
-  //TODO: remove some unnecessary functions
   late final double ratio;
 
   late Profile profile;
@@ -44,109 +43,34 @@ class DataController extends GetxController {
   late String totalLeger;
   List<CheckIn> checkInHistories = [];
 
-  void updateRatio(double data) {
-    ratio = data;
-    update();
-  }
-
-  void updateProfile(Profile data) {
-    profile = data;
-    update();
-  }
-
-  void updateCurrentTerm(List<Term> data) {
-    currentTerm = data;
-    update();
-  }
-
-  void updateTerms(List<Term> data) {
-    terms = data;
-    update();
-  }
-
-  void updateBranches(List<String> data) {
-    branches = data;
-    update();
-  }
-
   void updateDisplayDate(DateTime data) {
     displayDate = data;
     update();
   }
 
-  void updateTeacherInfos(List<TeacherInfo> data) {
-    teacherInfos = data;
-    update();
-  }
+  void reset() {
+    teacherInfos = [];
+    reservations = [];
+    reservationDataSource = null;
 
-  void updateReservations(List<Reservation> data) {
-    reservations = data;
-    update();
-  }
+    users = [];
+    regularSchedules = [];
+    thisMonthReservations = [];
+    lastMonthReservations = [];
+    changes = [];
 
-  void updateReservationDataSource(ReservationDataSource data) {
-    reservationDataSource = data;
-    update();
-  }
-
-  void updateUsers(List<User> data) {
-    users = data;
-    update();
-  }
-
-  void updateRegularSchedules(List<RegularSchedule> data) {
-    regularSchedules = data;
-    update();
-  }
-
-  void updateThisMonthReservations(List<Reservation> data) {
-    thisMonthReservations = data;
-    update();
-  }
-
-  void updateLastMonthReservations(List<Reservation> data) {
-    lastMonthReservations = data;
-    update();
-  }
-
-  void updateChanges(List<Change> data) {
-    changes = data;
-    update();
-  }
-
-  void updateControls(List<Control> data) {
-    controls = data;
-    update();
-  }
-
-  void updateTeachers(List<Teacher> data) {
-    teachers = data;
-    update();
-  }
-
-  void updateCanceledReservations(List<Canceled> data) {
-    canceledReservations = data;
-    update();
-  }
-
-  void updateSalaries(List<Salary> data) {
-    salaries = data;
-    update();
-  }
-
-  void updateLedgers(List<Ledger> data) {
-    ledgers = data;
-    update();
-  }
-
-  void updateCheckInHistories(List<CheckIn> data) {
-    checkInHistories = data;
-    update();
+    controls = [];
+    teachers = [];
+    canceledReservations = [];
+    salaries = [];
+    ledgers = [];
+    checkInHistories = [];
   }
 }
 
 class CacheController extends GetxController {
   bool isSearched = false;
+  bool hasBeenShown = false;
 
   Map<int, DateTime?> dateTime = {};
   Map<int, DateTime?> date = {};
@@ -159,6 +83,7 @@ class CacheController extends GetxController {
   String? branchName;
   int? workDow;
   int? termID;
+  Duration? duration;
 
   var edit1 = TextEditingController();
   var edit2 = TextEditingController();
@@ -176,6 +101,7 @@ class CacheController extends GetxController {
     branchName = null;
     workDow = null;
     termID = null;
+    duration = null;
 
     edit1.text = "";
     edit2.text = "";
