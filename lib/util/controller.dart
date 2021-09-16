@@ -23,54 +23,9 @@ class DataController extends GetxController {
   late List<Reservation> lastMonthReservations;
   late List<Change> changes;
 
-  void updateRatio(double data) {
-    ratio = data;
-    update();
-  }
-
-  void updateProfile(Profile data) {
-    profile = data;
-    update();
-  }
-
-  void updateRegularSchedules(List<RegularSchedule> data) {
-    regularSchedules = data;
-    update();
-  }
-
-  void updateAvailableSpots(List<DateTime> data) {
-    availabaleSpots = data;
-    update();
-  }
-
-  void updateMyValidReservations(List<Reservation> data) {
-    myValidReservations = data;
-    update();
-  }
-
-  void updateCurrentTerm(List<Term> data) {
-    currentTerm = data;
-    update();
-  }
-
   void updateDays(DateTime selectedData, DateTime focusedData) {
     selectedDay = selectedData;
     focusedDay = focusedData;
-    update();
-  }
-
-  void updateThisMonthReservations(List<Reservation> data) {
-    thisMonthReservations = data;
-    update();
-  }
-
-  void updateLastMonthReservations(List<Reservation> data) {
-    lastMonthReservations = data;
-    update();
-  }
-
-  void updateChanges(List<Change> data) {
-    changes = data;
     update();
   }
 }

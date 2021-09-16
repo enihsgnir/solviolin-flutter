@@ -17,7 +17,7 @@ class GridAvailable extends StatefulWidget {
 
 class _GridAvailableState extends State<GridAvailable> {
   var _client = Get.find<Client>();
-  var _controller = Get.find<DataController>();
+  var _data = Get.find<DataController>();
 
   @override
   Widget build(BuildContext context) {
@@ -84,8 +84,8 @@ class _GridAvailableState extends State<GridAvailable> {
   }
 
   Future _showReserve(BuildContext context, DateTime time) {
-    var _duration = _controller.regularSchedules[0].endTime -
-        _controller.regularSchedules[0].startTime;
+    var _duration =
+        _data.regularSchedules[0].endTime - _data.regularSchedules[0].startTime;
 
     return showCupertinoModalPopup(
       context: context,
@@ -103,16 +103,16 @@ class _GridAvailableState extends State<GridAvailable> {
               onPressed: () => showLoading(() async {
                 try {
                   await _client.makeUpReservation(
-                    teacherID: _controller.regularSchedules[0].teacherID,
-                    branchName: _controller.profile.branchName,
+                    teacherID: _data.regularSchedules[0].teacherID,
+                    branchName: _data.profile.branchName,
                     startDate: time,
                     endDate: time.add(_duration),
-                    userID: _controller.profile.userID,
+                    userID: _data.profile.userID,
                   );
 
                   await getUserBasedData();
-                  await getSelectedDayData(_controller.selectedDay);
-                  await getChangedPageData(_controller.focusedDay);
+                  await getSelectedDayData(_data.selectedDay);
+                  await getChangedPageData(_data.focusedDay);
 
                   Get.back();
                 } catch (e) {

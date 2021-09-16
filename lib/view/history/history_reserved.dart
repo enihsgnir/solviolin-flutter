@@ -24,7 +24,7 @@ class HistoryReserved extends StatefulWidget {
 
 class _HistoryReservedState extends State<HistoryReserved> {
   var _client = Get.find<Client>();
-  var _controller = Get.find<DataController>();
+  var _data = Get.find<DataController>();
 
   @override
   Widget build(BuildContext context) {
@@ -119,8 +119,8 @@ class _HistoryReservedState extends State<HistoryReserved> {
                   await _client.cancelReservation(reservation.id);
 
                   await getUserBasedData();
-                  await getSelectedDayData(_controller.selectedDay);
-                  await getChangedPageData(_controller.focusedDay);
+                  await getSelectedDayData(_data.selectedDay);
+                  await getChangedPageData(_data.focusedDay);
                   await getReservedHistoryData();
 
                   Get.back();
@@ -162,8 +162,8 @@ class _HistoryReservedState extends State<HistoryReserved> {
                   await _client.extendReservation(reservation.id);
 
                   await getUserBasedData();
-                  await getSelectedDayData(_controller.selectedDay);
-                  await getChangedPageData(_controller.focusedDay);
+                  await getSelectedDayData(_data.selectedDay);
+                  await getChangedPageData(_data.focusedDay);
                   await getReservedHistoryData();
 
                   Get.back();

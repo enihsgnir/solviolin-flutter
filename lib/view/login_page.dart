@@ -28,7 +28,7 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () => FocusScope.of(context).unfocus(),
+      onTap: () => FocusScope.of(context).requestFocus(FocusNode()),
       child: Scaffold(
         body: SafeArea(
           child: Column(
@@ -95,7 +95,7 @@ class _LoginPageState extends State<LoginPage> {
                 margin: EdgeInsets.all(16.r),
                 child: TextButton(
                   onPressed: () {
-                    FocusScope.of(context).unfocus();
+                    FocusScope.of(context).requestFocus(FocusNode());
 
                     showLoading(() async {
                       try {

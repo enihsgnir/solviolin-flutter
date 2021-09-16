@@ -302,7 +302,9 @@ class NetworkException extends DioError {
     if (options.queryParameters.isNotEmpty) {
       message += "\n${options.queryParameters}";
     }
-    if (options.data != null && options.path != "/auth/login") {
+    if (options.data != null &&
+        options.path != "/auth/refresh" &&
+        options.path != "/auth/login") {
       message += "\n${options.data}";
     }
 

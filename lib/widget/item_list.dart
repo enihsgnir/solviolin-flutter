@@ -85,9 +85,6 @@ Widget mySlideAction({
             : Container(),
       ],
     ),
-    onTap: () {
-      FocusScope.of(context).unfocus();
-      onTap();
-    },
+    onTap: onTap,
   );
 }

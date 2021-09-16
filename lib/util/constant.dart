@@ -4,9 +4,9 @@ import 'package:solviolin/util/controller.dart';
 
 extension RFS on num {
   double get r {
-    var _controller = Get.find<DataController>();
+    var _data = Get.find<DataController>();
 
-    return this * _controller.ratio;
+    return this * _data.ratio;
   } //'r'esponsible font size
 }
 
