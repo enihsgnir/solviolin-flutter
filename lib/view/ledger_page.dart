@@ -87,6 +87,13 @@ class _LedgerPageState extends State<LedgerPage> {
                     termID: search.termID,
                     userID: textEdit(search.edit1),
                   );
+
+                  if (_data.ledgers.length == 0) {
+                    await showMySnackbar(
+                      title: "알림",
+                      message: "검색 조건에 해당하는 목록이 없습니다.",
+                    );
+                  }
                 } catch (e) {
                   showError(e.toString());
                 }
@@ -134,7 +141,7 @@ class _LedgerPageState extends State<LedgerPage> {
                         icon: CupertinoIcons.delete,
                         item: "삭제",
                         onTap: () => showMyDialog(
-                          title: "매출 삭제",
+                          title: "매출 내역 삭제",
                           contents: [
                             Text("정말 삭제하시겠습니까?"),
                           ],
@@ -149,6 +156,10 @@ class _LedgerPageState extends State<LedgerPage> {
                               );
 
                               Get.back();
+
+                              await showMySnackbar(
+                                message: "매출 내역 삭제에 성공했습니다.",
+                              );
                             } catch (e) {
                               showError(e.toString());
                             }

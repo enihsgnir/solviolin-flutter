@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:solviolin_admin/util/controller.dart';
+import 'package:solviolin_admin/util/data_source.dart';
 import 'package:solviolin_admin/util/format.dart';
 import 'package:solviolin_admin/util/network.dart';
 import 'package:solviolin_admin/widget/dialog.dart';
@@ -30,7 +31,7 @@ class _MenuPageState extends State<MenuPage> {
   @override
   Widget build(BuildContext context) {
     Get.put(CacheController(), tag: "/search/main");
-    Get.put(CacheController(), tag: "/search/user");
+    var user = Get.put(CacheController(), tag: "/search/user");
     Get.put(CacheController(), tag: "/search/control");
     Get.put(CacheController(), tag: "/search/teacher");
     Get.put(CacheController(), tag: "/search/canceled");
@@ -46,7 +47,19 @@ class _MenuPageState extends State<MenuPage> {
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               menu("메인", () => Get.toNamed("/main")),
-              menu("유저", () => Get.toNamed("/user")),
+              menu("유저", () async {
+                if (user.isSearched) {
+                  await getUsersData(
+                    branchName: user.branchName,
+                    userID: textEdit(user.edit1),
+                    isPaid: user.check[0],
+                    userType: UserType.values.indexOf(user.type[UserType]),
+                    status: user.check[1],
+                  );
+                }
+
+                Get.toNamed("/user");
+              }),
               menu("오픈/클로즈", () => Get.toNamed("/control")),
               menu("학기", () => Get.toNamed("/term")),
               menu("강사 세부", () => Get.toNamed("/teacher")),
@@ -77,6 +90,10 @@ class _MenuPageState extends State<MenuPage> {
           _data.branches = await _client.getBranches();
           _data.update();
           Get.back();
+
+          await showMySnackbar(
+            message: "신규 지점 등록에 성공했습니다.",
+          );
         } catch (e) {
           showError(e.toString());
         }
@@ -97,6 +114,10 @@ class _MenuPageState extends State<MenuPage> {
         } catch (_) {
         } finally {
           Get.offAllNamed("/login");
+
+          await showMySnackbar(
+            message: "안전하게 로그아웃 되었습니다.",
+          );
         }
       }),
     );

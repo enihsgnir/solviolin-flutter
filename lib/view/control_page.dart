@@ -24,6 +24,7 @@ class ControlPage extends StatefulWidget {
 
 class _ControlPageState extends State<ControlPage> {
   var _client = Get.find<Client>();
+  var _data = Get.find<DataController>();
 
   var search = Get.find<CacheController>(tag: "/search/control");
   var register = Get.put(CacheController(), tag: "/register");
@@ -86,12 +87,19 @@ class _ControlPageState extends State<ControlPage> {
                   await getControlsData(
                     branchName: search.branchName!,
                     teacherID: textEdit(search.edit1),
-                    startDate: search.dateTime[0],
-                    endDate: search.dateTime[1],
+                    controlStart: search.dateTime[0],
+                    controlEnd: search.dateTime[1],
                     status: search.check[0],
                   );
 
                   search.isSearched = true;
+
+                  if (_data.controls.length == 0) {
+                    await showMySnackbar(
+                      title: "알림",
+                      message: "검색 조건에 해당하는 목록이 없습니다.",
+                    );
+                  }
                 } catch (e) {
                   showError(e.toString());
                 }
@@ -131,12 +139,16 @@ class _ControlPageState extends State<ControlPage> {
                         await getControlsData(
                           branchName: search.branchName!,
                           teacherID: textEdit(search.edit1),
-                          startDate: search.dateTime[0],
-                          endDate: search.dateTime[1],
+                          controlStart: search.dateTime[0],
+                          controlEnd: search.dateTime[1],
                           status: search.check[0],
                         );
 
                         Get.back();
+
+                        await showMySnackbar(
+                          message: "오픈/클로즈 삭제에 성공했습니다.",
+                        );
                       } catch (e) {
                         showError(e.toString());
                       }
@@ -146,7 +158,7 @@ class _ControlPageState extends State<ControlPage> {
               ],
               children: [
                 Text("${control.teacherID} / ${control.branchName}" +
-                    " / ${control.status == 0 ? "Open" : "Close"}"),
+                    " / ${control.status == 0 ? "오픈" : "클로즈"}"),
                 Text("시작: " +
                     DateFormat("yy/MM/dd HH:mm").format(control.controlStart)),
                 Text("종료: " +
@@ -200,26 +212,30 @@ class _ControlPageState extends State<ControlPage> {
       onPressed: () => showLoading(() async {
         try {
           await _client.registerControl(
-            teacherID: textEdit(search.edit1)!,
-            branchName: search.branchName!,
-            controlStart: search.dateTime[0]!,
-            controlEnd: search.dateTime[1]!,
-            status: ControlStatus.values.indexOf(search.type[ControlStatus]),
+            teacherID: textEdit(register.edit1)!,
+            branchName: register.branchName!,
+            controlStart: register.dateTime[0]!,
+            controlEnd: register.dateTime[1]!,
+            status: ControlStatus.values.indexOf(register.type[ControlStatus]),
             cancelInClose:
-                CancelInClose.values.indexOf(search.type[CancelInClose]),
+                CancelInClose.values.indexOf(register.type[CancelInClose]),
           );
 
           if (search.isSearched) {
             await getControlsData(
               branchName: search.branchName!,
               teacherID: textEdit(search.edit1),
-              startDate: search.dateTime[0],
-              endDate: search.dateTime[1],
+              controlStart: search.dateTime[0],
+              controlEnd: search.dateTime[1],
               status: search.check[0],
             );
           }
 
           Get.back();
+
+          await showMySnackbar(
+            message: "신규 오픈/클로즈 등록에 성공했습니다.",
+          );
         } catch (e) {
           showError(e.toString());
         }

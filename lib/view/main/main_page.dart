@@ -90,10 +90,11 @@ class _MainPageState extends State<MainPage> {
                 );
 
                 if (newDate != null) {
-                  _data.updateDisplayDate(newDate);
                   _calendar.displayDate = newDate;
 
                   if (!isSameWeek(newDate, _data.displayDate)) {
+                    _data.updateDisplayDate(newDate);
+
                     showLoading(() async {
                       try {
                         await _getSearchedReservationsData();
@@ -137,6 +138,13 @@ class _MainPageState extends State<MainPage> {
 
           search.isSearched = true;
           Get.back();
+
+          if (_data.reservations.length == 0) {
+            await showMySnackbar(
+              title: "알림",
+              message: "검색 조건에 해당하는 목록이 없습니다.",
+            );
+          }
         } catch (e) {
           showError(e.toString());
         }

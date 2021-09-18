@@ -36,11 +36,38 @@ class _MenuForTeacherPageState extends State<MenuForTeacherPage> {
                     );
 
                     Get.toNamed("/main-teacher");
+
+                    if (_data.reservations.length == 0) {
+                      await showMySnackbar(
+                        title: "알림",
+                        message: "검색 조건에 해당하는 목록이 없습니다.",
+                      );
+                    }
                   } catch (e) {
                     showError(e.toString());
                   }
                 });
               }),
+              // menu("취소 내역", () {
+              //   showLoading(() async {
+              //     try {
+              //       _data.canceledReservations = await _client
+              //           .getCanceledReservations(_data.profile.userID);
+              //       _data.update();
+
+              //       Get.toNamed("/canceled-teacher");
+
+              //       if (_data.canceledReservations.length == 0) {
+              //         await showMySnackbar(
+              //           title: "알림",
+              //           message: "검색 조건에 해당하는 목록이 없습니다.",
+              //         );
+              //       }
+              //     } catch (e) {
+              //       showError(e.toString());
+              //     }
+              //   });
+              // }), //TODO: not admin
               menu("체크인", () => Get.toNamed("/check-in")),
               menu("로그아웃", _showLogout, true),
             ]
@@ -66,6 +93,10 @@ class _MenuForTeacherPageState extends State<MenuForTeacherPage> {
         } catch (_) {
         } finally {
           Get.offAllNamed("/login");
+
+          await showMySnackbar(
+            message: "안전하게 로그아웃 되었습니다.",
+          );
         }
       }),
     );

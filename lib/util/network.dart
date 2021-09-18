@@ -19,8 +19,6 @@ import 'package:solviolin_admin/model/term.dart';
 import 'package:solviolin_admin/model/user.dart';
 import 'package:solviolin_admin/util/format.dart';
 
-//TODO: add comments
-
 class Client {
   final dio = Dio();
   final storage = Get.find<FlutterSecureStorage>();
@@ -44,22 +42,22 @@ class Client {
         return handler.next(options);
       },
       onResponse: (response, handler) async {
-        var accessT = await isLoggedIn(); //TODO: touch up implemented
-        var refreshT = await storage.containsKey(key: "refreshToken");
+        var accessible = await isLoggedIn();
+        var refreshable = await storage.containsKey(key: "refreshToken");
 
-        if (response.statusCode == 401 && accessT && refreshT) {
+        if (response.statusCode == 401 && accessible && refreshable) {
           try {
             await refresh();
             return handler.next(await retry(response.requestOptions));
           } on NetworkException catch (e) {
             return handler.reject(e);
           }
-        } else if (response.statusCode == 401 && !accessT && refreshT) {
+        } else if (response.statusCode == 401 && !accessible && refreshable) {
           Get.offAllNamed("/login");
           await logout();
 
           return handler.reject(NetworkException._(
-            message: "인증이 만료되었습니다. 자동으로 로그아웃 됩니다.",
+            message: "인증이 만료되어 자동으로 로그아웃 합니다.",
             options: response.requestOptions,
           ));
         } else if (response.statusCode != 200 && response.statusCode != 201) {
@@ -379,8 +377,8 @@ class Client {
   Future<List<Control>> getControls({
     required String branchName,
     String? teacherID,
-    DateTime? startDate,
-    DateTime? endDate,
+    DateTime? controlStart,
+    DateTime? controlEnd,
     int? status,
   }) async {
     var response = await dio.post(
@@ -388,8 +386,8 @@ class Client {
       data: {
         "branchName": branchName,
         "teacherID": teacherID,
-        "startDate": startDate?.toIso8601String(),
-        "endDate": endDate?.toIso8601String(),
+        "controlStart": controlStart?.toIso8601String(),
+        "controlEnd": controlEnd?.toIso8601String(),
         "status": status,
       }..removeWhere((key, value) => value == null),
     );

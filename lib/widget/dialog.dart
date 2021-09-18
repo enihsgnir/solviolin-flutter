@@ -4,9 +4,18 @@ import 'package:get/get.dart';
 import 'package:solviolin_admin/util/constant.dart';
 
 Future showError(String message) {
+  var type = message.split(" ")[0];
+  //TODO: custom error message
+  //TODO: seperate util/error.dart
+
   if (message == "Null check operator used on a null value") {
-    message = "필수 항목을 입력하세요";
-  } //TODO: custom error message
+    message = "필수 항목을 입력하세요"; //CastError
+  } else if (type == "FormatException:") {
+    message = "입력값의 형식이 올바르지 않습니다";
+  } else if (type == "NoSuchMethodError:") {
+    message = "아래 메시지와 함께 관리자에게 문의하세요!\n" + message;
+  }
+  // message == "type 'int' is not a subtype of type 'double'") //TypeError
 
   return Get.dialog(
     CupertinoAlertDialog(
@@ -86,7 +95,6 @@ Future showMyDialog({
 
   if (isScrollable) {
     dialog = GestureDetector(
-      //TODO: Get.focusScope
       onTap: () => FocusScope.of(Get.overlayContext!).requestFocus(FocusNode()),
       child: SingleChildScrollView(
         child: dialog,
@@ -119,18 +127,16 @@ Future<void> showLoading(Future<void> Function() asyncFunction) {
 }
 
 Future<void> showMySnackbar({
-  String? title,
-  String? message,
+  String title = "성공",
+  required String message,
 }) async {
   return Get.snackbar(
     "",
     "",
-    titleText: title == null
-        ? null
-        : Text(
-            title,
-            style: TextStyle(color: Colors.white, fontSize: 24.r),
-          ),
-    messageText: message == null ? null : Text(message, style: contentStyle),
+    titleText: Text(
+      title,
+      style: TextStyle(color: Colors.white, fontSize: 24.r),
+    ),
+    messageText: Text(message, style: contentStyle),
   );
 }

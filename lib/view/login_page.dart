@@ -101,12 +101,18 @@ class _LoginPageState extends State<LoginPage> {
 
                     showLoading(() async {
                       try {
+                        _data.reset();
                         await getInitialData(false, id.text, pw.text);
                         if (_data.profile.userType == 2) {
                           Get.offAllNamed("/menu");
                         } else if (_data.profile.userType == 1) {
                           Get.offAllNamed("/menu-teacher");
                         }
+
+                        await showMySnackbar(
+                          title: "${_data.profile.userID}님",
+                          message: "환영합니다!",
+                        );
                       } catch (e) {
                         try {
                           await _client.logout();

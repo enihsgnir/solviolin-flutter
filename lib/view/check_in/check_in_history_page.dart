@@ -74,6 +74,13 @@ class _CheckInHistoryPageState extends State<CheckInHistoryPage> {
                       return primary != 0 ? primary : b.id.compareTo(a.id);
                     }); //TODO: touch up unnecessary body
                   _data.update();
+
+                  if (_data.checkInHistories.length == 0) {
+                    await showMySnackbar(
+                      title: "알림",
+                      message: "검색 조건에 해당하는 목록이 없습니다.",
+                    );
+                  }
                 } catch (e) {
                   showError(e.toString());
                 }

@@ -13,6 +13,7 @@ import 'package:solviolin_admin/view/canceled_page.dart';
 import 'package:solviolin_admin/view/check_in/check_in_history_page.dart';
 import 'package:solviolin_admin/view/check_in/check_in_page.dart';
 import 'package:solviolin_admin/view/control_page.dart';
+import 'package:solviolin_admin/view/for_teacher/canceled_for_teacher_page.dart';
 import 'package:solviolin_admin/view/for_teacher/main_for_teacher_page.dart';
 import 'package:solviolin_admin/view/for_teacher/menu_for_teacher_page.dart';
 import 'package:solviolin_admin/view/ledger_page.dart';
@@ -82,13 +83,15 @@ class _MyAppState extends State<MyApp> {
         GetPage(name: "/control", page: () => ControlPage()),
         GetPage(name: "/term", page: () => TermPage()),
         GetPage(name: "/teacher", page: () => TeacherPage()),
-        GetPage(name: "/teacher/canceled", page: () => CancelPage()),
+        GetPage(name: "/teacher/canceled", page: () => CanceledPage()),
         GetPage(name: "/teacher/salary", page: () => SalaryPage()),
         GetPage(name: "/ledger", page: () => LedgerPage()),
         GetPage(name: "/check-in", page: () => CheckInPage()),
         GetPage(name: "/check-in/history", page: () => CheckInHistoryPage()),
         GetPage(name: "/menu-teacher", page: () => MenuForTeacherPage()),
         GetPage(name: "/main-teacher", page: () => MainForTeacherPage()),
+        GetPage(
+            name: "/canceled-teacher", page: () => CanceledForTeacherPage()),
       ],
     );
   }

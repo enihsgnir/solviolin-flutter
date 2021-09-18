@@ -15,6 +15,8 @@ class TimeSlotForTeacher extends StatefulWidget {
 }
 
 class _TimeSlotForTeacherState extends State<TimeSlotForTeacher> {
+  var _data = Get.find<DataController>();
+
   var _calendar = Get.find<CalendarController>(tag: "/teacher");
 
   @override
@@ -49,6 +51,13 @@ class _TimeSlotForTeacherState extends State<TimeSlotForTeacher> {
                     displayDate: controller.displayDate,
                     teacherID: controller.profile.userID,
                   );
+
+                  if (_data.reservations.length == 0) {
+                    await showMySnackbar(
+                      title: "알림",
+                      message: "검색 조건에 해당하는 목록이 없습니다.",
+                    );
+                  }
                 } catch (e) {
                   showError(e.toString());
                 }

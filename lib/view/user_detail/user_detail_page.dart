@@ -84,7 +84,7 @@ class _UserDetailPageState extends State<UserDetailPage>
                                         await _client
                                             .updateEndDateAndDeleteLaterCourse(
                                           regular.id,
-                                          endDate: delete.date[0]!,
+                                          endDate: delete.dateTime[0]!,
                                         );
                                         await getUsersData(
                                           branchName: search.branchName,
@@ -98,6 +98,11 @@ class _UserDetailPageState extends State<UserDetailPage>
                                             search.userDetail!);
 
                                         Get.back();
+
+                                        await showMySnackbar(
+                                          message:
+                                              "정규 스케줄을 삭제하고 이후 모든 수업을 취소했습니다.",
+                                        );
                                       } catch (e) {
                                         showError(e.toString());
                                       }
@@ -236,7 +241,7 @@ class _UserDetailPageState extends State<UserDetailPage>
         try {
           await _client.registerLedger(
             userID: _data.regularSchedules[0].userID,
-            amount: int.parse(textEdit(expend.edit1)!),
+            amount: intEdit(expend.edit1)!,
             termID: expend.termID!,
             branchName: expend.branchName!,
           );
@@ -250,6 +255,10 @@ class _UserDetailPageState extends State<UserDetailPage>
           await getUserDetailData(search.userDetail!);
 
           Get.back();
+
+          await showMySnackbar(
+            message: "원비 납부 내역을 생성했습니다.",
+          );
         } catch (e) {
           showError(e.toString());
         }
@@ -282,7 +291,7 @@ class _UserDetailPageState extends State<UserDetailPage>
             userBranch: update.branchName,
             userPhone: textEdit(update.edit1),
             status: update.check[0],
-            userCredit: int.parse(textEdit(update.edit2)!),
+            userCredit: intEdit(update.edit2),
             userName: textEdit(update.edit3),
           );
 
@@ -296,6 +305,10 @@ class _UserDetailPageState extends State<UserDetailPage>
           await getUserDetailData(search.userDetail!);
 
           Get.back();
+
+          await showMySnackbar(
+            message: "유저 정보 수정에 성공했습니다.",
+          );
         } catch (e) {
           showError(e.toString());
         }

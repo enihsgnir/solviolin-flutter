@@ -23,6 +23,7 @@ class UserPage extends StatefulWidget {
 
 class _UserPageState extends State<UserPage> {
   var _client = Get.find<Client>();
+  var _data = Get.find<DataController>();
 
   var search = Get.find<CacheController>(tag: "/search/user");
   var register = Get.put(CacheController(), tag: "/register");
@@ -113,12 +114,14 @@ class _UserPageState extends State<UserPage> {
                     status: search.check[1],
                   );
 
-                  await showMySnackbar(
-                    title: "로딩 성공",
-                    message: "유저 목록을 불러왔습니다.",
-                  );
-
                   search.isSearched = true;
+
+                  if (_data.users.length == 0) {
+                    await showMySnackbar(
+                      title: "알림",
+                      message: "검색 조건에 해당하는 목록이 없습니다.",
+                    );
+                  }
                 } catch (e) {
                   showError(e.toString());
                 }
@@ -144,7 +147,7 @@ class _UserPageState extends State<UserPage> {
                     Text("유저 목록 파일 저장 경로"),
                     Text("\nAndroid: 내장 메모리/Android/data/"),
                     Text("/com.solviolin.solviolin_admin/files/"),
-                    Text("\niOS: 나의 iPhone (또는 나의 iPad)/"),
+                    Text("\niOS: 파일/나의 iPhone(iPad)/"),
                     Text("솔바이올린(관리자)/"),
                   ], //TODO:
                 ),
@@ -246,6 +249,10 @@ class _UserPageState extends State<UserPage> {
 
               Get.back();
               Get.back();
+
+              await showMySnackbar(
+                message: "신규 유저 등록에 성공했습니다.",
+              );
             } catch (e) {
               showError(e.toString());
             }

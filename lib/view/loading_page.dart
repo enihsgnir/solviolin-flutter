@@ -79,6 +79,11 @@ class _LoadingPageState extends State<LoadingPage> {
         } else if (_data.profile.userType == 1) {
           Get.offAllNamed("/menu-teacher");
         }
+
+        await showMySnackbar(
+          title: "${_data.profile.userID}님",
+          message: "환영합니다!",
+        );
       } catch (e) {
         try {
           await _client.logout();

@@ -283,15 +283,16 @@ Future<void> getUserDetailData(User user) async {
 Future<void> getControlsData({
   required String branchName,
   String? teacherID,
-  DateTime? startDate,
-  DateTime? endDate,
+  DateTime? controlStart,
+  DateTime? controlEnd,
   int? status,
 }) async {
   _data.controls = await _client.getControls(
     branchName: branchName,
     teacherID: teacherID,
-    startDate: startDate,
-    endDate: endDate?.add(const Duration(hours: 23, minutes: 59, seconds: 59)),
+    controlStart: controlStart,
+    controlEnd:
+        controlEnd?.add(const Duration(hours: 23, minutes: 59, seconds: 59)),
     status: status,
   )
     ..sort((a, b) => a.controlStart.compareTo(b.controlStart));

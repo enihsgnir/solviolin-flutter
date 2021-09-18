@@ -11,14 +11,14 @@ import 'package:solviolin_admin/widget/item_list.dart';
 import 'package:solviolin_admin/widget/search.dart';
 import 'package:solviolin_admin/widget/single.dart';
 
-class CancelPage extends StatefulWidget {
-  const CancelPage({Key? key}) : super(key: key);
+class CanceledPage extends StatefulWidget {
+  const CanceledPage({Key? key}) : super(key: key);
 
   @override
-  _CancelPageState createState() => _CancelPageState();
+  _CanceledPageState createState() => _CanceledPageState();
 }
 
-class _CancelPageState extends State<CancelPage> {
+class _CanceledPageState extends State<CanceledPage> {
   var _client = Get.find<Client>();
   var _data = Get.find<DataController>();
 
@@ -60,6 +60,13 @@ class _CancelPageState extends State<CancelPage> {
                       .getCanceledReservations(textEdit(search.edit1)!)
                     ..sort((a, b) => a.startDate.compareTo(b.startDate));
                   _data.update();
+
+                  if (_data.canceledReservations.length == 0) {
+                    await showMySnackbar(
+                      title: "알림",
+                      message: "검색 조건에 해당하는 목록이 없습니다.",
+                    );
+                  }
                 } catch (e) {
                   showError(e.toString());
                 }

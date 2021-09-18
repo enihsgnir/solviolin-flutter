@@ -62,12 +62,21 @@ class _SalaryPageState extends State<SalaryPage> {
                   _data.salaries = await _client.getSalaries(
                     branchName: search.branchName!,
                     termID: search.termID!,
-                    dayTimeCost: int.parse(textEdit(search.edit1)!),
-                    nightTimeCost: int.parse(textEdit(search.edit2)!),
+                    dayTimeCost: intEdit(search.edit1)!,
+                    nightTimeCost: intEdit(search.edit2)!,
                   );
                   _data.update();
+
+                  if (_data.salaries.length == 0) {
+                    await showMySnackbar(
+                      title: "알림",
+                      message: "검색 조건에 해당하는 목록이 없습니다.",
+                    );
+                  }
                 } catch (e) {
                   showError(e.toString());
+                  print(e.runtimeType);
+                  // showError(TypeError().toString());
                 }
               }),
             ),

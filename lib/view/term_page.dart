@@ -103,7 +103,14 @@ class _TermPageState extends State<TermPage> {
                               termEnd: update.date[1]!,
                             );
 
+                            _data.terms = await _client.getTerms(10);
+                            _data.update();
+
                             Get.back();
+
+                            await showMySnackbar(
+                              message: "학기 수정에 성공했습니다.",
+                            );
                           } catch (e) {
                             showError(e.toString());
                           }
@@ -156,6 +163,10 @@ class _TermPageState extends State<TermPage> {
           _data.update();
 
           Get.back();
+
+          await showMySnackbar(
+            message: "신규 학기 등록에 성공했습니다.",
+          );
         } catch (e) {
           showError(e.toString());
         }
@@ -204,6 +215,10 @@ class _TermPageState extends State<TermPage> {
           await _client.extendAllCoursesOfBranch(extend.branchName!);
 
           Get.back();
+
+          await showMySnackbar(
+            message: "해당 지점의 모든 수업을 다음 학기로 연장했습니다.",
+          );
         } catch (e) {
           showError(e.toString());
         }
@@ -225,6 +240,10 @@ class _TermPageState extends State<TermPage> {
           await _client.extendAllCoursesOfUser(textEdit(extend.edit1)!);
 
           Get.back();
+
+          await showMySnackbar(
+            message: "해당 수강생의 모든 수업을 다음 학기로 연장했습니다.",
+          );
         } catch (e) {
           showError(e.toString());
         }

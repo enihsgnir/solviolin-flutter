@@ -304,9 +304,9 @@ class _TimeSlotState extends State<TimeSlot> {
 
   Future _showReserveRegular(CalendarTapDetails details) {
     regular.reset();
+    regular.edit1.text = details.resource!.displayName;
 
     if (search.isSearched) {
-      regular.edit1.text = search.edit2.text;
       regular.branchName = search.branchName;
       regular.edit2.text = search.edit1.text;
     }
@@ -343,9 +343,9 @@ class _TimeSlotState extends State<TimeSlot> {
 
   Future _showMakeUpByAdmin(CalendarTapDetails details) {
     admin.reset();
+    admin.edit1.text = details.resource!.displayName;
 
     if (search.isSearched) {
-      admin.edit1.text = search.edit2.text;
       admin.branchName = search.branchName;
       admin.edit2.text = search.edit1.text;
     }
@@ -382,9 +382,9 @@ class _TimeSlotState extends State<TimeSlot> {
 
   Future _showFreeCourse(CalendarTapDetails details) {
     free.reset();
+    free.edit1.text = details.resource!.displayName;
 
     if (search.isSearched) {
-      free.edit1.text = search.edit2.text;
       free.branchName = search.branchName;
       free.edit2.text = search.edit1.text;
     }
@@ -426,6 +426,11 @@ class _TimeSlotState extends State<TimeSlot> {
         branchName: search.branchName!,
         userID: textEdit(search.edit1),
         teacherID: textEdit(search.edit2),
+      );
+    } else {
+      await showMySnackbar(
+        title: "알림",
+        message: "검색값이 없습니다.",
       );
     }
   }

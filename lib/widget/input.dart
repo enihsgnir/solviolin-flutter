@@ -22,7 +22,6 @@ Widget label(String item, bool isMandatory) {
   );
 }
 
-//TODO: FormatException when int.parse
 Widget myTextInput(
   String item,
   TextEditingController controller, [

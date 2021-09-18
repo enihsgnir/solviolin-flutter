@@ -48,11 +48,5 @@ String dowToString(int dow) {
 String? textEdit(TextEditingController edit) =>
     edit.text == "" ? null : edit.text;
 
-// TODO: unused
-int getFirstDayOffset(DateTime date) {
-  final weekdayFromMonday = DateTime(date.year, date.month).weekday - 1;
-  var firstDayOfWeekIndex = 0;
-  firstDayOfWeekIndex = (firstDayOfWeekIndex - 1) % 7;
-
-  return (weekdayFromMonday - firstDayOfWeekIndex) % 7;
-}
+int? intEdit(TextEditingController edit) =>
+    edit.text == "" ? null : int.parse(edit.text);

@@ -60,6 +60,10 @@ class _CheckInPageState extends State<CheckInPage> {
 
                       controller.stopCamera();
                       Get.back();
+
+                      await showMySnackbar(
+                        message: "체크인에 성공했습니다.",
+                      );
                     } catch (e) {
                       Get.snackbar(
                         "",

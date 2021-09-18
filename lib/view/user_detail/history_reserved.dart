@@ -119,6 +119,10 @@ class _HistoryReservedState extends State<HistoryReserved> {
 
                   await _getSearchedUsersData();
                   Get.back();
+
+                  await showMySnackbar(
+                    message: "수업을 취소했습니다.",
+                  );
                 } catch (e) {
                   showError(e.toString());
                 }
@@ -172,6 +176,10 @@ class _HistoryReservedState extends State<HistoryReserved> {
 
                   await _getSearchedUsersData();
                   Get.back();
+
+                  await showMySnackbar(
+                    message: "수강생의 권한으로 수업을 연장했습니다.",
+                  );
                 } catch (e) {
                   showError(e.toString());
                 }
@@ -188,6 +196,10 @@ class _HistoryReservedState extends State<HistoryReserved> {
 
                   await _getSearchedUsersData();
                   Get.back();
+
+                  await showMySnackbar(
+                    message: "관리자의 권한으로 카운트를 차감하여 수업을 연장했습니다.",
+                  );
                 } catch (e) {
                   showError(e.toString());
                 }
@@ -204,6 +216,10 @@ class _HistoryReservedState extends State<HistoryReserved> {
 
                   await _getSearchedUsersData();
                   Get.back();
+
+                  await showMySnackbar(
+                    message: "관리자의 권한으로 카운트를 미차감하여 수업을 연장했습니다.",
+                  );
                 } catch (e) {
                   showError(e.toString());
                 }

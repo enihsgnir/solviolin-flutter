@@ -20,9 +20,9 @@ class DataController extends GetxController {
 
   late Profile profile;
 
-  late List<Term> currentTerm;
+  List<Term> currentTerm = [];
   List<Term> terms = [];
-  late List<String> branches;
+  List<String> branches = [];
 
   DateTime displayDate = DateTime.now();
   List<TeacherInfo> teacherInfos = [];
@@ -30,10 +30,10 @@ class DataController extends GetxController {
   ReservationDataSource? reservationDataSource;
 
   List<User> users = [];
-  late List<RegularSchedule> regularSchedules;
-  late List<Reservation> thisMonthReservations;
-  late List<Reservation> lastMonthReservations;
-  late List<Change> changes;
+  List<RegularSchedule> regularSchedules = [];
+  List<Reservation> thisMonthReservations = [];
+  List<Reservation> lastMonthReservations = [];
+  List<Change> changes = [];
 
   List<Control> controls = [];
   List<Teacher> teachers = [];

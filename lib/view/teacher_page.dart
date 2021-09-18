@@ -23,6 +23,7 @@ class TeacherPage extends StatefulWidget {
 
 class _TeacherPageState extends State<TeacherPage> {
   var _client = Get.find<Client>();
+  var _data = Get.find<DataController>();
 
   var search = Get.find<CacheController>(tag: "/search/teacher");
   var register = Get.put(CacheController(), tag: "/register");
@@ -85,6 +86,13 @@ class _TeacherPageState extends State<TeacherPage> {
                   );
 
                   search.isSearched = true;
+
+                  if (_data.teachers.length == 0) {
+                    await showMySnackbar(
+                      title: "알림",
+                      message: "검색 조건에 해당하는 목록이 없습니다.",
+                    );
+                  }
                 } catch (e) {
                   showError(e.toString());
                 }
@@ -127,6 +135,10 @@ class _TeacherPageState extends State<TeacherPage> {
                         );
 
                         Get.back();
+
+                        await showMySnackbar(
+                          message: "강사 스케줄 삭제에 성공했습니다.",
+                        );
                       } catch (e) {
                         showError(e.toString());
                       }
@@ -191,6 +203,10 @@ class _TeacherPageState extends State<TeacherPage> {
           }
 
           Get.back();
+
+          await showMySnackbar(
+            message: "신규 강사 스케줄 등록에 성공했습니다.",
+          );
         } catch (e) {
           showError(e.toString());
         }

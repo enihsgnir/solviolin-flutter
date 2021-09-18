@@ -52,6 +52,10 @@ class _MainForTeacherPageState extends State<MainForTeacherPage> {
                     displayDate: _data.displayDate,
                     teacherID: _data.profile.userID,
                   );
+
+                  await showMySnackbar(
+                    message: "예약 목록을 불러왔습니다.",
+                  );
                 } catch (e) {
                   showError(e.toString());
                 }
@@ -83,16 +87,24 @@ class _MainForTeacherPageState extends State<MainForTeacherPage> {
                 );
 
                 if (newDate != null) {
-                  _data.updateDisplayDate(newDate);
                   _calendar.displayDate = newDate;
 
                   if (!isSameWeek(newDate, _data.displayDate)) {
+                    _data.updateDisplayDate(newDate);
+
                     showLoading(() async {
                       try {
                         await getReservationDataForTeacher(
                           displayDate: _data.displayDate,
                           teacherID: _data.profile.userID,
                         );
+
+                        if (_data.reservations.length == 0) {
+                          await showMySnackbar(
+                            title: "알림",
+                            message: "검색 조건에 해당하는 목록이 없습니다.",
+                          );
+                        }
                       } catch (e) {
                         showError(e.toString());
                       }
