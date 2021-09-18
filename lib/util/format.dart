@@ -41,3 +41,12 @@ String dowToString(int dow) {
 
   return days[dow]!;
 }
+
+// TODO: for getting first cell of calendar
+int getFirstDayOffset(DateTime date) {
+  final weekdayFromMonday = DateTime(date.year, date.month).weekday - 1;
+  var firstDayOfWeekIndex = 0;
+  firstDayOfWeekIndex = (firstDayOfWeekIndex - 1) % 7;
+
+  return (weekdayFromMonday - firstDayOfWeekIndex) % 7;
+}

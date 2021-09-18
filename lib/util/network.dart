@@ -10,8 +10,6 @@ import 'package:solviolin/model/reservation.dart';
 import 'package:solviolin/model/term.dart';
 import 'package:solviolin/util/format.dart';
 
-//TODO: add comments
-
 class Client {
   final dio = Dio();
   final storage = Get.find<FlutterSecureStorage>();
@@ -35,22 +33,22 @@ class Client {
         return handler.next(options);
       },
       onResponse: (response, handler) async {
-        var accessT = await isLoggedIn(); //TODO: touch up implemented
-        var refreshT = await storage.containsKey(key: "refreshToken");
+        var accessible = await isLoggedIn();
+        var refreshable = await storage.containsKey(key: "refreshToken");
 
-        if (response.statusCode == 401 && accessT && refreshT) {
+        if (response.statusCode == 401 && accessible && refreshable) {
           try {
             await refresh();
             return handler.next(await retry(response.requestOptions));
           } on NetworkException catch (e) {
             return handler.reject(e);
           }
-        } else if (response.statusCode == 401 && !accessT && refreshT) {
+        } else if (response.statusCode == 401 && !accessible && refreshable) {
           Get.offAllNamed("/login");
           await logout();
 
           return handler.reject(NetworkException._(
-            message: "인증이 만료되었습니다. 자동으로 로그아웃 됩니다.",
+            message: "인증이 만료되어 자동으로 로그아웃 합니다.",
             options: response.requestOptions,
           ));
         } else if (response.statusCode != 200 && response.statusCode != 201) {

@@ -10,8 +10,6 @@ import 'package:table_calendar/table_calendar.dart';
 Client _client = Get.find<Client>();
 DataController _data = Get.find<DataController>();
 
-//TODO: remove some unnecessary functions
-
 Future<void> getInitialData([
   bool isLoggedIn = true,
   String? userID,

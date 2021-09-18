@@ -162,7 +162,7 @@ class _CalendarReservedState extends State<CalendarReserved> {
     );
   }
 
-  //TODO: touch up detail colors
+  //TODO: color details later
   Color _getSelectedTextColor() {
     if (isSameDay(_selectedDay, todayKST)) {
       return Colors.black87;

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:solviolin/util/constant.dart';
+import 'package:solviolin/util/controller.dart';
 import 'package:solviolin/util/data_source.dart';
 import 'package:solviolin/util/network.dart';
 import 'package:solviolin/widget/dialog.dart';
@@ -14,6 +15,7 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
   var _client = Get.find<Client>();
+  var _data = Get.find<DataController>();
 
   var id = TextEditingController();
   var pw = TextEditingController();
@@ -99,6 +101,7 @@ class _LoginPageState extends State<LoginPage> {
 
                     showLoading(() async {
                       try {
+                        _data.reset();
                         await getInitialData(false, id.text, pw.text);
                         Get.offAllNamed("/main");
                       } catch (e) {
