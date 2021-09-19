@@ -28,76 +28,82 @@ class _HistoryReservedState extends State<HistoryReserved> {
 
   @override
   Widget build(BuildContext context) {
-    return GetBuilder<DataController>(
-      builder: (controller) {
-        return ListView.builder(
-          itemCount: widget.reservations.length,
-          itemBuilder: (context, index) {
-            var reservation = widget.reservations[index];
-
-            return mySlidableCard(
-              slideActions: [
-                mySlideAction(
-                  context: context,
-                  icon: CupertinoIcons.delete_left,
-                  item: "취소",
-                  onTap: () async {
-                    reservation.bookingStatus.abs() == 2
-                        ? showError("이미 취소된 수업입니다.")
-                        : await _showModalCancel(context, reservation);
-                  },
-                  borderRight: true,
-                ),
-                mySlideAction(
-                  context: context,
-                  icon: Icons.more_time,
-                  item: "연장",
-                  onTap: () async {
-                    reservation.bookingStatus.abs() == 3
-                        ? showError("이미 연장된 수업입니다.")
-                        : await _showModalExtend(context, reservation);
-                  },
-                  borderLeft: true,
-                ),
-              ],
+    return widget.reservations.length == 0
+        ? DefaultTextStyle(
+            style: TextStyle(color: Colors.red, fontSize: 20.r),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text(
-                  "${reservation.teacherID} / ${reservation.branchName}",
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 24.r,
-                    decoration: reservation.bookingStatus.abs() == 2
-                        ? TextDecoration.lineThrough
-                        : null,
-                  ),
-                ),
-                Text(
-                  DateFormat("yy/MM/dd HH:mm").format(reservation.startDate) +
-                      " ~ " +
-                      DateFormat("HH:mm").format(reservation.endDate),
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 24.r,
-                    decoration: reservation.bookingStatus.abs() == 2
-                        ? TextDecoration.lineThrough
-                        : null,
-                  ),
-                ),
-                Container(
-                  alignment: Alignment.centerRight,
-                  padding: EdgeInsets.only(right: 24.r),
-                  width: double.infinity,
-                  child: Text(
-                    _statusToString(reservation.bookingStatus),
-                    style: TextStyle(color: Colors.red, fontSize: 20.r),
-                  ),
-                ),
+                Text("예약내역을 조회할 수 없습니다."),
               ],
-            );
-          },
-        );
-      },
-    );
+            ),
+          )
+        : ListView.builder(
+            itemCount: widget.reservations.length,
+            itemBuilder: (context, index) {
+              var reservation = widget.reservations[index];
+
+              return mySlidableCard(
+                slideActions: [
+                  mySlideAction(
+                    context: context,
+                    icon: CupertinoIcons.delete_left,
+                    item: "취소",
+                    onTap: () async {
+                      reservation.bookingStatus.abs() == 2
+                          ? showError("이미 취소된 수업입니다.")
+                          : await _showModalCancel(context, reservation);
+                    },
+                    borderRight: true,
+                  ),
+                  mySlideAction(
+                    context: context,
+                    icon: Icons.more_time,
+                    item: "연장",
+                    onTap: () async {
+                      reservation.bookingStatus.abs() == 3
+                          ? showError("이미 연장된 수업입니다.")
+                          : await _showModalExtend(context, reservation);
+                    },
+                    borderLeft: true,
+                  ),
+                ],
+                children: [
+                  Text(
+                    "${reservation.teacherID} / ${reservation.branchName}",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 24.r,
+                      decoration: reservation.bookingStatus.abs() == 2
+                          ? TextDecoration.lineThrough
+                          : null,
+                    ),
+                  ),
+                  Text(
+                    DateFormat("yy/MM/dd HH:mm").format(reservation.startDate) +
+                        " ~ " +
+                        DateFormat("HH:mm").format(reservation.endDate),
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 24.r,
+                      decoration: reservation.bookingStatus.abs() == 2
+                          ? TextDecoration.lineThrough
+                          : null,
+                    ),
+                  ),
+                  Container(
+                    alignment: Alignment.centerRight,
+                    padding: EdgeInsets.only(right: 24.r),
+                    width: double.infinity,
+                    child: Text(
+                      _statusToString(reservation.bookingStatus),
+                      style: TextStyle(color: Colors.red, fontSize: 20.r),
+                    ),
+                  ),
+                ],
+              );
+            },
+          );
   }
 
   Future _showModalCancel(BuildContext context, Reservation reservation) {
@@ -124,8 +130,12 @@ class _HistoryReservedState extends State<HistoryReserved> {
                   await getReservedHistoryData();
 
                   Get.back();
+
+                  await showMySnackbar(
+                    message: "수업 취소에 성공했습니다.",
+                  );
                 } catch (e) {
-                  showError(e.toString());
+                  showError(e);
                 }
               }),
               isDestructiveAction: true,
@@ -167,8 +177,12 @@ class _HistoryReservedState extends State<HistoryReserved> {
                   await getReservedHistoryData();
 
                   Get.back();
+
+                  await showMySnackbar(
+                    message: "수업 연장에 성공했습니다.",
+                  );
                 } catch (e) {
-                  showError(e.toString());
+                  showError(e);
                 }
               }),
               child: Text("수업 연장", style: TextStyle(fontSize: 24.r)),

@@ -104,12 +104,17 @@ class _LoginPageState extends State<LoginPage> {
                         _data.reset();
                         await getInitialData(false, id.text, pw.text);
                         Get.offAllNamed("/main");
+
+                        await showMySnackbar(
+                          title: "${_data.profile.userID}님",
+                          message: "환영합니다!",
+                        );
                       } catch (e) {
                         try {
                           await _client.logout();
                         } catch (_) {
                         } finally {
-                          showError(e.toString());
+                          showError(e);
                           pw.text = "";
                         }
                       }

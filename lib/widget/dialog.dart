@@ -3,7 +3,18 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:solviolin/util/constant.dart';
 
-Future showError(String message) {
+Future showError(dynamic error) {
+  var message = error.toString();
+  if (error is CastError) {
+    message = "필수 항목을 입력하세요";
+  } else if (error is FormatException) {
+    message = "입력값의 형식이 올바르지 않습니다";
+  } else if (error is TypeError || error is NoSuchMethodError) {
+    message = "아래 메시지와 함께 관리자에게 문의하세요!\n" + message;
+  }
+  //TODO: custom error message
+  //TODO: seperate util/error.dart
+
   return Get.dialog(
     CupertinoAlertDialog(
       title: Text("Error", style: TextStyle(fontSize: 32.r)),
@@ -97,5 +108,20 @@ Future<void> showLoading(Future<void> Function() asyncFunction) {
     ),
     opacityColor: Colors.black12,
     opacity: 1,
+  );
+}
+
+Future<void> showMySnackbar({
+  String title = "성공",
+  required String message,
+}) async {
+  return Get.snackbar(
+    "",
+    "",
+    titleText: Text(
+      title,
+      style: TextStyle(color: Colors.white, fontSize: 24.r),
+    ),
+    messageText: Text(message, style: contentStyle),
   );
 }

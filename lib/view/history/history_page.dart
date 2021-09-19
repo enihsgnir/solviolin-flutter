@@ -111,24 +111,35 @@ class _HistoryPageState extends State<HistoryPage>
 
     return GetBuilder<DataController>(
       builder: (controller) {
-        return ListView.builder(
-          itemCount: controller.changes.length,
-          itemBuilder: (context, index) {
-            var change = controller.changes[index];
+        return controller.changes.length == 0
+            ? DefaultTextStyle(
+                style: TextStyle(color: Colors.red, fontSize: 20.r),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text("변경내역을 조회할 수 없습니다."),
+                  ],
+                ),
+              )
+            : ListView.builder(
+                itemCount: controller.changes.length,
+                itemBuilder: (context, index) {
+                  var change = controller.changes[index];
 
-            return myNormalCard(
-              children: [
-                Text("${change.teacherID} / ${change.branchName}"),
-                Text("변경 전: " +
-                    DateFormat("yy/MM/dd HH:mm").format(change.fromDate)),
-                Text(change.toDate == null
-                    ? "변경 사항이 없습니다."
-                    : "변경 후: " +
-                        DateFormat("yy/MM/dd HH:mm").format(change.toDate!)),
-              ],
-            );
-          },
-        );
+                  return myNormalCard(
+                    children: [
+                      Text("${change.teacherID} / ${change.branchName}"),
+                      Text("변경 전: " +
+                          DateFormat("yy/MM/dd HH:mm").format(change.fromDate)),
+                      Text(change.toDate == null
+                          ? "변경 사항이 없습니다."
+                          : "변경 후: " +
+                              DateFormat("yy/MM/dd HH:mm")
+                                  .format(change.toDate!)),
+                    ],
+                  );
+                },
+              );
       },
     );
   }
@@ -144,6 +155,10 @@ class _HistoryPageState extends State<HistoryPage>
         } catch (_) {
         } finally {
           Get.offAllNamed("/login");
+
+          await showMySnackbar(
+            message: "안전하게 로그아웃 되었습니다.",
+          );
         }
       }),
     );

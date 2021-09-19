@@ -37,7 +37,7 @@ class _UserProfileState extends State<UserProfile> {
                         await getReservedHistoryData();
                         Get.toNamed("/history");
                       } catch (e) {
-                        showError(e.toString());
+                        showError(e);
                       }
                     }),
                     child: GetBuilder<DataController>(
@@ -69,7 +69,7 @@ class _UserProfileState extends State<UserProfile> {
                         await getReservedHistoryData();
                         Get.toNamed("/history");
                       } catch (e) {
-                        showError(e.toString());
+                        showError(e);
                       }
                     }),
                     child: Icon(

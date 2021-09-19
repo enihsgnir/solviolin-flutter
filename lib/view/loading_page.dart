@@ -75,13 +75,18 @@ class _LoadingPageState extends State<LoadingPage> {
       try {
         await getInitialData();
         Get.offAllNamed("/main");
+
+        await showMySnackbar(
+          title: "${_data.profile.userID}님",
+          message: "환영합니다!",
+        );
       } catch (e) {
         try {
           await _client.logout();
         } catch (_) {
         } finally {
           Get.offAllNamed("/login");
-          showError(e.toString());
+          showError(e);
         }
       }
     } else {

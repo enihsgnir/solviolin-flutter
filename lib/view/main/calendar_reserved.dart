@@ -128,7 +128,7 @@ class _CalendarReservedState extends State<CalendarReserved> {
                     events = getEvents();
                   });
                 } catch (e) {
-                  showError(e.toString());
+                  showError(e);
                 }
               });
             }
@@ -151,7 +151,7 @@ class _CalendarReservedState extends State<CalendarReserved> {
                   events = getEvents();
                 });
               } catch (e) {
-                showError(e.toString());
+                showError(e);
               }
             });
 

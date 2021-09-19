@@ -115,8 +115,12 @@ class _GridAvailableState extends State<GridAvailable> {
                   await getChangedPageData(_data.focusedDay);
 
                   Get.back();
+
+                  await showMySnackbar(
+                    message: "수업 예약에 성공했습니다.",
+                  );
                 } catch (e) {
-                  showError(e.toString());
+                  showError(e);
                 }
               }),
               child: Text("예약", style: TextStyle(fontSize: 24.r)),
