@@ -72,8 +72,10 @@ class _CheckInHistoryPageState extends State<CheckInHistoryPage> {
                       var primary = b.createdAt.compareTo(a.createdAt);
 
                       return primary != 0 ? primary : b.id.compareTo(a.id);
-                    }); //TODO: touch up unnecessary body
+                    });
                   _data.update();
+
+                  search.isSearched = true;
 
                   if (_data.checkInHistories.length == 0) {
                     await showMySnackbar(
@@ -82,7 +84,7 @@ class _CheckInHistoryPageState extends State<CheckInHistoryPage> {
                     );
                   }
                 } catch (e) {
-                  showError(e.toString());
+                  showError(e);
                 }
               }),
             ),

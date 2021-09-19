@@ -112,7 +112,7 @@ class _TermPageState extends State<TermPage> {
                               message: "학기 수정에 성공했습니다.",
                             );
                           } catch (e) {
-                            showError(e.toString());
+                            showError(e);
                           }
                         }),
                       );
@@ -168,7 +168,7 @@ class _TermPageState extends State<TermPage> {
             message: "신규 학기 등록에 성공했습니다.",
           );
         } catch (e) {
-          showError(e.toString());
+          showError(e);
         }
       }),
       action: "등록",
@@ -220,7 +220,7 @@ class _TermPageState extends State<TermPage> {
             message: "해당 지점의 모든 수업을 다음 학기로 연장했습니다.",
           );
         } catch (e) {
-          showError(e.toString());
+          showError(e);
         }
       }),
       action: "등록",
@@ -245,7 +245,7 @@ class _TermPageState extends State<TermPage> {
             message: "해당 수강생의 모든 수업을 다음 학기로 연장했습니다.",
           );
         } catch (e) {
-          showError(e.toString());
+          showError(e);
         }
       }),
       action: "등록",

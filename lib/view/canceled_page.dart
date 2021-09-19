@@ -61,6 +61,8 @@ class _CanceledPageState extends State<CanceledPage> {
                     ..sort((a, b) => a.startDate.compareTo(b.startDate));
                   _data.update();
 
+                  search.isSearched = true;
+
                   if (_data.canceledReservations.length == 0) {
                     await showMySnackbar(
                       title: "알림",
@@ -68,7 +70,7 @@ class _CanceledPageState extends State<CanceledPage> {
                     );
                   }
                 } catch (e) {
-                  showError(e.toString());
+                  showError(e);
                 }
               }),
             ),

@@ -24,7 +24,7 @@ class Canceled {
       userID: json["userID"],
       teacherID: json["teacherID"],
       branchName: json["branchName"],
-      toID: List<int>.generate(
+      toID: List.generate(
         json["linkFrom"].length,
         (index) => json["linkFrom"][index]["toID"],
       ),

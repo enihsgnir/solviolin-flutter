@@ -3,19 +3,17 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:solviolin_admin/util/constant.dart';
 
-Future showError(String message) {
-  var type = message.split(" ")[0];
-  //TODO: custom error message
-  //TODO: seperate util/error.dart
-
-  if (message == "Null check operator used on a null value") {
-    message = "필수 항목을 입력하세요"; //CastError
-  } else if (type == "FormatException:") {
+Future showError(dynamic error) {
+  var message = error.toString();
+  if (error is CastError) {
+    message = "필수 항목을 입력하세요";
+  } else if (error is FormatException) {
     message = "입력값의 형식이 올바르지 않습니다";
-  } else if (type == "NoSuchMethodError:") {
+  } else if (error is TypeError || error is NoSuchMethodError) {
     message = "아래 메시지와 함께 관리자에게 문의하세요!\n" + message;
   }
-  // message == "type 'int' is not a subtype of type 'double'") //TypeError
+  //TODO: custom error message
+  //TODO: seperate util/error.dart
 
   return Get.dialog(
     CupertinoAlertDialog(

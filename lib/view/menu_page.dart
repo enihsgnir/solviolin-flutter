@@ -2,7 +2,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:solviolin_admin/util/controller.dart';
-import 'package:solviolin_admin/util/data_source.dart';
 import 'package:solviolin_admin/util/format.dart';
 import 'package:solviolin_admin/util/network.dart';
 import 'package:solviolin_admin/widget/dialog.dart';
@@ -30,14 +29,14 @@ class _MenuPageState extends State<MenuPage> {
 
   @override
   Widget build(BuildContext context) {
-    Get.put(CacheController(), tag: "/search/main");
+    var main = Get.put(CacheController(), tag: "/search/main");
     var user = Get.put(CacheController(), tag: "/search/user");
-    Get.put(CacheController(), tag: "/search/control");
-    Get.put(CacheController(), tag: "/search/teacher");
+    var control = Get.put(CacheController(), tag: "/search/control");
+    var teacher = Get.put(CacheController(), tag: "/search/teacher");
     Get.put(CacheController(), tag: "/search/canceled");
-    Get.put(CacheController(), tag: "/search/salary");
-    Get.put(CacheController(), tag: "/search/ledger");
-    Get.put(CacheController(), tag: "/search/check-in");
+    var salary = Get.put(CacheController(), tag: "/search/salary");
+    var ledger = Get.put(CacheController(), tag: "/search/ledger");
+    var checkIn = Get.put(CacheController(), tag: "/search/check-in");
 
     return Scaffold(
       resizeToAvoidBottomInset: false,
@@ -46,29 +45,128 @@ class _MenuPageState extends State<MenuPage> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              menu("메인", () => Get.toNamed("/main")),
-              menu("유저", () async {
-                if (user.isSearched) {
-                  await getUsersData(
-                    branchName: user.branchName,
-                    userID: textEdit(user.edit1),
-                    isPaid: user.check[0],
-                    userType: UserType.values.indexOf(user.type[UserType]),
-                    status: user.check[1],
-                  );
-                }
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  menu("예약 슬롯", () async {
+                    Get.toNamed("/main");
 
-                Get.toNamed("/user");
-              }),
-              menu("오픈/클로즈", () => Get.toNamed("/control")),
-              menu("학기", () => Get.toNamed("/term")),
-              menu("강사 세부", () => Get.toNamed("/teacher")),
-              menu("지점 등록", _showBranchRegister),
-              menu("매출", () => Get.toNamed("/ledger")),
-              menu("체크인", () => Get.toNamed("/check-in")),
-              menu("체크인 이력", () => Get.toNamed("/check-in/history")),
-              menu("로그아웃", _showLogout, true),
-            ], //TODO: touch up number of menus, especially branch-register
+                    if (main.isSearched) {
+                      await showMySnackbar(
+                        title: "알림",
+                        message: "검색 기록이 존재합니다. 재검색을 시도하세요.",
+                      );
+                    } else {
+                      main.branchName = _data.profile.branchName;
+                    }
+                  }),
+                  menu("유저 검색", () async {
+                    Get.toNamed("/user");
+
+                    if (user.isSearched) {
+                      await showMySnackbar(
+                        title: "알림",
+                        message: "검색 기록이 존재합니다. 재검색을 시도하세요.",
+                      );
+                    } else {
+                      user.branchName = _data.profile.branchName;
+                    }
+                  }),
+                ],
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  menu("학기", () => Get.toNamed("/term")),
+                  menu("매출", () async {
+                    Get.toNamed("/ledger");
+
+                    if (ledger.isSearched) {
+                      await showMySnackbar(
+                        title: "알림",
+                        message: "검색 기록이 존재합니다. 재검색을 시도하세요.",
+                      );
+                    } else {
+                      ledger.branchName = _data.profile.branchName;
+                      ledger.termID = _data.currentTerm[0].id;
+                    }
+                  }),
+                ],
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  menu("강사 스케줄", () async {
+                    Get.toNamed("/teacher");
+
+                    if (teacher.isSearched) {
+                      await showMySnackbar(
+                        title: "알림",
+                        message: "검색 기록이 존재합니다. 재검색을 시도하세요.",
+                      );
+                    } else {
+                      teacher.branchName = _data.profile.branchName;
+                    }
+                  }),
+                  menu("오픈/클로즈", () async {
+                    Get.toNamed("/control");
+
+                    if (control.isSearched) {
+                      await showMySnackbar(
+                        title: "알림",
+                        message: "검색 기록이 존재합니다. 재검색을 시도하세요.",
+                      );
+                    } else {
+                      control.branchName = _data.profile.branchName;
+                    }
+                  }),
+                ],
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  menu("취소 내역", () => Get.toNamed("/teacher/canceled")),
+                  menu("급여 계산", () async {
+                    Get.toNamed("/teacher/salary");
+
+                    if (salary.isSearched) {
+                      await showMySnackbar(
+                        title: "알림",
+                        message: "검색 기록이 존재합니다. 재검색을 시도하세요.",
+                      );
+                    } else {
+                      salary.branchName = _data.profile.branchName;
+                      salary.termID = _data.currentTerm[0].id;
+                    }
+                  }),
+                ],
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  menu("체크인", () => Get.toNamed("/check-in")),
+                  menu("체크인 이력", () async {
+                    Get.toNamed("/check-in/history");
+
+                    if (checkIn.isSearched) {
+                      await showMySnackbar(
+                        title: "알림",
+                        message: "검색 기록이 존재합니다. 재검색을 시도하세요.",
+                      );
+                    } else {
+                      checkIn.branchName = _data.profile.branchName;
+                    }
+                  }),
+                ],
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  menu("지점 등록", _showBranchRegister),
+                  menu("로그아웃", _showLogout, true),
+                ],
+              ),
+            ],
           ),
         ),
       ),
@@ -95,7 +193,7 @@ class _MenuPageState extends State<MenuPage> {
             message: "신규 지점 등록에 성공했습니다.",
           );
         } catch (e) {
-          showError(e.toString());
+          showError(e);
         }
       }),
       action: "등록",

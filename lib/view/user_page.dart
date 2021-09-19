@@ -33,7 +33,7 @@ class _UserPageState extends State<UserPage> {
     return GestureDetector(
       onTap: () => FocusScope.of(context).requestFocus(FocusNode()),
       child: Scaffold(
-        appBar: myAppBar("유저"),
+        appBar: myAppBar("유저 검색"),
         body: SafeArea(
           child: Column(
             children: [
@@ -56,36 +56,8 @@ class _UserPageState extends State<UserPage> {
   Widget _userSearch() {
     return mySearch(
       contents: [
-        Row(
-          children: [
-            myTextInput("이름", search.edit1),
-            myActionButton(
-              context: context,
-              onPressed: () => showLoading(() async {
-                try {
-                  await saveUsersData(
-                    branchName: search.branchName,
-                    userID: textEdit(search.edit1),
-                    isPaid: search.check[0],
-                    userType: UserType.values.indexOf(search.type[UserType]),
-                    status: search.check[1],
-                  );
-                } catch (e) {
-                  showError(e.toString());
-                }
-              }),
-              action: "저장",
-            ),
-          ],
-        ),
+        myTextInput("이름", search.edit1),
         branchDropdown("/search/user"),
-        myCheckBox(
-          tag: "/search/user",
-          index: 0,
-          item: "결제 여부",
-          trueName: "완료",
-          falseName: "미완료",
-        ),
         myRadio<UserType>(
           tag: "/search/user",
           item: "구분",
@@ -101,6 +73,34 @@ class _UserPageState extends State<UserPage> {
               item: "등록 여부",
               trueName: "등록",
               falseName: "미등록",
+            ),
+            myActionButton(
+              context: context,
+              onPressed: () => showLoading(() async {
+                try {
+                  await saveUsersData(
+                    branchName: search.branchName,
+                    userID: textEdit(search.edit1),
+                    isPaid: search.check[0],
+                    userType: UserType.values.indexOf(search.type[UserType]),
+                    status: search.check[1],
+                  );
+                } catch (e) {
+                  showError(e);
+                }
+              }),
+              action: "저장",
+            ),
+          ],
+        ),
+        Row(
+          children: [
+            myCheckBox(
+              tag: "/search/user",
+              index: 0,
+              item: "결제 여부",
+              trueName: "완료",
+              falseName: "미완료",
             ),
             myActionButton(
               context: context,
@@ -123,7 +123,7 @@ class _UserPageState extends State<UserPage> {
                     );
                   }
                 } catch (e) {
-                  showError(e.toString());
+                  showError(e);
                 }
               }),
             ),
@@ -144,7 +144,9 @@ class _UserPageState extends State<UserPage> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text("유저 목록 파일 저장 경로"),
+                    Text("목록은 검색 입력값을 기반으로 저장됩니다."),
+                    Text("저장하기 전 검색을 권장합니다."),
+                    Text("\n유저 목록 파일 저장 경로"),
                     Text("\nAndroid: 내장 메모리/Android/data/"),
                     Text("/com.solviolin.solviolin_admin/files/"),
                     Text("\niOS: 파일/나의 iPhone(iPad)/"),
@@ -165,7 +167,7 @@ class _UserPageState extends State<UserPage> {
                         Text(_parsePhoneNumber(user.userPhone)),
                         Text("${user.status == 0 ? "미등록" : "등록"}" +
                             " / 크레딧: ${user.userCredit}"),
-                        Text("결제일: ${_ledgerToString(user.paidAt)}"),
+                        Text(_ledgerToString(user.paidAt)),
                       ],
                     ),
                     onTap: () {
@@ -177,7 +179,7 @@ class _UserPageState extends State<UserPage> {
                           search.userDetail = user;
                           Get.toNamed("/user/detail");
                         } catch (e) {
-                          showError(e.toString());
+                          showError(e);
                         }
                       });
                     },
@@ -200,6 +202,7 @@ class _UserPageState extends State<UserPage> {
         myTextInput("이름", register.edit3, "이름을 입력하세요!"),
         myTextInput(
             "전화번호", register.edit4, "전화번호를 입력하세요!", TextInputType.number),
+        branchDropdown("/register", "지점을 선택하세요!"),
         myRadio<UserType>(
           tag: "/register",
           item: "구분",
@@ -207,7 +210,6 @@ class _UserPageState extends State<UserPage> {
           values: UserType.values,
           groupValue: UserType.student,
         ),
-        branchDropdown("/register", "지점을 선택하세요!"),
       ],
       onPressed: () {
         FocusScope.of(context).requestFocus(FocusNode());
@@ -251,10 +253,10 @@ class _UserPageState extends State<UserPage> {
               Get.back();
 
               await showMySnackbar(
-                message: "신규 유저 등록에 성공했습니다.",
+                message: "유저 신규 등록에 성공했습니다.",
               );
             } catch (e) {
-              showError(e.toString());
+              showError(e);
             }
           }),
         );
@@ -287,5 +289,5 @@ String _parsePhoneNumber(String phone) {
 }
 
 String _ledgerToString(List<DateTime> paidAt) => paidAt.length == 0
-    ? "결제 기록 없음"
-    : DateFormat("yy/MM/dd HH:mm").format(paidAt[0]);
+    ? "이번 학기 결제 미완료"
+    : "결제일: " + DateFormat("yy/MM/dd HH:mm").format(paidAt[0]);

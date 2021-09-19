@@ -49,14 +49,14 @@ class _MainPageState extends State<MainPage> {
       child: Scaffold(
         resizeToAvoidBottomInset: false,
         appBar: myAppBar(
-          "메인",
+          "예약 슬롯",
           actions: [
             IconButton(
               onPressed: () => showLoading(() async {
                 try {
                   await _getSearchedReservationsData();
                 } catch (e) {
-                  showError(e.toString());
+                  showError(e);
                 }
               }),
               icon: Icon(CupertinoIcons.refresh, size: 24.r),
@@ -99,7 +99,7 @@ class _MainPageState extends State<MainPage> {
                       try {
                         await _getSearchedReservationsData();
                       } catch (e) {
-                        showError(e.toString());
+                        showError(e);
                       }
                     });
                   }
@@ -146,7 +146,7 @@ class _MainPageState extends State<MainPage> {
             );
           }
         } catch (e) {
-          showError(e.toString());
+          showError(e);
         }
       }),
       action: "검색",

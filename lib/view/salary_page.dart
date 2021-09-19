@@ -67,6 +67,8 @@ class _SalaryPageState extends State<SalaryPage> {
                   );
                   _data.update();
 
+                  search.isSearched = true;
+
                   if (_data.salaries.length == 0) {
                     await showMySnackbar(
                       title: "알림",
@@ -74,9 +76,7 @@ class _SalaryPageState extends State<SalaryPage> {
                     );
                   }
                 } catch (e) {
-                  showError(e.toString());
-                  print(e.runtimeType);
-                  // showError(TypeError().toString());
+                  showError(e);
                 }
               }),
             ),

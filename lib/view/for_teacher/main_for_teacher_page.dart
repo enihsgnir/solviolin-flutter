@@ -57,7 +57,7 @@ class _MainForTeacherPageState extends State<MainForTeacherPage> {
                     message: "예약 목록을 불러왔습니다.",
                   );
                 } catch (e) {
-                  showError(e.toString());
+                  showError(e);
                 }
               }),
               icon: Icon(CupertinoIcons.refresh, size: 24.r),
@@ -106,7 +106,7 @@ class _MainForTeacherPageState extends State<MainForTeacherPage> {
                           );
                         }
                       } catch (e) {
-                        showError(e.toString());
+                        showError(e);
                       }
                     });
                   }

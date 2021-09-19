@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
@@ -34,11 +35,12 @@ class _UserDetailPageState extends State<UserDetailPage>
   var delete = Get.put(CacheController(), tag: "/delete");
   var expend = Get.put(CacheController(), tag: "/expend");
   var update = Get.put(CacheController(), tag: "/update");
+  var reset = Get.put(CacheController(), tag: "/reset");
 
   @override
   void initState() {
     super.initState();
-    tabController = TabController(initialIndex: 1, length: 3, vsync: this);
+    tabController = TabController(initialIndex: 1, length: 4, vsync: this);
   }
 
   @override
@@ -72,6 +74,8 @@ class _UserDetailPageState extends State<UserDetailPage>
                                   showMyDialog(
                                     title: "정규 종료",
                                     contents: [
+                                      Text("정규 스케줄을 종료하고"),
+                                      Text("종료일 이후 모든 수업을 삭제합니다."),
                                       pickDateTime(
                                         context: context,
                                         item: "종료일",
@@ -104,7 +108,7 @@ class _UserDetailPageState extends State<UserDetailPage>
                                               "정규 스케줄을 삭제하고 이후 모든 수업을 취소했습니다.",
                                         );
                                       } catch (e) {
-                                        showError(e.toString());
+                                        showError(e);
                                       }
                                     }),
                                   );
@@ -139,7 +143,28 @@ class _UserDetailPageState extends State<UserDetailPage>
                             "원비납부",
                             style: TextStyle(
                               color: Colors.white,
-                              fontSize: 28.r,
+                              fontSize: 26.r,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                      child: Container(
+                        width: double.infinity,
+                        decoration: BoxDecoration(
+                          border: Border(
+                            left: BorderSide(color: Colors.grey, width: 0.5.r),
+                            right: BorderSide(color: Colors.grey, width: 0.5.r),
+                          ),
+                        ),
+                        child: TextButton(
+                          onPressed: _showUpdate,
+                          child: Text(
+                            "정보수정",
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 26.r,
                             ),
                           ),
                         ),
@@ -154,12 +179,12 @@ class _UserDetailPageState extends State<UserDetailPage>
                           ),
                         ),
                         child: TextButton(
-                          onPressed: _showUpdate,
+                          onPressed: _showReset,
                           child: Text(
-                            "정보수정",
+                            "PW초기화",
                             style: TextStyle(
                               color: Colors.white,
-                              fontSize: 28.r,
+                              fontSize: 26.r,
                             ),
                           ),
                         ),
@@ -172,13 +197,16 @@ class _UserDetailPageState extends State<UserDetailPage>
                   controller: tabController,
                   tabs: [
                     Tab(
-                      child: Text("지난 달", style: TextStyle(fontSize: 28.r)),
+                      child: Text("지난 달", style: TextStyle(fontSize: 22.r)),
                     ),
                     Tab(
-                      child: Text("이번 달", style: TextStyle(fontSize: 28.r)),
+                      child: Text("이번 달", style: TextStyle(fontSize: 22.r)),
                     ),
                     Tab(
-                      child: Text("변경 내역", style: TextStyle(fontSize: 28.r)),
+                      child: Text("변경내역", style: TextStyle(fontSize: 22.r)),
+                    ),
+                    Tab(
+                      child: Text("납부내역", style: TextStyle(fontSize: 22.r)),
                     ),
                   ],
                 ),
@@ -190,6 +218,7 @@ class _UserDetailPageState extends State<UserDetailPage>
                       HistoryReserved(controller.lastMonthReservations),
                       HistoryReserved(controller.thisMonthReservations),
                       _changedList(),
+                      _paidList(),
                     ],
                   ),
                 ),
@@ -204,24 +233,116 @@ class _UserDetailPageState extends State<UserDetailPage>
   Widget _changedList() {
     return GetBuilder<DataController>(
       builder: (controller) {
-        return ListView.builder(
-          itemCount: controller.changes.length,
-          itemBuilder: (context, index) {
-            var change = controller.changes[index];
+        return controller.changes.length == 0
+            ? DefaultTextStyle(
+                style: TextStyle(color: Colors.red, fontSize: 20.r),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text("변경내역을 조회할 수 없습니다."),
+                  ],
+                ),
+              )
+            : ListView.builder(
+                itemCount: controller.changes.length,
+                itemBuilder: (context, index) {
+                  var change = controller.changes[index];
 
-            return myNormalCard(
-              children: [
-                Text("${change.teacherID} / ${change.branchName}"),
-                Text("변경 전: " +
-                    DateFormat("yy/MM/dd HH:mm").format(change.fromDate)),
-                Text(change.toDate == null
-                    ? "변경 사항이 없습니다."
-                    : "변경 후: " +
-                        DateFormat("yy/MM/dd HH:mm").format(change.toDate!)),
-              ],
-            );
-          },
-        );
+                  return myNormalCard(
+                    children: [
+                      Text("${change.teacherID} / ${change.branchName}"),
+                      Text("변경 전: " +
+                          DateFormat("yy/MM/dd HH:mm").format(change.fromDate)),
+                      Text(change.toDate == null
+                          ? "변경 사항이 없습니다."
+                          : "변경 후: " +
+                              DateFormat("yy/MM/dd HH:mm")
+                                  .format(change.toDate!)),
+                    ],
+                  );
+                },
+              );
+      },
+    );
+  }
+
+  Widget _paidList() {
+    return GetBuilder<DataController>(
+      builder: (controller) {
+        return controller.myLedgers.length == 0
+            ? DefaultTextStyle(
+                style: TextStyle(color: Colors.red, fontSize: 20.r),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text("납부내역을 조회할 수 없습니다."),
+                  ],
+                ),
+              )
+            : ListView.builder(
+                itemCount: controller.myLedgers.length,
+                itemBuilder: (context, index) {
+                  var ledger = controller.myLedgers[index];
+
+                  var _termIndex = controller.terms
+                      .indexWhere((element) => ledger.termID == element.id);
+                  var _termString = _termIndex < 0
+                      ? DateFormat("yy/MM/dd")
+                              .format(controller.terms.last.termStart) +
+                          " 이전"
+                      : DateFormat("yy/MM/dd")
+                              .format(controller.terms[_termIndex].termStart) +
+                          " ~ " +
+                          DateFormat("yy/MM/dd")
+                              .format(controller.terms[_termIndex].termEnd);
+
+                  return mySlidableCard(
+                    slideActions: [
+                      mySlideAction(
+                        context: context,
+                        icon: CupertinoIcons.delete,
+                        item: "삭제",
+                        onTap: () => showMyDialog(
+                          title: "매출 내역 삭제",
+                          contents: [
+                            Text("정말 삭제하시겠습니까?"),
+                          ],
+                          onPressed: () => showLoading(() async {
+                            try {
+                              await _client.deleteLedger(ledger.id);
+
+                              await getUsersData(
+                                branchName: search.branchName,
+                                userID: textEdit(search.edit1),
+                                isPaid: search.check[0],
+                                userType: UserType.values
+                                    .indexOf(search.type[UserType]),
+                                status: search.check[1],
+                              );
+                              await getUserDetailData(search.userDetail!);
+
+                              Get.back();
+
+                              await showMySnackbar(
+                                message: "매출 내역 삭제에 성공했습니다.",
+                              );
+                            } catch (e) {
+                              showError(e);
+                            }
+                          }),
+                        ),
+                      ),
+                    ],
+                    children: [
+                      Text("${ledger.userID} / ${ledger.branchName} / " +
+                          NumberFormat("#,###원").format(ledger.amount)),
+                      Text("학기: " + _termString),
+                      Text("결제일자: " +
+                          DateFormat("yy/MM/dd HH:mm").format(ledger.paidAt)),
+                    ],
+                  );
+                },
+              );
       },
     );
   }
@@ -260,7 +381,7 @@ class _UserDetailPageState extends State<UserDetailPage>
             message: "원비 납부 내역을 생성했습니다.",
           );
         } catch (e) {
-          showError(e.toString());
+          showError(e);
         }
       }),
       isScrollable: true,
@@ -273,16 +394,16 @@ class _UserDetailPageState extends State<UserDetailPage>
     return showMyDialog(
       title: "정보수정",
       contents: [
-        branchDropdown("/update"),
+        myTextInput("이름", update.edit3),
         myTextInput("전화번호", update.edit1, null, TextInputType.number),
+        myTextInput("크레딧", update.edit2, null, TextInputType.number),
+        branchDropdown("/update"),
         myCheckBox(
           tag: "/update",
           item: "등록 여부",
           trueName: "등록",
           falseName: "미등록",
         ),
-        myTextInput("크레딧", update.edit2, null, TextInputType.number),
-        myTextInput("이름", update.edit3),
       ],
       onPressed: () => showLoading(() async {
         try {
@@ -310,7 +431,45 @@ class _UserDetailPageState extends State<UserDetailPage>
             message: "유저 정보 수정에 성공했습니다.",
           );
         } catch (e) {
-          showError(e.toString());
+          showError(e);
+        }
+      }),
+      isScrollable: true,
+    );
+  }
+
+  Future _showReset() {
+    reset.reset();
+
+    return showMyDialog(
+      title: "비밀번호 초기화",
+      contents: [
+        Text("${search.userDetail!.userID} 계정의 비밀번호를 새로 설정합니다."),
+        myTextInput("비밀번호", reset.edit1, "새로운 비밀번호를 입력하세요!"),
+      ],
+      onPressed: () => showLoading(() async {
+        try {
+          await _client.resetPassword(
+            userID: search.userDetail!.userID,
+            userPassword: textEdit(reset.edit1)!,
+          );
+
+          await getUsersData(
+            branchName: search.branchName,
+            userID: textEdit(search.edit1),
+            isPaid: search.check[0],
+            userType: UserType.values.indexOf(search.type[UserType]),
+            status: search.check[1],
+          );
+          await getUserDetailData(search.userDetail!);
+
+          Get.back();
+
+          await showMySnackbar(
+            message: "비밀번호 초기화에 성공했습니다.",
+          );
+        } catch (e) {
+          showError(e);
         }
       }),
       isScrollable: true,

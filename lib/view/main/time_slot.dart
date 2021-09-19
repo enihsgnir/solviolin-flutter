@@ -40,7 +40,6 @@ class _TimeSlotState extends State<TimeSlot> {
           controller: _calendar,
           onTap: (details) async {
             if (!search.isSearched && !search.hasBeenShown) {
-              // await showError("필터를 사용하여 예약을 검색할 수 있습니다");
               await showMySnackbar(
                 title: "팁",
                 message: "필터를 사용하여 예약을 검색할 수 있습니다",
@@ -73,7 +72,7 @@ class _TimeSlotState extends State<TimeSlot> {
                 try {
                   await _getSearchedReservationsData();
                 } catch (e) {
-                  showError(e.toString());
+                  showError(e);
                 }
               });
             }
@@ -159,7 +158,7 @@ class _TimeSlotState extends State<TimeSlot> {
           await _getSearchedReservationsData();
           Get.back();
         } catch (e) {
-          showError(e.toString());
+          showError(e);
         }
       }),
     );
@@ -178,7 +177,7 @@ class _TimeSlotState extends State<TimeSlot> {
           await _getSearchedReservationsData();
           Get.back();
         } catch (e) {
-          showError(e.toString());
+          showError(e);
         }
       }),
     );
@@ -197,7 +196,7 @@ class _TimeSlotState extends State<TimeSlot> {
           await _getSearchedReservationsData();
           Get.back();
         } catch (e) {
-          showError(e.toString());
+          showError(e);
         }
       }),
     );
@@ -241,7 +240,7 @@ class _TimeSlotState extends State<TimeSlot> {
           await _getSearchedReservationsData();
           Get.back();
         } catch (e) {
-          showError(e.toString());
+          showError(e);
         }
       }),
     );
@@ -251,11 +250,11 @@ class _TimeSlotState extends State<TimeSlot> {
     return showMyDialog(
       title: "정규 종료",
       contents: [
+        Text("정규 스케줄을 종료하고"),
+        Text("종료일 이후 모든 수업을 삭제하시겠습니까?"),
         Text("종료일: " +
             DateFormat("yy/MM/dd HH:mm")
                 .format(details.appointments![0].endDate)),
-        Text("정규 스케줄을 종료하고"),
-        Text("이후 수업을 삭제하시겠습니까?"),
       ],
       onPressed: () => showLoading(() async {
         try {
@@ -267,7 +266,7 @@ class _TimeSlotState extends State<TimeSlot> {
           await _getSearchedReservationsData();
           Get.back();
         } catch (e) {
-          showError(e.toString());
+          showError(e);
         }
       }),
     );
@@ -314,6 +313,7 @@ class _TimeSlotState extends State<TimeSlot> {
     return showMyDialog(
       title: "정규 등록",
       contents: [
+        Text("정규 스케줄을 생성하고 수업을 예약합니다."),
         Text(DateFormat("yy/MM/dd HH:mm").format(details.date!) + " ~ "),
         myTextInput("강사", regular.edit1, "강사명을 입력하세요!"),
         branchDropdown("/regular", "지점을 선택하세요!"),
@@ -333,7 +333,7 @@ class _TimeSlotState extends State<TimeSlot> {
           await _getSearchedReservationsData();
           Get.back();
         } catch (e) {
-          showError(e.toString());
+          showError(e);
         }
       }),
       action: "등록",
@@ -353,6 +353,7 @@ class _TimeSlotState extends State<TimeSlot> {
     return showMyDialog(
       title: "보강 예약 (관리자)",
       contents: [
+        Text("관리자의 권한으로 보강을 예약합니다."),
         Text(DateFormat("yy/MM/dd HH:mm").format(details.date!) + " ~ "),
         myTextInput("강사", admin.edit1, "강사명을 입력하세요!"),
         branchDropdown("/admin", "지점을 선택하세요!"),
@@ -372,7 +373,7 @@ class _TimeSlotState extends State<TimeSlot> {
           await _getSearchedReservationsData();
           Get.back();
         } catch (e) {
-          showError(e.toString());
+          showError(e);
         }
       }),
       action: "등록",
@@ -411,7 +412,7 @@ class _TimeSlotState extends State<TimeSlot> {
           await _getSearchedReservationsData();
           Get.back();
         } catch (e) {
-          showError(e.toString());
+          showError(e);
         }
       }),
       action: "등록",

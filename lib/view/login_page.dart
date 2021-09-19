@@ -118,7 +118,7 @@ class _LoginPageState extends State<LoginPage> {
                           await _client.logout();
                         } catch (_) {
                         } finally {
-                          showError(e.toString());
+                          showError(e);
                           pw.text = "";
                         }
                       }

@@ -87,7 +87,7 @@ Widget myCheckBox({
                 if (_trueValue && _falseValue) {
                   _trueValue = true;
                   _falseValue = false;
-                  _cache.check[index] = null;
+                  _cache.check[index] = isReversed ? 0 : 1;
                 } else if (_trueValue && !_falseValue) {
                   _cache.check[index] = isReversed ? 0 : 1;
                 } else if (!_trueValue && _falseValue) {
@@ -108,7 +108,7 @@ Widget myCheckBox({
                 if (_trueValue && _falseValue) {
                   _trueValue = false;
                   _falseValue = true;
-                  _cache.check[index] = null;
+                  _cache.check[index] = isReversed ? 1 : 0;
                 } else if (_trueValue && !_falseValue) {
                   _cache.check[index] = isReversed ? 0 : 1;
                 } else if (!_trueValue && _falseValue) {

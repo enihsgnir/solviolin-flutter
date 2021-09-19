@@ -24,7 +24,7 @@ class User {
       branchName: json["branchName"],
       userCredit: json["userCredit"],
       status: json["status"],
-      paidAt: List<DateTime>.generate(
+      paidAt: List.generate(
         json["ledgers"].length,
         (index) => parseDateTime(json["ledgers"][index]["paidAt"])
             .add(const Duration(hours: 9)),

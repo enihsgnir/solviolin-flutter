@@ -59,7 +59,7 @@ class _TimeSlotForTeacherState extends State<TimeSlotForTeacher> {
                     );
                   }
                 } catch (e) {
-                  showError(e.toString());
+                  showError(e);
                 }
               });
             }

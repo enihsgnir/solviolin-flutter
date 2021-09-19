@@ -33,7 +33,7 @@ class _TeacherPageState extends State<TeacherPage> {
     return GestureDetector(
       onTap: () => FocusScope.of(context).requestFocus(FocusNode()),
       child: Scaffold(
-        appBar: myAppBar("강사 세부"),
+        appBar: myAppBar("강사 스케줄"),
         body: SafeArea(
           child: Column(
             children: [
@@ -45,25 +45,10 @@ class _TeacherPageState extends State<TeacherPage> {
             ],
           ),
         ),
-        floatingActionButton: Padding(
-          padding: EdgeInsets.all(32.r),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              FloatingActionButton(
-                child: Icon(Icons.menu, size: 36.r),
-                heroTag: null,
-                onPressed: _showMenu,
-              ),
-              FloatingActionButton(
-                child: Icon(Icons.add, size: 36.r),
-                heroTag: null,
-                onPressed: _showRegister,
-              ),
-            ],
-          ),
+        floatingActionButton: FloatingActionButton(
+          child: Icon(Icons.add, size: 36.r),
+          onPressed: _showRegister,
         ),
-        floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       ),
     );
   }
@@ -94,7 +79,7 @@ class _TeacherPageState extends State<TeacherPage> {
                     );
                   }
                 } catch (e) {
-                  showError(e.toString());
+                  showError(e);
                 }
               }),
             ),
@@ -140,7 +125,7 @@ class _TeacherPageState extends State<TeacherPage> {
                           message: "강사 스케줄 삭제에 성공했습니다.",
                         );
                       } catch (e) {
-                        showError(e.toString());
+                        showError(e);
                       }
                     }),
                   ),
@@ -208,44 +193,11 @@ class _TeacherPageState extends State<TeacherPage> {
             message: "신규 강사 스케줄 등록에 성공했습니다.",
           );
         } catch (e) {
-          showError(e.toString());
+          showError(e);
         }
       }),
       action: "등록",
       isScrollable: true,
-    );
-  }
-
-  Future _showMenu() {
-    FocusScope.of(context).requestFocus(FocusNode());
-
-    return showCupertinoModalPopup(
-      context: context,
-      builder: (context) {
-        return CupertinoActionSheet(
-          actions: [
-            CupertinoActionSheetAction(
-              onPressed: () {
-                Get.back();
-                Get.toNamed("/teacher/canceled");
-              },
-              child: Text("취소 내역", style: TextStyle(fontSize: 24.r)),
-            ),
-            CupertinoActionSheetAction(
-              onPressed: () {
-                Get.back();
-                Get.toNamed("/teacher/salary");
-              },
-              child: Text("급여 계산", style: TextStyle(fontSize: 24.r)),
-            ),
-          ],
-          cancelButton: CupertinoActionSheetAction(
-            onPressed: Get.back,
-            isDefaultAction: true,
-            child: Text("닫기", style: TextStyle(fontSize: 24.r)),
-          ),
-        );
-      },
     );
   }
 }

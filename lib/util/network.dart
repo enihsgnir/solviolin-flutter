@@ -71,6 +71,7 @@ class Client {
           return handler.reject(NetworkException._(
             message: message,
             options: response.requestOptions,
+            response: response,
           ));
         }
 
@@ -78,7 +79,7 @@ class Client {
       },
       onError: (error, handler) {
         return handler.reject(NetworkException._(
-          message: "DioError: ${error.message}",
+          message: "아래 메시지와 함께 관리자에게 문의하세요!\n" + "DioError: ${error.message}",
           options: error.requestOptions,
         ));
       },
@@ -268,6 +269,16 @@ class Client {
         "token": token,
       }..removeWhere((key, value) => value == null),
     );
+  }
+
+  Future<void> resetPassword({
+    required String userID,
+    required String userPassword,
+  }) async {
+    await dio.patch("/user/admin/reset", data: {
+      "userID": userID,
+      "userPassword": userPassword,
+    });
   }
 
   Future<void> registerTerm({
@@ -743,10 +754,12 @@ class Client {
 class NetworkException extends DioError {
   String message;
   RequestOptions options;
+  Response? response;
 
   NetworkException({
     required this.message,
     required this.options,
+    this.response,
   }) : super(
           requestOptions: options,
         );
@@ -754,15 +767,35 @@ class NetworkException extends DioError {
   factory NetworkException._({
     required String message,
     required RequestOptions options,
+    Response? response,
   }) {
     return NetworkException(
       message: message,
       options: options,
+      response: response,
     );
   }
 
   @override
   String toString() {
+    if (response != null) {
+      if (response!.statusCode == 400) {
+        return "잘못된 요청입니다. 관리자에게 문의하세요.";
+      } else if (response!.statusCode == 401) {
+        return "인증이 필요합니다. 관리자에게 문의하세요.";
+      } else if (response!.statusCode == 403) {
+        return "요청한 데이터에 대해 권한을 갖고 있지 않습니다. 관리자에게 문의하세요.";
+      } else if (response!.statusCode == 404) {
+        return "요청한 데이터를 찾을 수 없습니다. 관리자에게 문의하세요.";
+      } else if (response!.statusCode == 405) {
+        return "취소 가능 횟수를 초과하였습니다. 관리자에게 문의하세요.";
+      } else if (response!.statusCode == 409) {
+        return "중복된 데이터가 존재합니다. 관리자에게 문의하세요.";
+      } else if (response!.statusCode == 412) {
+        return "해당 슬롯이 현재 닫힌 상태입니다. 관리자에게 문의하세요.";
+      }
+    }
+
     message += "\n${options.method}${options.path}";
     if (options.queryParameters.isNotEmpty) {
       message += "\n${options.queryParameters}";

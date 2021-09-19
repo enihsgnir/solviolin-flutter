@@ -90,7 +90,7 @@ class _LoadingPageState extends State<LoadingPage> {
         } catch (_) {
         } finally {
           Get.offAllNamed("/login");
-          showError(e.toString());
+          showError(e);
         }
       }
     } else {

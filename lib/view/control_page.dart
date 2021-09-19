@@ -101,7 +101,7 @@ class _ControlPageState extends State<ControlPage> {
                     );
                   }
                 } catch (e) {
-                  showError(e.toString());
+                  showError(e);
                 }
               }),
             ),
@@ -150,7 +150,7 @@ class _ControlPageState extends State<ControlPage> {
                           message: "오픈/클로즈 삭제에 성공했습니다.",
                         );
                       } catch (e) {
-                        showError(e.toString());
+                        showError(e);
                       }
                     }),
                   ),
@@ -237,7 +237,7 @@ class _ControlPageState extends State<ControlPage> {
             message: "신규 오픈/클로즈 등록에 성공했습니다.",
           );
         } catch (e) {
-          showError(e.toString());
+          showError(e);
         }
       }),
       action: "등록",

@@ -34,6 +34,7 @@ class DataController extends GetxController {
   List<Reservation> thisMonthReservations = [];
   List<Reservation> lastMonthReservations = [];
   List<Change> changes = [];
+  List<Ledger> myLedgers = [];
 
   List<Control> controls = [];
   List<Teacher> teachers = [];
@@ -58,6 +59,7 @@ class DataController extends GetxController {
     thisMonthReservations = [];
     lastMonthReservations = [];
     changes = [];
+    myLedgers = [];
 
     controls = [];
     teachers = [];
