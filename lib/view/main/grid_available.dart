@@ -23,7 +23,7 @@ class _GridAvailableState extends State<GridAvailable> {
   Widget build(BuildContext context) {
     return GetBuilder<DataController>(
       builder: (controller) {
-        final today = DateTime.now();
+        final today = DateUtils.dateOnly(DateTime.now());
 
         return controller.selectedDay.isBefore(today)
             ? Center(

@@ -15,8 +15,7 @@ class CalendarReserved extends StatefulWidget {
 }
 
 class _CalendarReservedState extends State<CalendarReserved> {
-  var todayZ = DateTime.now();
-  late DateTime todayKST;
+  var today = DateTime.now();
   late DateTime _selectedDay;
   late DateTime _focusedDay;
 
@@ -25,9 +24,8 @@ class _CalendarReservedState extends State<CalendarReserved> {
   @override
   void initState() {
     super.initState();
-    todayKST = todayZ.add(const Duration(hours: 9));
-    _selectedDay = todayZ;
-    _focusedDay = todayZ;
+    _selectedDay = today;
+    _focusedDay = today;
   }
 
   @override
@@ -38,10 +36,10 @@ class _CalendarReservedState extends State<CalendarReserved> {
       builder: (controller) {
         return TableCalendar(
           focusedDay: _focusedDay,
-          firstDay: DateTime(todayKST.year, todayKST.month - 5, 1),
+          firstDay: DateTime(today.year, today.month - 5, 1),
           lastDay: controller.currentTerm[0].termEnd
               .add(const Duration(hours: 23, minutes: 59, seconds: 59)),
-          currentDay: todayKST,
+          currentDay: today,
           weekendDays: const [DateTime.sunday],
           availableCalendarFormats: const {CalendarFormat.month: "Month"},
           pageJumpingEnabled: true,
@@ -82,7 +80,7 @@ class _CalendarReservedState extends State<CalendarReserved> {
             selectedTextStyle: TextStyle(
               color: _getSelectedTextColor(),
               fontSize: 22.r,
-              fontWeight: isSameDay(_selectedDay, todayKST)
+              fontWeight: isSameDay(_selectedDay, today)
                   ? FontWeight.bold
                   : FontWeight.normal,
             ),
@@ -111,15 +109,14 @@ class _CalendarReservedState extends State<CalendarReserved> {
           onDaySelected: (selectedDay, focusedDay) {
             if (!isSameDay(_selectedDay, selectedDay)) {
               setState(() {
-                todayZ = DateTime.now();
-                todayKST = todayZ.add(const Duration(hours: 9));
+                today = DateTime.now();
                 _selectedDay = selectedDay;
                 _focusedDay = focusedDay;
               });
               controller.update();
             }
 
-            if (selectedDay.isAfter(todayZ) || isSameDay(selectedDay, todayZ)) {
+            if (selectedDay.isAfter(today) || isSameDay(selectedDay, today)) {
               showLoading(() async {
                 try {
                   await getSelectedDayData(selectedDay);
@@ -136,8 +133,7 @@ class _CalendarReservedState extends State<CalendarReserved> {
             controller.updateDays(selectedDay, focusedDay);
           },
           onPageChanged: (focusedDay) {
-            todayZ = DateTime.now();
-            todayKST = todayZ.add(const Duration(hours: 9));
+            today = DateTime.now();
             _selectedDay = focusedDay;
             _focusedDay = focusedDay;
             controller.update();
@@ -164,7 +160,7 @@ class _CalendarReservedState extends State<CalendarReserved> {
 
   //TODO: color details later
   Color _getSelectedTextColor() {
-    if (isSameDay(_selectedDay, todayKST)) {
+    if (isSameDay(_selectedDay, today)) {
       return Colors.black87;
     } else if (events.containsKey(_selectedDay)) {
       return Colors.white70;
@@ -175,7 +171,7 @@ class _CalendarReservedState extends State<CalendarReserved> {
   }
 
   Color _getSelectedDecorationColor() {
-    if (isSameDay(_selectedDay, todayKST)) {
+    if (isSameDay(_selectedDay, today)) {
       return Colors.green[300]!.withOpacity(0.5);
     } else if (events.containsKey(_selectedDay)) {
       return symbolColor.withOpacity(0.25);

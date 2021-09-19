@@ -50,9 +50,11 @@ class _HistoryReservedState extends State<HistoryReserved> {
                     icon: CupertinoIcons.delete_left,
                     item: "취소",
                     onTap: () async {
-                      reservation.bookingStatus.abs() == 2
-                          ? showError("이미 취소된 수업입니다.")
-                          : await _showModalCancel(context, reservation);
+                      reservation.startDate.isBefore(DateTime.now())
+                          ? await showError("지난 수업은 취소할 수 없습니다.")
+                          : reservation.bookingStatus.abs() == 2
+                              ? await showError("이미 취소된 수업입니다.")
+                              : await _showModalCancel(context, reservation);
                     },
                     borderRight: true,
                   ),
@@ -61,9 +63,11 @@ class _HistoryReservedState extends State<HistoryReserved> {
                     icon: Icons.more_time,
                     item: "연장",
                     onTap: () async {
-                      reservation.bookingStatus.abs() == 3
-                          ? showError("이미 연장된 수업입니다.")
-                          : await _showModalExtend(context, reservation);
+                      reservation.startDate.isBefore(DateTime.now())
+                          ? await showError("지난 수업은 연장할 수 없습니다.")
+                          : reservation.bookingStatus.abs() == 3
+                              ? showError("이미 연장된 수업입니다.")
+                              : await _showModalExtend(context, reservation);
                     },
                     borderLeft: true,
                   ),
