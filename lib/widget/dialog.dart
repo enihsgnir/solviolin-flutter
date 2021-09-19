@@ -6,9 +6,10 @@ import 'package:solviolin_admin/util/constant.dart';
 Future showError(dynamic error) {
   var message = error.toString();
   if (error is CastError) {
-    message = "필수 항목을 입력하세요";
+    message = "필수 항목을 입력하세요.";
   } else if (error is FormatException) {
-    message = "입력값의 형식이 올바르지 않습니다";
+    message = "입력값의 형식이 올바르지 않습니다." +
+        "\n전화번호를 포함한 대부분의 숫자 입력값은 하이픈(-)을 제외한 정수로만 이루어져야 합니다.";
   } else if (error is TypeError || error is NoSuchMethodError) {
     message = "아래 메시지와 함께 관리자에게 문의하세요!\n" + message;
   }

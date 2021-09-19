@@ -113,6 +113,7 @@ class Client {
       options: Options(
         method: requestOptions.method,
         headers: requestOptions.headers,
+        extra: requestOptions.extra,
       ),
     );
   }
@@ -129,10 +130,19 @@ class Client {
   }
 
   Future<Profile> login(String userID, String userPassword) async {
-    var response = await dio.post("/auth/login", data: {
-      "userID": userID,
-      "userPassword": userPassword,
-    });
+    var response = await dio.post(
+      "/auth/login",
+      data: {
+        "userID": userID,
+        "userPassword": userPassword,
+      },
+      options: Options(
+        extra: {
+          "401": "아이디 혹은 비밀번호가 올바르지 않습니다.",
+          "404": "존재하지 않는 아이디입니다.",
+        },
+      ),
+    );
     if (response.statusCode == 201) {
       if (response.data["userType"] != 0) {
         await storage.write(
@@ -154,7 +164,14 @@ class Client {
   }
 
   Future<Profile> getProfile() async {
-    var response = await dio.get("/auth/profile");
+    var response = await dio.get(
+      "/auth/profile",
+      options: Options(
+        extra: {
+          "404": "존재하지 않는 계정입니다. 앱을 다시 실행해주세요.",
+        },
+      ),
+    );
     if (response.statusCode == 200) {
       if (response.data["userType"] != 0) {
         return Profile.fromJson(response.data);
@@ -191,6 +208,11 @@ class Client {
         "userBranch": userBranch,
         "token": token,
       }..removeWhere((key, value) => value == null),
+      options: Options(
+        extra: {
+          "409": "중복된 아이디 혹은 전화번호가 이미 등록되어 있습니다. 다시 확인해주세요.",
+        },
+      ),
     );
   }
 
@@ -268,6 +290,11 @@ class Client {
         "status": status,
         "token": token,
       }..removeWhere((key, value) => value == null),
+      options: Options(
+        extra: {
+          "409": "중복된 전화번호가 이미 등록되어 있습니다. 다시 확인해주세요.",
+        },
+      ),
     );
   }
 
@@ -437,11 +464,27 @@ class Client {
   }
 
   Future<void> cancelReservation(int id) async {
-    await dio.patch("/reservation/user/cancel/$id");
+    await dio.patch(
+      "/reservation/user/cancel/$id",
+      options: Options(
+        extra: {
+          "403": "다른 수강생의 수업을 취소할 수 없습니다. 관리자에게 문의하세요.",
+          "404": "해당 수업을 찾을 수 없습니다. 재검색을 시도하세요.",
+          "405": "취소 가능 횟수를 초과하였습니다. 취소 내역을 확인하거나 관리자에게 문의하세요.",
+        },
+      ),
+    );
   }
 
   Future<void> cancelReservationByAdmin(int id) async {
-    await dio.patch("/reservation/admin/cancel/$id");
+    await dio.patch(
+      "/reservation/admin/cancel/$id",
+      options: Options(
+        extra: {
+          "404": "해당 수업을 찾을 수 없습니다. 재검색을 시도하세요.",
+        },
+      ),
+    );
   }
 
   Future<void> makeUpReservationByAdmin({
@@ -451,13 +494,24 @@ class Client {
     required DateTime endDate,
     required String userID,
   }) async {
-    await dio.post("/reservation/admin", data: {
-      "teacherID": teacherID,
-      "branchName": branchName,
-      "startDate": startDate.toIso8601String(),
-      "endDate": endDate.toIso8601String(),
-      "userID": userID,
-    });
+    await dio.post(
+      "/reservation/admin",
+      data: {
+        "teacherID": teacherID,
+        "branchName": branchName,
+        "startDate": startDate.toIso8601String(),
+        "endDate": endDate.toIso8601String(),
+        "userID": userID,
+      },
+      options: Options(
+        extra: {
+          "409": "해당 시간대에 기예약된 수업이 존재합니다. 재검색을 시도하세요.",
+          "412": "조건을 충족하지 않은 요청입니다. 다음의 경우에 해당합니다." +
+              "\n1) 해당 시간대가 현재 닫힌 상태입니다. 다른 시간대에 예약을 시도하세요." +
+              "\n2) 보강 가능한 횟수가 부족합니다. 취소 내역을 확인하세요.",
+        },
+      ),
+    );
   }
 
   Future<void> reserveFreeCourse({
@@ -467,24 +521,52 @@ class Client {
     required DateTime endDate,
     required String userID,
   }) async {
-    await dio.post("/reservation/free", data: {
-      "teacherID": teacherID,
-      "branchName": branchName,
-      "startDate": startDate.toIso8601String(),
-      "endDate": endDate.toIso8601String(),
-      "userID": userID,
-    });
+    await dio.post(
+      "/reservation/free",
+      data: {
+        "teacherID": teacherID,
+        "branchName": branchName,
+        "startDate": startDate.toIso8601String(),
+        "endDate": endDate.toIso8601String(),
+        "userID": userID,
+      },
+      options: Options(
+        extra: {
+          "409": "해당 시간대에 기예약된 수업이 존재합니다. 재검색을 시도하세요.",
+        },
+      ),
+    );
   }
 
   Future<void> extendReservation(int id) async {
-    await dio.patch("/reservation/user/extend/$id");
+    await dio.patch(
+      "/reservation/user/extend/$id",
+      options: Options(
+        extra: {
+          "400": "수업 시작 4시간 전부터는 수업을 연장할 수 없습니다.",
+          "403": "다른 수강생의 수업을 연장할 수 없습니다. 관리자에게 문의하세요.",
+          "404": "해당 수업을 찾을 수 없습니다. 재검색을 시도하세요.",
+          "405": "이미 취소된 수업입니다. 재검색을 시도하세요.",
+          "409": "해당 시간대에 기예약된 수업이 존재합니다. 재검색을 시도하세요.",
+          "412": "해당 시간대가 현재 닫힌 상태입니다. 다른 시간대에 예약을 시도하세요.",
+        },
+      ),
+    );
   }
 
   Future<void> extendReservationByAdmin(
     int id, {
     required int count,
   }) async {
-    await dio.patch("/reservation/admin/extend/$id/$count");
+    await dio.patch(
+      "/reservation/admin/extend/$id/$count",
+      options: Options(
+        extra: {
+          "404": "해당 수업을 찾을 수 없습니다. 재검색을 시도하세요.",
+          "409": "해당 시간대에 기예약된 수업이 존재합니다. 재검색을 시도하세요.",
+        },
+      ),
+    );
   }
 
   Future<List<Reservation>> getReservations({
@@ -582,30 +664,63 @@ class Client {
     required DateTime endDate,
     required String userID,
   }) async {
-    await dio.post("/reservation/regular", data: {
-      "teacherID": teacherID,
-      "branchName": branchName,
-      "startDate": startDate.toIso8601String(),
-      "endDate": endDate.toIso8601String(),
-      "userID": userID,
-    });
+    await dio.post(
+      "/reservation/regular",
+      data: {
+        "teacherID": teacherID,
+        "branchName": branchName,
+        "startDate": startDate.toIso8601String(),
+        "endDate": endDate.toIso8601String(),
+        "userID": userID,
+      },
+      options: Options(
+        extra: {
+          "409": "해당 시간대에 기예약된 수업이 존재합니다. 재검색을 시도하세요.",
+          "412": "해당 시간대가 현재 닫힌 상태입니다. 다른 시간대에 예약을 시도하세요.",
+        },
+      ),
+    );
   }
 
   Future<void> updateEndDateAndDeleteLaterCourse(
     int id, {
     required DateTime endDate,
   }) async {
-    await dio.patch("/reservation/regular/$id", data: {
-      "endDate": endDate.toIso8601String(),
-    });
+    await dio.patch(
+      "/reservation/regular/$id",
+      data: {
+        "endDate": endDate.toIso8601String(),
+      },
+      options: Options(
+        extra: {
+          "404": "해당 정규 스케줄을 찾을 수 없습니다. 정규 스케줄을 확인하세요.",
+        },
+      ),
+    );
   }
 
   Future<void> extendAllCoursesOfBranch(String branch) async {
-    await dio.post("/reservation/regular/extend/$branch");
+    await dio.post(
+      "/reservation/regular/extend/$branch",
+      options: Options(
+        extra: {
+          "404": "다음 학기가 등록되어 있지 않습니다.",
+          "409": "해당 시간대에 기예약된 수업이 존재합니다. 예약 슬롯을 확인하세요.",
+        },
+      ),
+    );
   }
 
   Future<void> extendAllCoursesOfUser(String userID) async {
-    await dio.post("/reservation/regular/extend/user/$userID");
+    await dio.post(
+      "/reservation/regular/extend/user/$userID",
+      options: Options(
+        extra: {
+          "404": "다음 학기가 등록되어 있지 않습니다.",
+          "409": "해당 시간대에 기예약된 수업이 존재합니다. 예약 슬롯을 확인하세요.",
+        },
+      ),
+    );
   }
 
   Future<void> modifyTerm(
@@ -613,10 +728,18 @@ class Client {
     required DateTime termStart,
     required DateTime termEnd,
   }) async {
-    await dio.patch("/reservation/term/$id", data: {
-      "termStart": termStart.toIso8601String(),
-      "termEnd": termEnd.toIso8601String(),
-    });
+    await dio.patch(
+      "/reservation/term/$id",
+      data: {
+        "termStart": termStart.toIso8601String(),
+        "termEnd": termEnd.toIso8601String(),
+      },
+      options: Options(
+        extra: {
+          "400": "다음 학기만 수정할 수 있습니다.",
+        },
+      ),
+    );
   }
 
   Future<List<RegularSchedule>> getRegularSchedulesByAdmin(
@@ -779,20 +902,25 @@ class NetworkException extends DioError {
   @override
   String toString() {
     if (response != null) {
-      if (response!.statusCode == 400) {
-        return "잘못된 요청입니다. 관리자에게 문의하세요.";
-      } else if (response!.statusCode == 401) {
-        return "인증이 필요합니다. 관리자에게 문의하세요.";
-      } else if (response!.statusCode == 403) {
-        return "요청한 데이터에 대해 권한을 갖고 있지 않습니다. 관리자에게 문의하세요.";
-      } else if (response!.statusCode == 404) {
-        return "요청한 데이터를 찾을 수 없습니다. 관리자에게 문의하세요.";
-      } else if (response!.statusCode == 405) {
-        return "취소 가능 횟수를 초과하였습니다. 관리자에게 문의하세요.";
-      } else if (response!.statusCode == 409) {
-        return "중복된 데이터가 존재합니다. 관리자에게 문의하세요.";
-      } else if (response!.statusCode == 412) {
-        return "해당 슬롯이 현재 닫힌 상태입니다. 관리자에게 문의하세요.";
+      if (response!.requestOptions.extra[response!.statusCode.toString()] !=
+          null) {
+        return response!.requestOptions.extra[response!.statusCode.toString()];
+      } else {
+        if (response!.statusCode == 400) {
+          return "잘못된 요청입니다. 관리자에게 문의하세요.";
+        } else if (response!.statusCode == 401) {
+          return "인증이 필요합니다. 관리자에게 문의하세요.";
+        } else if (response!.statusCode == 403) {
+          return "요청한 데이터에 대해 권한을 갖고 있지 않습니다. 관리자에게 문의하세요.";
+        } else if (response!.statusCode == 404) {
+          return "요청한 데이터를 찾을 수 없습니다. 관리자에게 문의하세요.";
+        } else if (response!.statusCode == 405) {
+          return "승인되지 않은 행동입니다. 관리자에게 문의하세요.";
+        } else if (response!.statusCode == 409) {
+          return "중복된 데이터가 존재합니다. 관리자에게 문의하세요.";
+        } else if (response!.statusCode == 412) {
+          return "조건을 충족하지 않은 요청입니다. 관리자에게 문의하세요.";
+        }
       }
     }
 
