@@ -90,11 +90,11 @@ class _MainPageState extends State<MainPage> {
                 );
 
                 if (newDate != null) {
+                  final _temp = _data.displayDate;
+                  _data.updateDisplayDate(newDate);
                   _calendar.displayDate = newDate;
 
-                  if (!isSameWeek(newDate, _data.displayDate)) {
-                    _data.updateDisplayDate(newDate);
-
+                  if (!isSameWeek(newDate, _temp)) {
                     showLoading(() async {
                       try {
                         await _getSearchedReservationsData();

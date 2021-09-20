@@ -42,7 +42,7 @@ class _TimeSlotState extends State<TimeSlot> {
             if (!search.isSearched && !search.hasBeenShown) {
               await showMySnackbar(
                 title: "팁",
-                message: "필터를 사용하여 예약을 검색할 수 있습니다",
+                message: "필터를 사용하여 예약을 검색할 수 있습니다.",
               );
               search.hasBeenShown = true;
             }
@@ -115,16 +115,8 @@ class _TimeSlotState extends State<TimeSlot> {
         return CupertinoActionSheet(
           actions: [
             CupertinoActionSheetAction(
-              onPressed: () => _showCancelByUser(details),
-              child: Text("취소 (수강생)", style: TextStyle(fontSize: 24.r)),
-            ),
-            CupertinoActionSheetAction(
               onPressed: () => _showCancelByAdmin(details),
               child: Text("취소 (관리자)", style: TextStyle(fontSize: 24.r)),
-            ),
-            CupertinoActionSheetAction(
-              onPressed: () => _showExtendByUser(details),
-              child: Text("연장 (수강생)", style: TextStyle(fontSize: 24.r)),
             ),
             CupertinoActionSheetAction(
               onPressed: () => _showExtendByAdmin(details),
@@ -145,56 +137,47 @@ class _TimeSlotState extends State<TimeSlot> {
     );
   }
 
-  Future _showCancelByUser(CalendarTapDetails details) {
-    return showMyDialog(
-      title: "취소 (수강생)",
-      contents: [
-        Text("수강생의 권한으로 취소하시겠습니까?"),
-      ],
-      onPressed: () => showLoading(() async {
-        try {
-          await _client.cancelReservation(details.appointments![0].id);
-
-          await _getSearchedReservationsData();
-          Get.back();
-        } catch (e) {
-          showError(e);
-        }
-      }),
-    );
-  }
-
   Future _showCancelByAdmin(CalendarTapDetails details) {
+    var count = false;
+
     return showMyDialog(
       title: "취소 (관리자)",
       contents: [
         Text("관리자의 권한으로 취소하시겠습니까?"),
+        Row(
+          children: [
+            Container(
+              width: 120.r,
+              child: label("카운트 차감", true),
+            ),
+            StatefulBuilder(
+              builder: (context, setState) {
+                return Checkbox(
+                  value: count,
+                  onChanged: (value) {
+                    setState(() {
+                      count = value!;
+                    });
+                  },
+                );
+              },
+            ),
+          ],
+        ),
       ],
       onPressed: () => showLoading(() async {
         try {
-          await _client.cancelReservationByAdmin(details.appointments![0].id);
+          await _client.cancelReservationByAdmin(
+            details.appointments![0].id,
+            count: count ? 1 : 0,
+          );
 
           await _getSearchedReservationsData();
           Get.back();
-        } catch (e) {
-          showError(e);
-        }
-      }),
-    );
-  }
 
-  Future _showExtendByUser(CalendarTapDetails details) {
-    return showMyDialog(
-      title: "연장 (수강생)",
-      contents: [
-        Text("수강생의 권한으로 연장하시겠습니까?"),
-      ],
-      onPressed: () => showLoading(() async {
-        try {
-          await _client.extendReservation(details.appointments![0].id);
-
-          await _getSearchedReservationsData();
-          Get.back();
+          await showMySnackbar(
+            message: "관리자의 권한으로 카운트를 ${count ? "차감" : "미차감"}하여 예약을 취소했습니다.",
+          );
         } catch (e) {
           showError(e);
         }
@@ -213,7 +196,7 @@ class _TimeSlotState extends State<TimeSlot> {
           children: [
             Container(
               width: 120.r,
-              child: label("카운트 포함", true),
+              child: label("카운트 차감", true),
             ),
             StatefulBuilder(
               builder: (context, setState) {
@@ -239,6 +222,10 @@ class _TimeSlotState extends State<TimeSlot> {
 
           await _getSearchedReservationsData();
           Get.back();
+
+          await showMySnackbar(
+            message: "관리자의 권한으로 카운트를 ${count ? "차감" : "미차감"}하여 예약을 연장했습니다.",
+          );
         } catch (e) {
           showError(e);
         }
@@ -250,8 +237,8 @@ class _TimeSlotState extends State<TimeSlot> {
     return showMyDialog(
       title: "정규 종료",
       contents: [
-        Text("정규 스케줄을 종료하고"),
-        Text("종료일 이후 모든 수업을 삭제하시겠습니까?"),
+        Text("정규 스케줄의 종료일을 갱신하고"),
+        Text("종료일 이후의 해당 정규 수업들을 삭제하시겠습니까?"),
         Text("종료일: " +
             DateFormat("yy/MM/dd HH:mm")
                 .format(details.appointments![0].endDate)),
@@ -265,8 +252,14 @@ class _TimeSlotState extends State<TimeSlot> {
 
           await _getSearchedReservationsData();
           Get.back();
+
+          await showMySnackbar(
+            message: "정규 종료에 성공했습니다.",
+          );
         } catch (e) {
-          showError(e);
+          e is CastError
+              ? showError("정규 스케줄을 따르는 예약인 경우에만 정규 종료 할 수 있습니다.")
+              : showError(e);
         }
       }),
     );
@@ -304,11 +297,8 @@ class _TimeSlotState extends State<TimeSlot> {
   Future _showReserveRegular(CalendarTapDetails details) {
     regular.reset();
     regular.edit1.text = details.resource!.displayName;
-
-    if (search.isSearched) {
-      regular.branchName = search.branchName;
-      regular.edit2.text = search.edit1.text;
-    }
+    regular.branchName = search.branchName;
+    regular.edit2.text = search.edit1.text;
 
     return showMyDialog(
       title: "정규 등록",
@@ -332,6 +322,10 @@ class _TimeSlotState extends State<TimeSlot> {
 
           await _getSearchedReservationsData();
           Get.back();
+
+          await showMySnackbar(
+            message: "정규 스케줄을 생성하고 수업을 예약했습니다.",
+          );
         } catch (e) {
           showError(e);
         }
@@ -344,11 +338,8 @@ class _TimeSlotState extends State<TimeSlot> {
   Future _showMakeUpByAdmin(CalendarTapDetails details) {
     admin.reset();
     admin.edit1.text = details.resource!.displayName;
-
-    if (search.isSearched) {
-      admin.branchName = search.branchName;
-      admin.edit2.text = search.edit1.text;
-    }
+    admin.branchName = search.branchName;
+    admin.edit2.text = search.edit1.text;
 
     return showMyDialog(
       title: "보강 예약 (관리자)",
@@ -372,6 +363,10 @@ class _TimeSlotState extends State<TimeSlot> {
 
           await _getSearchedReservationsData();
           Get.back();
+
+          await showMySnackbar(
+            message: "관리자의 권한으로 보강을 예약했습니다.",
+          );
         } catch (e) {
           showError(e);
         }
@@ -384,11 +379,8 @@ class _TimeSlotState extends State<TimeSlot> {
   Future _showFreeCourse(CalendarTapDetails details) {
     free.reset();
     free.edit1.text = details.resource!.displayName;
-
-    if (search.isSearched) {
-      free.branchName = search.branchName;
-      free.edit2.text = search.edit1.text;
-    }
+    free.branchName = search.branchName;
+    free.edit2.text = search.edit1.text;
 
     return showMyDialog(
       title: "무료 보강 등록",
@@ -411,6 +403,10 @@ class _TimeSlotState extends State<TimeSlot> {
 
           await _getSearchedReservationsData();
           Get.back();
+
+          await showMySnackbar(
+            message: "무료 보강을 예약했습니다.",
+          );
         } catch (e) {
           showError(e);
         }

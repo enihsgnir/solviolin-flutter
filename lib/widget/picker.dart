@@ -48,7 +48,7 @@ Widget pickDateTime({
                     context: context,
                     initialDate: controller.date[index] ?? initialDate,
                     firstDate: DateTime(initialDate.year - 3),
-                    lastDate: DateTime(initialDate.year + 1),
+                    lastDate: DateTime(initialDate.year + 2, 1, 0),
                     builder: (context, child) {
                       return Theme(
                         data: ThemeData.dark().copyWith(
@@ -124,7 +124,7 @@ Widget pickDate({
                     context: context,
                     initialDate: controller.date[index] ?? initialDate,
                     firstDate: DateTime(initialDate.year - 3),
-                    lastDate: DateTime(initialDate.year + 1),
+                    lastDate: DateTime(initialDate.year + 2, 1, 0),
                     builder: (context, child) {
                       return Theme(
                         data: ThemeData.dark().copyWith(

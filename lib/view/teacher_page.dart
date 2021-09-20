@@ -148,6 +148,7 @@ class _TeacherPageState extends State<TeacherPage> {
   Future _showRegister() {
     FocusScope.of(context).requestFocus(FocusNode());
     register.reset();
+    register.branchName = _data.profile.branchName;
 
     return showMyDialog(
       title: "강사 스케줄 등록",

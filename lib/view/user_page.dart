@@ -147,11 +147,12 @@ class _UserPageState extends State<UserPage> {
                     Text("목록은 검색 입력값을 기반으로 저장됩니다."),
                     Text("저장하기 전 검색을 권장합니다."),
                     Text("\n유저 목록 파일 저장 경로"),
-                    Text("\nAndroid: 내장 메모리/Android/data/"),
-                    Text("/com.solviolin.solviolin_admin/files/"),
-                    Text("\niOS: 파일/나의 iPhone(iPad)/"),
-                    Text("솔바이올린(관리자)/"),
-                  ], //TODO:
+                    Text(
+                        "Android: 내장 메모리/Android/data/com.solviolin.solviolin_admin/files/"),
+                    Text("iOS: 파일/나의 iPhone(iPad)/솔바이올린(관리자)/"),
+                    Text("\n저장된 JSON 파일을 UTF-8 인코딩을 통해"),
+                    Text("CSV 형식으로 변환하여 사용할 수 있습니다."),
+                  ],
                 ),
               )
             : ListView.builder(
@@ -193,6 +194,7 @@ class _UserPageState extends State<UserPage> {
   Future _showUserRegister() {
     FocusScope.of(context).requestFocus(FocusNode());
     register.reset();
+    register.branchName = _data.profile.branchName;
 
     return showMyDialog(
       title: "유저 신규 등록",

@@ -19,6 +19,15 @@ class _MenuPageState extends State<MenuPage> {
   var _client = Get.find<Client>();
   var _data = Get.find<DataController>();
 
+  var main = Get.put(CacheController(), tag: "/search/main");
+  var user = Get.put(CacheController(), tag: "/search/user");
+  var control = Get.put(CacheController(), tag: "/search/control");
+  var teacher = Get.put(CacheController(), tag: "/search/teacher");
+  var canceled = Get.put(CacheController(), tag: "/search/canceled");
+  var salary = Get.put(CacheController(), tag: "/search/salary");
+  var ledger = Get.put(CacheController(), tag: "/search/ledger");
+  var checkIn = Get.put(CacheController(), tag: "/search/check-in");
+
   var branch = TextEditingController();
 
   @override
@@ -29,15 +38,6 @@ class _MenuPageState extends State<MenuPage> {
 
   @override
   Widget build(BuildContext context) {
-    var main = Get.put(CacheController(), tag: "/search/main");
-    var user = Get.put(CacheController(), tag: "/search/user");
-    var control = Get.put(CacheController(), tag: "/search/control");
-    var teacher = Get.put(CacheController(), tag: "/search/teacher");
-    Get.put(CacheController(), tag: "/search/canceled");
-    var salary = Get.put(CacheController(), tag: "/search/salary");
-    var ledger = Get.put(CacheController(), tag: "/search/ledger");
-    var checkIn = Get.put(CacheController(), tag: "/search/check-in");
-
     return Scaffold(
       resizeToAvoidBottomInset: false,
       body: SafeArea(
@@ -58,6 +58,10 @@ class _MenuPageState extends State<MenuPage> {
                       );
                     } else {
                       main.branchName = _data.profile.branchName;
+                      await showMySnackbar(
+                        title: "알림",
+                        message: "검색값이 없습니다.",
+                      );
                     }
                   }),
                   menu("유저 검색", () async {
@@ -209,6 +213,15 @@ class _MenuPageState extends State<MenuPage> {
       onPressed: () => showLoading(() async {
         try {
           await _client.logout();
+
+          main.isSearched = false;
+          user.isSearched = false;
+          control.isSearched = false;
+          teacher.isSearched = false;
+          canceled.isSearched = false;
+          salary.isSearched = false;
+          ledger.isSearched = false;
+          checkIn.isSearched = false;
         } catch (_) {
         } finally {
           Get.offAllNamed("/login");

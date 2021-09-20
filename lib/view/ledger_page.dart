@@ -72,7 +72,7 @@ class _LedgerPageState extends State<LedgerPage> {
                   _showTotal();
                 } catch (e) {
                   e is CastError
-                      ? showError("지점/학기는 필수 입력 항목입니다")
+                      ? showError("지점/학기는 필수 입력 항목입니다.")
                       : showError(e);
                 }
               }),
@@ -133,10 +133,10 @@ class _LedgerPageState extends State<LedgerPage> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text("합계 조회 시 지점/학기는"),
-                    Text("필수 입력 항목입니다"),
+                    Text("필수 입력 항목입니다."),
                     Text("\n검색에 사용한 값들은"),
-                    Text("원비납부 화면과 연동됩니다"),
-                    Text("('금액'은 검색에 사용되지 않습니다)"),
+                    Text("원비납부 화면과 연동됩니다."),
+                    Text("('금액'은 검색에 사용되지 않습니다.)"),
                   ],
                 ),
               )
@@ -207,17 +207,15 @@ class _LedgerPageState extends State<LedgerPage> {
   Future _showExpend() {
     FocusScope.of(context).requestFocus(FocusNode());
     expend.reset();
-    if (search.isSearched) {
-      expend.edit1.text = search.edit1.text;
-      expend.branchName = search.branchName;
-      expend.termID = search.termID;
-      expend.edit2.text = search.edit2.text;
-    }
+    expend.edit1.text = search.edit1.text;
+    expend.branchName = search.branchName;
+    expend.termID = search.termID;
+    expend.edit2.text = search.edit2.text;
 
     return showMyDialog(
       title: "원비납부",
       contents: [
-        myTextInput("이름", expend.edit1, "이름을 입력하세요!"),
+        myTextInput("수강생", expend.edit1, "이름을 입력하세요!"),
         branchDropdown("/expend", "지점을 선택하세요!"),
         termDropdown("/expend", "지점을 선택하세요!"),
         myTextInput("금액", expend.edit2, "금액을 입력하세요!", TextInputType.number),

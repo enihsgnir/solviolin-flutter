@@ -68,8 +68,11 @@ class _HistoryReservedState extends State<HistoryReserved> {
                       reservation.startDate.isBefore(DateTime.now())
                           ? await showError("지난 수업은 연장할 수 없습니다.")
                           : reservation.bookingStatus.abs() == 3
-                              ? showError("이미 연장된 수업입니다.")
-                              : await _showModalExtend(context, reservation);
+                              ? await showError("이미 연장된 수업입니다.")
+                              : reservation.bookingStatus.abs() == 2
+                                  ? await showError("취소된 수업은 연장할 수 없습니다.")
+                                  : await _showModalExtend(
+                                      context, reservation);
                     },
                     borderLeft: true,
                   ),
@@ -128,34 +131,43 @@ class _HistoryReservedState extends State<HistoryReserved> {
             CupertinoActionSheetAction(
               onPressed: () => showLoading(() async {
                 try {
-                  await _client.cancelReservation(reservation.id);
+                  await _client.cancelReservationByAdmin(
+                    reservation.id,
+                    count: 1,
+                  );
 
                   await _getSearchedUsersData();
                   Get.back();
 
                   await showMySnackbar(
-                    message: "수업을 취소했습니다.",
+                    message: "관리자의 권한으로 카운트를 차감하여 수업을 취소했습니다.",
                   );
                 } catch (e) {
                   showError(e);
                 }
               }),
-              isDestructiveAction: true,
-              child: Text("취소 (수강생)", style: TextStyle(fontSize: 24.r)),
+              child: Text("취소 (관리자, 카운트 차감)", style: TextStyle(fontSize: 24.r)),
             ),
             CupertinoActionSheetAction(
               onPressed: () => showLoading(() async {
                 try {
-                  await _client.cancelReservationByAdmin(reservation.id);
+                  await _client.cancelReservationByAdmin(
+                    reservation.id,
+                    count: 0,
+                  );
 
                   await _getSearchedUsersData();
                   Get.back();
+
+                  await showMySnackbar(
+                    message: "관리자의 권한으로 카운트를 미차감하여 수업을 취소했습니다.",
+                  );
                 } catch (e) {
                   showError(e);
                 }
               }),
-              isDestructiveAction: true,
-              child: Text("취소 (관리자)", style: TextStyle(fontSize: 24.r)),
+              child:
+                  Text("취소 (관리자, 카운트 미차감)", style: TextStyle(fontSize: 24.r)),
             ),
           ],
           cancelButton: CupertinoActionSheetAction(
@@ -185,23 +197,6 @@ class _HistoryReservedState extends State<HistoryReserved> {
             CupertinoActionSheetAction(
               onPressed: () => showLoading(() async {
                 try {
-                  await _client.extendReservation(reservation.id);
-
-                  await _getSearchedUsersData();
-                  Get.back();
-
-                  await showMySnackbar(
-                    message: "수강생의 권한으로 수업을 연장했습니다.",
-                  );
-                } catch (e) {
-                  showError(e);
-                }
-              }),
-              child: Text("연장 (수강생)", style: TextStyle(fontSize: 24.r)),
-            ),
-            CupertinoActionSheetAction(
-              onPressed: () => showLoading(() async {
-                try {
                   await _client.extendReservationByAdmin(
                     reservation.id,
                     count: 1,
@@ -217,7 +212,7 @@ class _HistoryReservedState extends State<HistoryReserved> {
                   showError(e);
                 }
               }),
-              child: Text("연장 (관리자, 카운트 포함)", style: TextStyle(fontSize: 24.r)),
+              child: Text("연장 (관리자, 카운트 차감)", style: TextStyle(fontSize: 24.r)),
             ),
             CupertinoActionSheetAction(
               onPressed: () => showLoading(() async {
@@ -238,7 +233,7 @@ class _HistoryReservedState extends State<HistoryReserved> {
                 }
               }),
               child:
-                  Text("연장 (관리자, 카운트 미포함)", style: TextStyle(fontSize: 24.r)),
+                  Text("연장 (관리자, 카운트 미차감)", style: TextStyle(fontSize: 24.r)),
             ),
           ],
           cancelButton: CupertinoActionSheetAction(

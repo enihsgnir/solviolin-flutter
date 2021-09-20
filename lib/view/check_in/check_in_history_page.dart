@@ -65,8 +65,8 @@ class _CheckInHistoryPageState extends State<CheckInHistoryPage> {
                 try {
                   _data.checkInHistories = await _client.getCheckInHistories(
                     branchName: search.branchName!,
-                    startDate: search.dateTime[0],
-                    endDate: search.dateTime[1],
+                    startDate: search.date[0],
+                    endDate: search.date[1],
                   )
                     ..sort((a, b) {
                       var primary = b.createdAt.compareTo(a.createdAt);

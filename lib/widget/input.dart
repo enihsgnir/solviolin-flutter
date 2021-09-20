@@ -132,6 +132,7 @@ Widget myRadio<T>({
   required List<String> names,
   required List<T> values,
   required T groupValue,
+  bool isMandatory = true,
 }) {
   var _cache = Get.find<CacheController>(tag: tag);
   _cache.type[T] == null
@@ -146,7 +147,7 @@ Widget myRadio<T>({
           children: [
             Container(
               width: 120.r,
-              child: label(item, true),
+              child: label(item, isMandatory),
             ),
             Row(
               mainAxisSize: MainAxisSize.min,

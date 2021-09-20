@@ -174,6 +174,7 @@ class _ControlPageState extends State<ControlPage> {
   Future _showRegister() {
     FocusScope.of(context).requestFocus(FocusNode());
     register.reset();
+    register.branchName = _data.profile.branchName;
 
     return showMyDialog(
       title: "오픈/클로즈 등록",
@@ -203,10 +204,15 @@ class _ControlPageState extends State<ControlPage> {
         ),
         myRadio<CancelInClose>(
           tag: "/register",
-          item: "기간 내",
+          item: "클로즈 시",
           names: ["유지", "취소", "삭제"],
           values: CancelInClose.values,
           groupValue: CancelInClose.none,
+          isMandatory: false,
+        ),
+        Text(
+          "*클로즈 등록 시 기간 내 수업 상태 선택",
+          style: TextStyle(color: Colors.red, fontSize: 16.r),
         ),
       ],
       onPressed: () => showLoading(() async {

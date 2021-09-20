@@ -204,6 +204,7 @@ class _TermPageState extends State<TermPage> {
 
   Future _showExtendOfBranch() {
     extend.reset();
+    extend.branchName = _data.profile.branchName;
 
     return showMyDialog(
       title: "정규 연장 (지점)",

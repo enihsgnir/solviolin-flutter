@@ -71,7 +71,7 @@ class _CheckInPageState extends State<CheckInPage> {
                         snackPosition: SnackPosition.BOTTOM,
                         titleText: Text(
                           "Error",
-                          style: TextStyle(fontSize: 28.r),
+                          style: TextStyle(color: Colors.white, fontSize: 28.r),
                         ),
                         messageText: Text(
                           e.toString(),

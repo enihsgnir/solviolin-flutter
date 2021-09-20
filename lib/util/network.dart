@@ -138,8 +138,8 @@ class Client {
       },
       options: Options(
         extra: {
-          "401": "아이디 혹은 비밀번호가 올바르지 않습니다.",
-          "404": "존재하지 않는 아이디입니다.",
+          "401": "아이디 또는 비밀번호가 올바르지 않습니다.",
+          "404": "아이디 또는 비밀번호가 올바르지 않습니다.",
         },
       ),
     );
@@ -210,7 +210,7 @@ class Client {
       }..removeWhere((key, value) => value == null),
       options: Options(
         extra: {
-          "409": "중복된 아이디 혹은 전화번호가 이미 등록되어 있습니다. 다시 확인해주세요.",
+          "409": "중복된 아이디 또는 전화번호가 이미 등록되어 있습니다. 다시 확인해주세요.",
         },
       ),
     );
@@ -312,10 +312,18 @@ class Client {
     required DateTime termStart,
     required DateTime termEnd,
   }) async {
-    await dio.post("/term", data: {
-      "termStart": termStart.toIso8601String(),
-      "termEnd": termEnd.toIso8601String(),
-    });
+    await dio.post(
+      "/term",
+      data: {
+        "termStart": termStart.toIso8601String(),
+        "termEnd": termEnd.toIso8601String(),
+      },
+      options: Options(
+        extra: {
+          "409": "해당 기간에 학기가 기등록되어 있습니다.",
+        },
+      ),
+    );
   }
 
   Future<List<Term>> getCurrentTerm() async {
@@ -463,25 +471,16 @@ class Client {
     await dio.delete("/control/$id");
   }
 
-  Future<void> cancelReservation(int id) async {
+  Future<void> cancelReservationByAdmin(
+    int id, {
+    required int count,
+  }) async {
     await dio.patch(
-      "/reservation/user/cancel/$id",
-      options: Options(
-        extra: {
-          "403": "다른 수강생의 수업을 취소할 수 없습니다. 관리자에게 문의하세요.",
-          "404": "해당 수업을 찾을 수 없습니다. 재검색을 시도하세요.",
-          "405": "취소 가능 횟수를 초과하였습니다. 취소 내역을 확인하거나 관리자에게 문의하세요.",
-        },
-      ),
-    );
-  }
-
-  Future<void> cancelReservationByAdmin(int id) async {
-    await dio.patch(
-      "/reservation/admin/cancel/$id",
+      "/reservation/admin/cancel/$id/$count",
       options: Options(
         extra: {
           "404": "해당 수업을 찾을 수 없습니다. 재검색을 시도하세요.",
+          "405": "취소 가능 횟수를 초과하였습니다. 취소 내역을 확인하세요.",
         },
       ),
     );
@@ -508,7 +507,8 @@ class Client {
           "409": "해당 시간대에 기예약된 수업이 존재합니다. 재검색을 시도하세요.",
           "412": "조건을 충족하지 않은 요청입니다. 다음의 경우에 해당합니다." +
               "\n1) 해당 시간대가 현재 닫힌 상태입니다. 다른 시간대에 예약을 시도하세요." +
-              "\n2) 보강 가능한 횟수가 부족합니다. 취소 내역을 확인하세요.",
+              "\n2) 보강 가능한 횟수가 부족합니다. 취소 내역을 확인하세요." +
+              "\n3) 입력값이 정규 스케줄의 데이터와 일치하지 않습니다. 정규 스케줄을 확인하세요.",
         },
       ),
     );
@@ -538,22 +538,6 @@ class Client {
     );
   }
 
-  Future<void> extendReservation(int id) async {
-    await dio.patch(
-      "/reservation/user/extend/$id",
-      options: Options(
-        extra: {
-          "400": "수업 시작 4시간 전부터는 수업을 연장할 수 없습니다.",
-          "403": "다른 수강생의 수업을 연장할 수 없습니다. 관리자에게 문의하세요.",
-          "404": "해당 수업을 찾을 수 없습니다. 재검색을 시도하세요.",
-          "405": "이미 취소된 수업입니다. 재검색을 시도하세요.",
-          "409": "해당 시간대에 기예약된 수업이 존재합니다. 재검색을 시도하세요.",
-          "412": "해당 시간대가 현재 닫힌 상태입니다. 다른 시간대에 예약을 시도하세요.",
-        },
-      ),
-    );
-  }
-
   Future<void> extendReservationByAdmin(
     int id, {
     required int count,
@@ -562,8 +546,11 @@ class Client {
       "/reservation/admin/extend/$id/$count",
       options: Options(
         extra: {
+          "400": "수업 시작 4시간 전부터는 수업을 연장할 수 없습니다.",
           "404": "해당 수업을 찾을 수 없습니다. 재검색을 시도하세요.",
+          "405": "이미 취소된 수업입니다. 재검색을 시도하세요.",
           "409": "해당 시간대에 기예약된 수업이 존재합니다. 재검색을 시도하세요.",
+          "412": "연장 가능한 횟수가 부족합니다. 취소 내역을 확인하세요.",
         },
       ),
     );

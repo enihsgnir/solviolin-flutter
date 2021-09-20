@@ -278,7 +278,6 @@ Future<void> getUserDetailData(User user) async {
     });
 
   _data.myLedgers = await _client.getLedgers(
-    branchName: user.branchName,
     userID: user.userID,
   )
     ..sort((a, b) => b.paidAt.compareTo(a.paidAt));

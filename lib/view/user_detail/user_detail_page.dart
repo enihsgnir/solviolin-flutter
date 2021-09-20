@@ -74,8 +74,8 @@ class _UserDetailPageState extends State<UserDetailPage>
                                   showMyDialog(
                                     title: "정규 종료",
                                     contents: [
-                                      Text("정규 스케줄을 종료하고"),
-                                      Text("종료일 이후 모든 수업을 삭제합니다."),
+                                      Text("정규 스케줄의 종료일을 갱신하고"),
+                                      Text("종료일 이후의 해당 정규 수업들을 삭제합니다."),
                                       pickDateTime(
                                         context: context,
                                         item: "종료일",

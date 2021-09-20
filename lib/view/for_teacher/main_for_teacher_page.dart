@@ -87,11 +87,11 @@ class _MainForTeacherPageState extends State<MainForTeacherPage> {
                 );
 
                 if (newDate != null) {
+                  final _temp = _data.displayDate;
+                  _data.updateDisplayDate(newDate);
                   _calendar.displayDate = newDate;
 
-                  if (!isSameWeek(newDate, _data.displayDate)) {
-                    _data.updateDisplayDate(newDate);
-
+                  if (!isSameWeek(newDate, _temp)) {
                     showLoading(() async {
                       try {
                         await getReservationDataForTeacher(
