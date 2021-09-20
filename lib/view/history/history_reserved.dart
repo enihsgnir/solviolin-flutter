@@ -66,8 +66,11 @@ class _HistoryReservedState extends State<HistoryReserved> {
                       reservation.startDate.isBefore(DateTime.now())
                           ? await showError("지난 수업은 연장할 수 없습니다.")
                           : reservation.bookingStatus.abs() == 3
-                              ? showError("이미 연장된 수업입니다.")
-                              : await _showModalExtend(context, reservation);
+                              ? await showError("이미 연장된 수업입니다.")
+                              : reservation.bookingStatus.abs() == 2
+                                  ? await showError("취소된 수업은 연장할 수 없습니다.")
+                                  : await _showModalExtend(
+                                      context, reservation);
                     },
                     borderLeft: true,
                   ),

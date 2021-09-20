@@ -35,50 +35,69 @@ class _GridAvailableState extends State<GridAvailable> {
                   ),
                 ),
               )
-            : controller.availabaleSpots.length == 0
+            : !_data.isRegularScheduleExisting
                 ? Center(
                     child: Container(
                       padding: EdgeInsets.only(top: 40.r),
-                      child: Text(
-                        "예약가능한 시간대가 없습니다!",
+                      child: DefaultTextStyle(
                         style: TextStyle(color: Colors.red, fontSize: 22.r),
-                      ),
-                    ),
-                  )
-                : Expanded(
-                    child: GridView.count(
-                      shrinkWrap: true,
-                      padding: EdgeInsets.fromLTRB(8.r, 8.r, 8.r, 0),
-                      crossAxisCount: 4,
-                      mainAxisSpacing: 16.r,
-                      crossAxisSpacing: 8.r,
-                      childAspectRatio: 2.2,
-                      children: List.generate(
-                        controller.availabaleSpots.length,
-                        (index) => InkWell(
-                          child: Container(
-                            alignment: Alignment.center,
-                            decoration: BoxDecoration(
-                              color: symbolColor,
-                              borderRadius: BorderRadius.circular(15.r),
-                            ),
-                            child: Text(
-                              DateFormat("HH:mm")
-                                  .format(controller.availabaleSpots[index]),
-                              style: contentStyle,
-                            ),
-                          ),
-                          onTap: () async {
-                            await _showReserve(
-                              context,
-                              controller.availabaleSpots[index],
-                            );
-                          },
-                          enableFeedback: false,
+                        child: Column(
+                          children: [
+                            Text("정규 스케줄이 등록되어 있지 않아"),
+                            Text("예약가능한 시간대가 표시되지 않습니다."),
+                            Text("관리자에게 문의하세요."),
+                          ],
                         ),
                       ),
                     ),
-                  );
+                  )
+                : controller.availabaleSpots.length == 0
+                    ? Center(
+                        child: Container(
+                          padding: EdgeInsets.only(top: 40.r),
+                          child: Text(
+                            "예약가능한 시간대가 없습니다!",
+                            style: TextStyle(color: Colors.red, fontSize: 22.r),
+                          ),
+                        ),
+                      )
+                    : Expanded(
+                        child: GridView.count(
+                          shrinkWrap: true,
+                          padding: EdgeInsets.fromLTRB(8.r, 8.r, 8.r, 0),
+                          crossAxisCount: 4,
+                          mainAxisSpacing: 16.r,
+                          crossAxisSpacing: 8.r,
+                          childAspectRatio: 2.2,
+                          children: List.generate(
+                            controller.availabaleSpots.length,
+                            (index) => InkWell(
+                              child: Container(
+                                alignment: Alignment.center,
+                                decoration: BoxDecoration(
+                                  color: symbolColor,
+                                  borderRadius: BorderRadius.circular(15.r),
+                                ),
+                                child: Text(
+                                  DateFormat("HH:mm").format(
+                                      controller.availabaleSpots[index]),
+                                  style: contentStyle,
+                                ),
+                              ),
+                              onTap: () async {
+                                !_data.isRegularScheduleExisting
+                                    ? await showError(
+                                        "정규 스케줄이 등록되어 있지 않아 수업을 예약할 수 없습니다. 관리자에게 문의하세요.")
+                                    : await _showReserve(
+                                        context,
+                                        controller.availabaleSpots[index],
+                                      );
+                              },
+                              enableFeedback: false,
+                            ),
+                          ),
+                        ),
+                      );
       },
     );
   }

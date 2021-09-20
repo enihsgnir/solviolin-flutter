@@ -22,6 +22,8 @@ class DataController extends GetxController {
   List<Reservation> lastMonthReservations = [];
   List<Change> changes = [];
 
+  bool isRegularScheduleExisting = true;
+
   void updateDays(DateTime selectedData, DateTime focusedData) {
     selectedDay = selectedData;
     focusedDay = focusedData;

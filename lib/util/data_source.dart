@@ -30,6 +30,7 @@ Future<void> getInitialData([
 
         return primary != 0 ? primary : a.startTime.compareTo(b.startTime);
       });
+    _data.isRegularScheduleExisting = true;
   } catch (e) {
     _data.regularSchedules = [
       RegularSchedule(
@@ -40,13 +41,16 @@ Future<void> getInitialData([
         branchName: _data.profile.branchName,
       ),
     ];
+    _data.isRegularScheduleExisting = false;
   }
 
-  _data.availabaleSpots = await _client.getAvailableSpots(
-    branchName: _data.profile.branchName,
-    teacherID: _data.regularSchedules[0].teacherID,
-    startDate: DateTime(today.year, today.month, today.day),
-  )
+  _data.availabaleSpots = !_data.isRegularScheduleExisting
+      ? []
+      : await _client.getAvailableSpots(
+          branchName: _data.profile.branchName,
+          teacherID: _data.regularSchedules[0].teacherID,
+          startDate: DateTime(today.year, today.month, today.day),
+        )
     ..sort((a, b) => a.compareTo(b));
 
   _data.myValidReservations = await _client.getReservations(
@@ -74,6 +78,7 @@ Future<void> getUserBasedData() async {
 
         return primary != 0 ? primary : a.startTime.compareTo(b.startTime);
       });
+    _data.isRegularScheduleExisting = true;
   } catch (e) {
     _data.regularSchedules = [
       RegularSchedule(
@@ -84,6 +89,7 @@ Future<void> getUserBasedData() async {
         branchName: _data.profile.branchName,
       ),
     ];
+    _data.isRegularScheduleExisting = false;
   }
 
   _data.currentTerm = await _client.getCurrentTerm()
@@ -93,11 +99,13 @@ Future<void> getUserBasedData() async {
 }
 
 Future<void> getSelectedDayData(DateTime selectedDay) async {
-  _data.availabaleSpots = await _client.getAvailableSpots(
-    branchName: _data.profile.branchName,
-    teacherID: _data.regularSchedules[0].teacherID,
-    startDate: selectedDay,
-  )
+  _data.availabaleSpots = !_data.isRegularScheduleExisting
+      ? []
+      : await _client.getAvailableSpots(
+          branchName: _data.profile.branchName,
+          teacherID: _data.regularSchedules[0].teacherID,
+          startDate: selectedDay,
+        )
     ..sort((a, b) => a.compareTo(b));
   _data.update();
 }
