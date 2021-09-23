@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:csv/csv.dart';
+import 'package:excel/excel.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
@@ -193,13 +193,6 @@ Future<void> saveUsersData({
   int? userType,
   int? status,
 }) async {
-  final directory = Platform.isIOS
-      ? await getApplicationDocumentsDirectory()
-      : await getExternalStorageDirectory();
-  final path = directory?.path;
-  final file = File("$path/users_list_" +
-      "${DateFormat("yy_MM_dd_HH_mm").format(DateTime.now())}.csv");
-
   final jsonList = await _client.getJsonUsers(
     branchName: branchName,
     userID: userID,
@@ -209,25 +202,37 @@ Future<void> saveUsersData({
   )
     ..sort((a, b) => a["userName"].compareTo(b["userName"]));
 
-  List<List<dynamic>> listOfValuesAsRows = [];
-  jsonList.forEach((element) {
-    String phone = element["userPhone"];
-    if (phone.length == 10) {
-      phone = phone.replaceAllMapped(
-        RegExp(r"(\d{3})(\d{3})(\d+)"),
-        (match) => "${match[1]}-${match[2]}-${match[3]}",
-      );
-    } else if (phone.length == 11) {
+  var excel = Excel.createExcel();
+  var sheetObject = excel["Sheet1"];
+  for (int i = 0; i < jsonList.length; i++) {
+    sheetObject
+        .cell(CellIndex.indexByColumnRow(columnIndex: 0, rowIndex: i))
+        .value = jsonList[i]["userName"];
+
+    String phone = jsonList[i]["userPhone"];
+    if (phone.length == 11) {
       phone = phone.replaceAllMapped(
         RegExp(r"(\d{3})(\d{4})(\d+)"),
         (match) => "${match[1]}-${match[2]}-${match[3]}",
       );
+    } else if (phone.length == 10) {
+      phone = phone.replaceAllMapped(
+        RegExp(r"(\d{3})(\d{3})(\d+)"),
+        (match) => "${match[1]}-${match[2]}-${match[3]}",
+      );
     }
+    sheetObject
+        .cell(CellIndex.indexByColumnRow(columnIndex: 1, rowIndex: i))
+        .value = phone;
+  }
 
-    listOfValuesAsRows.add([element["userName"], phone]);
-  });
-  var csv = const ListToCsvConverter().convert(listOfValuesAsRows);
-  file.writeAsString(csv);
+  final directory = Platform.isIOS
+      ? await getApplicationDocumentsDirectory()
+      : await getExternalStorageDirectory();
+  final path = directory?.path;
+  final file = File("$path/user_list_" +
+      "${DateFormat("yy_MM_dd_HH_mm").format(DateTime.now())}.xlsx")
+    ..writeAsBytesSync(excel.encode()!);
 
   Get.snackbar(
     "",

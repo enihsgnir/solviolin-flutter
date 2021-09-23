@@ -147,12 +147,11 @@ class _UserPageState extends State<UserPage> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text("목록은 검색 입력값을 기반으로 저장됩니다."),
-                    Text("저장하기 전 검색을 권장합니다."),
-                    Text("\n유저 목록 파일 저장 경로"),
+                    Text("저장하기 전 검색을 통해 목록을 확인하세요."),
+                    Text("\n유저 목록 파일(*.xlsx) 저장 경로"),
                     Text(
                         "Android: 내장 메모리/Android/data/com.solviolin.solviolin_admin/files/"),
                     Text("iOS: 파일/나의 iPhone(iPad)/솔바이올린(관리자)/"),
-                    Text("\n*.csv 확장자로 저장됩니다."),
                   ],
                 ),
               )
@@ -271,14 +270,14 @@ class _UserPageState extends State<UserPage> {
 }
 
 String _parsePhoneNumber(String phone) {
-  if (phone.length == 10) {
-    return phone.replaceAllMapped(
-      RegExp(r"(\d{3})(\d{3})(\d+)"),
-      (match) => "${match[1]}-${match[2]}-${match[3]}",
-    );
-  } else if (phone.length == 11) {
+  if (phone.length == 11) {
     return phone.replaceAllMapped(
       RegExp(r"(\d{3})(\d{4})(\d+)"),
+      (match) => "${match[1]}-${match[2]}-${match[3]}",
+    );
+  } else if (phone.length == 10) {
+    return phone.replaceAllMapped(
+      RegExp(r"(\d{3})(\d{3})(\d+)"),
       (match) => "${match[1]}-${match[2]}-${match[3]}",
     );
   } else if (phone.length > 3) {
