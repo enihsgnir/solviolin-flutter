@@ -32,7 +32,16 @@ Widget pickDateTime({
           Container(
             width: 220.r,
             child: InputDecorator(
-              decoration: const InputDecoration(),
+              decoration: InputDecoration(
+                suffixIcon: IconButton(
+                  onPressed: () {
+                    controller.dateTime[index] = null;
+                    controller.update();
+                  },
+                  icon: Icon(Icons.clear, size: 20.r),
+                  splashRadius: 20.r,
+                ),
+              ),
               child: InkWell(
                 child: Text(
                   controller.dateTime[index] == null
@@ -109,7 +118,16 @@ Widget pickDate({
           Container(
             width: 220.r,
             child: InputDecorator(
-              decoration: const InputDecoration(),
+              decoration: InputDecoration(
+                suffixIcon: IconButton(
+                  onPressed: () {
+                    controller.date[index] = null;
+                    controller.update();
+                  },
+                  icon: Icon(Icons.clear, size: 20.r),
+                  splashRadius: 20.r,
+                ),
+              ),
               child: InkWell(
                 child: Text(
                   controller.date[index] == null
@@ -177,7 +195,16 @@ Widget pickTime({
           Container(
             width: 220.r,
             child: InputDecorator(
-              decoration: const InputDecoration(),
+              decoration: InputDecoration(
+                suffixIcon: IconButton(
+                  onPressed: () {
+                    controller.time[index] = null;
+                    controller.update();
+                  },
+                  icon: Icon(Icons.clear, size: 20.r),
+                  splashRadius: 20.r,
+                ),
+              ),
               child: InkWell(
                 child: Text(
                   controller.time[index] == null

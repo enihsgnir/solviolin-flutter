@@ -33,10 +33,11 @@ class _HistoryReservedState extends State<HistoryReserved> {
     return widget.reservations.length == 0
         ? DefaultTextStyle(
             style: TextStyle(color: Colors.red, fontSize: 20.r),
+            textAlign: TextAlign.center,
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text("예약내역을 조회할 수 없습니다."),
+                Text("예약 내역을 조회할 수 없습니다."),
               ],
             ),
           )

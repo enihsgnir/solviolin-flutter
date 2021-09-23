@@ -1,12 +1,11 @@
-import 'dart:convert';
 import 'dart:io';
 
+import 'package:csv/csv.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:solviolin_admin/model/regular_schedule.dart';
-import 'package:solviolin_admin/model/reservation.dart';
 import 'package:solviolin_admin/model/teacher_info.dart';
 import 'package:solviolin_admin/model/user.dart';
 import 'package:solviolin_admin/util/constant.dart';
@@ -95,9 +94,9 @@ Future<void> getReservationDataForTeacher({
     (index) => _data.teachers[index].branchName,
   ).toSet().toList();
 
-  List<Reservation> _reservations = [];
+  _data.reservations = [];
   await Future.forEach<String>(_branches, (element) async {
-    _reservations.addAll(await _client.getReservations(
+    _data.reservations.addAll(await _client.getReservations(
       branchName: element,
       teacherID: teacherID,
       startDate: first,
@@ -106,7 +105,6 @@ Future<void> getReservationDataForTeacher({
     )
       ..sort((a, b) => a.startDate.compareTo(b.startDate)));
   });
-  _data.reservations = _reservations;
 
   _data.reservationDataSource = ReservationDataSource();
 
@@ -200,16 +198,36 @@ Future<void> saveUsersData({
       : await getExternalStorageDirectory();
   final path = directory?.path;
   final file = File("$path/users_list_" +
-      "${DateFormat("yy_MM_dd_HH_mm").format(DateTime.now())}.json");
+      "${DateFormat("yy_MM_dd_HH_mm").format(DateTime.now())}.csv");
 
-  final data = await _client.getJsonUsers(
+  final jsonList = await _client.getJsonUsers(
     branchName: branchName,
     userID: userID,
     isPaid: isPaid,
     userType: userType,
     status: status,
-  );
-  file.writeAsString(json.encode(data));
+  )
+    ..sort((a, b) => a["userName"].compareTo(b["userName"]));
+
+  List<List<dynamic>> listOfValuesAsRows = [];
+  jsonList.forEach((element) {
+    String phone = element["userPhone"];
+    if (phone.length == 10) {
+      phone = phone.replaceAllMapped(
+        RegExp(r"(\d{3})(\d{3})(\d+)"),
+        (match) => "${match[1]}-${match[2]}-${match[3]}",
+      );
+    } else if (phone.length == 11) {
+      phone = phone.replaceAllMapped(
+        RegExp(r"(\d{3})(\d{4})(\d+)"),
+        (match) => "${match[1]}-${match[2]}-${match[3]}",
+      );
+    }
+
+    listOfValuesAsRows.add([element["userName"], phone]);
+  });
+  var csv = const ListToCsvConverter().convert(listOfValuesAsRows);
+  file.writeAsString(csv);
 
   Get.snackbar(
     "",
@@ -301,6 +319,30 @@ Future<void> getControlsData({
     status: status,
   )
     ..sort((a, b) => a.controlStart.compareTo(b.controlStart));
+
+  _data.update();
+}
+
+Future<void> getControlsDataForTeacher({
+  String? teacherID,
+}) async {
+  _data.teachers = await _client.getTeachers(
+    teacherID: teacherID,
+  );
+
+  var _branches = List.generate(
+    _data.teachers.length,
+    (index) => _data.teachers[index].branchName,
+  ).toSet().toList();
+
+  _data.controls = []; //TODO: set contolStart and controlEnd
+  await Future.forEach<String>(_branches, (element) async {
+    _data.controls.addAll(await _client.getControls(
+      branchName: element,
+      teacherID: teacherID,
+    )
+      ..sort((a, b) => a.controlStart.compareTo(b.controlStart)));
+  });
 
   _data.update();
 }

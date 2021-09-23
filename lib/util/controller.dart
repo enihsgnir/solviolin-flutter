@@ -71,14 +71,16 @@ class DataController extends GetxController {
 }
 
 class CacheController extends GetxController {
-  bool isSearched = false;
-  bool hasBeenShown = false;
+  var isSearched = false;
+  var hasBeenShown = false;
 
   Map<int, DateTime?> dateTime = {};
   Map<int, DateTime?> date = {};
   Map<int, TimeOfDay?> time = {};
 
   Map<int, int?> check = {};
+
+  Map<Type, dynamic> type = {};
 
   User? userDetail;
 
@@ -92,25 +94,24 @@ class CacheController extends GetxController {
   var edit3 = TextEditingController();
   var edit4 = TextEditingController();
 
-  Map<Type, dynamic> type = {};
-
   void reset() {
+    isSearched = false;
+
     dateTime = {};
     date = {};
     time = {};
     check = {};
+    type = {};
 
     branchName = null;
     workDow = null;
     termID = null;
     duration = null;
 
-    edit1.text = "";
-    edit2.text = "";
-    edit3.text = "";
-    edit4.text = "";
-
-    type = {};
+    edit1.clear();
+    edit2.clear();
+    edit3.clear();
+    edit4.clear();
   }
 
   @override

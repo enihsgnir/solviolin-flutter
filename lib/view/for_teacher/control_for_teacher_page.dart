@@ -6,25 +6,25 @@ import 'package:solviolin_admin/util/controller.dart';
 import 'package:solviolin_admin/widget/item_list.dart';
 import 'package:solviolin_admin/widget/single.dart';
 
-class CanceledForTeacherPage extends StatefulWidget {
-  const CanceledForTeacherPage({Key? key}) : super(key: key);
+class ControlForTeacherPage extends StatefulWidget {
+  const ControlForTeacherPage({Key? key}) : super(key: key);
 
   @override
-  _CanceledForTeacherPageState createState() => _CanceledForTeacherPageState();
+  _ControlForTeacherPageState createState() => _ControlForTeacherPageState();
 }
 
-class _CanceledForTeacherPageState extends State<CanceledForTeacherPage> {
+class _ControlForTeacherPageState extends State<ControlForTeacherPage> {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () => FocusScope.of(context).requestFocus(FocusNode()),
       child: Scaffold(
-        appBar: myAppBar("취소 내역"),
+        appBar: myAppBar("오픈/클로즈"),
         body: SafeArea(
           child: Column(
             children: [
               Expanded(
-                child: _canceledList(),
+                child: _controlList(),
               ),
             ],
           ),
@@ -33,11 +33,12 @@ class _CanceledForTeacherPageState extends State<CanceledForTeacherPage> {
     );
   }
 
-  Widget _canceledList() {
-    //TODO: without Get.find?
+  Widget _controlList() {
+    Get.find<DataController>();
+
     return GetBuilder<DataController>(
       builder: (controller) {
-        return controller.canceledReservations.length == 0
+        return controller.controls.length == 0
             ? DefaultTextStyle(
                 style: TextStyle(color: Colors.red, fontSize: 20.r),
                 textAlign: TextAlign.center,
@@ -45,27 +46,26 @@ class _CanceledForTeacherPageState extends State<CanceledForTeacherPage> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text("취소 내역을 조회할 수 없습니다."),
+                      Text("오픈/클로즈 목록을 조회할 수 없습니다."),
                     ],
                   ),
                 ),
               )
             : ListView.builder(
-                itemCount: controller.canceledReservations.length,
+                itemCount: controller.controls.length,
                 itemBuilder: (context, index) {
-                  var canceled = controller.canceledReservations[index];
+                  var control = controller.controls[index];
 
                   return myNormalCard(
                     children: [
-                      Text(
-                          "${canceled.teacherID} / ${canceled.userID} / ${canceled.branchName}"),
-                      Text(DateFormat("yy/MM/dd HH:mm")
-                              .format(canceled.startDate) +
-                          " ~ " +
-                          DateFormat("HH:mm").format(canceled.endDate)),
-                      Text(canceled.toID.length == 0
-                          ? "보강 미예약"
-                          : "보강 ID: " + canceled.toID.toString()),
+                      Text("${control.teacherID} / ${control.branchName}" +
+                          " / ${control.status == 0 ? "오픈" : "클로즈"}"),
+                      Text("시작: " +
+                          DateFormat("yy/MM/dd HH:mm")
+                              .format(control.controlStart)),
+                      Text("종료: " +
+                          DateFormat("yy/MM/dd HH:mm")
+                              .format(control.controlEnd)),
                     ],
                   );
                 },

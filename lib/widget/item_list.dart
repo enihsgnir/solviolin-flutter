@@ -13,6 +13,7 @@ Widget myNormalCard({
     margin: EdgeInsets.symmetric(vertical: 4.r, horizontal: 8.r),
     child: DefaultTextStyle(
       style: TextStyle(fontSize: 24.r),
+      textAlign: TextAlign.center,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: children,
@@ -37,6 +38,7 @@ Widget mySlidableCard({
       margin: EdgeInsets.symmetric(vertical: 4.r, horizontal: 8.r),
       child: DefaultTextStyle(
         style: TextStyle(fontSize: 24.r),
+        textAlign: TextAlign.center,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: children,

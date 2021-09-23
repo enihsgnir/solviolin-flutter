@@ -200,14 +200,14 @@ class _ControlPageState extends State<ControlPage> {
           item: "오픈/클로즈",
           names: ["오픈", "클로즈"],
           values: ControlStatus.values,
-          groupValue: ControlStatus.open,
+          groupValue: ControlStatus.values[0],
         ),
         myRadio<CancelInClose>(
           tag: "/register",
           item: "클로즈 시",
           names: ["유지", "취소", "삭제"],
           values: CancelInClose.values,
-          groupValue: CancelInClose.none,
+          groupValue: CancelInClose.values[0],
           isMandatory: false,
         ),
         Text(

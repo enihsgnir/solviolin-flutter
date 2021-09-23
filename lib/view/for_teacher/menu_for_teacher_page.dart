@@ -40,7 +40,28 @@ class _MenuForTeacherPageState extends State<MenuForTeacherPage> {
                     if (_data.reservations.length == 0) {
                       await showMySnackbar(
                         title: "알림",
-                        message: "검색 조건에 해당하는 목록이 없습니다.",
+                        message: "계정 정보에 해당하는 목록이 없습니다.",
+                      );
+                    }
+                  } catch (e) {
+                    showError(e);
+                  }
+                });
+              }),
+              menu("오픈/클로즈", () {
+                showLoading(() async {
+                  try {
+                    await getControlsDataForTeacher(
+                      teacherID: _data.profile.userID,
+                    );
+                    _data.update();
+
+                    Get.toNamed("/control-teacher");
+
+                    if (_data.controls.length == 0) {
+                      await showMySnackbar(
+                        title: "알림",
+                        message: "계정 정보에 해당하는 목록이 없습니다.",
                       );
                     }
                   } catch (e) {
@@ -61,7 +82,7 @@ class _MenuForTeacherPageState extends State<MenuForTeacherPage> {
                     if (_data.canceledReservations.length == 0) {
                       await showMySnackbar(
                         title: "알림",
-                        message: "검색 조건에 해당하는 목록이 없습니다.",
+                        message: "계정 정보에 해당하는 목록이 없습니다.",
                       );
                     }
                   } catch (e) {

@@ -14,6 +14,7 @@ import 'package:solviolin_admin/view/check_in/check_in_history_page.dart';
 import 'package:solviolin_admin/view/check_in/check_in_page.dart';
 import 'package:solviolin_admin/view/control_page.dart';
 import 'package:solviolin_admin/view/for_teacher/canceled_for_teacher_page.dart';
+import 'package:solviolin_admin/view/for_teacher/control_for_teacher_page.dart';
 import 'package:solviolin_admin/view/for_teacher/main_for_teacher_page.dart';
 import 'package:solviolin_admin/view/for_teacher/menu_for_teacher_page.dart';
 import 'package:solviolin_admin/view/ledger_page.dart';
@@ -90,6 +91,7 @@ class _MyAppState extends State<MyApp> {
         GetPage(name: "/check-in/history", page: () => CheckInHistoryPage()),
         GetPage(name: "/menu-teacher", page: () => MenuForTeacherPage()),
         GetPage(name: "/main-teacher", page: () => MainForTeacherPage()),
+        GetPage(name: "/control-teacher", page: () => ControlForTeacherPage()),
         GetPage(
             name: "/canceled-teacher", page: () => CanceledForTeacherPage()),
       ],

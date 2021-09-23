@@ -33,9 +33,9 @@ Widget _myDropdown<T>({
           style: contentStyle,
           validator: (value) => value == null ? validator : null,
           onChanged: onChanged,
+          onSaved: onChanged,
           onTap: () =>
               FocusScope.of(Get.overlayContext!).requestFocus(FocusNode()),
-          onSaved: onChanged,
           items: items,
         ),
       ),
@@ -62,12 +62,18 @@ Widget branchDropdown([
     ));
   }
 
-  return _myDropdown<String>(
-    title: "지점명",
-    value: _cache.branchName,
-    validator: validator,
-    onChanged: (value) => _cache.branchName = value,
-    items: items,
+  return StatefulBuilder(
+    builder: (context, setState) {
+      return _myDropdown<String>(
+        title: "지점명",
+        value: _cache.branchName,
+        validator: validator,
+        onChanged: (value) => setState(() {
+          _cache.branchName = value;
+        }),
+        items: items,
+      );
+    },
   );
 }
 
@@ -90,12 +96,18 @@ Widget workDowDropdown([
     ));
   }
 
-  return _myDropdown<int>(
-    title: "요일",
-    value: _cache.workDow,
-    validator: validator,
-    onChanged: (value) => _cache.workDow = value,
-    items: items,
+  return StatefulBuilder(
+    builder: (context, setState) {
+      return _myDropdown<int>(
+        title: "요일",
+        value: _cache.workDow,
+        validator: validator,
+        onChanged: (value) => setState(() {
+          _cache.workDow = value;
+        }),
+        items: items,
+      );
+    },
   );
 }
 
@@ -120,12 +132,18 @@ Widget termDropdown([
     ));
   }
 
-  return _myDropdown<int>(
-    title: "학기",
-    value: _cache.termID,
-    validator: validator,
-    onChanged: (value) => _cache.termID = value,
-    items: items,
+  return StatefulBuilder(
+    builder: (context, setState) {
+      return _myDropdown<int>(
+        title: "학기",
+        value: _cache.termID,
+        validator: validator,
+        onChanged: (value) => setState(() {
+          _cache.termID = value;
+        }),
+        items: items,
+      );
+    },
   );
 }
 
@@ -148,11 +166,17 @@ Widget durationDropdown([
     ));
   }
 
-  return _myDropdown<Duration>(
-    title: "수업시간",
-    value: _cache.duration,
-    validator: validator,
-    onChanged: (value) => _cache.duration = value,
-    items: items,
+  return StatefulBuilder(
+    builder: (context, setState) {
+      return _myDropdown<Duration>(
+        title: "수업시간",
+        value: _cache.duration,
+        validator: validator,
+        onChanged: (value) => setState(() {
+          _cache.duration = value;
+        }),
+        items: items,
+      );
+    },
   );
 }

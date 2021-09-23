@@ -236,10 +236,11 @@ class _UserDetailPageState extends State<UserDetailPage>
         return controller.changes.length == 0
             ? DefaultTextStyle(
                 style: TextStyle(color: Colors.red, fontSize: 20.r),
+                textAlign: TextAlign.center,
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text("변경내역을 조회할 수 없습니다."),
+                    Text("변경 내역을 조회할 수 없습니다."),
                   ],
                 ),
               )
@@ -272,10 +273,11 @@ class _UserDetailPageState extends State<UserDetailPage>
         return controller.myLedgers.length == 0
             ? DefaultTextStyle(
                 style: TextStyle(color: Colors.red, fontSize: 20.r),
+                textAlign: TextAlign.center,
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text("납부내역을 조회할 수 없습니다."),
+                    Text("납부 내역을 조회할 수 없습니다."),
                   ],
                 ),
               )

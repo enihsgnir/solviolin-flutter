@@ -129,14 +129,16 @@ class _LedgerPageState extends State<LedgerPage> {
         return controller.ledgers.length == 0
             ? DefaultTextStyle(
                 style: TextStyle(color: Colors.red, fontSize: 20.r),
+                textAlign: TextAlign.center,
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text("합계 조회 시 지점/학기는"),
                     Text("필수 입력 항목입니다."),
-                    Text("\n검색에 사용한 값들은"),
-                    Text("원비납부 화면과 연동됩니다."),
-                    Text("('금액'은 검색에 사용되지 않습니다.)"),
+                    Text("\n검색란에 값을 미리 지정해두면"),
+                    Text("우측 하단의 버튼을 통해 연결되는"),
+                    Text("원비납부 화면에서 자동으로 연동됩니다."),
+                    Text("('금액'은 검색 조건에 해당하지 않습니다.)"),
                   ],
                 ),
               )

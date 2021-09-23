@@ -33,7 +33,9 @@ class _UserPageState extends State<UserPage> {
     return GestureDetector(
       onTap: () => FocusScope.of(context).requestFocus(FocusNode()),
       child: Scaffold(
-        appBar: myAppBar("유저 검색"),
+        appBar: myAppBar(
+          "유저 검색",
+        ),
         body: SafeArea(
           child: Column(
             children: [
@@ -63,7 +65,7 @@ class _UserPageState extends State<UserPage> {
           item: "구분",
           names: ["수강생", "강사", "관리자"],
           values: UserType.values,
-          groupValue: UserType.student,
+          groupValue: UserType.values[0],
         ),
         Row(
           children: [
@@ -77,15 +79,14 @@ class _UserPageState extends State<UserPage> {
             myActionButton(
               context: context,
               onPressed: () => showLoading(() async {
-                try {
-                  await saveUsersData(
-                    branchName: search.branchName,
-                    userID: textEdit(search.edit1),
-                    isPaid: search.check[0],
-                    userType: UserType.values.indexOf(search.type[UserType]),
-                    status: search.check[1],
-                  );
-                } catch (e) {
+                await saveUsersData(
+                  branchName: search.branchName,
+                  userID: textEdit(search.edit1),
+                  isPaid: search.check[0],
+                  userType: UserType.values.indexOf(search.type[UserType]),
+                  status: search.check[1],
+                );
+                try {} catch (e) {
                   showError(e);
                 }
               }),
@@ -141,6 +142,7 @@ class _UserPageState extends State<UserPage> {
         return controller.users.length == 0
             ? DefaultTextStyle(
                 style: TextStyle(color: Colors.red, fontSize: 20.r),
+                textAlign: TextAlign.center,
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -150,8 +152,7 @@ class _UserPageState extends State<UserPage> {
                     Text(
                         "Android: 내장 메모리/Android/data/com.solviolin.solviolin_admin/files/"),
                     Text("iOS: 파일/나의 iPhone(iPad)/솔바이올린(관리자)/"),
-                    Text("\n저장된 JSON 파일을 UTF-8 인코딩을 통해"),
-                    Text("CSV 형식으로 변환하여 사용할 수 있습니다."),
+                    Text("\n*.csv 확장자로 저장됩니다."),
                   ],
                 ),
               )
@@ -210,7 +211,7 @@ class _UserPageState extends State<UserPage> {
           item: "구분",
           names: ["수강생", "강사", "관리자"],
           values: UserType.values,
-          groupValue: UserType.student,
+          groupValue: UserType.values[0],
         ),
       ],
       onPressed: () {

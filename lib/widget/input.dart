@@ -38,6 +38,13 @@ Widget myTextInput(
         width: 220.r,
         child: TextFormField(
           controller: controller,
+          decoration: InputDecoration(
+            suffixIcon: IconButton(
+              onPressed: controller.clear,
+              icon: Icon(Icons.clear, size: 20.r),
+              splashRadius: 20.r,
+            ),
+          ),
           keyboardType: keyboardType,
           style: contentStyle,
           validator: (value) => value == "" ? validator : null,

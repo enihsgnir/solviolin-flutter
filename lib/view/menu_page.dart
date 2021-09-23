@@ -129,7 +129,16 @@ class _MenuPageState extends State<MenuPage> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  menu("취소 내역", () => Get.toNamed("/teacher/canceled")),
+                  menu("취소 내역", () async {
+                    Get.toNamed("/teacher/canceled");
+
+                    if (canceled.isSearched) {
+                      await showMySnackbar(
+                        title: "알림",
+                        message: "검색 기록이 존재합니다. 재검색을 시도하세요.",
+                      );
+                    }
+                  }),
                   menu("급여 계산", () async {
                     Get.toNamed("/teacher/salary");
 
@@ -178,7 +187,7 @@ class _MenuPageState extends State<MenuPage> {
   }
 
   Future _showBranchRegister() {
-    branch.text = "";
+    branch.clear();
 
     return showMyDialog(
       title: "지점 등록",

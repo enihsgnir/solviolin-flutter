@@ -97,10 +97,10 @@ class _SalaryPageState extends State<SalaryPage> {
             return myNormalCard(
               children: [
                 Text(salary.teacherID),
-                Text(
-                    "주간근로시간: " + NumberFormat("#,###분").format(salary.dayTime)),
-                Text("야간근로시간: " +
-                    NumberFormat("#,###분").format(salary.nightTime)),
+                Text("주간근로시간: 30분 * " +
+                    NumberFormat("#,###.#회").format(salary.dayTime / 30)),
+                Text("야간근로시간: 30분 * " +
+                    NumberFormat("#,###.#회").format(salary.nightTime / 30)),
                 Text("급여: " + NumberFormat("#,###원").format(salary.income)),
               ],
             );
