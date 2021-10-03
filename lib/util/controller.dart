@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:solviolin/model/change.dart';
 import 'package:solviolin/model/profile.dart';
@@ -15,8 +16,10 @@ class DataController extends GetxController {
   List<Reservation> myValidReservations = [];
   List<Term> currentTerm = [];
 
-  DateTime selectedDay = DateTime.now();
-  late DateTime focusedDay;
+  DateTime selectedDay =
+      DateUtils.dateOnly(DateTime.now()).add(DateTime.now().timeZoneOffset);
+  DateTime focusedDay =
+      DateUtils.dateOnly(DateTime.now()).add(DateTime.now().timeZoneOffset);
 
   List<Reservation> thisMonthReservations = [];
   List<Reservation> lastMonthReservations = [];

@@ -40,6 +40,7 @@ class _CalendarReservedState extends State<CalendarReserved> {
           lastDay: controller.currentTerm[0].termEnd
               .add(const Duration(hours: 23, minutes: 59, seconds: 59)),
           currentDay: today,
+          locale: "en_US", // not timezone
           weekendDays: const [DateTime.sunday],
           availableCalendarFormats: const {CalendarFormat.month: "Month"},
           pageJumpingEnabled: true,
@@ -49,7 +50,7 @@ class _CalendarReservedState extends State<CalendarReserved> {
           headerStyle: HeaderStyle(
             titleCentered: true,
             titleTextFormatter: (date, locale) =>
-                DateFormat.yMMM().format(date),
+                DateFormat.yMMM(locale).format(date),
             titleTextStyle: TextStyle(
               color: Colors.white,
               fontSize: 28.r,

@@ -78,7 +78,7 @@ class _LoadingPageState extends State<LoadingPage> {
 
         var message = "환영합니다!";
         if (!_data.isRegularScheduleExisting) {
-          message = "정규 스케줄이 등록되어 있지 않아 예약가능한 시간대가 표시되지 않습니다. 관리자에게 문의하세요.";
+          message = "정기 스케줄이 등록되어 있지 않아 예약가능한 시간대가 표시되지 않습니다. 관리자에게 문의하세요.";
         }
         await showMySnackbar(
           title: "${_data.profile.userID}님",

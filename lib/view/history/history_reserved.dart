@@ -208,7 +208,7 @@ class _HistoryReservedState extends State<HistoryReserved> {
 
 String _statusToString(int bookingStatus) {
   Map<int, String> status = {
-    0: "정규",
+    0: "정기",
     1: "보강",
     2: "취소",
     3: "연장",

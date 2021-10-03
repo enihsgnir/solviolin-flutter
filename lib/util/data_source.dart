@@ -49,8 +49,14 @@ Future<void> getInitialData([
       : await _client.getAvailableSpots(
           branchName: _data.profile.branchName,
           teacherID: _data.regularSchedules[0].teacherID,
-          startDate: DateTime(today.year, today.month, today.day),
+          startDate: DateTime.utc(today.year, today.month, today.day),
         )
+    ..removeWhere((element) =>
+        Duration(hours: element.hour, minutes: element.minute) <=
+        Duration(hours: today.hour + 4, minutes: today.minute))
+    ..removeWhere((element) => _data.regularSchedules[0].startTime.inHours >= 16
+        ? element.hour < 16
+        : element.hour >= 16)
     ..sort((a, b) => a.compareTo(b));
 
   _data.myValidReservations = await _client.getReservations(
@@ -99,6 +105,8 @@ Future<void> getUserBasedData() async {
 }
 
 Future<void> getSelectedDayData(DateTime selectedDay) async {
+  var today = DateTime.now();
+
   _data.availabaleSpots = !_data.isRegularScheduleExisting
       ? []
       : await _client.getAvailableSpots(
@@ -106,6 +114,13 @@ Future<void> getSelectedDayData(DateTime selectedDay) async {
           teacherID: _data.regularSchedules[0].teacherID,
           startDate: selectedDay,
         )
+    ..removeWhere((element) => isSameDay(selectedDay, today)
+        ? Duration(hours: element.hour, minutes: element.minute) <=
+            Duration(hours: today.hour + 4, minutes: today.minute)
+        : false)
+    ..removeWhere((element) => _data.regularSchedules[0].startTime.inHours >= 16
+        ? element.hour < 16
+        : element.hour >= 16)
     ..sort((a, b) => a.compareTo(b));
   _data.update();
 }

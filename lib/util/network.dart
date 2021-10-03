@@ -178,7 +178,7 @@ class Client {
       );
     }
     throw NetworkException._(
-      message: "내 정규 일정을 불러올 수 없습니다.",
+      message: "내 정기 스케줄을 불러올 수 없습니다.",
       options: response.requestOptions,
     );
   }
@@ -286,7 +286,7 @@ class Client {
         extra: {
           "400": "잘못된 요청입니다. 다음의 경우에 해당합니다." +
               "\n1) 수업 시작 4시간 전부터는 보강을 예약할 수 없습니다." +
-              "\n2) 정규 스케줄이 16시 이후에 해당하는 수강생은 16시 이후의 수업만 예약할 수 있습니다. 반대의 경우도 동일합니다.",
+              "\n2) 정기 스케줄이 16시 이후에 해당하는 수강생은 16시 이후의 수업만 예약할 수 있습니다. 반대의 경우도 동일합니다.",
           "409": "해당 시간대에 기예약된 수업이 존재합니다.",
           "412": "조건을 충족하지 않은 요청입니다. 다음의 경우에 해당합니다." +
               "\n1) 해당 시간대가 현재 닫힌 상태입니다. 다른 시간대에 예약을 시도하세요." +
@@ -301,7 +301,8 @@ class Client {
       "/reservation/user/cancel/$id",
       options: Options(
         extra: {
-          "403": "다른 수강생의 수업을 취소할 수 없습니다. 관리자에게 문의하세요.",
+          "400": "수업 시작 4시간 전부터는 수업을 취소할 수 없습니다.",
+          "403": "현재 학기가 아닌 다른 학기의 수업은 취소할 수 없습니다.",
           "404": "해당 수업을 찾을 수 없습니다. 앱을 다시 실행해주세요.",
           "405": "취소 가능 횟수를 초과하였습니다. 취소 내역을 확인하거나 관리자에게 문의하세요.",
         },
@@ -315,7 +316,6 @@ class Client {
       options: Options(
         extra: {
           "400": "수업 시작 4시간 전부터는 수업을 연장할 수 없습니다.",
-          "403": "다른 수강생의 수업을 연장할 수 없습니다. 관리자에게 문의하세요.",
           "404": "해당 수업을 찾을 수 없습니다. 앱을 다시 실행해주세요.",
           "405": "이미 취소된 수업입니다. 앱을 다시 실행해주세요.",
           "409": "해당 시간대에 기예약된 수업이 존재합니다.",
@@ -365,19 +365,21 @@ class NetworkException extends DioError {
         return response!.requestOptions.extra[response!.statusCode.toString()];
       } else {
         if (response!.statusCode == 400) {
-          return "잘못된 요청입니다. 관리자에게 문의하세요.";
+          message = "잘못된 요청입니다. 관리자에게 문의하세요.\n" + message;
         } else if (response!.statusCode == 401) {
-          return "인증이 필요합니다. 관리자에게 문의하세요.";
+          message = "인증이 필요합니다. 관리자에게 문의하세요.\n" + message;
         } else if (response!.statusCode == 403) {
-          return "요청한 데이터에 대해 권한을 갖고 있지 않습니다. 관리자에게 문의하세요.";
+          message = "요청한 데이터에 대해 권한을 갖고 있지 않습니다. 관리자에게 문의하세요.\n" + message;
         } else if (response!.statusCode == 404) {
-          return "요청한 데이터를 찾을 수 없습니다. 관리자에게 문의하세요.";
+          message = "요청한 데이터를 찾을 수 없습니다. 관리자에게 문의하세요.\n" + message;
         } else if (response!.statusCode == 405) {
-          return "승인되지 않은 행동입니다. 관리자에게 문의하세요.";
+          message = "승인되지 않은 행동입니다. 관리자에게 문의하세요.\n" + message;
         } else if (response!.statusCode == 409) {
-          return "중복된 데이터가 존재합니다. 관리자에게 문의하세요.";
+          message = "중복된 데이터가 존재합니다. 관리자에게 문의하세요.\n" + message;
         } else if (response!.statusCode == 412) {
-          return "조건을 충족하지 않은 요청입니다. 관리자에게 문의하세요.";
+          message = "조건을 충족하지 않은 요청입니다. 관리자에게 문의하세요.\n" + message;
+        } else {
+          message += "\nStatus: ${response!.statusCode}";
         }
       }
     }

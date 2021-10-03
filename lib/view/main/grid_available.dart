@@ -23,7 +23,8 @@ class _GridAvailableState extends State<GridAvailable> {
   Widget build(BuildContext context) {
     return GetBuilder<DataController>(
       builder: (controller) {
-        final today = DateUtils.dateOnly(DateTime.now());
+        var now = DateTime.now();
+        var today = DateUtils.dateOnly(now).add(now.timeZoneOffset);
 
         return controller.selectedDay.isBefore(today)
             ? Center(
@@ -43,7 +44,7 @@ class _GridAvailableState extends State<GridAvailable> {
                         style: TextStyle(color: Colors.red, fontSize: 22.r),
                         child: Column(
                           children: [
-                            Text("정규 스케줄이 등록되어 있지 않아"),
+                            Text("정기 스케줄이 등록되어 있지 않아"),
                             Text("예약가능한 시간대가 표시되지 않습니다."),
                             Text("관리자에게 문의하세요."),
                           ],
@@ -87,7 +88,7 @@ class _GridAvailableState extends State<GridAvailable> {
                               onTap: () async {
                                 !_data.isRegularScheduleExisting
                                     ? await showError(
-                                        "정규 스케줄이 등록되어 있지 않아 수업을 예약할 수 없습니다. 관리자에게 문의하세요.")
+                                        "정기 스케줄이 등록되어 있지 않아 수업을 예약할 수 없습니다. 관리자에게 문의하세요.")
                                     : await _showReserve(
                                         context,
                                         controller.availabaleSpots[index],
