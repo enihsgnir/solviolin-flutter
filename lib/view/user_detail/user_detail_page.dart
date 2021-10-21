@@ -72,10 +72,10 @@ class _UserDetailPageState extends State<UserDetailPage>
                                   delete.reset();
 
                                   showMyDialog(
-                                    title: "정규 종료",
+                                    title: "정기 종료",
                                     contents: [
-                                      Text("정규 스케줄의 종료일을 갱신하고"),
-                                      Text("종료일 이후의 해당 정규 수업들을 삭제합니다."),
+                                      Text("정기 스케줄의 종료일을 갱신하고"),
+                                      Text("종료일 이후의 해당 정기 수업들을 삭제합니다."),
                                       pickDateTime(
                                         context: context,
                                         item: "종료일",
@@ -105,7 +105,7 @@ class _UserDetailPageState extends State<UserDetailPage>
 
                                         await showMySnackbar(
                                           message:
-                                              "정규 스케줄을 삭제하고 이후 모든 수업을 취소했습니다.",
+                                              "정기 스케줄을 삭제하고 이후 모든 수업을 취소했습니다.",
                                         );
                                       } catch (e) {
                                         showError(e);
@@ -113,7 +113,7 @@ class _UserDetailPageState extends State<UserDetailPage>
                                     }),
                                   );
                                 },
-                                action: "정규종료",
+                                action: "정기종료",
                               ),
                             ],
                           ),

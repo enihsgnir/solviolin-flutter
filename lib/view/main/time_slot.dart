@@ -36,6 +36,7 @@ class _TimeSlotState extends State<TimeSlot> {
       builder: (controller) {
         return SfCalendar(
           view: CalendarView.week,
+          timeZone: "Korea Standard Time",
           dataSource: controller.reservationDataSource,
           controller: _calendar,
           onTap: (details) async {
@@ -124,7 +125,7 @@ class _TimeSlotState extends State<TimeSlot> {
             ),
             CupertinoActionSheetAction(
               onPressed: () => _showDeleteLaterCourse(details),
-              child: Text("정규 종료", style: TextStyle(fontSize: 24.r)),
+              child: Text("정기 종료", style: TextStyle(fontSize: 24.r)),
             ),
           ],
           cancelButton: CupertinoActionSheetAction(
@@ -235,10 +236,10 @@ class _TimeSlotState extends State<TimeSlot> {
 
   Future _showDeleteLaterCourse(CalendarTapDetails details) {
     return showMyDialog(
-      title: "정규 종료",
+      title: "정기 종료",
       contents: [
-        Text("정규 스케줄의 종료일을 갱신하고"),
-        Text("종료일 이후의 해당 정규 수업들을 삭제하시겠습니까?"),
+        Text("정기 스케줄의 종료일을 갱신하고"),
+        Text("종료일 이후의 해당 정기 수업들을 삭제하시겠습니까?"),
         Text("종료일: " +
             DateFormat("yy/MM/dd HH:mm")
                 .format(details.appointments![0].endDate)),
@@ -254,11 +255,11 @@ class _TimeSlotState extends State<TimeSlot> {
           Get.back();
 
           await showMySnackbar(
-            message: "정규 종료에 성공했습니다.",
+            message: "정기 종료에 성공했습니다.",
           );
         } catch (e) {
           e is CastError
-              ? showError("정규 스케줄을 따르는 예약인 경우에만 정규 종료 할 수 있습니다.")
+              ? showError("정기 스케줄을 따르는 예약인 경우에만 정기 종료 할 수 있습니다.")
               : showError(e);
         }
       }),
@@ -273,7 +274,7 @@ class _TimeSlotState extends State<TimeSlot> {
           actions: [
             CupertinoActionSheetAction(
               onPressed: () => _showReserveRegular(details),
-              child: Text("정규 등록", style: TextStyle(fontSize: 24.r)),
+              child: Text("정기 등록", style: TextStyle(fontSize: 24.r)),
             ),
             CupertinoActionSheetAction(
               onPressed: () => _showMakeUpByAdmin(details),
@@ -301,9 +302,9 @@ class _TimeSlotState extends State<TimeSlot> {
     regular.edit2.text = search.edit1.text;
 
     return showMyDialog(
-      title: "정규 등록",
+      title: "정기 등록",
       contents: [
-        Text("정규 스케줄을 생성하고 수업을 예약합니다."),
+        Text("정기 스케줄을 생성하고 수업을 예약합니다."),
         Text(DateFormat("yy/MM/dd HH:mm").format(details.date!) + " ~ "),
         myTextInput("강사", regular.edit1, "강사명을 입력하세요!"),
         branchDropdown("/regular", "지점을 선택하세요!"),
@@ -324,7 +325,7 @@ class _TimeSlotState extends State<TimeSlot> {
           Get.back();
 
           await showMySnackbar(
-            message: "정규 스케줄을 생성하고 수업을 예약했습니다.",
+            message: "정기 스케줄을 생성하고 수업을 예약했습니다.",
           );
         } catch (e) {
           showError(e);

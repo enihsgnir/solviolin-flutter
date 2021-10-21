@@ -24,7 +24,10 @@ class DataController extends GetxController {
   List<Term> terms = [];
   List<String> branches = [];
 
-  DateTime displayDate = DateTime.now();
+  DateTime displayDate =
+      DateUtils.dateOnly(DateTime.now()).add(DateTime.now().timeZoneOffset);
+  //TODO: set again with timezone
+
   List<TeacherInfo> teacherInfos = [];
   List<Reservation> reservations = [];
   ReservationDataSource? reservationDataSource;

@@ -508,7 +508,7 @@ class Client {
           "412": "조건을 충족하지 않은 요청입니다. 다음의 경우에 해당합니다." +
               "\n1) 해당 시간대가 현재 닫힌 상태입니다. 다른 시간대에 예약을 시도하세요." +
               "\n2) 보강 가능한 횟수가 부족합니다. 취소 내역을 확인하세요." +
-              "\n3) 입력값이 정규 스케줄의 데이터와 일치하지 않습니다. 정규 스케줄을 확인하세요.",
+              "\n3) 입력값이 정기 스케줄의 데이터와 일치하지 않습니다. 정기 스케줄을 확인하세요.",
         },
       ),
     );
@@ -680,7 +680,7 @@ class Client {
       },
       options: Options(
         extra: {
-          "404": "해당 정규 스케줄을 찾을 수 없습니다. 정규 스케줄을 확인하세요.",
+          "404": "해당 정기 스케줄을 찾을 수 없습니다. 정기 스케줄을 확인하세요.",
         },
       ),
     );
@@ -739,7 +739,7 @@ class Client {
       );
     }
     throw NetworkException._(
-      message: "해당 유저의 정규 예약 정보를 불러올 수 없습니다.",
+      message: "해당 유저의 정기 예약 정보를 불러올 수 없습니다.",
       options: response.requestOptions,
     );
   }
@@ -894,19 +894,21 @@ class NetworkException extends DioError {
         return response!.requestOptions.extra[response!.statusCode.toString()];
       } else {
         if (response!.statusCode == 400) {
-          return "잘못된 요청입니다. 관리자에게 문의하세요.";
+          message = "잘못된 요청입니다. 관리자에게 문의하세요.\n" + message;
         } else if (response!.statusCode == 401) {
-          return "인증이 필요합니다. 관리자에게 문의하세요.";
+          message = "인증이 필요합니다. 관리자에게 문의하세요.\n" + message;
         } else if (response!.statusCode == 403) {
-          return "요청한 데이터에 대해 권한을 갖고 있지 않습니다. 관리자에게 문의하세요.";
+          message = "요청한 데이터에 대해 권한을 갖고 있지 않습니다. 관리자에게 문의하세요.\n" + message;
         } else if (response!.statusCode == 404) {
-          return "요청한 데이터를 찾을 수 없습니다. 관리자에게 문의하세요.";
+          message = "요청한 데이터를 찾을 수 없습니다. 관리자에게 문의하세요.\n" + message;
         } else if (response!.statusCode == 405) {
-          return "승인되지 않은 행동입니다. 관리자에게 문의하세요.";
+          message = "승인되지 않은 행동입니다. 관리자에게 문의하세요.\n" + message;
         } else if (response!.statusCode == 409) {
-          return "중복된 데이터가 존재합니다. 관리자에게 문의하세요.";
+          message = "중복된 데이터가 존재합니다. 관리자에게 문의하세요.\n" + message;
         } else if (response!.statusCode == 412) {
-          return "조건을 충족하지 않은 요청입니다. 관리자에게 문의하세요.";
+          message = "조건을 충족하지 않은 요청입니다. 관리자에게 문의하세요.\n" + message;
+        } else {
+          message += "\nStatus: ${response!.statusCode}";
         }
       }
     }

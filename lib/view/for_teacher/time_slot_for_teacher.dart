@@ -27,6 +27,7 @@ class _TimeSlotForTeacherState extends State<TimeSlotForTeacher> {
       builder: (controller) {
         return SfCalendar(
           view: CalendarView.week,
+          timeZone: "Korea Standard Time",
           dataSource: controller.reservationDataSource,
           controller: _calendar,
           onTap: (details) {

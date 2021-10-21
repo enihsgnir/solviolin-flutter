@@ -231,7 +231,7 @@ Future<void> saveUsersData({
       : await getExternalStorageDirectory();
   final path = directory?.path;
   final file = File("$path/user_list_" +
-      "${DateFormat("yy_MM_dd_HH_mm").format(DateTime.now())}.xlsx")
+      "${DateFormat("yyMMdd_HHmmss").format(DateTime.now())}.xlsx")
     ..writeAsBytesSync(excel.encode()!);
 
   Get.snackbar(

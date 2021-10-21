@@ -185,11 +185,11 @@ class _TermPageState extends State<TermPage> {
           actions: [
             CupertinoActionSheetAction(
               onPressed: _showExtendOfBranch,
-              child: Text("정규 연장 (지점)", style: TextStyle(fontSize: 24.r)),
+              child: Text("정기 연장 (지점)", style: TextStyle(fontSize: 24.r)),
             ),
             CupertinoActionSheetAction(
               onPressed: _showExtendOfUser,
-              child: Text("정규 연장 (수강생)", style: TextStyle(fontSize: 24.r)),
+              child: Text("정기 연장 (수강생)", style: TextStyle(fontSize: 24.r)),
             ),
           ],
           cancelButton: CupertinoActionSheetAction(
@@ -207,7 +207,7 @@ class _TermPageState extends State<TermPage> {
     extend.branchName = _data.profile.branchName;
 
     return showMyDialog(
-      title: "정규 연장 (지점)",
+      title: "정기 연장 (지점)",
       contents: [
         branchDropdown("/extend", "지점을 선택하세요!"),
       ],
@@ -232,7 +232,7 @@ class _TermPageState extends State<TermPage> {
     extend.reset();
 
     return showMyDialog(
-      title: "정규 연장 (수강생)",
+      title: "정기 연장 (수강생)",
       contents: [
         myTextInput("이름", extend.edit1, "이름을 입력하세요!"),
       ],
