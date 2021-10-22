@@ -64,11 +64,14 @@ class _HistoryPageState extends State<HistoryPage>
                           width: double.infinity,
                           child: const Text("내 수업"),
                         ),
-                        Text(regular.teacherID + " / ${regular.branchName}"),
-                        Text("${dowToString(regular.dow)}" +
-                            " / ${timeToString(regular.startTime)}" +
-                            " ~ ${timeToString(regular.endTime)}"),
-                      ],
+                      ]
+                        ..addAllIf(regular.dow != -1, [
+                          Text(regular.teacherID + " / ${regular.branchName}"),
+                          Text("${dowToString(regular.dow)}" +
+                              " / ${timeToString(regular.startTime)}" +
+                              " ~ ${timeToString(regular.endTime)}"),
+                        ])
+                        ..addIf(regular.dow == -1, Text("\n정기수업 시작 전입니다.")),
                     );
                   },
                 ),

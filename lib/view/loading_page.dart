@@ -23,22 +23,16 @@ class _LoadingPageState extends State<LoadingPage> {
   void initState() {
     super.initState();
     Future.delayed(const Duration(seconds: 1), () async {
-      // await _client.logout(); // for test
-
       await _checkProfile();
     });
   }
 
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
+  Widget build(BuildContext context) {
     _data.ratio = min(MediaQuery.of(context).size.width / 540,
         MediaQuery.of(context).size.height / 1152);
     _data.update();
-  }
 
-  @override
-  Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
         child: Center(
@@ -78,7 +72,7 @@ class _LoadingPageState extends State<LoadingPage> {
 
         var message = "환영합니다!";
         if (!_data.isRegularScheduleExisting) {
-          message = "정기 스케줄이 등록되어 있지 않아 예약가능한 시간대가 표시되지 않습니다. 관리자에게 문의하세요.";
+          message = "정기수업이 시작되지 않아 예약가능한 시간대가 표시되지 않습니다. 관리자에게 문의하세요.";
         }
         await showMySnackbar(
           title: "${_data.profile.userID}님",

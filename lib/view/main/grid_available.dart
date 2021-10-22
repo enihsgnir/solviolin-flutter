@@ -44,9 +44,9 @@ class _GridAvailableState extends State<GridAvailable> {
                         style: TextStyle(color: Colors.red, fontSize: 22.r),
                         child: Column(
                           children: [
-                            Text("정기 스케줄이 등록되어 있지 않아"),
-                            Text("예약가능한 시간대가 표시되지 않습니다."),
-                            Text("관리자에게 문의하세요."),
+                            Text("정기수업 시작 전입니다."),
+                            Text("취소를 원하시면 우측 상단 첫번째 아이콘 클릭 후"),
+                            Text("해당 수업을 취소(왼쪽으로 스와이프) 해주세요."),
                           ],
                         ),
                       ),
@@ -88,7 +88,7 @@ class _GridAvailableState extends State<GridAvailable> {
                               onTap: () async {
                                 !_data.isRegularScheduleExisting
                                     ? await showError(
-                                        "정기 스케줄이 등록되어 있지 않아 수업을 예약할 수 없습니다. 관리자에게 문의하세요.")
+                                        "정기수업이 시작되지 않아 수업을 예약할 수 없습니다. 관리자에게 문의하세요.")
                                     : await _showReserve(
                                         context,
                                         controller.availabaleSpots[index],

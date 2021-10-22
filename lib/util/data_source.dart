@@ -10,14 +10,25 @@ import 'package:table_calendar/table_calendar.dart';
 Client _client = Get.find<Client>();
 DataController _data = Get.find<DataController>();
 
+int getFirstDayOffset(DateTime date) {
+  final weekdayFromMonday = DateTime(date.year, date.month).weekday - 1;
+  var firstDayOfWeekIndex = 0;
+  firstDayOfWeekIndex = (firstDayOfWeekIndex - 1) % 7;
+
+  return (weekdayFromMonday - firstDayOfWeekIndex) % 7;
+}
+
 Future<void> getInitialData([
   bool isLoggedIn = true,
   String? userID,
   String? userPassword,
 ]) async {
   final today = DateTime.now();
-  final first = DateTime(today.year, today.month, 1);
-  final last = DateTime(today.year, today.month + 1, 0);
+  final first = DateTime(today.year, today.month, 1)
+      .subtract(Duration(days: getFirstDayOffset(today)));
+  final last = DateTime(today.year, today.month + 1, 0, 23, 59, 59).add(
+      Duration(
+          days: 14 - getFirstDayOffset(DateTime(today.year, today.month + 1))));
 
   isLoggedIn
       ? _data.profile = await _client.getProfile()
@@ -54,15 +65,19 @@ Future<void> getInitialData([
     ..removeWhere((element) =>
         Duration(hours: element.hour, minutes: element.minute) <=
         Duration(hours: today.hour + 4, minutes: today.minute))
-    ..removeWhere((element) => _data.regularSchedules[0].startTime.inHours >= 16
-        ? element.hour < 16
-        : element.hour >= 16)
+    ..removeWhere((element) {
+      var regular = _data.regularSchedules[0];
+      return regular.dow >= 1 &&
+          regular.dow <= 5 &&
+          regular.startTime.inHours < 16 &&
+          element.hour >= 16;
+    })
     ..sort((a, b) => a.compareTo(b));
 
   _data.myValidReservations = await _client.getReservations(
     branchName: _data.profile.branchName,
     startDate: first,
-    endDate: last.add(Duration(hours: 23, minutes: 59, seconds: 59)),
+    endDate: last,
     userID: _data.profile.userID,
     bookingStatus: [-3, -1, 0, 1, 3],
   )
@@ -118,21 +133,30 @@ Future<void> getSelectedDayData(DateTime selectedDay) async {
         ? Duration(hours: element.hour, minutes: element.minute) <=
             Duration(hours: today.hour + 4, minutes: today.minute)
         : false)
-    ..removeWhere((element) => _data.regularSchedules[0].startTime.inHours >= 16
-        ? element.hour < 16
-        : element.hour >= 16)
+    ..removeWhere((element) {
+      var regular = _data.regularSchedules[0];
+      return regular.dow >= 1 &&
+          regular.dow <= 5 &&
+          regular.startTime.inHours < 16 &&
+          element.hour >= 16;
+    })
     ..sort((a, b) => a.compareTo(b));
   _data.update();
 }
 
 Future<void> getChangedPageData(DateTime focusedDay) async {
-  final first = DateTime(focusedDay.year, focusedDay.month, 1);
-  final last = DateTime(focusedDay.year, focusedDay.month + 1, 0);
+  final first = DateTime(focusedDay.year, focusedDay.month, 1)
+      .subtract(Duration(days: getFirstDayOffset(focusedDay)));
+  final last = DateTime(focusedDay.year, focusedDay.month + 1, 0, 23, 59, 59)
+      .add(Duration(
+          days: 14 -
+              getFirstDayOffset(
+                  DateTime(focusedDay.year, focusedDay.month + 1))));
 
   _data.myValidReservations = await _client.getReservations(
     branchName: _data.profile.branchName,
     startDate: first,
-    endDate: last.add(const Duration(hours: 23, minutes: 59, seconds: 59)),
+    endDate: last,
     userID: _data.profile.userID,
     bookingStatus: [-3, -1, 0, 1, 3],
   )

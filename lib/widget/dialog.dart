@@ -12,8 +12,6 @@ Future showError(dynamic error) {
   } else if (error is TypeError || error is NoSuchMethodError) {
     message = "아래 메시지와 함께 관리자에게 문의하세요!\n" + message;
   }
-  //TODO: custom error message
-  //TODO: seperate util/error.dart
 
   return Get.dialog(
     CupertinoAlertDialog(
