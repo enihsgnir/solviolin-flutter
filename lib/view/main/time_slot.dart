@@ -38,6 +38,7 @@ class _TimeSlotState extends State<TimeSlot> {
           view: CalendarView.week,
           timeZone: "Korea Standard Time",
           dataSource: controller.reservationDataSource,
+          specialRegions: controller.timeRegions,
           controller: _calendar,
           onTap: (details) async {
             if (!search.isSearched && !search.hasBeenShown) {
@@ -122,6 +123,10 @@ class _TimeSlotState extends State<TimeSlot> {
             CupertinoActionSheetAction(
               onPressed: () => _showExtendByAdmin(details),
               child: Text("연장 (관리자)", style: TextStyle(fontSize: 24.r)),
+            ),
+            CupertinoActionSheetAction(
+              onPressed: () => _showDeleteReservation(details),
+              child: Text("삭제", style: TextStyle(fontSize: 24.r)),
             ),
             CupertinoActionSheetAction(
               onPressed: () => _showDeleteLaterCourse(details),
@@ -231,6 +236,46 @@ class _TimeSlotState extends State<TimeSlot> {
           showError(e);
         }
       }),
+    );
+  }
+
+  Future _showDeleteReservation(CalendarTapDetails details) {
+    return showMyDialog(
+      contents: [
+        Text("예약을 삭제하시겠습니까?"),
+        Text("취소 내역에 기록되지 않습니다."),
+        Text("\n*되돌릴 수 없습니다.*", style: TextStyle(color: Colors.red)),
+        Text("\n*취소와는 다른 기능입니다.*", style: TextStyle(color: Colors.red)),
+        Text("\n*강제로 예약 데이터를 삭제합니다.", style: TextStyle(color: Colors.red)),
+        Text("예상치 못한 오류가 발생할 수 있습니다.*", style: TextStyle(color: Colors.red)),
+        Text("\n*잘못 예약했을 경우 즉시 철회하는", style: TextStyle(color: Colors.red)),
+        Text("용도로만 사용하는 것을 권장합니다.*", style: TextStyle(color: Colors.red)),
+      ],
+      onPressed: () {
+        showMyDialog(
+          contents: [
+            Text("정말로 삭제하시겠습니까?", style: TextStyle(color: Colors.red)),
+          ],
+          onPressed: () => showLoading(() async {
+            try {
+              await _client.deleteReservation(details.appointments![0].id);
+
+              await _getSearchedReservationsData();
+
+              Get.back();
+              Get.back();
+              Get.back();
+
+              await showMySnackbar(
+                message: "예약을 삭제했습니다.",
+              );
+            } catch (e) {
+              showError(e);
+            }
+          }),
+        );
+      },
+      isScrollable: true,
     );
   }
 

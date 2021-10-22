@@ -76,6 +76,16 @@ class _HistoryReservedState extends State<HistoryReserved> {
                                       context, reservation);
                     },
                     borderLeft: true,
+                    borderRight: true,
+                  ),
+                  mySlideAction(
+                    context: context,
+                    icon: Icons.delete_forever,
+                    item: "삭제",
+                    onTap: () async {
+                      await _showModalDelete(context, reservation);
+                    },
+                    borderLeft: true,
                   ),
                 ],
                 children: [
@@ -235,6 +245,76 @@ class _HistoryReservedState extends State<HistoryReserved> {
               }),
               child:
                   Text("연장 (관리자, 카운트 미차감)", style: TextStyle(fontSize: 24.r)),
+            ),
+          ],
+          cancelButton: CupertinoActionSheetAction(
+            onPressed: Get.back,
+            isDefaultAction: true,
+            child: Text("닫기", style: TextStyle(fontSize: 24.r)),
+          ),
+        );
+      },
+    );
+  }
+
+  Future _showModalDelete(BuildContext context, Reservation reservation) {
+    return showCupertinoModalPopup(
+      context: context,
+      builder: (context) {
+        return CupertinoActionSheet(
+          title: Text(
+            DateFormat("yy/MM/dd HH:mm").format(reservation.startDate) +
+                " ~ " +
+                DateFormat("HH:mm").format(reservation.endDate),
+            style: TextStyle(fontSize: 24.r),
+          ),
+          message: Text("예약을 삭제 하시겠습니까?", style: TextStyle(fontSize: 24.r)),
+          actions: [
+            CupertinoActionSheetAction(
+              onPressed: () {
+                showMyDialog(
+                  contents: [
+                    Text("예약을 삭제합니다."),
+                    Text("취소 내역에 기록되지 않습니다."),
+                    Text("\n*되돌릴 수 없습니다.*",
+                        style: TextStyle(color: Colors.red)),
+                    Text("\n*취소와는 다른 기능입니다.*",
+                        style: TextStyle(color: Colors.red)),
+                    Text("\n*강제로 예약 데이터를 삭제합니다.",
+                        style: TextStyle(color: Colors.red)),
+                    Text("예상치 못한 오류가 발생할 수 있습니다.*",
+                        style: TextStyle(color: Colors.red)),
+                    Text("\n*잘못 예약했을 경우 즉시 철회하는",
+                        style: TextStyle(color: Colors.red)),
+                    Text("용도로만 사용하는 것을 권장합니다.*",
+                        style: TextStyle(color: Colors.red)),
+                  ],
+                  onPressed: () {
+                    showMyDialog(
+                      contents: [
+                        Text("정말로 삭제하시겠습니까?",
+                            style: TextStyle(color: Colors.red)),
+                      ],
+                      onPressed: () => showLoading(() async {
+                        try {
+                          await _client.deleteReservation(reservation.id);
+
+                          Get.back();
+                          Get.back();
+                          Get.back();
+
+                          await showMySnackbar(
+                            message: "예약을 삭제했습니다.",
+                          );
+                        } catch (e) {
+                          showError(e);
+                        }
+                      }),
+                    );
+                  },
+                );
+              },
+              child: Text("삭제", style: TextStyle(fontSize: 24.r)),
             ),
           ],
           cancelButton: CupertinoActionSheetAction(

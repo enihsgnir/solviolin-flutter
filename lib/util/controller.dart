@@ -14,6 +14,7 @@ import 'package:solviolin_admin/model/teacher_info.dart';
 import 'package:solviolin_admin/model/term.dart';
 import 'package:solviolin_admin/model/user.dart';
 import 'package:solviolin_admin/util/data_source.dart';
+import 'package:syncfusion_flutter_calendar/calendar.dart';
 
 class DataController extends GetxController {
   late final double ratio;
@@ -31,6 +32,7 @@ class DataController extends GetxController {
   List<TeacherInfo> teacherInfos = [];
   List<Reservation> reservations = [];
   ReservationDataSource? reservationDataSource;
+  List<TimeRegion> timeRegions = [];
 
   List<User> users = [];
   List<RegularSchedule> regularSchedules = [];

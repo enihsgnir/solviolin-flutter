@@ -23,22 +23,16 @@ class _LoadingPageState extends State<LoadingPage> {
   void initState() {
     super.initState();
     Future.delayed(const Duration(seconds: 1), () async {
-      // await _client.logout(); // for test
-
       await _checkProfile();
     });
   }
 
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
+  Widget build(BuildContext context) {
     _data.ratio = min(MediaQuery.of(context).size.width / 540,
         MediaQuery.of(context).size.height / 1152);
     _data.update();
-  }
 
-  @override
-  Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
         child: Center(

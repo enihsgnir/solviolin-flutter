@@ -29,6 +29,7 @@ class _TimeSlotForTeacherState extends State<TimeSlotForTeacher> {
           view: CalendarView.week,
           timeZone: "Korea Standard Time",
           dataSource: controller.reservationDataSource,
+          specialRegions: controller.timeRegions,
           controller: _calendar,
           onTap: (details) {
             if (details.targetElement == CalendarElement.viewHeader) {

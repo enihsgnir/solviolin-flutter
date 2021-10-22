@@ -3,6 +3,7 @@ import 'package:solviolin_admin/util/format.dart';
 class User {
   String userID;
   String userPhone;
+  int userType;
   String branchName;
   int userCredit;
   int status;
@@ -11,6 +12,7 @@ class User {
   User({
     required this.userID,
     required this.userPhone,
+    required this.userType,
     required this.branchName,
     required this.userCredit,
     required this.status,
@@ -21,6 +23,7 @@ class User {
     return User(
       userID: json["userID"],
       userPhone: json["userPhone"],
+      userType: json["userType"],
       branchName: json["branchName"],
       userCredit: json["userCredit"],
       status: json["status"],

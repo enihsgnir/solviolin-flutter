@@ -7,6 +7,7 @@ class Control {
   String teacherID;
   String branchName;
   int status;
+  int? cancelInClose;
 
   Control({
     required this.id,
@@ -15,6 +16,7 @@ class Control {
     required this.teacherID,
     required this.branchName,
     required this.status,
+    this.cancelInClose,
   });
 
   factory Control.fromJson(Map<String, dynamic> json) {
@@ -25,6 +27,7 @@ class Control {
       teacherID: json["teacherID"],
       branchName: json["branchName"],
       status: json["status"],
+      cancelInClose: json["cancelInClose"],
     );
   }
 }

@@ -55,19 +55,25 @@ class _ControlPageState extends State<ControlPage> {
   }
 
   Widget _controlSearch() {
+    if (!search.isSearched) {
+      var today = DateTime.now();
+      search.date[0] = DateTime(today.year, today.month, today.day - 2);
+      search.date[1] = DateTime(today.year, today.month, today.day + 7);
+    }
+
     return mySearch(
       contents: [
         branchDropdown("/search/control", "지점을 선택하세요!"),
         myTextInput("강사", search.edit1),
-        pickDateTime(
+        pickDate(
           context: context,
-          item: "시작일",
+          item: "부터",
           tag: "/search/control",
           index: 0,
         ),
-        pickDateTime(
+        pickDate(
           context: context,
-          item: "종료일",
+          item: "까지",
           tag: "/search/control",
           index: 1,
         ),
@@ -87,8 +93,8 @@ class _ControlPageState extends State<ControlPage> {
                   await getControlsData(
                     branchName: search.branchName!,
                     teacherID: textEdit(search.edit1),
-                    controlStart: search.dateTime[0],
-                    controlEnd: search.dateTime[1],
+                    controlStart: search.date[0],
+                    controlEnd: search.date[1],
                     status: search.check[0],
                   );
 
@@ -158,7 +164,14 @@ class _ControlPageState extends State<ControlPage> {
               ],
               children: [
                 Text("${control.teacherID} / ${control.branchName}" +
-                    " / ${control.status == 0 ? "오픈" : "클로즈"}"),
+                    " / ${control.status == 0 ? "오픈" : "클로즈"}" +
+                    (control.status == 1 && control.cancelInClose != null
+                        ? control.cancelInClose == 0
+                            ? "(유지)"
+                            : control.cancelInClose == 1
+                                ? "(취소)"
+                                : "(삭제)"
+                        : "")),
                 Text("시작: " +
                     DateFormat("yy/MM/dd HH:mm").format(control.controlStart)),
                 Text("종료: " +
@@ -215,37 +228,73 @@ class _ControlPageState extends State<ControlPage> {
           style: TextStyle(color: Colors.red, fontSize: 16.r),
         ),
       ],
-      onPressed: () => showLoading(() async {
-        try {
-          await _client.registerControl(
-            teacherID: textEdit(register.edit1)!,
-            branchName: register.branchName!,
-            controlStart: register.dateTime[0]!,
-            controlEnd: register.dateTime[1]!,
-            status: ControlStatus.values.indexOf(register.type[ControlStatus]),
-            cancelInClose:
-                CancelInClose.values.indexOf(register.type[CancelInClose]),
-          );
+      onPressed: () {
+        register.update();
 
-          if (search.isSearched) {
-            await getControlsData(
-              branchName: search.branchName!,
-              teacherID: textEdit(search.edit1),
-              controlStart: search.dateTime[0],
-              controlEnd: search.dateTime[1],
-              status: search.check[0],
-            );
-          }
+        void Function(int) _request = (time) => showLoading(() async {
+              try {
+                await _client.registerControl(
+                  teacherID: textEdit(register.edit1)!,
+                  branchName: register.branchName!,
+                  controlStart: register.dateTime[0]!,
+                  controlEnd: register.dateTime[1]!,
+                  status: ControlStatus.values
+                      .indexOf(register.type[ControlStatus]),
+                  cancelInClose: CancelInClose.values
+                      .indexOf(register.type[CancelInClose]),
+                );
 
-          Get.back();
+                if (search.isSearched) {
+                  await getControlsData(
+                    branchName: search.branchName!,
+                    teacherID: textEdit(search.edit1),
+                    controlStart: search.dateTime[0],
+                    controlEnd: search.dateTime[1],
+                    status: search.check[0],
+                  );
+                }
 
-          await showMySnackbar(
-            message: "신규 오픈/클로즈 등록에 성공했습니다.",
-          );
-        } catch (e) {
-          showError(e);
-        }
-      }),
+                for (int i = 0; i < time; i++) {
+                  Get.back();
+                }
+
+                await showMySnackbar(
+                  message: "신규 오픈/클로즈 등록에 성공했습니다.",
+                );
+              } catch (e) {
+                showError(e);
+              }
+            });
+
+        register.type[ControlStatus] == ControlStatus.close &&
+                register.type[CancelInClose] == CancelInClose.delete
+            ? showMyDialog(
+                contents: [
+                  Text("클로즈 기간 내 예약을"),
+                  Text("삭제하시겠습니까?"),
+                  Text("취소 내역에 기록되지 않습니다."),
+                  Text("\n*되돌릴 수 없습니다.*", style: TextStyle(color: Colors.red)),
+                  Text("\n*취소와는 다른 기능입니다.*",
+                      style: TextStyle(color: Colors.red)),
+                  Text("\n*강제로 예약 데이터를 삭제합니다.",
+                      style: TextStyle(color: Colors.red)),
+                  Text("예상치 못한 오류가 발생할 수 있습니다.*",
+                      style: TextStyle(color: Colors.red)),
+                  Text("\n*되도록 권장하지 않습니다.*",
+                      style: TextStyle(color: Colors.red)),
+                ],
+                onPressed: () {
+                  showMyDialog(
+                    contents: [
+                      Text("정말로 삭제하시겠습니까?",
+                          style: TextStyle(color: Colors.red)),
+                    ],
+                    onPressed: () => _request(3),
+                  );
+                },
+              )
+            : _request(1);
+      },
       action: "등록",
       isScrollable: true,
     );

@@ -5,18 +5,19 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:solviolin_admin/model/control.dart';
 import 'package:solviolin_admin/model/regular_schedule.dart';
+import 'package:solviolin_admin/model/teacher.dart';
 import 'package:solviolin_admin/model/teacher_info.dart';
 import 'package:solviolin_admin/model/user.dart';
 import 'package:solviolin_admin/util/constant.dart';
 import 'package:solviolin_admin/util/controller.dart';
+import 'package:solviolin_admin/util/format.dart';
 import 'package:solviolin_admin/util/network.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
 
 Client _client = Get.find<Client>();
 DataController _data = Get.find<DataController>();
-
-//TODO: remove some unnecessary functions
 
 Future<void> getInitialData([
   bool isLoggedIn = true,
@@ -55,6 +56,20 @@ Future<void> getReservationData({
     branchName: branchName,
   )
     ..sort((a, b) => a.teacherID.compareTo(b.teacherID));
+  var teacherIds = List.generate(
+    _data.teacherInfos.length,
+    (index) => _data.teacherInfos[index].teacherID,
+  );
+  var teacherColors = Map<String, Color?>.fromIterable(
+    _data.teacherInfos,
+    key: (item) => item.teacherID,
+    value: (item) => item.color,
+  );
+
+  _data.teachers = await _client.getTeachers(
+    teacherID: teacherID,
+    branchName: branchName,
+  );
 
   _data.reservations = await _client.getReservations(
     branchName: branchName,
@@ -67,6 +82,38 @@ Future<void> getReservationData({
     ..sort((a, b) => a.startDate.compareTo(b.startDate));
 
   _data.reservationDataSource = ReservationDataSource();
+
+  _data.timeRegions = [];
+  await Future.forEach<Teacher>(_data.teachers, (element) async {
+    _data.timeRegions.add(TimeRegion(
+      startTime: first.subtract(Duration(days: 7)).add(element.startTime),
+      endTime: first.subtract(Duration(days: 7)).add(element.endTime),
+      recurrenceRule:
+          "FREQ=WEEKLY;INTERVAL=1;BYDAY=${dowToString(element.workDow).substring(0, 2)};COUNT=3",
+      color: teacherColors[element.teacherID]?.withOpacity(0.2) ??
+          symbolColor.withOpacity(0.2),
+      enablePointerInteraction: false,
+      resourceIds: [teacherIds.indexOf(element.teacherID)],
+    ));
+  });
+
+  List<Control> _controls = await _client.getControls(
+    branchName: branchName,
+    teacherID: teacherID,
+    controlStart: first,
+    controlEnd: last,
+    status: 0,
+  );
+  await Future.forEach<Control>(_controls, (element) async {
+    _data.timeRegions.add(TimeRegion(
+      startTime: element.controlStart,
+      endTime: element.controlEnd,
+      color: teacherColors[element.teacherID]?.withOpacity(0.2) ??
+          symbolColor.withOpacity(0.2),
+      enablePointerInteraction: false,
+      resourceIds: [teacherIds.indexOf(element.teacherID)],
+    ));
+  });
 
   _data.update();
 }
@@ -107,6 +154,39 @@ Future<void> getReservationDataForTeacher({
   });
 
   _data.reservationDataSource = ReservationDataSource();
+
+  _data.timeRegions = [];
+  await Future.forEach<Teacher>(_data.teachers, (element) async {
+    _data.timeRegions.add(TimeRegion(
+      startTime: first.subtract(Duration(days: 7)).add(element.startTime),
+      endTime: first.subtract(Duration(days: 7)).add(element.endTime),
+      recurrenceRule:
+          "FREQ=WEEKLY;INTERVAL=1;BYDAY=${dowToString(element.workDow).substring(0, 2)};COUNT=3",
+      color: symbolColor.withOpacity(0.2),
+      enablePointerInteraction: false,
+      resourceIds: [0],
+    ));
+  });
+
+  List<Control> _controls = [];
+  await Future.forEach<String>(_branches, (element) async {
+    _controls.addAll(await _client.getControls(
+      branchName: element,
+      teacherID: teacherID,
+      controlStart: first,
+      controlEnd: last,
+      status: 0,
+    ));
+  });
+  await Future.forEach<Control>(_controls, (element) async {
+    _data.timeRegions.add(TimeRegion(
+      startTime: element.controlStart,
+      endTime: element.controlEnd,
+      color: symbolColor.withOpacity(0.2),
+      enablePointerInteraction: false,
+      resourceIds: [0],
+    ));
+  });
 
   _data.update();
 }
@@ -159,12 +239,12 @@ class ReservationDataSource extends CalendarDataSource {
 
   @override
   List<Object> getResourceIds(int index) {
-    var teacherIDs = List.generate(
+    var teacherIds = List.generate(
       _data.teacherInfos.length,
       (index) => _data.teacherInfos[index].teacherID,
     );
 
-    return [teacherIDs.indexOf(appointments![index].teacherID)];
+    return [teacherIds.indexOf(appointments![index].teacherID)];
   }
 }
 
@@ -323,7 +403,7 @@ Future<void> getControlsData({
         controlEnd?.add(const Duration(hours: 23, minutes: 59, seconds: 59)),
     status: status,
   )
-    ..sort((a, b) => a.controlStart.compareTo(b.controlStart));
+    ..sort((a, b) => b.controlStart.compareTo(a.controlStart));
 
   _data.update();
 }
@@ -345,9 +425,9 @@ Future<void> getControlsDataForTeacher({
     _data.controls.addAll(await _client.getControls(
       branchName: element,
       teacherID: teacherID,
-    )
-      ..sort((a, b) => a.controlStart.compareTo(b.controlStart)));
+    ));
   });
+  _data.controls.sort((a, b) => b.controlStart.compareTo(a.controlStart));
 
   _data.update();
 }

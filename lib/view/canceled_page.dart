@@ -58,7 +58,7 @@ class _CanceledPageState extends State<CanceledPage> {
                 try {
                   _data.canceledReservations = await _client
                       .getCanceledReservations(textEdit(search.edit1)!)
-                    ..sort((a, b) => a.startDate.compareTo(b.startDate));
+                    ..sort((a, b) => b.startDate.compareTo(a.startDate));
                   _data.update();
 
                   search.isSearched = true;

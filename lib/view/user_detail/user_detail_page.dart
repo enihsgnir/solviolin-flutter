@@ -29,7 +29,6 @@ class _UserDetailPageState extends State<UserDetailPage>
   late TabController tabController;
 
   var _client = Get.find<Client>();
-  var _data = Get.find<DataController>();
 
   var search = Get.find<CacheController>(tag: "/search/user");
   var delete = Get.put(CacheController(), tag: "/delete");
@@ -58,72 +57,169 @@ class _UserDetailPageState extends State<UserDetailPage>
                     var regular = controller.regularSchedules[index];
 
                     return mySwipeableCard(
-                      children: [
-                        Container(
-                          padding: EdgeInsets.symmetric(horizontal: 24.r),
-                          width: double.infinity,
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(regular.userID),
-                              myActionButton(
-                                context: context,
-                                onPressed: () {
-                                  delete.reset();
+                        children: [
+                      Container(
+                        padding: EdgeInsets.symmetric(horizontal: 24.r),
+                        width: double.infinity,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(regular.userID),
+                            Row(
+                              children: []
+                                ..addAllIf(search.userDetail!.userType == 0, [
+                                  myActionButton(
+                                    context: context,
+                                    action: "정기삭제",
+                                    onPressed: () {
+                                      showMyDialog(
+                                        title: "정기 삭제",
+                                        contents: [
+                                          Text("정기 스케줄을 삭제합니다."),
+                                          Text("아직 시작되지 않은 정기 스케줄만"),
+                                          Text("삭제할 수 있습니다."),
+                                        ],
+                                        onPressed: () => showLoading(() async {
+                                          try {
+                                            await _client.deleteRegularSchedule(
+                                                regular.id);
 
-                                  showMyDialog(
-                                    title: "정기 종료",
-                                    contents: [
-                                      Text("정기 스케줄의 종료일을 갱신하고"),
-                                      Text("종료일 이후의 해당 정기 수업들을 삭제합니다."),
-                                      pickDateTime(
-                                        context: context,
-                                        item: "종료일",
-                                        tag: "/delete",
-                                        isMandatory: true,
-                                      ),
-                                    ],
-                                    onPressed: () => showLoading(() async {
-                                      try {
-                                        await _client
-                                            .updateEndDateAndDeleteLaterCourse(
-                                          regular.id,
-                                          endDate: delete.dateTime[0]!,
-                                        );
-                                        await getUsersData(
-                                          branchName: search.branchName,
-                                          userID: textEdit(search.edit1),
-                                          isPaid: search.check[0],
-                                          userType: UserType.values
-                                              .indexOf(search.type[UserType]),
-                                          status: search.check[1],
-                                        );
-                                        await getUserDetailData(
-                                            search.userDetail!);
+                                            await getUsersData(
+                                              branchName: search.branchName,
+                                              userID: textEdit(search.edit1),
+                                              isPaid: search.check[0],
+                                              userType: UserType.values.indexOf(
+                                                  search.type[UserType]),
+                                              status: search.check[1],
+                                            );
 
-                                        Get.back();
+                                            await getUserDetailData(
+                                                search.userDetail!);
 
-                                        await showMySnackbar(
-                                          message:
-                                              "정기 스케줄을 삭제하고 이후 모든 수업을 취소했습니다.",
-                                        );
-                                      } catch (e) {
-                                        showError(e);
-                                      }
-                                    }),
-                                  );
-                                },
-                                action: "정기종료",
-                              ),
-                            ],
-                          ),
+                                            Get.back();
+
+                                            await showMySnackbar(
+                                              message: "정기 스케줄을 삭제했습니다.",
+                                            );
+                                          } catch (e) {
+                                            showError(e);
+                                          }
+                                        }),
+                                      );
+                                    },
+                                  ),
+                                  myActionButton(
+                                    context: context,
+                                    action: "정기종료",
+                                    onPressed: () {
+                                      delete.reset();
+
+                                      showMyDialog(
+                                        title: "정기 종료",
+                                        contents: [
+                                          Text("정기 스케줄의 종료일을 갱신하고"),
+                                          Text("종료일 이후의 해당 정기 수업들을 삭제합니다."),
+                                          pickDateTime(
+                                            context: context,
+                                            item: "종료일",
+                                            tag: "/delete",
+                                            isMandatory: true,
+                                          ),
+                                        ],
+                                        onPressed: () => showLoading(() async {
+                                          try {
+                                            await _client
+                                                .updateEndDateAndDeleteLaterCourse(
+                                              regular.id,
+                                              endDate: delete.dateTime[0]!,
+                                            );
+
+                                            await getUsersData(
+                                              branchName: search.branchName,
+                                              userID: textEdit(search.edit1),
+                                              isPaid: search.check[0],
+                                              userType: UserType.values.indexOf(
+                                                  search.type[UserType]),
+                                              status: search.check[1],
+                                            );
+
+                                            await getUserDetailData(
+                                                search.userDetail!);
+
+                                            Get.back();
+
+                                            await showMySnackbar(
+                                              message:
+                                                  "정기 스케줄을 종료하고 이후 모든 수업을 취소했습니다.",
+                                            );
+                                          } catch (e) {
+                                            showError(e);
+                                          }
+                                        }),
+                                      );
+                                    },
+                                  ),
+                                ])
+                                ..addIf(
+                                  search.userDetail!.userType == 1,
+                                  myActionButton(
+                                    context: context,
+                                    action: "강사삭제",
+                                    onPressed: () {
+                                      showMyDialog(
+                                        title: "강사 삭제",
+                                        contents: [
+                                          Text("강사의 유저 데이터를 삭제하시겠습니까?"),
+                                        ],
+                                        onPressed: () {
+                                          showMyDialog(
+                                            contents: [
+                                              Text("\n\n강사 데이터를 삭제합니다."),
+                                              Text("\n*되돌릴 수 없습니다.*\n\n",
+                                                  style: TextStyle(
+                                                      color: Colors.red)),
+                                            ],
+                                            onPressed: () =>
+                                                showLoading(() async {
+                                              try {
+                                                await _client.terminateTeacher(
+                                                    search.userDetail!.userID);
+
+                                                Get.back();
+                                                Get.back();
+
+                                                await showMySnackbar(
+                                                  message: "강사 데이터를 삭제했습니다.",
+                                                );
+                                              } catch (e) {
+                                                showError(e);
+                                              }
+                                            }),
+                                          );
+                                        },
+                                      );
+                                    },
+                                  ),
+                                ),
+                            ),
+                          ],
                         ),
-                        Text(regular.teacherID + " / ${regular.branchName}"),
-                        Text("${dowToString(regular.dow)}" +
-                            " / ${timeToString(regular.startTime)}" +
-                            " ~ ${timeToString(regular.endTime)}"),
-                      ],
-                    );
+                      ),
+                    ]
+                          ..addAllIf(regular.dow != -1, [
+                            Text(
+                                regular.teacherID + " / ${regular.branchName}"),
+                            Text("${dowToString(regular.dow)}" +
+                                " / ${timeToString(regular.startTime)}" +
+                                " ~ ${timeToString(regular.endTime)}"),
+                          ])
+                          ..addIf(
+                              regular.dow == -1,
+                              search.userDetail!.userType == 0
+                                  ? Text("\n정기수업 시작 전입니다.")
+                                  : search.userDetail!.userType == 1
+                                      ? Text("\n강사 상세 페이지입니다.")
+                                      : Text("\n관리자 상세 페이지입니다.")));
                   },
                 ),
                 myDivider(),
@@ -363,7 +459,7 @@ class _UserDetailPageState extends State<UserDetailPage>
       onPressed: () => showLoading(() async {
         try {
           await _client.registerLedger(
-            userID: _data.regularSchedules[0].userID,
+            userID: search.userDetail!.userID,
             amount: intEdit(expend.edit1)!,
             termID: expend.termID!,
             branchName: expend.branchName!,
@@ -406,16 +502,42 @@ class _UserDetailPageState extends State<UserDetailPage>
           trueName: "등록",
           falseName: "미등록",
         ),
-      ],
+      ]..addAllIf(
+          search.userDetail!.userType == 1,
+          [
+            myTextInput("색상", update.edit4, null),
+            Text(
+              "\n색상: # + HEX Code\nex) #5F9EA0\ncf) htmlcolorcodes.com",
+              style: TextStyle(color: Colors.red, fontSize: 20.r),
+            )
+          ],
+        ),
       onPressed: () => showLoading(() async {
         try {
+          var color = textEdit(update.edit4);
+          if (color != null) {
+            color = color.toUpperCase();
+            if (color.substring(0, 1) != "#") {
+              color = "#" + color;
+            }
+            if (color.length != 7) {
+              throw FormatException("hex");
+            }
+            for (int i = 1; i < 7; i++) {
+              if (!"0123456789ABCDEF".contains(color.substring(i, i + 1))) {
+                throw FormatException("hex");
+              }
+            }
+          }
+
           await _client.updateUserInformation(
-            _data.regularSchedules[0].userID,
+            search.userDetail!.userID,
             userBranch: update.branchName,
             userPhone: textEdit(update.edit1),
             status: update.check[0],
             userCredit: intEdit(update.edit2),
             userName: textEdit(update.edit3),
+            color: color,
           );
 
           await getUsersData(

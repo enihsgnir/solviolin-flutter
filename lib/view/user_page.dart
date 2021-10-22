@@ -33,9 +33,7 @@ class _UserPageState extends State<UserPage> {
     return GestureDetector(
       onTap: () => FocusScope.of(context).requestFocus(FocusNode()),
       child: Scaffold(
-        appBar: myAppBar(
-          "유저 검색",
-        ),
+        appBar: myAppBar("유저 검색"),
         body: SafeArea(
           child: Column(
             children: [
@@ -47,10 +45,25 @@ class _UserPageState extends State<UserPage> {
             ],
           ),
         ),
-        floatingActionButton: FloatingActionButton(
-          child: Icon(Icons.add, size: 36.r),
-          onPressed: _showUserRegister,
+        floatingActionButton: Padding(
+          padding: EdgeInsets.all(32.r),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              FloatingActionButton(
+                child: Icon(Icons.menu, size: 36.r),
+                heroTag: null,
+                onPressed: _showMenu,
+              ),
+              FloatingActionButton(
+                child: Icon(Icons.add, size: 36.r),
+                heroTag: null,
+                onPressed: _showUserRegister,
+              ),
+            ],
+          ),
         ),
+        floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       ),
     );
   }
@@ -265,6 +278,61 @@ class _UserPageState extends State<UserPage> {
       },
       action: "등록",
       isScrollable: true,
+    );
+  }
+
+  Future _showMenu() {
+    FocusScope.of(context).requestFocus(FocusNode());
+
+    return showCupertinoModalPopup(
+      context: context,
+      builder: (context) {
+        return CupertinoActionSheet(
+          actions: [
+            CupertinoActionSheetAction(
+              onPressed: _showInitializeCredit,
+              child: Text("크레딧 초기화", style: TextStyle(fontSize: 24.r)),
+            ),
+          ],
+          cancelButton: CupertinoActionSheetAction(
+            onPressed: Get.back,
+            isDefaultAction: true,
+            child: Text("닫기", style: TextStyle(fontSize: 24.r)),
+          ),
+        );
+      },
+    );
+  }
+
+  Future _showInitializeCredit() {
+    return showMyDialog(
+      contents: [
+        Text("전 지점의 등록된 모든 수강생의"),
+        Text("크레딧을 초기화 하시겠습니까?"),
+      ],
+      onPressed: () {
+        showMyDialog(
+          contents: [
+            Text("\n\n크레딧 초기화를 진행합니다."),
+            Text("\n*되돌릴 수 없습니다.*\n\n", style: TextStyle(color: Colors.red)),
+          ],
+          onPressed: () => showLoading(() async {
+            try {
+              await _client.initializeCredit();
+
+              Get.back();
+              Get.back();
+              Get.back();
+
+              await showMySnackbar(
+                message: "모든 수강생의 크레딧을 초기화 했습니다.",
+              );
+            } catch (e) {
+              showError(e);
+            }
+          }),
+        );
+      },
     );
   }
 }

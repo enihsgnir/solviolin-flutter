@@ -278,7 +278,7 @@ class Client {
     String? userBranch,
     int? userCredit,
     int? status,
-    String? token,
+    String? color,
   }) async {
     await dio.patch(
       "/user/$userID",
@@ -288,10 +288,11 @@ class Client {
         "userBranch": userBranch,
         "userCredit": userCredit,
         "status": status,
-        "token": token,
+        "color": color,
       }..removeWhere((key, value) => value == null),
       options: Options(
         extra: {
+          "400": "입력값이 없습니다. 다시 확인해주세요.",
           "409": "중복된 전화번호가 이미 등록되어 있습니다. 다시 확인해주세요.",
         },
       ),
@@ -306,6 +307,25 @@ class Client {
       "userID": userID,
       "userPassword": userPassword,
     });
+  }
+
+  Future<void> terminateTeacher(String teacherID) async {
+    await dio.patch(
+      "/user/terminate/teacher",
+      data: {
+        "teacherID": teacherID,
+        "endDate": DateTime.now().toIso8601String(),
+      },
+      options: Options(
+        extra: {
+          "404": "해당 강사를 찾을 수 없습니다. 다시 확인해주세요.",
+        },
+      ),
+    );
+  }
+
+  Future<void> initializeCredit() async {
+    await dio.patch("/user/initialize/credit");
   }
 
   Future<void> registerTerm({
@@ -630,6 +650,12 @@ class Client {
     );
   }
 
+  Future<void> deleteReservation(int id) async {
+    await dio.delete("/reservation", data: {
+      "ids": [id],
+    });
+  }
+
   Future<List<Canceled>> getCanceledReservations(String teacherID) async {
     var response = await dio.get("/reservation/canceled/$teacherID");
     if (response.statusCode == 200) {
@@ -724,6 +750,17 @@ class Client {
       options: Options(
         extra: {
           "400": "다음 학기만 수정할 수 있습니다.",
+        },
+      ),
+    );
+  }
+
+  Future<void> deleteRegularSchedule(int id) async {
+    await dio.delete(
+      "/regular-schedule/$id",
+      options: Options(
+        extra: {
+          "404": "해당 정기 스케줄을 찾을 수 없습니다. 정기 스케줄을 확인하세요.",
         },
       ),
     );

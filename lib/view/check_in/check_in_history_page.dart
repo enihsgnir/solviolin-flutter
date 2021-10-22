@@ -42,12 +42,18 @@ class _CheckInHistoryPageState extends State<CheckInHistoryPage> {
   }
 
   Widget _checkInHistorySearch() {
+    if (!search.isSearched) {
+      var today = DateTime.now();
+      search.date[0] = DateTime(today.year, today.month, today.day);
+      search.date[1] = DateTime(today.year, today.month, today.day);
+    }
+
     return mySearch(
       contents: [
         branchDropdown("/search/check-in", "지점을 선택하세요!"),
         pickDate(
           context: context,
-          item: "시작일",
+          item: "부터",
           tag: "/search/check-in",
           index: 0,
         ),
@@ -55,7 +61,7 @@ class _CheckInHistoryPageState extends State<CheckInHistoryPage> {
           children: [
             pickDate(
               context: context,
-              item: "종료일",
+              item: "까지",
               tag: "/search/check-in",
               index: 1,
             ),
@@ -66,7 +72,8 @@ class _CheckInHistoryPageState extends State<CheckInHistoryPage> {
                   _data.checkInHistories = await _client.getCheckInHistories(
                     branchName: search.branchName!,
                     startDate: search.date[0],
-                    endDate: search.date[1],
+                    endDate: search.date[1]?.add(
+                        const Duration(hours: 23, minutes: 59, seconds: 59)),
                   )
                     ..sort((a, b) {
                       var primary = b.createdAt.compareTo(a.createdAt);
