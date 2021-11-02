@@ -92,7 +92,6 @@ Future<void> getReservationData({
           "FREQ=WEEKLY;INTERVAL=1;BYDAY=${dowToString(element.workDow).substring(0, 2)};COUNT=3",
       color: teacherColors[element.teacherID]?.withOpacity(0.2) ??
           symbolColor.withOpacity(0.2),
-      enablePointerInteraction: false,
       resourceIds: [teacherIds.indexOf(element.teacherID)],
     ));
   });
@@ -110,7 +109,6 @@ Future<void> getReservationData({
       endTime: element.controlEnd,
       color: teacherColors[element.teacherID]?.withOpacity(0.2) ??
           symbolColor.withOpacity(0.2),
-      enablePointerInteraction: false,
       resourceIds: [teacherIds.indexOf(element.teacherID)],
     ));
   });
@@ -163,7 +161,6 @@ Future<void> getReservationDataForTeacher({
       recurrenceRule:
           "FREQ=WEEKLY;INTERVAL=1;BYDAY=${dowToString(element.workDow).substring(0, 2)};COUNT=3",
       color: symbolColor.withOpacity(0.2),
-      enablePointerInteraction: false,
       resourceIds: [0],
     ));
   });
@@ -183,7 +180,6 @@ Future<void> getReservationDataForTeacher({
       startTime: element.controlStart,
       endTime: element.controlEnd,
       color: symbolColor.withOpacity(0.2),
-      enablePointerInteraction: false,
       resourceIds: [0],
     ));
   });
