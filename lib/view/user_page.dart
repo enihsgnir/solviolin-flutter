@@ -73,6 +73,7 @@ class _UserPageState extends State<UserPage> {
       contents: [
         myTextInput("이름", search.edit1),
         branchDropdown("/search/user"),
+        termDropdown("/search/user"),
         myRadio<UserType>(
           tag: "/search/user",
           item: "구분",
@@ -92,14 +93,16 @@ class _UserPageState extends State<UserPage> {
             myActionButton(
               context: context,
               onPressed: () => showLoading(() async {
-                await saveUsersData(
-                  branchName: search.branchName,
-                  userID: textEdit(search.edit1),
-                  isPaid: search.check[0],
-                  userType: UserType.values.indexOf(search.type[UserType]),
-                  status: search.check[1],
-                );
-                try {} catch (e) {
+                try {
+                  await saveUsersData(
+                    branchName: search.branchName,
+                    userID: textEdit(search.edit1),
+                    isPaid: search.check[0],
+                    userType: UserType.values.indexOf(search.type[UserType]),
+                    status: search.check[1],
+                    termID: search.termID,
+                  );
+                } catch (e) {
                   showError(e);
                 }
               }),
@@ -126,6 +129,7 @@ class _UserPageState extends State<UserPage> {
                     isPaid: search.check[0],
                     userType: UserType.values.indexOf(search.type[UserType]),
                     status: search.check[1],
+                    termID: search.termID,
                   );
 
                   search.isSearched = true;

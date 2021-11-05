@@ -299,6 +299,8 @@ class _HistoryReservedState extends State<HistoryReserved> {
                         try {
                           await _client.deleteReservation(reservation.id);
 
+                          await _getSearchedUsersData();
+
                           Get.back();
                           Get.back();
                           Get.back();

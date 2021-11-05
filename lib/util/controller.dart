@@ -17,7 +17,8 @@ import 'package:solviolin_admin/util/data_source.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
 
 class DataController extends GetxController {
-  late final double ratio;
+  double ratio = 1.0;
+  bool isRatioUpdated = false;
 
   late Profile profile;
 

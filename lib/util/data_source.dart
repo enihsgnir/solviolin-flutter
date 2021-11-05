@@ -250,6 +250,7 @@ Future<void> getUsersData({
   int? isPaid,
   int? userType,
   int? status,
+  int? termID,
 }) async {
   _data.users = await _client.getUsers(
     branchName: branchName,
@@ -257,6 +258,7 @@ Future<void> getUsersData({
     isPaid: isPaid,
     userType: userType,
     status: status,
+    termID: termID,
   )
     ..sort((a, b) => a.userID.compareTo(b.userID));
   _data.update();
@@ -268,6 +270,7 @@ Future<void> saveUsersData({
   int? isPaid,
   int? userType,
   int? status,
+  int? termID,
 }) async {
   final jsonList = await _client.getJsonUsers(
     branchName: branchName,
@@ -275,6 +278,7 @@ Future<void> saveUsersData({
     isPaid: isPaid,
     userType: userType,
     status: status,
+    termID: termID,
   )
     ..sort((a, b) => a["userName"].compareTo(b["userName"]));
 
@@ -309,6 +313,9 @@ Future<void> saveUsersData({
   final file = File("$path/user_list_" +
       "${DateFormat("yyMMdd_HHmmss").format(DateTime.now())}.xlsx")
     ..writeAsBytesSync(excel.encode()!);
+  File("$path/user_list_" +
+          "${DateFormat("yyMMdd_HHmmss").format(DateTime.now())}.xls")
+      .writeAsBytesSync(excel.encode()!);
 
   Get.snackbar(
     "",

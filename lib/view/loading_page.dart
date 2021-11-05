@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:solviolin_admin/util/constant.dart';
@@ -29,10 +27,6 @@ class _LoadingPageState extends State<LoadingPage> {
 
   @override
   Widget build(BuildContext context) {
-    _data.ratio = min(MediaQuery.of(context).size.width / 540,
-        MediaQuery.of(context).size.height / 1152);
-    _data.update();
-
     return Scaffold(
       body: SafeArea(
         child: Center(

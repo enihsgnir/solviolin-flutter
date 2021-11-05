@@ -222,6 +222,7 @@ class Client {
     int? isPaid,
     int? userType,
     int? status,
+    int? termID,
   }) async {
     var response = await dio.get(
       "/user",
@@ -231,6 +232,7 @@ class Client {
         "isPaid": isPaid,
         "userType": userType,
         "status": status,
+        "termID": termID,
       }..removeWhere((key, value) => value == null),
     );
     if (response.statusCode == 200) {
@@ -251,6 +253,7 @@ class Client {
     int? isPaid,
     int? userType,
     int? status,
+    int? termID,
   }) async {
     var response = await dio.get(
       "/user",
@@ -260,6 +263,7 @@ class Client {
         "isPaid": isPaid,
         "userType": userType,
         "status": status,
+        "termID": termID,
       }..removeWhere((key, value) => value == null),
     );
     if (response.statusCode == 200) {
