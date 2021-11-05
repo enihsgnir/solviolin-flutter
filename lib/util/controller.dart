@@ -7,7 +7,8 @@ import 'package:solviolin/model/reservation.dart';
 import 'package:solviolin/model/term.dart';
 
 class DataController extends GetxController {
-  late final double ratio;
+  double ratio = 1.0;
+  bool isRatioUpdated = false;
 
   late Profile profile;
 

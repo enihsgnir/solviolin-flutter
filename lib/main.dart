@@ -39,15 +39,27 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     Get.put(FlutterSecureStorage());
     Get.put(Client());
-    Get.put(DataController());
+    var _data = Get.put(DataController());
 
     return GetMaterialApp(
-      builder: (context, child) => MediaQuery(
-        data: MediaQuery.of(context).copyWith(
-          textScaleFactor: min(MediaQuery.of(context).textScaleFactor, 1.0),
-        ),
-        child: child!,
-      ),
+      builder: (context, child) {
+        if (!_data.isRatioUpdated) {
+          var _ratio = min(MediaQuery.of(context).size.width / 540,
+              MediaQuery.of(context).size.height / 1152);
+          if (_ratio != 0.0) {
+            _data.ratio = _ratio;
+            _data.isRatioUpdated = true;
+            _data.update();
+          }
+        }
+
+        return MediaQuery(
+          data: MediaQuery.of(context).copyWith(
+            textScaleFactor: min(MediaQuery.of(context).textScaleFactor, 1.0),
+          ),
+          child: child!,
+        );
+      },
       title: "SolViolin",
       theme: ThemeData(
         brightness: Brightness.dark,

@@ -58,7 +58,7 @@ class _LoginPageState extends State<LoginPage> {
                 padding: EdgeInsets.fromLTRB(8.r, 30.r, 8.r, 8.r),
                 child: TextFormField(
                   controller: id,
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
                     labelText: "아이디",
                     labelStyle: const TextStyle(color: Colors.white),
                     border: const OutlineInputBorder(
@@ -66,6 +66,11 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                     focusedBorder: const OutlineInputBorder(
                       borderSide: const BorderSide(color: Colors.white),
+                    ),
+                    suffixIcon: IconButton(
+                      onPressed: id.clear,
+                      icon: Icon(Icons.clear, size: 20.r),
+                      splashRadius: 20.r,
                     ),
                   ),
                   style: contentStyle,
@@ -76,7 +81,7 @@ class _LoginPageState extends State<LoginPage> {
                 padding: EdgeInsets.all(8.r),
                 child: TextFormField(
                   controller: pw,
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
                     labelText: "비밀번호",
                     labelStyle: const TextStyle(color: Colors.white),
                     border: const OutlineInputBorder(
@@ -84,6 +89,11 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                     focusedBorder: const OutlineInputBorder(
                       borderSide: const BorderSide(color: Colors.white),
+                    ),
+                    suffixIcon: IconButton(
+                      onPressed: pw.clear,
+                      icon: Icon(Icons.clear, size: 20.r),
+                      splashRadius: 20.r,
                     ),
                   ),
                   style: contentStyle,
