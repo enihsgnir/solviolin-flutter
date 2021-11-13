@@ -1,6 +1,5 @@
 import 'package:dio/dio.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart'
-    hide Options;
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get/get.dart' hide Response;
 import 'package:intl/intl.dart';
 import 'package:pretty_dio_logger/pretty_dio_logger.dart';
