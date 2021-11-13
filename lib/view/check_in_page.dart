@@ -57,7 +57,7 @@ class _CheckInPageState extends State<CheckInPage> {
 
                   showLoading(() async {
                     try {
-                      await _client.checkIn(result!.code);
+                      await _client.checkIn(result!.code!);
 
                       controller.stopCamera();
                       Get.back();
