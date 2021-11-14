@@ -20,7 +20,7 @@ class RegularSchedule {
       startTime: parseTimeOnly(json["startTime"]),
       endTime: parseTimeOnly(json["endTime"]),
       dow: json["dow"],
-      teacherID: json["teacherID"],
+      teacherID: json["teacherID"].trim(),
       branchName: json["branchName"],
     );
   }

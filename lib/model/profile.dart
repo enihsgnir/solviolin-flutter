@@ -9,7 +9,7 @@ class Profile {
 
   factory Profile.fromJson(Map<String, dynamic> json) {
     return Profile(
-      userID: json["userID"],
+      userID: json["userID"].trim(),
       branchName: json["branchName"],
     );
   }

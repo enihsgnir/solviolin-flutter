@@ -37,7 +37,7 @@ class _CalendarReservedState extends State<CalendarReserved> {
         return TableCalendar(
           focusedDay: _focusedDay,
           firstDay: DateTime(today.year, today.month - 5, 1),
-          lastDay: controller.currentTerm[1].termEnd
+          lastDay: controller.currentTerm[0].termEnd
               .add(const Duration(hours: 23, minutes: 59, seconds: 59)),
           currentDay: today,
           locale: "en_US", // not timezone

@@ -23,7 +23,7 @@ class Reservation {
       startDate: parseDateTime(json["startDate"]),
       endDate: parseDateTime(json["endDate"]),
       bookingStatus: json["bookingStatus"],
-      teacherID: json["teacherID"],
+      teacherID: json["teacherID"].trim(),
       branchName: json["branchName"],
     );
   }

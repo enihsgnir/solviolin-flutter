@@ -15,7 +15,7 @@ class Change {
 
   factory Change.fromJson(Map<String, dynamic> json) {
     return Change(
-      teacherID: json["from"]["teacherID"],
+      teacherID: json["from"]["teacherID"].trim(),
       branchName: json["from"]["branchName"],
       fromDate: parseDateTime(json["from"]["startDate"]),
       toDate:

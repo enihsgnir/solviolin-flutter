@@ -217,8 +217,5 @@ Map<DateTime, List<Reservation>> getEventSource() =>
 
 LinkedHashMap<DateTime, List<Reservation>> getEvents() => LinkedHashMap(
       equals: isSameDay,
-      hashCode: getHashCode,
+      hashCode: (key) => key.day * 1000000 + key.month * 10000 + key.year,
     )..addAll(getEventSource());
-
-int getHashCode(DateTime key) =>
-    key.day * 1000000 + key.month * 10000 + key.year;

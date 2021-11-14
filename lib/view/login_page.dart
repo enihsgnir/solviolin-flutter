@@ -56,7 +56,7 @@ class _LoginPageState extends State<LoginPage> {
               ),
               Padding(
                 padding: EdgeInsets.fromLTRB(8.r, 30.r, 8.r, 8.r),
-                child: TextFormField(
+                child: TextField(
                   controller: id,
                   decoration: InputDecoration(
                     labelText: "아이디",
@@ -74,12 +74,11 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                   ),
                   style: contentStyle,
-                  validator: (value) => (value == null) ? "아이디를 입력해주세요" : null,
                 ),
               ),
               Padding(
                 padding: EdgeInsets.all(8.r),
-                child: TextFormField(
+                child: TextField(
                   controller: pw,
                   decoration: InputDecoration(
                     labelText: "비밀번호",
@@ -98,7 +97,6 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                   style: contentStyle,
                   obscureText: true,
-                  validator: (value) => (value == null) ? "비밀번호를 입력해주세요" : null,
                 ),
               ),
               Container(
