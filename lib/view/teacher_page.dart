@@ -153,9 +153,9 @@ class _TeacherPageState extends State<TeacherPage> {
     return showMyDialog(
       title: "강사 스케줄 등록",
       contents: [
-        myTextInput("강사", register.edit1, "강사명을 입력하세요!"),
-        branchDropdown("/register", "지점을 선택하세요!"),
-        workDowDropdown("/register", "요일을 선택하세요!"),
+        myTextInput("강사", register.edit1, true),
+        branchDropdown("/register", true),
+        workDowDropdown("/register", true),
         pickTime(
           context: context,
           item: "시작시간",

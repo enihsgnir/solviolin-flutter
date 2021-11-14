@@ -209,7 +209,7 @@ class _TermPageState extends State<TermPage> {
     return showMyDialog(
       title: "정기 연장 (지점)",
       contents: [
-        branchDropdown("/extend", "지점을 선택하세요!"),
+        branchDropdown("/extend", true),
       ],
       onPressed: () => showLoading(() async {
         try {
@@ -234,7 +234,7 @@ class _TermPageState extends State<TermPage> {
     return showMyDialog(
       title: "정기 연장 (수강생)",
       contents: [
-        myTextInput("이름", extend.edit1, "이름을 입력하세요!"),
+        myTextInput("이름", extend.edit1, true),
       ],
       onPressed: () => showLoading(() async {
         try {

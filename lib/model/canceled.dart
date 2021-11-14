@@ -21,8 +21,8 @@ class Canceled {
     return Canceled(
       startDate: parseDateTime(json["startDate"]),
       endDate: parseDateTime(json["endDate"]),
-      userID: json["userID"],
-      teacherID: json["teacherID"],
+      userID: json["userID"].trim(),
+      teacherID: json["teacherID"].trim(),
       branchName: json["branchName"],
       toID: List.generate(
         json["linkFrom"].length,

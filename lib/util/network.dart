@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart'
+    hide Options;
 import 'package:get/get.dart' hide Response;
 import 'package:intl/intl.dart';
 import 'package:pretty_dio_logger/pretty_dio_logger.dart';
@@ -23,8 +24,8 @@ class Client {
   final storage = Get.find<FlutterSecureStorage>();
 
   Client() {
-    dio.options.connectTimeout = 5000;
-    dio.options.receiveTimeout = 3000;
+    dio.options.connectTimeout = 10000;
+    dio.options.receiveTimeout = 5000;
     dio.options.baseUrl = "https://xn--sy2bt7bxwhpof3wb.com";
 
     // not to get breakpoints at error
@@ -80,6 +81,7 @@ class Client {
         return handler.reject(NetworkException._(
           message: "아래 메시지와 함께 관리자에게 문의하세요!\n" + "DioError: ${error.message}",
           options: error.requestOptions,
+          errorType: error.type,
         ));
       },
     ));
@@ -905,29 +907,40 @@ class NetworkException extends DioError {
   String message;
   RequestOptions options;
   Response? response;
+  DioErrorType errorType;
 
   NetworkException({
     required this.message,
     required this.options,
     this.response,
+    this.errorType = DioErrorType.other,
   }) : super(
           requestOptions: options,
+          type: errorType,
         );
 
   factory NetworkException._({
     required String message,
     required RequestOptions options,
     Response? response,
+    DioErrorType errorType = DioErrorType.other,
   }) {
     return NetworkException(
       message: message,
       options: options,
       response: response,
+      errorType: errorType,
     );
   }
 
   @override
   String toString() {
+    if (errorType == DioErrorType.connectTimeout ||
+        errorType == DioErrorType.sendTimeout ||
+        errorType == DioErrorType.receiveTimeout) {
+      return "연결 시간이 초과했습니다. 다시 시도해주세요.";
+    }
+
     if (response != null) {
       if (response!.requestOptions.extra[response!.statusCode.toString()] !=
           null) {

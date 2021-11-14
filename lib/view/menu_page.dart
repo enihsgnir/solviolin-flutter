@@ -192,7 +192,7 @@ class _MenuPageState extends State<MenuPage> {
     return showMyDialog(
       title: "지점 등록",
       contents: [
-        myTextInput("지점명", branch, "지점명을 입력하세요!"),
+        myTextInput("지점명", branch, true),
       ],
       onPressed: () => showLoading(() async {
         try {

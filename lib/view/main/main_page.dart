@@ -125,7 +125,7 @@ class _MainPageState extends State<MainPage> {
       contents: [
         myTextInput("수강생", search.edit1),
         myTextInput("강사", search.edit2),
-        branchDropdown("/search/main", "지점을 선택하세요!"),
+        branchDropdown("/search/main", true),
       ],
       onPressed: () => showLoading(() async {
         try {

@@ -52,10 +52,36 @@ Future<void> getReservationData({
   final last =
       first.add(const Duration(days: 6, hours: 23, minutes: 59, seconds: 59));
 
+  _data.reservations = await _client.getReservations(
+    branchName: branchName,
+    teacherID: teacherID,
+    startDate: first,
+    endDate: last,
+    userID: userID,
+    bookingStatus: [-3, -1, 0, 1, 3],
+  )
+    ..sort((a, b) => a.startDate.compareTo(b.startDate));
+
+  // var _teacherInfoSet = LinkedHashSet<TeacherInfo>(
+  //   equals: (a, b) => a.teacherID == b.teacherID && a.color == b.color,
+  //   hashCode: (element) => element.color?.value ?? -1,
+  // );
+  // await Future.forEach<Reservation>(_data.reservations, (element) async {
+  //   _teacherInfoSet.add(TeacherInfo(
+  //     teacherID: element.teacherID,
+  //     color: element.color,
+  //   ));
+  // });
+  // _data.teacherInfos = _teacherInfoSet.toList()
+  //   ..sort((a, b) => a.teacherID.compareTo(b.teacherID));
+
+  //TODO:
+
   _data.teacherInfos = await _client.getTeacherInfos(
     branchName: branchName,
   )
     ..sort((a, b) => a.teacherID.compareTo(b.teacherID));
+
   var teacherIds = List.generate(
     _data.teacherInfos.length,
     (index) => _data.teacherInfos[index].teacherID,
@@ -70,16 +96,6 @@ Future<void> getReservationData({
     teacherID: teacherID,
     branchName: branchName,
   );
-
-  _data.reservations = await _client.getReservations(
-    branchName: branchName,
-    teacherID: teacherID,
-    startDate: first,
-    endDate: last,
-    userID: userID,
-    bookingStatus: [-3, -1, 0, 1, 3],
-  )
-    ..sort((a, b) => a.startDate.compareTo(b.startDate));
 
   _data.reservationDataSource = ReservationDataSource();
 

@@ -20,7 +20,7 @@ class Teacher {
   factory Teacher.fromJson(Map<String, dynamic> json) {
     return Teacher(
       id: json["id"],
-      teacherID: json["teacherID"],
+      teacherID: json["teacherID"].trim(),
       branchName: json["branchName"],
       workDow: json["workDow"],
       startTime: parseTimeOnly(json["startTime"]),

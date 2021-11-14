@@ -108,7 +108,7 @@ class _LedgerPageState extends State<LedgerPage> {
             ),
           ],
         ),
-        myTextInput("금액", search.edit2, null, TextInputType.number),
+        myTextInput("금액", search.edit2, false, TextInputType.number),
       ],
     );
   }
@@ -217,10 +217,10 @@ class _LedgerPageState extends State<LedgerPage> {
     return showMyDialog(
       title: "원비납부",
       contents: [
-        myTextInput("수강생", expend.edit1, "이름을 입력하세요!"),
-        branchDropdown("/expend", "지점을 선택하세요!"),
-        termDropdown("/expend", "지점을 선택하세요!"),
-        myTextInput("금액", expend.edit2, "금액을 입력하세요!", TextInputType.number),
+        myTextInput("수강생", expend.edit1, true),
+        branchDropdown("/expend", true),
+        termDropdown("/expend", true),
+        myTextInput("금액", expend.edit2, true, TextInputType.number),
       ],
       onPressed: () => showLoading(() async {
         try {

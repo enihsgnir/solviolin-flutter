@@ -351,10 +351,10 @@ class _TimeSlotState extends State<TimeSlot> {
       contents: [
         Text("정기 스케줄을 생성하고 수업을 예약합니다."),
         Text(DateFormat("yy/MM/dd HH:mm").format(details.date!) + " ~ "),
-        myTextInput("강사", regular.edit1, "강사명을 입력하세요!"),
-        branchDropdown("/regular", "지점을 선택하세요!"),
-        durationDropdown("/regular", "수업시간을 선택하세요!"),
-        myTextInput("수강생", regular.edit2, "이름을 입력하세요!"),
+        myTextInput("강사", regular.edit1, true),
+        branchDropdown("/regular", true),
+        durationDropdown("/regular", true),
+        myTextInput("수강생", regular.edit2, true),
       ],
       onPressed: () => showLoading(() async {
         try {
@@ -392,10 +392,10 @@ class _TimeSlotState extends State<TimeSlot> {
       contents: [
         Text("관리자의 권한으로 보강을 예약합니다."),
         Text(DateFormat("yy/MM/dd HH:mm").format(details.date!) + " ~ "),
-        myTextInput("강사", admin.edit1, "강사명을 입력하세요!"),
-        branchDropdown("/admin", "지점을 선택하세요!"),
-        durationDropdown("/admin", "수업시간을 선택하세요!"),
-        myTextInput("수강생", admin.edit2, "이름을 입력하세요!"),
+        myTextInput("강사", admin.edit1, true),
+        branchDropdown("/admin", true),
+        durationDropdown("/admin", true),
+        myTextInput("수강생", admin.edit2, true),
       ],
       onPressed: () => showLoading(() async {
         try {
@@ -432,10 +432,10 @@ class _TimeSlotState extends State<TimeSlot> {
       title: "무료 보강 등록",
       contents: [
         Text(DateFormat("yy/MM/dd HH:mm").format(details.date!) + " ~ "),
-        myTextInput("강사", free.edit1, "강사명을 입력하세요!"),
-        branchDropdown("/free", "지점을 선택하세요!"),
-        durationDropdown("/free", "수업시간을 선택하세요!"),
-        myTextInput("수강생", free.edit2, "이름을 입력하세요!"),
+        myTextInput("강사", free.edit1, true),
+        branchDropdown("/free", true),
+        durationDropdown("/free", true),
+        myTextInput("수강생", free.edit2, true),
       ],
       onPressed: () => showLoading(() async {
         try {

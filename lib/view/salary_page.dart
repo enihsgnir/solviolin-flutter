@@ -48,13 +48,12 @@ class _SalaryPageState extends State<SalaryPage> {
   Widget _salarySearch() {
     return mySearch(
       contents: [
-        branchDropdown("/search/salary", "지점을 선택하세요!"),
-        termDropdown("/search/salary", "학기를 선택하세요!"),
-        myTextInput("주간시급", search.edit1, "주간시급을 입력하세요!", TextInputType.number),
+        branchDropdown("/search/salary", true),
+        termDropdown("/search/salary", true),
+        myTextInput("주간시급", search.edit1, true, TextInputType.number),
         Row(
           children: [
-            myTextInput(
-                "야간시급", search.edit2, "야간시급을 입력하세요!", TextInputType.number),
+            myTextInput("야간시급", search.edit2, true, TextInputType.number),
             myActionButton(
               context: context,
               onPressed: () => showLoading(() async {

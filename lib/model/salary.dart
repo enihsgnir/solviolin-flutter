@@ -13,7 +13,7 @@ class Salary {
 
   factory Salary.fromList(List<dynamic> list) {
     return Salary(
-      teacherID: list[0],
+      teacherID: list[0].trim(),
       dayTime: list[1]["dayTime"],
       nightTime: list[1]["nightTime"],
       income: list[1]["income"],

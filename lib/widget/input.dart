@@ -25,18 +25,18 @@ Widget label(String item, bool isMandatory) {
 Widget myTextInput(
   String item,
   TextEditingController controller, [
-  String? validator,
+  bool isMandatory = false,
   TextInputType? keyboardType,
 ]) {
   return Row(
     children: [
       Container(
         width: 110.r,
-        child: label(item, validator != null),
+        child: label(item, isMandatory),
       ),
       Container(
         width: 220.r,
-        child: TextFormField(
+        child: TextField(
           controller: controller,
           decoration: InputDecoration(
             suffixIcon: IconButton(
@@ -47,7 +47,6 @@ Widget myTextInput(
           ),
           keyboardType: keyboardType,
           style: contentStyle,
-          validator: (value) => value == "" ? validator : null,
         ),
       ),
     ],

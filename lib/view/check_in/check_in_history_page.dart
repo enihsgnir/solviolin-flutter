@@ -50,7 +50,7 @@ class _CheckInHistoryPageState extends State<CheckInHistoryPage> {
 
     return mySearch(
       contents: [
-        branchDropdown("/search/check-in", "지점을 선택하세요!"),
+        branchDropdown("/search/check-in", true),
         pickDate(
           context: context,
           item: "부터",

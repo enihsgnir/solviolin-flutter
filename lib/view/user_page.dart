@@ -216,12 +216,11 @@ class _UserPageState extends State<UserPage> {
     return showMyDialog(
       title: "유저 신규 등록",
       contents: [
-        myTextInput("아이디", register.edit1, "아이디를 입력하세요!"),
-        myTextInput("비밀번호", register.edit2, "비밀번호를 입력하세요!"),
-        myTextInput("이름", register.edit3, "이름을 입력하세요!"),
-        myTextInput(
-            "전화번호", register.edit4, "전화번호를 입력하세요!", TextInputType.number),
-        branchDropdown("/register", "지점을 선택하세요!"),
+        myTextInput("아이디", register.edit1, true),
+        myTextInput("비밀번호", register.edit2, true),
+        myTextInput("이름", register.edit3, true),
+        myTextInput("전화번호", register.edit4, true, TextInputType.number),
+        branchDropdown("/register", true),
         myRadio<UserType>(
           tag: "/register",
           item: "구분",

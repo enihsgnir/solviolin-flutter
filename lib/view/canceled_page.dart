@@ -51,7 +51,7 @@ class _CanceledPageState extends State<CanceledPage> {
       contents: [
         Row(
           children: [
-            myTextInput("강사", search.edit1, "강사명을 입력하세요!"),
+            myTextInput("강사", search.edit1, true),
             myActionButton(
               context: context,
               onPressed: () => showLoading(() async {

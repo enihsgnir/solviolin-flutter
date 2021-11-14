@@ -21,7 +21,7 @@ class Ledger {
     return Ledger(
       id: json["id"],
       amount: json["amount"],
-      userID: json["userID"],
+      userID: json["userID"].trim(),
       termID: json["termID"],
       branchName: json["branchName"],
       paidAt: parseDateTime(json["paidAt"]).add(const Duration(hours: 9)),

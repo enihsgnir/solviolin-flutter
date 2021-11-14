@@ -11,7 +11,7 @@ class TeacherInfo {
 
   factory TeacherInfo.fromJson(Map<String, dynamic> json) {
     return TeacherInfo(
-      teacherID: json["teacherID"],
+      teacherID: json["teacherID"].trim(),
       color: json["teacher"]["color"] == null
           ? null
           : Color(int.parse(

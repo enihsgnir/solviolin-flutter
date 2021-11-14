@@ -11,7 +11,7 @@ class Profile {
 
   factory Profile.fromJson(Map<String, dynamic> json) {
     return Profile(
-      userID: json["userID"],
+      userID: json["userID"].trim(),
       userType: json["userType"],
       branchName: json["branchName"],
     );

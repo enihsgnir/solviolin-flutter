@@ -46,7 +46,26 @@ String dowToString(int dow) {
 }
 
 String? textEdit(TextEditingController edit) =>
-    edit.text == "" ? null : edit.text;
+    edit.text == "" ? null : edit.text.trim();
 
 int? intEdit(TextEditingController edit) =>
-    edit.text == "" ? null : int.parse(edit.text);
+    edit.text == "" ? null : int.parse(edit.text.trim());
+
+//TODO:
+String? trimColorString(String? color) {
+  if (color != null) {
+    color = color.trim().toLowerCase();
+    if (color.startsWith("#")) {
+      color = color.substring(1, color.length);
+    }
+    if (color.length != 6) {
+      return null;
+    }
+    for (int i = 0; i < 6; i++) {
+      if (!"0123456789abcdef".contains(color.substring(i, i + 1))) {
+        return null;
+      }
+    }
+  }
+  return color;
+}

@@ -63,7 +63,7 @@ class _ControlPageState extends State<ControlPage> {
 
     return mySearch(
       contents: [
-        branchDropdown("/search/control", "지점을 선택하세요!"),
+        branchDropdown("/search/control", true),
         myTextInput("강사", search.edit1),
         pickDate(
           context: context,
@@ -192,8 +192,8 @@ class _ControlPageState extends State<ControlPage> {
     return showMyDialog(
       title: "오픈/클로즈 등록",
       contents: [
-        myTextInput("강사", register.edit1, "강사명을 입력하세요!"),
-        branchDropdown("/register", "지점을 선택하세요!"),
+        myTextInput("강사", register.edit1, true),
+        branchDropdown("/register", true),
         pickDateTime(
           context: context,
           item: "시작일",

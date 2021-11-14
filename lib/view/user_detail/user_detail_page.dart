@@ -452,9 +452,9 @@ class _UserDetailPageState extends State<UserDetailPage>
     return showMyDialog(
       title: "원비납부",
       contents: [
-        myTextInput("금액", expend.edit1, "금액을 입력하세요!", TextInputType.number),
-        branchDropdown("/expend", "지점을 선택하세요!"),
-        termDropdown("/expend", "지점을 선택하세요!"),
+        myTextInput("금액", expend.edit1, true, TextInputType.number),
+        branchDropdown("/expend", true),
+        termDropdown("/expend", true),
       ],
       onPressed: () => showLoading(() async {
         try {
@@ -493,8 +493,8 @@ class _UserDetailPageState extends State<UserDetailPage>
       title: "정보수정",
       contents: [
         myTextInput("이름", update.edit3),
-        myTextInput("전화번호", update.edit1, null, TextInputType.number),
-        myTextInput("크레딧", update.edit2, null, TextInputType.number),
+        myTextInput("전화번호", update.edit1, false, TextInputType.number),
+        myTextInput("크레딧", update.edit2, false, TextInputType.number),
         branchDropdown("/update"),
         myCheckBox(
           tag: "/update",
@@ -505,7 +505,7 @@ class _UserDetailPageState extends State<UserDetailPage>
       ]..addAllIf(
           search.userDetail!.userType == 1,
           [
-            myTextInput("색상", update.edit4, null),
+            myTextInput("색상", update.edit4),
             Text(
               "\n색상: # + HEX Code\nex) #5F9EA0\ncf) htmlcolorcodes.com",
               style: TextStyle(color: Colors.red, fontSize: 20.r),
@@ -517,7 +517,7 @@ class _UserDetailPageState extends State<UserDetailPage>
           var color = textEdit(update.edit4);
           if (color != null) {
             color = color.toUpperCase();
-            if (color.substring(0, 1) != "#") {
+            if (!color.startsWith("#")) {
               color = "#" + color;
             }
             if (color.length != 7) {
@@ -569,7 +569,7 @@ class _UserDetailPageState extends State<UserDetailPage>
       title: "비밀번호 초기화",
       contents: [
         Text("${search.userDetail!.userID} 계정의 비밀번호를 새로 설정합니다."),
-        myTextInput("비밀번호", reset.edit1, "새로운 비밀번호를 입력하세요!"),
+        myTextInput("비밀번호", reset.edit1, true),
       ],
       onPressed: () => showLoading(() async {
         try {

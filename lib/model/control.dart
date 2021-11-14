@@ -24,7 +24,7 @@ class Control {
       id: json["id"],
       controlStart: parseDateTime(json["controlStart"]),
       controlEnd: parseDateTime(json["controlEnd"]),
-      teacherID: json["teacherID"],
+      teacherID: json["teacherID"].trim(),
       branchName: json["branchName"],
       status: json["status"],
       cancelInClose: json["cancelInClose"],

@@ -16,7 +16,7 @@ class CheckIn {
   factory CheckIn.fromJson(Map<String, dynamic> json) {
     return CheckIn(
       id: json["id"],
-      userID: json["userID"],
+      userID: json["userID"].trim(),
       branchName: json["branchName"],
       createdAt: parseDateTime(json["createdAt"]).add(const Duration(hours: 9)),
     );

@@ -12,7 +12,7 @@ DataController _data = Get.find<DataController>();
 Widget _myDropdown<T>({
   required String title,
   T? value,
-  String? validator,
+  required bool isMandatory,
   void Function(T?)? onChanged,
   required List<DropdownMenuItem<T>> items,
 }) {
@@ -20,7 +20,7 @@ Widget _myDropdown<T>({
     children: [
       Container(
         width: 110.r,
-        child: label(title, validator != null),
+        child: label(title, isMandatory),
       ),
       Container(
         width: 220.r,
@@ -31,9 +31,7 @@ Widget _myDropdown<T>({
           iconSize: 24.r,
           elevation: 16,
           style: contentStyle,
-          validator: (value) => value == null ? validator : null,
           onChanged: onChanged,
-          onSaved: onChanged,
           onTap: () =>
               FocusScope.of(Get.overlayContext!).requestFocus(FocusNode()),
           items: items,
@@ -45,7 +43,7 @@ Widget _myDropdown<T>({
 
 Widget branchDropdown([
   String? tag,
-  String? validator,
+  bool isMandatory = false,
 ]) {
   var _cache = Get.find<CacheController>(tag: tag);
 
@@ -55,7 +53,7 @@ Widget branchDropdown([
             child: Text(e),
           ))
       .toList();
-  if (validator == null) {
+  if (!isMandatory) {
     items.add(DropdownMenuItem(
       value: null,
       child: Text("선택"),
@@ -67,7 +65,7 @@ Widget branchDropdown([
       return _myDropdown<String>(
         title: "지점명",
         value: _cache.branchName,
-        validator: validator,
+        isMandatory: isMandatory,
         onChanged: (value) => setState(() {
           _cache.branchName = value;
         }),
@@ -79,7 +77,7 @@ Widget branchDropdown([
 
 Widget workDowDropdown([
   String? tag,
-  String? validator,
+  bool isMandatory = false,
 ]) {
   var _cache = Get.find<CacheController>(tag: tag);
 
@@ -89,7 +87,7 @@ Widget workDowDropdown([
             child: Text(dowToString(e)),
           ))
       .toList();
-  if (validator == null) {
+  if (!isMandatory) {
     items.add(DropdownMenuItem(
       value: null,
       child: Text("선택"),
@@ -101,7 +99,7 @@ Widget workDowDropdown([
       return _myDropdown<int>(
         title: "요일",
         value: _cache.workDow,
-        validator: validator,
+        isMandatory: isMandatory,
         onChanged: (value) => setState(() {
           _cache.workDow = value;
         }),
@@ -113,7 +111,7 @@ Widget workDowDropdown([
 
 Widget termDropdown([
   String? tag,
-  String? validator,
+  bool isMandatory = false,
 ]) {
   var _cache = Get.find<CacheController>(tag: tag);
 
@@ -125,7 +123,7 @@ Widget termDropdown([
                 DateFormat("yy/MM/dd").format(e.termEnd)),
           ))
       .toList();
-  if (validator == null) {
+  if (!isMandatory) {
     items.add(DropdownMenuItem(
       value: null,
       child: Text("선택"),
@@ -137,7 +135,7 @@ Widget termDropdown([
       return _myDropdown<int>(
         title: "학기",
         value: _cache.termID,
-        validator: validator,
+        isMandatory: isMandatory,
         onChanged: (value) => setState(() {
           _cache.termID = value;
         }),
@@ -149,7 +147,7 @@ Widget termDropdown([
 
 Widget durationDropdown([
   String? tag,
-  String? validator,
+  bool isMandatory = false,
 ]) {
   var _cache = Get.find<CacheController>(tag: tag);
 
@@ -159,7 +157,7 @@ Widget durationDropdown([
             child: Text("$e분"),
           ))
       .toList();
-  if (validator == null) {
+  if (!isMandatory) {
     items.add(DropdownMenuItem(
       value: null,
       child: Text("선택"),
@@ -171,7 +169,7 @@ Widget durationDropdown([
       return _myDropdown<Duration>(
         title: "수업시간",
         value: _cache.duration,
-        validator: validator,
+        isMandatory: isMandatory,
         onChanged: (value) => setState(() {
           _cache.duration = value;
         }),
