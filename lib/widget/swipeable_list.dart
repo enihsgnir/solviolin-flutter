@@ -1,45 +1,79 @@
 import 'package:flutter/material.dart';
 import 'package:solviolin/util/constant.dart';
 
-Widget swipeableList({
-  double? height,
-  required int itemCount,
-  required Widget Function(BuildContext, int) itemBuilder,
-}) {
-  var currentPage = 0;
+class SwipeableList extends StatefulWidget {
+  final int itemCount;
+  final Widget Function(BuildContext, int) itemBuilder;
 
-  return StatefulBuilder(
-    builder: (context, setState) {
-      return Stack(
-        alignment: Alignment.bottomCenter,
-        children: [
-          Container(
-            height: height ?? 225.r, //TODO: shrinkwrap to child
-            child: PageView.builder(
-              onPageChanged: (page) {
-                setState(() {
-                  currentPage = page;
-                });
-              },
-              itemCount: itemCount,
-              itemBuilder: itemBuilder,
+  const SwipeableList({
+    Key? key,
+    required this.itemCount,
+    required this.itemBuilder,
+  }) : super(key: key);
+
+  @override
+  _SwipeableListState createState() => _SwipeableListState();
+}
+
+class _SwipeableListState extends State<SwipeableList> {
+  final _key = GlobalKey();
+  double? _height;
+  var _currentPage = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance?.addPostFrameCallback((timeStamp) {
+      final _renderBox = _key.currentContext?.findRenderObject() as RenderBox;
+      setState(() {
+        _height = _renderBox.size.height;
+      });
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    var _items = List.generate(
+      widget.itemCount,
+      (index) => widget.itemBuilder(context, index),
+    );
+
+    return Stack(
+      alignment: Alignment.bottomCenter,
+      children: [
+        IndexedStack(
+          key: _key,
+          children: [
+            _height == null
+                ? Container()
+                : Container(
+                    height: _height! + 16.r,
+                    child: PageView(
+                      onPageChanged: (page) {
+                        setState(() {
+                          _currentPage = page;
+                        });
+                      },
+                      children: _items,
+                    ),
+                  ),
+            ..._items,
+          ],
+        ),
+        Container(
+          margin: EdgeInsets.only(bottom: 16.r),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
+            children: List.generate(
+              widget.itemCount,
+              (index) => _indicator(isActive: index == _currentPage),
             ),
           ),
-          Container(
-            margin: EdgeInsets.only(bottom: 16.r),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              mainAxisSize: MainAxisSize.min,
-              children: List.generate(
-                itemCount,
-                (index) => _indicator(isActive: index == currentPage),
-              ),
-            ),
-          ),
-        ],
-      );
-    },
-  );
+        ),
+      ],
+    );
+  }
 }
 
 Widget mySwipeableCard({
