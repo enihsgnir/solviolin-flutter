@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
@@ -50,8 +49,7 @@ class _HistoryPageState extends State<HistoryPage>
           builder: (controller) {
             return Column(
               children: [
-                swipeableList(
-                  height: 200.r,
+                SwipeableList(
                   itemCount: controller.regularSchedules.length,
                   itemBuilder: (context, index) {
                     var regular = controller.regularSchedules[index];
@@ -71,7 +69,8 @@ class _HistoryPageState extends State<HistoryPage>
                               " / ${timeToString(regular.startTime)}" +
                               " ~ ${timeToString(regular.endTime)}"),
                         ])
-                        ..addIf(regular.dow == -1, Text("\n정기수업 시작 전입니다.")),
+                        ..addIf(regular.dow == -1,
+                            Text("\nWelcome to SOLVIOLIN :)")),
                     );
                   },
                 ),

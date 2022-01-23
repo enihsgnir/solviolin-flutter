@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-import 'package:solviolin/util/constant.dart';
 import 'package:solviolin/util/controller.dart';
 import 'package:solviolin/widget/single.dart';
 import 'package:solviolin/widget/swipeable_list.dart';
@@ -30,8 +29,7 @@ class _MyReservationState extends State<MyReservation> {
             ? Container()
             : Column(
                 children: [
-                  swipeableList(
-                    height: 150.r,
+                  SwipeableList(
                     itemCount: reservations.length,
                     itemBuilder: (context, index) {
                       var reservation = reservations[index];

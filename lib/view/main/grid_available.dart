@@ -44,9 +44,9 @@ class _GridAvailableState extends State<GridAvailable> {
                         style: TextStyle(color: Colors.red, fontSize: 22.r),
                         child: Column(
                           children: [
-                            Text("정기수업 시작 전입니다."),
-                            Text("취소를 원하시면 우측 상단 첫번째 아이콘 클릭 후"),
+                            Text("수업 취소는 오른쪽 상단 첫번째 아이콘 클릭 후"),
                             Text("해당 수업을 취소(왼쪽으로 스와이프) 해주세요."),
+                            Text("\n보강 예약은 010-6684-8224로 문의바랍니다.")
                           ],
                         ),
                       ),
