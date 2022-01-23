@@ -51,7 +51,7 @@ class _UserDetailPageState extends State<UserDetailPage>
           builder: (controller) {
             return Column(
               children: [
-                swipeableList(
+                SwipeableList(
                   itemCount: controller.regularSchedules.length,
                   itemBuilder: (context, index) {
                     var regular = controller.regularSchedules[index];
@@ -213,13 +213,16 @@ class _UserDetailPageState extends State<UserDetailPage>
                                 " / ${timeToString(regular.startTime)}" +
                                 " ~ ${timeToString(regular.endTime)}"),
                           ])
-                          ..addIf(
-                              regular.dow == -1,
-                              search.userDetail!.userType == 0
-                                  ? Text("\n정기수업 시작 전입니다.")
-                                  : search.userDetail!.userType == 1
-                                      ? Text("\n강사 상세 페이지입니다.")
-                                      : Text("\n관리자 상세 페이지입니다.")));
+                          ..addIf(regular.dow == -1, Text(() {
+                            switch (search.userDetail!.userType) {
+                              case 0:
+                                return "\n정기수업 시작 전입니다.";
+                              case 1:
+                                return "\n강사 상세 페이지입니다.";
+                              default:
+                                return "\n관리자 상세 페이지입니다.";
+                            }
+                          }())));
                   },
                 ),
                 myDivider(),
