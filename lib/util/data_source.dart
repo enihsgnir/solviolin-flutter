@@ -92,6 +92,7 @@ Future<void> getReservationData({
     value: (item) => item.color,
   );
 
+  //TODO: declare seperately
   _data.teachers = await _client.getTeachers(
     teacherID: teacherID,
     branchName: branchName,
