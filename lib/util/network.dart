@@ -24,8 +24,8 @@ class Client {
   final storage = Get.find<FlutterSecureStorage>();
 
   Client() {
-    dio.options.connectTimeout = 10000;
-    dio.options.receiveTimeout = 5000;
+    dio.options.connectTimeout = 75 * 1000;
+    dio.options.receiveTimeout = 40 * 1000;
     dio.options.baseUrl = "https://xn--sy2bt7bxwhpof3wb.com";
 
     // not to get breakpoints at error
