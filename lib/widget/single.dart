@@ -22,3 +22,23 @@ Widget myDivider() {
     margin: EdgeInsets.symmetric(vertical: 4.r, horizontal: 8.r),
   );
 }
+
+Widget menu(String name, void Function() onPressed,
+    [bool isDestructive = false]) {
+  return ElevatedButton(
+    onPressed: onPressed,
+    style: ElevatedButton.styleFrom(
+      primary: isDestructive ? Colors.red : symbolColor,
+      textStyle: TextStyle(color: Colors.white, fontSize: 22.r),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(15.r),
+      ),
+    ),
+    child: Container(
+      alignment: Alignment.center,
+      width: 135.r,
+      height: 60.r,
+      child: Text(name),
+    ),
+  );
+}

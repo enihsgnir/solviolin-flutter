@@ -4,6 +4,8 @@ class Reservation {
   int id;
   DateTime startDate;
   DateTime endDate;
+
+  /// 0: Regular, 1: MadeUp, 2: Canceled, 3: Extended, Negative: By Admin
   int bookingStatus;
   String teacherID;
   String branchName;
@@ -27,4 +29,20 @@ class Reservation {
       branchName: json["branchName"],
     );
   }
+
+  @override
+  String toString() =>
+      "$teacherID / $branchName\n" + formatDateTimeRange(startDate, endDate);
+
+  String statusToString() =>
+      {
+        0: "정기",
+        1: "보강",
+        2: "취소",
+        3: "연장",
+        -1: "보강(관리자)",
+        -2: "취소(관리자)",
+        -3: "연장(관리자)",
+      }[bookingStatus] ??
+      "Null";
 }

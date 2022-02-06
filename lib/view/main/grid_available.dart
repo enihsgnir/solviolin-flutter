@@ -1,10 +1,10 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:intl/intl.dart';
 import 'package:solviolin/util/constant.dart';
 import 'package:solviolin/util/controller.dart';
 import 'package:solviolin/util/data_source.dart';
+import 'package:solviolin/util/format.dart';
 import 'package:solviolin/util/network.dart';
 import 'package:solviolin/widget/dialog.dart';
 
@@ -26,80 +26,62 @@ class _GridAvailableState extends State<GridAvailable> {
         var now = DateTime.now();
         var today = DateUtils.dateOnly(now).add(now.timeZoneOffset);
 
-        return controller.selectedDay.isBefore(today)
-            ? Center(
-                child: Container(
-                  padding: EdgeInsets.only(top: 40.r),
-                  child: Text(
-                    "오늘보다 이전 날짜에는 예약할 수 없습니다!",
-                    style: TextStyle(color: Colors.red, fontSize: 22.r),
-                  ),
-                ),
-              )
-            : !_data.isRegularScheduleExisting
-                ? Center(
-                    child: Container(
-                      padding: EdgeInsets.only(top: 40.r),
-                      child: DefaultTextStyle(
-                        style: TextStyle(color: Colors.red, fontSize: 22.r),
-                        child: Column(
-                          children: [
-                            Text("수업 취소는 오른쪽 상단 첫번째 아이콘 클릭 후"),
-                            Text("해당 수업을 취소(왼쪽으로 스와이프) 해주세요."),
-                            Text("\n보강 예약은 010-6684-8224로 문의바랍니다.")
-                          ],
-                        ),
-                      ),
+        if (!_data.isRegularScheduleExisting) {
+          return _warning("수업시간 변경이 필요하시면\n010-6684-8224로 문의바랍니다.");
+        } else if (controller.selectedDay.isBefore(today)) {
+          return _warning("오늘보다 이전 날짜에는 예약할 수 없습니다!");
+        } else if (controller.availabaleSpots.length == 0) {
+          return _warning("예약가능한 시간대가 없습니다!");
+        } else {
+          return Expanded(
+            child: GridView.count(
+              shrinkWrap: true,
+              padding: EdgeInsets.fromLTRB(8.r, 8.r, 8.r, 0),
+              crossAxisCount: 4,
+              mainAxisSpacing: 16.r,
+              crossAxisSpacing: 8.r,
+              childAspectRatio: 2.2,
+              children: List.generate(
+                controller.availabaleSpots.length,
+                (index) => InkWell(
+                  child: Container(
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                      color: symbolColor,
+                      borderRadius: BorderRadius.circular(15.r),
                     ),
-                  )
-                : controller.availabaleSpots.length == 0
-                    ? Center(
-                        child: Container(
-                          padding: EdgeInsets.only(top: 40.r),
-                          child: Text(
-                            "예약가능한 시간대가 없습니다!",
-                            style: TextStyle(color: Colors.red, fontSize: 22.r),
-                          ),
-                        ),
-                      )
-                    : Expanded(
-                        child: GridView.count(
-                          shrinkWrap: true,
-                          padding: EdgeInsets.fromLTRB(8.r, 8.r, 8.r, 0),
-                          crossAxisCount: 4,
-                          mainAxisSpacing: 16.r,
-                          crossAxisSpacing: 8.r,
-                          childAspectRatio: 2.2,
-                          children: List.generate(
-                            controller.availabaleSpots.length,
-                            (index) => InkWell(
-                              child: Container(
-                                alignment: Alignment.center,
-                                decoration: BoxDecoration(
-                                  color: symbolColor,
-                                  borderRadius: BorderRadius.circular(15.r),
-                                ),
-                                child: Text(
-                                  DateFormat("HH:mm").format(
-                                      controller.availabaleSpots[index]),
-                                  style: contentStyle,
-                                ),
-                              ),
-                              onTap: () async {
-                                !_data.isRegularScheduleExisting
-                                    ? await showError(
-                                        "정기수업이 시작되지 않아 수업을 예약할 수 없습니다. 관리자에게 문의하세요.")
-                                    : await _showReserve(
-                                        context,
-                                        controller.availabaleSpots[index],
-                                      );
-                              },
-                              enableFeedback: false,
-                            ),
-                          ),
-                        ),
-                      );
+                    child: Text(
+                      formatTime(controller.availabaleSpots[index]),
+                      style: contentStyle,
+                    ),
+                  ),
+                  onTap: () async {
+                    await _showReserve(
+                      context,
+                      controller.availabaleSpots[index],
+                    );
+                  },
+                  enableFeedback: false,
+                ),
+              ),
+            ),
+          );
+        }
       },
+    );
+  }
+
+  // TODO: rename function
+  Widget _warning(String text) {
+    return Center(
+      child: Container(
+        padding: EdgeInsets.only(top: 40.r),
+        child: Text(
+          text,
+          style: TextStyle(color: Colors.red, fontSize: 22.r),
+          textAlign: TextAlign.center,
+        ),
+      ),
     );
   }
 
@@ -112,9 +94,7 @@ class _GridAvailableState extends State<GridAvailable> {
       builder: (context) {
         return CupertinoActionSheet(
           title: Text(
-            DateFormat("yy/MM/dd HH:mm").format(time) +
-                " ~ " +
-                DateFormat("HH:mm").format(time.add(_duration)),
+            formatDateTimeRange(time, time.add(_duration)),
             style: TextStyle(fontSize: 24.r),
           ),
           message: Text("예약 하시겠습니까?", style: TextStyle(fontSize: 24.r)),

@@ -46,31 +46,26 @@ class Client {
         } else if (response.statusCode == 401 && !accessible && refreshable) {
           Get.offAllNamed("/login");
           await logout();
-
           return handler.reject(NetworkException._(
             message: "인증이 만료되어 자동으로 로그아웃 합니다.",
             options: response.requestOptions,
           ));
         } else if (response.statusCode != 200 && response.statusCode != 201) {
           var message = response.data["message"];
-          if (message is List<dynamic>) {
-            message = message.join("\n");
-          } else {
-            message = message.toString();
-          }
-
+          message = message is List<dynamic>
+              ? message.join("\n")
+              : message.toString();
           return handler.reject(NetworkException._(
             message: message,
             options: response.requestOptions,
             response: response,
           ));
         }
-
         return handler.next(response);
       },
       onError: (error, handler) {
         return handler.reject(NetworkException._(
-          message: "아래 메시지와 함께 관리자에게 문의하세요!\n" + "DioError: ${error.message}",
+          message: "아래 메시지와 함께 관리자에게 문의하세요!\nDioError: ${error.message}",
           options: error.requestOptions,
         ));
       },
@@ -110,14 +105,19 @@ class Client {
   }
 
   Future<void> logout() async {
-    if (await isLoggedIn()) {
-      await dio.patch("/auth/log-out");
+    try {
+      if (await isLoggedIn()) {
+        await dio.patch("/auth/log-out");
+      }
+    } finally {
+      await storage.delete(key: "accessToken");
+      await storage.delete(key: "refreshToken");
+      dio.options.headers.remove("Authorization");
     }
-    await storage.deleteAll();
-    dio.options.headers.remove("Authorization");
   }
 
-  Future<Profile> login(String userID, String userPassword) async {
+  Future<Profile> login(
+      String userID, String userPassword, bool autoLogin) async {
     var response = await dio.post(
       "/auth/login",
       data: {
@@ -133,10 +133,12 @@ class Client {
     );
     if (response.statusCode == 201) {
       if (response.data["userType"] == 0) {
-        await storage.write(
-            key: "accessToken", value: response.data["access_token"]);
-        await storage.write(
-            key: "refreshToken", value: response.data["refresh_token"]);
+        if (autoLogin) {
+          await storage.write(
+              key: "accessToken", value: response.data["access_token"]);
+          await storage.write(
+              key: "refreshToken", value: response.data["refresh_token"]);
+        }
         return Profile.fromJson(response.data);
       } else {
         throw NetworkException._(
@@ -175,7 +177,10 @@ class Client {
       return List.generate(
         response.data.length,
         (index) => RegularSchedule.fromJson(response.data[index]),
-      );
+      )..sort((a, b) {
+          var primary = a.dow.compareTo(b.dow);
+          return primary != 0 ? primary : a.startTime.compareTo(b.startTime);
+        });
     }
     throw NetworkException._(
       message: "내 정기 스케줄을 불러올 수 없습니다.",
@@ -197,7 +202,7 @@ class Client {
       return List.generate(
         response.data.length,
         (index) => parseDateTime(response.data[index]),
-      );
+      )..sort((a, b) => a.compareTo(b));
     }
     throw NetworkException._(
       message: "예약 가능한 시간대를 불러올 수 없습니다.",
@@ -228,7 +233,7 @@ class Client {
       return List.generate(
         response.data.length,
         (index) => Reservation.fromJson(response.data[index]),
-      );
+      )..sort((a, b) => a.startDate.compareTo(b.startDate));
     }
     throw NetworkException._(
       message: "예약 내역을 불러올 수 없습니다.",
@@ -244,7 +249,14 @@ class Client {
       return List.generate(
         response.data.length,
         (index) => Change.fromJson(response.data[index]),
-      );
+      )..sort((a, b) {
+          var primary = a.fromDate.compareTo(b.fromDate);
+          return primary != 0
+              ? primary
+              : a.toDate == null || b.toDate == null
+                  ? 0
+                  : a.toDate!.compareTo(b.toDate!);
+        });
     }
     throw NetworkException._(
       message: "변경 내역을 불러올 수 없습니다.",
@@ -252,16 +264,34 @@ class Client {
     );
   }
 
+  /// Returns the first two upcoming terms sorted in ascending order.
   Future<List<Term>> getCurrentTerm() async {
     var response = await dio.get("/term");
     if (response.statusCode == 200) {
       return List.generate(
         response.data.length,
         (index) => Term.fromJson(response.data[index]),
-      );
+      )..sort((a, b) => a.termStart.compareTo(b.termStart));
     }
     throw NetworkException._(
       message: "현재 학기 정보를 불러올 수 없습니다.",
+      options: response.requestOptions,
+    );
+  }
+
+  /// Returns terms sorted in descending order by the number of `take`.
+  ///
+  /// If `take` is zero, it returns all terms.
+  Future<List<Term>> getTerms(int take) async {
+    var response = await dio.get("/term/$take");
+    if (response.statusCode == 200) {
+      return List.generate(
+        response.data.length,
+        (index) => Term.fromJson(response.data[index]),
+      )..sort((a, b) => b.termStart.compareTo(a.termStart));
+    }
+    throw NetworkException._(
+      message: "학기 목록을 불러올 수 없습니다.",
       options: response.requestOptions,
     );
   }

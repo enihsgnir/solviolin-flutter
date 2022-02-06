@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:solviolin/util/constant.dart';
@@ -17,13 +18,15 @@ class _LoginPageState extends State<LoginPage> {
   var _client = Get.find<Client>();
   var _data = Get.find<DataController>();
 
-  var id = TextEditingController();
-  var pw = TextEditingController();
+  var _id = TextEditingController();
+  var _pw = TextEditingController();
+
+  var _autoLogin = true;
 
   @override
   void dispose() {
-    id.dispose();
-    pw.dispose();
+    _id.dispose();
+    _pw.dispose();
     super.dispose();
   }
 
@@ -57,7 +60,7 @@ class _LoginPageState extends State<LoginPage> {
               Padding(
                 padding: EdgeInsets.fromLTRB(8.r, 30.r, 8.r, 8.r),
                 child: TextField(
-                  controller: id,
+                  controller: _id,
                   decoration: InputDecoration(
                     labelText: "아이디",
                     labelStyle: const TextStyle(color: Colors.white),
@@ -68,7 +71,7 @@ class _LoginPageState extends State<LoginPage> {
                       borderSide: const BorderSide(color: Colors.white),
                     ),
                     suffixIcon: IconButton(
-                      onPressed: id.clear,
+                      onPressed: _id.clear,
                       icon: Icon(Icons.clear, size: 20.r),
                       splashRadius: 20.r,
                     ),
@@ -79,7 +82,7 @@ class _LoginPageState extends State<LoginPage> {
               Padding(
                 padding: EdgeInsets.all(8.r),
                 child: TextField(
-                  controller: pw,
+                  controller: _pw,
                   decoration: InputDecoration(
                     labelText: "비밀번호",
                     labelStyle: const TextStyle(color: Colors.white),
@@ -90,7 +93,7 @@ class _LoginPageState extends State<LoginPage> {
                       borderSide: const BorderSide(color: Colors.white),
                     ),
                     suffixIcon: IconButton(
-                      onPressed: pw.clear,
+                      onPressed: _pw.clear,
                       icon: Icon(Icons.clear, size: 20.r),
                       splashRadius: 20.r,
                     ),
@@ -98,6 +101,26 @@ class _LoginPageState extends State<LoginPage> {
                   style: contentStyle,
                   obscureText: true,
                 ),
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  Text(
+                    "자동로그인",
+                    style: TextStyle(color: Colors.white, fontSize: 20.r),
+                  ),
+                  Container(
+                    padding: EdgeInsets.symmetric(horizontal: 16.r),
+                    child: CupertinoSwitch(
+                      value: _autoLogin,
+                      onChanged: (value) {
+                        setState(() {
+                          _autoLogin = value;
+                        });
+                      },
+                    ),
+                  ),
+                ],
               ),
               Container(
                 width: double.infinity,
@@ -109,18 +132,15 @@ class _LoginPageState extends State<LoginPage> {
 
                     showLoading(() async {
                       try {
-                        _data.reset();
-                        await getInitialData(false, id.text, pw.text);
-                        Get.offAllNamed("/main");
+                        await getInitialData(false, _id.text, _pw.text,
+                            _autoLogin); //TODO: re-code
+                        Get.offAllNamed("/menu");
 
-                        var message = "환영합니다!";
-                        if (!_data.isRegularScheduleExisting) {
-                          message =
-                              "정기수업이 시작되지 않아 예약가능한 시간대가 표시되지 않습니다. 관리자에게 문의하세요.";
-                        }
                         await showMySnackbar(
                           title: "${_data.profile.userID}님",
-                          message: message,
+                          message: !_data.isRegularScheduleExisting
+                              ? "정기수업이 시작되지 않아 예약가능한 시간대가 표시되지 않습니다. 관리자에게 문의하세요."
+                              : "환영합니다!",
                         );
                       } catch (e) {
                         try {
@@ -128,7 +148,7 @@ class _LoginPageState extends State<LoginPage> {
                         } catch (_) {
                         } finally {
                           showError(e);
-                          pw.text = "";
+                          _pw.text = "";
                         }
                       }
                     });
@@ -136,7 +156,7 @@ class _LoginPageState extends State<LoginPage> {
                   style: TextButton.styleFrom(
                     backgroundColor: symbolColor,
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30.r),
+                      borderRadius: BorderRadius.circular(20.r),
                     ),
                   ),
                   child: Text(

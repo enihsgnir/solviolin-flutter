@@ -96,20 +96,14 @@ Future<void> showLoading(Future<void> Function() asyncFunction) {
   return Get.showOverlay<void>(
     asyncFunction: asyncFunction,
     loadingWidget: Center(
-      child: Container(
-        width: 90.r,
-        height: 90.r,
-        child: CircularProgressIndicator(
-          backgroundColor: Colors.grey,
-        ),
-      ),
+      child: CupertinoActivityIndicator(radius: 30.r),
     ),
     opacityColor: Colors.black12,
     opacity: 1,
   );
 }
 
-Future<void> showMySnackbar({
+Future showMySnackbar({
   String title = "성공",
   required String message,
 }) async {
@@ -123,3 +117,49 @@ Future<void> showMySnackbar({
     messageText: Text(message, style: contentStyle),
   );
 }
+
+// Future _showModalExtend(BuildContext context, Reservation reservation) {
+//   return showCupertinoModalPopup(
+//     context: context,
+//     builder: (context) {
+//       return CupertinoActionSheet(
+//         title: Text(
+//           formatDateTimeRange(reservation.startDate,
+//               reservation.endDate.add(const Duration(minutes: 15))),
+//           style: TextStyle(fontSize: 24.r),
+//         ),
+//         message: Text("수업을 15분 연장 하시겠습니까?", style: TextStyle(fontSize: 24.r)),
+//         actions: [
+//           CupertinoActionSheetAction(
+//             onPressed: () => showLoading(() async {
+//               try {
+//                 await _client.extendReservation(reservation.id);
+
+//                 await getUserBasedData();
+//                 await getSelectedDayData(_data.selectedDay);
+//                 await getChangedPageData(_data.focusedDay);
+//                 await getReservedHistoryData();
+
+//                 Get.back();
+
+//                 await showMySnackbar(
+//                   message: "수업 연장에 성공했습니다.",
+//                 );
+//               } catch (e) {
+//                 showError(e);
+//               }
+//             }),
+//             child: Text("수업 연장", style: TextStyle(fontSize: 24.r)),
+//           ),
+//         ],
+//         cancelButton: CupertinoActionSheetAction(
+//           onPressed: Get.back,
+//           isDefaultAction: true,
+//           child: Text("닫기", style: TextStyle(fontSize: 24.r)),
+//         ),
+//       );
+//     },
+//   );
+// }
+
+// Future? showMyModal() {}

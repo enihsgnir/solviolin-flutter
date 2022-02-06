@@ -22,4 +22,13 @@ class Change {
           json["to"] == null ? null : parseDateTime(json["to"]["startDate"]),
     );
   }
+
+  @override
+  String toString() =>
+      "$teacherID / $branchName" +
+      "\n변경 전: " +
+      formatDateTime(fromDate) +
+      (toDate == null
+          ? "\n변경 사항이 없습니다."
+          : "\n변경 후: " + formatDateTime(toDate!));
 }

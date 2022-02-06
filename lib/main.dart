@@ -14,6 +14,7 @@ import 'package:solviolin/view/history/history_page.dart';
 import 'package:solviolin/view/loading_page.dart';
 import 'package:solviolin/view/login_page.dart';
 import 'package:solviolin/view/main/main_page.dart';
+import 'package:solviolin/view/menu_page.dart';
 import 'package:solviolin/view/metronome_page.dart';
 
 void main() {
@@ -77,6 +78,7 @@ class _MyAppState extends State<MyApp> {
       getPages: [
         GetPage(name: "/loading", page: () => LoadingPage()),
         GetPage(name: "/login", page: () => LoginPage()),
+        GetPage(name: "/menu", page: () => MenuPage()),
         GetPage(name: "/main", page: () => MainPage()),
         GetPage(name: "/history", page: () => HistoryPage()),
         GetPage(name: "/check-in", page: () => CheckInPage()),

@@ -61,16 +61,14 @@ class _LoadingPageState extends State<LoadingPage> {
   Future<void> _checkProfile() async {
     if (await _client.isLoggedIn()) {
       try {
-        await getInitialData();
-        Get.offAllNamed("/main");
+        await getInitialData(); //TODO: re-code
+        Get.offAllNamed("/menu"); //TODO: getInitialData 안에 다 넣어버리기
 
-        var message = "환영합니다!";
-        if (!_data.isRegularScheduleExisting) {
-          message = "정기수업이 시작되지 않아 예약가능한 시간대가 표시되지 않습니다. 관리자에게 문의하세요.";
-        }
         await showMySnackbar(
           title: "${_data.profile.userID}님",
-          message: message,
+          message: !_data.isRegularScheduleExisting
+              ? "정기수업이 시작되지 않아 예약가능한 시간대가 표시되지 않습니다. 관리자에게 문의하세요."
+              : "환영합니다!",
         );
       } catch (e) {
         try {

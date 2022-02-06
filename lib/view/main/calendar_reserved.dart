@@ -131,7 +131,7 @@ class _CalendarReservedState extends State<CalendarReserved> {
               });
             }
 
-            controller.updateDays(selectedDay, focusedDay);
+            controller.setDays(selectedDay, focusedDay);
           },
           onPageChanged: (focusedDay) {
             today = DateTime.now();
@@ -152,7 +152,7 @@ class _CalendarReservedState extends State<CalendarReserved> {
               }
             });
 
-            controller.updateDays(focusedDay, focusedDay);
+            controller.setDays(focusedDay, focusedDay);
           },
         );
       },

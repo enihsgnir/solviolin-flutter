@@ -1,0 +1,70 @@
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:solviolin/util/constant.dart';
+import 'package:solviolin/util/controller.dart';
+import 'package:solviolin/util/data_source.dart';
+import 'package:solviolin/util/network.dart';
+import 'package:solviolin/widget/dialog.dart';
+import 'package:solviolin/widget/single.dart';
+
+class MenuPage extends StatefulWidget {
+  const MenuPage({Key? key}) : super(key: key);
+
+  @override
+  _MenuPageState createState() => _MenuPageState();
+}
+
+class _MenuPageState extends State<MenuPage> {
+  var _client = Get.find<Client>();
+  var _data = Get.find<DataController>();
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: SafeArea(
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              menu("나의 예약", () {
+                showLoading(() async {
+                  try {
+                    await getReservedHistoryData();
+                    Get.toNamed("/history");
+                  } catch (e) {
+                    showError(e);
+                  }
+                });
+              }),
+              menu("수업변경", () => Get.toNamed("/main")),
+              menu("QR 체크인", () => Get.toNamed("/check-in")),
+              menu("메트로놈", () => Get.toNamed("/metronome")),
+              menu("로그아웃", _showLogout, true),
+            ]
+                .map((e) => Padding(
+                      padding: EdgeInsets.symmetric(vertical: 24.r),
+                      child: e,
+                    ))
+                .toList(),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Future _showLogout() {
+    return showMyDialog(
+      contents: [Text("로그아웃 하시겠습니까?")],
+      onPressed: () => showLoading(() async {
+        try {
+          _data.reset();
+          await _client.logout();
+        } catch (_) {
+        } finally {
+          Get.offAllNamed("/login");
+          await showMySnackbar(message: "안전하게 로그아웃 되었습니다.");
+        }
+      }),
+    );
+  }
+}

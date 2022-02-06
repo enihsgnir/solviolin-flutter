@@ -1,11 +1,11 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:intl/intl.dart';
 import 'package:solviolin/model/reservation.dart';
 import 'package:solviolin/util/constant.dart';
 import 'package:solviolin/util/controller.dart';
 import 'package:solviolin/util/data_source.dart';
+import 'package:solviolin/util/format.dart';
 import 'package:solviolin/util/network.dart';
 import 'package:solviolin/widget/dialog.dart';
 import 'package:solviolin/widget/item_list.dart';
@@ -29,14 +29,14 @@ class _HistoryReservedState extends State<HistoryReserved> {
   @override
   Widget build(BuildContext context) {
     return widget.reservations.length == 0
-        ? DefaultTextStyle(
-            style: TextStyle(color: Colors.red, fontSize: 20.r),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text("예약내역을 조회할 수 없습니다."),
-              ],
-            ),
+        ? Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                "예약내역을 조회할 수 없습니다.",
+                style: TextStyle(color: Colors.red, fontSize: 22.r),
+              ),
+            ],
           )
         : ListView.builder(
             itemCount: widget.reservations.length,
@@ -77,7 +77,7 @@ class _HistoryReservedState extends State<HistoryReserved> {
                 ],
                 children: [
                   Text(
-                    "${reservation.teacherID} / ${reservation.branchName}",
+                    reservation.toString(),
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 24.r,
@@ -85,25 +85,14 @@ class _HistoryReservedState extends State<HistoryReserved> {
                           ? TextDecoration.lineThrough
                           : null,
                     ),
-                  ),
-                  Text(
-                    DateFormat("yy/MM/dd HH:mm").format(reservation.startDate) +
-                        " ~ " +
-                        DateFormat("HH:mm").format(reservation.endDate),
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 24.r,
-                      decoration: reservation.bookingStatus.abs() == 2
-                          ? TextDecoration.lineThrough
-                          : null,
-                    ),
+                    textAlign: TextAlign.center,
                   ),
                   Container(
                     alignment: Alignment.centerRight,
                     padding: EdgeInsets.only(right: 24.r),
                     width: double.infinity,
                     child: Text(
-                      _statusToString(reservation.bookingStatus),
+                      reservation.statusToString(),
                       style: TextStyle(color: Colors.red, fontSize: 20.r),
                     ),
                   ),
@@ -119,9 +108,7 @@ class _HistoryReservedState extends State<HistoryReserved> {
       builder: (context) {
         return CupertinoActionSheet(
           title: Text(
-            DateFormat("yy/MM/dd HH:mm").format(reservation.startDate) +
-                " ~ " +
-                DateFormat("HH:mm").format(reservation.endDate),
+            formatDateTimeRange(reservation.startDate, reservation.endDate),
             style: TextStyle(fontSize: 24.r),
           ),
           message: Text("수업을 취소 하시겠습니까?", style: TextStyle(fontSize: 24.r)),
@@ -165,10 +152,8 @@ class _HistoryReservedState extends State<HistoryReserved> {
       builder: (context) {
         return CupertinoActionSheet(
           title: Text(
-            DateFormat("yy/MM/dd HH:mm").format(reservation.startDate) +
-                " ~ " +
-                DateFormat("HH:mm").format(
-                    reservation.endDate.add(const Duration(minutes: 15))),
+            formatDateTimeRange(reservation.startDate,
+                reservation.endDate.add(const Duration(minutes: 15))),
             style: TextStyle(fontSize: 24.r),
           ),
           message: Text("수업을 15분 연장 하시겠습니까?", style: TextStyle(fontSize: 24.r)),
@@ -204,18 +189,4 @@ class _HistoryReservedState extends State<HistoryReserved> {
       },
     );
   }
-}
-
-String _statusToString(int bookingStatus) {
-  Map<int, String> status = {
-    0: "정기",
-    1: "보강",
-    2: "취소",
-    3: "연장",
-    -1: "보강(관리자)",
-    -2: "취소(관리자)",
-    -3: "연장(관리자)",
-  };
-
-  return status[bookingStatus]!;
 }

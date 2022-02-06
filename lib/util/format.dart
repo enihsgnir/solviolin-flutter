@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 DateTime parseDateOnly(String date) => DateUtils.dateOnly(DateTime.parse(date));
 
 Duration parseTimeOnly(String time) {
   var times = time.split(":");
-  var hours = int.parse(times[0]);
-  var minutes = int.parse(times[1]);
 
-  return Duration(hours: hours, minutes: minutes);
+  return Duration(hours: int.parse(times[0]), minutes: int.parse(times[1]));
 }
 
 DateTime parseDateTime(String dateTime) {
@@ -20,24 +19,19 @@ DateTime parseDateTime(String dateTime) {
 String _twoDigits(int n) => n < 10 ? "0$n" : "$n";
 
 String timeToString(Duration time) {
-  var twoDigitMinutes =
+  var _twoDigitMinutes =
       _twoDigits(time.inMinutes.remainder(Duration.minutesPerHour));
 
-  return "${_twoDigits(time.inHours)}:$twoDigitMinutes";
+  return "${_twoDigits(time.inHours)}:$_twoDigitMinutes";
 }
 
-String dowToString(int dow) {
-  var days = {
-    -1: "Null",
-    0: "SUN",
-    1: "MON",
-    2: "TUE",
-    3: "WED",
-    4: "THU",
-    5: "FRI",
-    6: "SAT",
-    7: "SUN",
-  };
+/// yy/MM/dd HH:mm
+String formatDateTime(DateTime dateTime) =>
+    DateFormat("yy/MM/dd HH:mm").format(dateTime);
 
-  return days[dow]!;
-}
+/// HH:mm
+String formatTime(DateTime time) => DateFormat("HH:mm").format(time);
+
+/// yy/MM/dd HH:mm ~ HH:mm
+String formatDateTimeRange(DateTime start, DateTime end) =>
+    formatDateTime(start) + " ~ " + formatTime(end);

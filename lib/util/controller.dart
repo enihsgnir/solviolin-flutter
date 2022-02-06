@@ -28,7 +28,7 @@ class DataController extends GetxController {
 
   bool isRegularScheduleExisting = true;
 
-  void updateDays(DateTime selectedData, DateTime focusedData) {
+  void setDays(DateTime selectedData, DateTime focusedData) {
     selectedDay = selectedData;
     focusedDay = focusedData;
     update();
