@@ -4,6 +4,8 @@ class Teacher {
   int id;
   String teacherID;
   String branchName;
+
+  /// 0: SUN
   int workDow;
   Duration startTime;
   Duration endTime;
@@ -27,4 +29,10 @@ class Teacher {
       endTime: parseTimeOnly(json["endTime"]),
     );
   }
+
+  @override
+  String toString() =>
+      "ID: $id" +
+      "\n$teacherID / $branchName" +
+      "\n${dowToString(workDow)} / ${timeToString(startTime)} ~ ${timeToString(endTime)}";
 }

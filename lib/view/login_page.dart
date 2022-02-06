@@ -109,7 +109,6 @@ class _LoginPageState extends State<LoginPage> {
 
                     showLoading(() async {
                       try {
-                        _data.reset();
                         await getInitialData(false, id.text, pw.text);
                         if (_data.profile.userType == 2) {
                           Get.offAllNamed("/menu");
@@ -135,7 +134,7 @@ class _LoginPageState extends State<LoginPage> {
                   style: TextButton.styleFrom(
                     backgroundColor: symbolColor,
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30.r),
+                      borderRadius: BorderRadius.circular(20.r),
                     ),
                   ),
                   child: Text(

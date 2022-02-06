@@ -154,7 +154,7 @@ class _TimeSlotState extends State<TimeSlot> {
           children: [
             Container(
               width: 120.r,
-              child: label("카운트 차감", true),
+              child: label("크레딧 차감", true),
             ),
             StatefulBuilder(
               builder: (context, setState) {
@@ -182,7 +182,7 @@ class _TimeSlotState extends State<TimeSlot> {
           Get.back();
 
           await showMySnackbar(
-            message: "관리자의 권한으로 카운트를 ${count ? "차감" : "미차감"}하여 예약을 취소했습니다.",
+            message: "관리자의 권한으로 크레딧을 ${count ? "차감" : "미차감"}하여 예약을 취소했습니다.",
           );
         } catch (e) {
           showError(e);
@@ -202,7 +202,7 @@ class _TimeSlotState extends State<TimeSlot> {
           children: [
             Container(
               width: 120.r,
-              child: label("카운트 차감", true),
+              child: label("크레딧 차감", true),
             ),
             StatefulBuilder(
               builder: (context, setState) {
@@ -230,7 +230,7 @@ class _TimeSlotState extends State<TimeSlot> {
           Get.back();
 
           await showMySnackbar(
-            message: "관리자의 권한으로 카운트를 ${count ? "차감" : "미차감"}하여 예약을 연장했습니다.",
+            message: "관리자의 권한으로 크레딧을 ${count ? "차감" : "미차감"}하여 예약을 연장했습니다.",
           );
         } catch (e) {
           showError(e);

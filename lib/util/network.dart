@@ -125,7 +125,8 @@ class Client {
         await dio.patch("/auth/log-out");
       }
     } finally {
-      await storage.deleteAll();
+      await storage.delete(key: "accessToken");
+      await storage.delete(key: "refreshToken");
       dio.options.headers.remove("Authorization");
     }
   }
@@ -240,7 +241,7 @@ class Client {
       return List.generate(
         response.data.length,
         (index) => User.fromJson(response.data[index]),
-      );
+      )..sort((a, b) => a.userID.compareTo(b.userID));
     }
     throw NetworkException._(
       message: "유저 목록을 불러올 수 없습니다.",
@@ -357,7 +358,7 @@ class Client {
       return List.generate(
         response.data.length,
         (index) => Term.fromJson(response.data[index]),
-      );
+      )..sort((a, b) => a.termStart.compareTo(b.termStart));
     }
     throw NetworkException._(
       message: "현재 학기 목록을 불러올 수 없습니다.",
@@ -371,7 +372,7 @@ class Client {
       return List.generate(
         response.data.length,
         (index) => Term.fromJson(response.data[index]),
-      );
+      )..sort((a, b) => b.termStart.compareTo(a.termStart));
     }
     throw NetworkException._(
       message: "학기 목록을 불러올 수 없습니다.",
@@ -414,7 +415,15 @@ class Client {
       return List.generate(
         response.data.length,
         (index) => Teacher.fromJson(response.data[index]),
-      );
+      )..sort((a, b) {
+          var primary = a.teacherID.compareTo(b.teacherID);
+          var secondary = a.workDow.compareTo(b.workDow);
+          return primary != 0
+              ? primary
+              : secondary != 0
+                  ? secondary
+                  : a.startTime.compareTo(b.startTime);
+        });
     }
     throw NetworkException._(
       message: "강사 스케줄 목록을 불러올 수 없습니다.",
@@ -437,7 +446,7 @@ class Client {
       return List.generate(
         response.data.length,
         (index) => TeacherInfo.fromJson(response.data[index]),
-      );
+      )..sort((a, b) => a.teacherID.compareTo(b.teacherID));
     }
     throw NetworkException._(
       message: "강사 정보 목록을 불러올 수 없습니다.",
@@ -466,7 +475,7 @@ class Client {
       return List.generate(
         response.data.length,
         (index) => Control.fromJson(response.data[index]),
-      );
+      )..sort((a, b) => b.controlStart.compareTo(a.controlStart));
     }
     throw NetworkException._(
       message: "컨트롤 정보를 불러올 수 없습니다.",
@@ -604,7 +613,7 @@ class Client {
       return List.generate(
         response.data.length,
         (index) => Reservation.fromJson(response.data[index]),
-      );
+      )..sort((a, b) => a.startDate.compareTo(b.startDate));
     }
     throw NetworkException._(
       message: "예약 내역을 불러올 수 없습니다.",
@@ -623,7 +632,14 @@ class Client {
       return List.generate(
         response.data.length,
         (index) => Change.fromJson(response.data[index]),
-      );
+      )..sort((a, b) {
+          var primary = a.fromDate.compareTo(b.fromDate);
+          return primary != 0
+              ? primary
+              : a.toDate == null || b.toDate == null
+                  ? 0
+                  : a.toDate!.compareTo(b.toDate!);
+        });
     }
     throw NetworkException._(
       message: "변경 내역을 불러올 수 없습니다.",
@@ -647,7 +663,7 @@ class Client {
       return List.generate(
         response.data.length,
         (index) => Salary.fromList(response.data[index]),
-      );
+      )..sort((a, b) => a.teacherID.compareTo(b.teacherID));
     }
     throw NetworkException._(
       message: "급여 목록을 불러올 수 없습니다.",
@@ -667,7 +683,7 @@ class Client {
       return List.generate(
         response.data.length,
         (index) => Canceled.fromJson(response.data[index]),
-      );
+      )..sort((a, b) => b.startDate.compareTo(a.startDate));
     }
     throw NetworkException._(
       message: "취소 내역을 불러올 수 없습니다.",
@@ -778,7 +794,10 @@ class Client {
       return List.generate(
         response.data.length,
         (index) => RegularSchedule.fromJson(response.data[index]),
-      );
+      )..sort((a, b) {
+          var primary = a.dow.compareTo(b.dow);
+          return primary != 0 ? primary : a.startTime.compareTo(b.startTime);
+        });
     }
     throw NetworkException._(
       message: "해당 유저의 정기 예약 정보를 불러올 수 없습니다.",
@@ -798,7 +817,7 @@ class Client {
       return List.generate(
         response.data.length,
         (index) => response.data[index]["branchName"],
-      );
+      )..sort((a, b) => a.compareTo(b));
     }
     throw NetworkException._(
       message: "지점 정보를 불러올 수 없습니다.",
@@ -829,7 +848,10 @@ class Client {
       return List.generate(
         response.data.length,
         (index) => CheckIn.fromJson(response.data[index]),
-      );
+      )..sort((a, b) {
+          var primary = b.createdAt.compareTo(a.createdAt);
+          return primary != 0 ? primary : b.id.compareTo(a.id);
+        });
     }
     throw NetworkException._(
       message: "체크인 이력을 불러올 수 없습니다.",
@@ -868,7 +890,10 @@ class Client {
       return List.generate(
         response.data.length,
         (index) => Ledger.fromJson(response.data[index]),
-      );
+      )..sort((a, b) {
+          var primary = b.paidAt.compareTo(a.paidAt);
+          return primary != 0 ? primary : a.userID.compareTo(b.userID);
+        });
     }
     throw NetworkException._(
       message: "매출 목록을 불러올 수 없습니다.",

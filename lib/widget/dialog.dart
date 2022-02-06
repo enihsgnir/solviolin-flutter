@@ -114,12 +114,8 @@ Future<void> showLoading(Future<void> Function() asyncFunction) {
   return Get.showOverlay<void>(
     asyncFunction: asyncFunction,
     loadingWidget: Center(
-      child: Container(
-        width: 90.r,
-        height: 90.r,
-        child: CircularProgressIndicator(
-          backgroundColor: Colors.grey,
-        ),
+      child: CupertinoActivityIndicator(
+        radius: 30.r,
       ),
     ),
     opacityColor: Colors.black12,

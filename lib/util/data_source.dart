@@ -28,14 +28,11 @@ Future<void> getInitialData([
       ? _data.profile = await _client.getProfile()
       : _data.profile = await _client.login(userID!, userPassword!);
 
-  _data.currentTerm = await _client.getCurrentTerm()
-    ..sort((a, b) => a.termStart.compareTo(b.termStart));
+  _data.currentTerm = await _client.getCurrentTerm();
 
-  _data.terms = await _client.getTerms(10)
-    ..sort((a, b) => b.termStart.compareTo(a.termStart));
+  _data.terms = await _client.getTerms(10);
 
-  _data.branches = await _client.getBranches()
-    ..sort((a, b) => a.compareTo(b));
+  _data.branches = await _client.getBranches();
 
   _data.update();
 }
@@ -59,8 +56,7 @@ Future<void> getReservationData({
     endDate: last,
     userID: userID,
     bookingStatus: [-3, -1, 0, 1, 3],
-  )
-    ..sort((a, b) => a.startDate.compareTo(b.startDate));
+  );
 
   // var _teacherInfoSet = LinkedHashSet<TeacherInfo>(
   //   equals: (a, b) => a.teacherID == b.teacherID && a.color == b.color,
@@ -79,8 +75,7 @@ Future<void> getReservationData({
 
   _data.teacherInfos = await _client.getTeacherInfos(
     branchName: branchName,
-  )
-    ..sort((a, b) => a.teacherID.compareTo(b.teacherID));
+  );
 
   var teacherIds = List.generate(
     _data.teacherInfos.length,
@@ -92,7 +87,7 @@ Future<void> getReservationData({
     value: (item) => item.color,
   );
 
-  //TODO: declare seperately
+  //TODO: declare seperately. 강사스케줄 데이터와 겹침
   _data.teachers = await _client.getTeachers(
     teacherID: teacherID,
     branchName: branchName,
@@ -164,8 +159,7 @@ Future<void> getReservationDataForTeacher({
       startDate: first,
       endDate: last,
       bookingStatus: [-3, -1, 0, 1, 3],
-    )
-      ..sort((a, b) => a.startDate.compareTo(b.startDate)));
+    ));
   });
 
   _data.reservationDataSource = ReservationDataSource();
@@ -276,8 +270,7 @@ Future<void> getUsersData({
     userType: userType,
     status: status,
     termID: termID,
-  )
-    ..sort((a, b) => a.userID.compareTo(b.userID));
+  );
   _data.update();
 }
 
@@ -351,12 +344,7 @@ Future<void> getUserDetailData(User user) async {
 
   try {
     _data.regularSchedules =
-        await _client.getRegularSchedulesByAdmin(user.userID)
-          ..sort((a, b) {
-            var primary = a.dow.compareTo(b.dow);
-
-            return primary != 0 ? primary : a.startTime.compareTo(b.startTime);
-          });
+        await _client.getRegularSchedulesByAdmin(user.userID);
   } catch (_) {
     _data.regularSchedules = [
       RegularSchedule(
@@ -377,8 +365,7 @@ Future<void> getUserDetailData(User user) async {
     endDate: DateTime(today.year, today.month + 1, 0, 23, 59, 59),
     userID: user.userID,
     bookingStatus: [-3, -2, -1, 0, 1, 2, 3],
-  )
-    ..sort((a, b) => a.startDate.compareTo(b.startDate));
+  );
 
   _data.lastMonthReservations = await _client.getReservations(
     branchName: user.branchName,
@@ -386,24 +373,13 @@ Future<void> getUserDetailData(User user) async {
     endDate: DateTime(today.year, today.month, 0, 23, 59, 59),
     userID: user.userID,
     bookingStatus: [-3, -2, -1, 0, 1, 2, 3],
-  )
-    ..sort((a, b) => a.startDate.compareTo(b.startDate));
+  );
 
-  _data.changes = await _client.getChangesWithID(user.userID)
-    ..sort((a, b) {
-      var primary = a.fromDate.compareTo(b.fromDate);
-
-      return primary != 0
-          ? primary
-          : a.toDate == null || b.toDate == null
-              ? 0
-              : a.toDate!.compareTo(b.toDate!);
-    });
+  _data.changes = await _client.getChangesWithID(user.userID);
 
   _data.myLedgers = await _client.getLedgers(
     userID: user.userID,
-  )
-    ..sort((a, b) => b.paidAt.compareTo(a.paidAt));
+  );
 
   _data.update();
 }
@@ -422,8 +398,7 @@ Future<void> getControlsData({
     controlEnd:
         controlEnd?.add(const Duration(hours: 23, minutes: 59, seconds: 59)),
     status: status,
-  )
-    ..sort((a, b) => b.controlStart.compareTo(a.controlStart));
+  );
 
   _data.update();
 }
@@ -459,17 +434,7 @@ Future<void> getTeachersData({
   _data.teachers = await _client.getTeachers(
     teacherID: teacherID,
     branchName: branchName,
-  )
-    ..sort((a, b) {
-      var primary = a.teacherID.compareTo(b.teacherID);
-      var secondary = a.workDow.compareTo(b.workDow);
-
-      return primary != 0
-          ? primary
-          : secondary != 0
-              ? secondary
-              : a.startTime.compareTo(b.startTime);
-    });
+  );
 
   _data.update();
 }
@@ -483,11 +448,6 @@ Future<void> getLedgersData({
     branchName: branchName,
     termID: termID,
     userID: userID,
-  )
-    ..sort((a, b) {
-      var primary = b.paidAt.compareTo(a.paidAt);
-
-      return primary != 0 ? primary : a.userID.compareTo(b.userID);
-    });
+  );
   _data.update();
 }

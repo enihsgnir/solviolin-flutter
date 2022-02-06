@@ -4,10 +4,8 @@ DateTime parseDateOnly(String date) => DateUtils.dateOnly(DateTime.parse(date));
 
 Duration parseTimeOnly(String time) {
   var times = time.split(":");
-  var hours = int.parse(times[0]);
-  var minutes = int.parse(times[1]);
 
-  return Duration(hours: hours, minutes: minutes);
+  return Duration(hours: int.parse(times[0]), minutes: int.parse(times[1]));
 }
 
 DateTime parseDateTime(String dateTime) {
@@ -30,7 +28,7 @@ Duration timeOfDayToDuration(TimeOfDay time) =>
     Duration(hours: time.hour, minutes: time.minute);
 
 String dowToString(int dow) {
-  var days = {
+  return {
     -1: "Null",
     0: "SUN",
     1: "MON",
@@ -40,9 +38,7 @@ String dowToString(int dow) {
     5: "FRI",
     6: "SAT",
     7: "SUN",
-  };
-
-  return days[dow]!;
+  }[dow]!;
 }
 
 String? textEdit(TextEditingController edit) =>

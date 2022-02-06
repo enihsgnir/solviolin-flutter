@@ -33,7 +33,19 @@ class _TermPageState extends State<TermPage> {
     return GestureDetector(
       onTap: () => FocusScope.of(context).requestFocus(FocusNode()),
       child: Scaffold(
-        appBar: myAppBar("학기"),
+        appBar: myAppBar(
+          "학기",
+          actions: [
+            IconButton(
+              onPressed: () async {
+                _data.currentTerm = await _client.getCurrentTerm();
+
+                _data.terms = await _client.getTerms(10);
+              },
+              icon: Icon(Icons.refresh_outlined, size: 28.r),
+            ),
+          ],
+        ),
         body: SafeArea(
           child: _termList(),
         ),

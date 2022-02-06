@@ -156,7 +156,7 @@ class _MenuPageState extends State<MenuPage> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  menu("체크인", () => Get.toNamed("/check-in")),
+                  menu("QR 체크인", () => Get.toNamed("/check-in")),
                   menu("체크인 이력", () async {
                     Get.toNamed("/check-in/history");
 
@@ -220,6 +220,7 @@ class _MenuPageState extends State<MenuPage> {
       ],
       onPressed: () => showLoading(() async {
         try {
+          _data.reset();
           await _client.logout();
 
           main.isSearched = false;

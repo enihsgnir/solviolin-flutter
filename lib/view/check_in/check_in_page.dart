@@ -41,7 +41,7 @@ class _CheckInPageState extends State<CheckInPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: myAppBar("체크인"),
+      appBar: myAppBar("QR 체크인"),
       body: Stack(
         alignment: Alignment.center,
         children: [

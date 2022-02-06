@@ -35,6 +35,7 @@ Widget myTextInput(
       ),
       Container(
         width: 220.r,
+        // height: 35.r, //TODO: set height of TextField
         child: TextField(
           controller: controller,
           decoration: InputDecoration(

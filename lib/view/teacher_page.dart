@@ -136,8 +136,8 @@ class _TeacherPageState extends State<TeacherPage> {
                 Text("${teacher.teacherID} / ${teacher.branchName}"),
                 Text("${dowToString(teacher.workDow)}" +
                     " / ${timeToString(teacher.startTime)}" +
-                    " : ${timeToString(teacher.endTime)}"),
-              ],
+                    " ~ ${timeToString(teacher.endTime)}"),
+              ], //TODO: toString()
             );
           },
         );

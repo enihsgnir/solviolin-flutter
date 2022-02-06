@@ -72,8 +72,7 @@ class _MenuForTeacherPageState extends State<MenuForTeacherPage> {
                 showLoading(() async {
                   try {
                     _data.canceledReservations = await _client
-                        .getCanceledReservations(_data.profile.userID)
-                      ..sort((a, b) => b.startDate.compareTo(a.startDate));
+                        .getCanceledReservations(_data.profile.userID);
                     _data.update();
 
                     Get.toNamed("/canceled-teacher");
@@ -89,7 +88,7 @@ class _MenuForTeacherPageState extends State<MenuForTeacherPage> {
                   }
                 });
               }),
-              menu("체크인", () => Get.toNamed("/check-in")),
+              menu("QR 체크인", () => Get.toNamed("/check-in")),
               menu("로그아웃", _showLogout, true),
             ]
                 .map((e) => Padding(
@@ -110,6 +109,7 @@ class _MenuForTeacherPageState extends State<MenuForTeacherPage> {
       ],
       onPressed: () => showLoading(() async {
         try {
+          _data.reset();
           await _client.logout();
         } catch (_) {
         } finally {

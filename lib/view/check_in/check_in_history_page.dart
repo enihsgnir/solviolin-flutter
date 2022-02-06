@@ -74,12 +74,7 @@ class _CheckInHistoryPageState extends State<CheckInHistoryPage> {
                     startDate: search.date[0],
                     endDate: search.date[1]?.add(
                         const Duration(hours: 23, minutes: 59, seconds: 59)),
-                  )
-                    ..sort((a, b) {
-                      var primary = b.createdAt.compareTo(a.createdAt);
-
-                      return primary != 0 ? primary : b.id.compareTo(a.id);
-                    });
+                  );
                   _data.update();
 
                   search.isSearched = true;

@@ -151,13 +151,13 @@ class _HistoryReservedState extends State<HistoryReserved> {
                   Get.back();
 
                   await showMySnackbar(
-                    message: "관리자의 권한으로 카운트를 차감하여 수업을 취소했습니다.",
+                    message: "관리자의 권한으로 크레딧을 차감하여 수업을 취소했습니다.",
                   );
                 } catch (e) {
                   showError(e);
                 }
               }),
-              child: Text("취소 (관리자, 카운트 차감)", style: TextStyle(fontSize: 24.r)),
+              child: Text("취소 (관리자, 크레딧 차감)", style: TextStyle(fontSize: 24.r)),
             ),
             CupertinoActionSheetAction(
               onPressed: () => showLoading(() async {
@@ -171,14 +171,14 @@ class _HistoryReservedState extends State<HistoryReserved> {
                   Get.back();
 
                   await showMySnackbar(
-                    message: "관리자의 권한으로 카운트를 미차감하여 수업을 취소했습니다.",
+                    message: "관리자의 권한으로 크레딧을 미차감하여 수업을 취소했습니다.",
                   );
                 } catch (e) {
                   showError(e);
                 }
               }),
               child:
-                  Text("취소 (관리자, 카운트 미차감)", style: TextStyle(fontSize: 24.r)),
+                  Text("취소 (관리자, 크레딧 미차감)", style: TextStyle(fontSize: 24.r)),
             ),
           ],
           cancelButton: CupertinoActionSheetAction(
@@ -217,13 +217,13 @@ class _HistoryReservedState extends State<HistoryReserved> {
                   Get.back();
 
                   await showMySnackbar(
-                    message: "관리자의 권한으로 카운트를 차감하여 수업을 연장했습니다.",
+                    message: "관리자의 권한으로 크레딧을 차감하여 수업을 연장했습니다.",
                   );
                 } catch (e) {
                   showError(e);
                 }
               }),
-              child: Text("연장 (관리자, 카운트 차감)", style: TextStyle(fontSize: 24.r)),
+              child: Text("연장 (관리자, 크레딧 차감)", style: TextStyle(fontSize: 24.r)),
             ),
             CupertinoActionSheetAction(
               onPressed: () => showLoading(() async {
@@ -237,14 +237,14 @@ class _HistoryReservedState extends State<HistoryReserved> {
                   Get.back();
 
                   await showMySnackbar(
-                    message: "관리자의 권한으로 카운트를 미차감하여 수업을 연장했습니다.",
+                    message: "관리자의 권한으로 크레딧을 미차감하여 수업을 연장했습니다.",
                   );
                 } catch (e) {
                   showError(e);
                 }
               }),
               child:
-                  Text("연장 (관리자, 카운트 미차감)", style: TextStyle(fontSize: 24.r)),
+                  Text("연장 (관리자, 크레딧 미차감)", style: TextStyle(fontSize: 24.r)),
             ),
           ],
           cancelButton: CupertinoActionSheetAction(
