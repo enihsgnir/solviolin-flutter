@@ -26,11 +26,11 @@ dependencies:
   flutter_localizations:
     sdk: flutter
   intl: ^0.17.0
-  google_fonts: ^2.1.0
-  get: ^4.3.8
-  flutter_secure_storage: ^4.2.1
-  dio: ^4.0.1
-  pretty_dio_logger: ^1.2.0-beta-1
+  google_fonts: ^2.3.1
+  get: ^4.6.1
+  flutter_secure_storage: ^5.0.2
+  dio: ^4.0.4
+  pretty_dio_logger: ^1.1.1
   flutter_slidable: ^0.6.0
   table_calendar: ^3.0.3
   qr_code_scanner: ^0.6.1
