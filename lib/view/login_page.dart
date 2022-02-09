@@ -131,21 +131,12 @@ class _LoginPageState extends State<LoginPage> {
 
                     showLoading(() async {
                       try {
-                        await _data.getInitialData(
-                          atLoggingIn: true,
-                          isLoggedIn: false,
-                          userID: _id.text,
-                          userPassword: _pw.text,
-                          autoLogin: _autoLogin,
-                        );
+                        _data.profile =
+                            await _client.login(_id.text, _pw.text, _autoLogin);
+                        await _data.getInitialData(atLoggingIn: true);
                       } catch (e) {
-                        try {
-                          await _client.logout();
-                        } catch (_) {
-                        } finally {
-                          showError(e);
-                          _pw.text = "";
-                        }
+                        showError(e);
+                        _pw.text = "";
                       }
                     });
                   },

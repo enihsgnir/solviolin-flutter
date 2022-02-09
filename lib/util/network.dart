@@ -383,11 +383,14 @@ class NetworkException extends DioError {
     );
   }
 
+  bool get isTimeout =>
+      errorType == DioErrorType.connectTimeout ||
+      errorType == DioErrorType.sendTimeout ||
+      errorType == DioErrorType.receiveTimeout;
+
   @override
   String toString() {
-    if (errorType == DioErrorType.connectTimeout ||
-        errorType == DioErrorType.sendTimeout ||
-        errorType == DioErrorType.receiveTimeout) {
+    if (isTimeout) {
       return "연결 시간이 초과했습니다. 다시 시도해주세요.";
     }
 

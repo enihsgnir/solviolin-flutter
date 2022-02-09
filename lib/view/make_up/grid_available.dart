@@ -24,7 +24,7 @@ class _GridAvailableState extends State<GridAvailable> {
         var now = DateTime.now();
         var today = DateUtils.dateOnly(now).add(now.timeZoneOffset);
 
-        if (!_data.isRegularScheduleExisting) {
+        if (!controller.isRegularScheduleExisting) {
           return _warning("수업시간 변경이 필요하시면\n010-6684-8224로 문의바랍니다.");
         } else if (controller.selectedDay.isBefore(today)) {
           return _warning("오늘보다 이전 날짜에는 예약할 수 없습니다!");

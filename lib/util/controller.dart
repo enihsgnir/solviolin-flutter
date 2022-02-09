@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:solviolin/model/change.dart';
@@ -12,8 +14,23 @@ import 'package:table_calendar/table_calendar.dart';
 class DataController extends GetxController {
   final _client = Get.find<Client>();
 
-  double ratio = 1.0;
-  bool isRatioUpdated = false;
+  double _ratio = 1.0;
+  bool _isRatioUpdated = false;
+
+  double _kTestEnvWidth = 540;
+  double _kTestEnvHeight = 1152;
+
+  double get ratio => _ratio;
+
+  /// set `_ratio`
+  set size(Size size) {
+    final _r = min(size.width / _kTestEnvWidth, size.height / _kTestEnvHeight);
+    if (!_isRatioUpdated && _r != 0.0) {
+      _ratio = _r;
+      _isRatioUpdated = true;
+      update();
+    }
+  }
 
   late Profile profile;
 
@@ -33,7 +50,8 @@ class DataController extends GetxController {
   List<Reservation> lastMonthReservations = [];
   List<Change> changes = [];
 
-  bool isRegularScheduleExisting = true;
+  bool _isRegularScheduleExisting = true;
+  bool get isRegularScheduleExisting => _isRegularScheduleExisting;
 
   void reset() {
     regularSchedules = [];
@@ -48,10 +66,7 @@ class DataController extends GetxController {
 
   Future<void> setTerms() async {
     final _today = DateTime.now();
-    // final _today = DateTime(2022, 1, 29).add(Duration(hours: 9)).toUtc();
     final _terms = await _client.getTerms(0);
-
-    // print(_today);
 
     currentTerm = []
       // this term
@@ -66,25 +81,15 @@ class DataController extends GetxController {
     update();
   }
 
-  Future<void> getInitialData({
-    bool atLoggingIn = false,
-    bool isLoggedIn = true,
-    String? userID,
-    String? userPassword,
-    bool? autoLogin,
-  }) async {
-    profile = isLoggedIn
-        ? await _client.getProfile()
-        : await _client.login(userID!, userPassword!, autoLogin!);
-
+  Future<void> getInitialData({bool atLoggingIn = false}) async {
     try {
       regularSchedules = await _client.getRegularSchedules();
-      isRegularScheduleExisting = true;
+      _isRegularScheduleExisting = true;
     } catch (e) {
       regularSchedules = [
         RegularSchedule(branchName: profile.branchName),
       ];
-      isRegularScheduleExisting = false;
+      _isRegularScheduleExisting = false;
     }
 
     if (atLoggingIn) {
@@ -93,7 +98,7 @@ class DataController extends GetxController {
       Get.offAllNamed("/menu");
       await showMySnackbar(
         title: "${profile.userID}님",
-        message: !isRegularScheduleExisting
+        message: !_isRegularScheduleExisting
             ? "정기수업이 시작되지 않아 예약가능한 시간대가 표시되지 않습니다. 관리자에게 문의하세요."
             : "환영합니다!",
       );
@@ -106,7 +111,7 @@ class DataController extends GetxController {
   Future<void> getSelectedDayData(DateTime selected) async {
     final _today = DateTime.now();
 
-    availabaleSpots = !isRegularScheduleExisting
+    availabaleSpots = !_isRegularScheduleExisting
         ? []
         : await _client.getAvailableSpots(
             branchName: profile.branchName,

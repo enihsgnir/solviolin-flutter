@@ -69,11 +69,19 @@ class _MenuPageState extends State<MenuPage> {
       isDestructiveAction: true,
       onPressed: () => showLoading(() async {
         try {
-          _data.reset();
-          await _client.logout();
-        } catch (_) {
+          try {
+            _data.reset();
+            await _client.logout();
+          } catch (_) {
+            rethrow;
+          } finally {
+            Get.offAllNamed("/login");
+          }
+        } catch (e) {
+          if (e is NetworkException && e.isTimeout) {
+            showError(e);
+          }
         } finally {
-          Get.offAllNamed("/login");
           await showMySnackbar(message: "안전하게 로그아웃 되었습니다.");
         }
       }),
