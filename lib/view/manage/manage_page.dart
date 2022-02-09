@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:solviolin/util/constant.dart';
 import 'package:solviolin/util/controller.dart';
-import 'package:solviolin/view/my/history_reserved.dart';
+import 'package:solviolin/view/manage/history_reserved.dart';
 import 'package:solviolin/widget/item_list.dart';
 import 'package:solviolin/widget/single.dart';
 import 'package:solviolin/widget/swipeable_list.dart';
