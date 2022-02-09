@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:solviolin/util/constant.dart';
 import 'package:solviolin/util/controller.dart';
-import 'package:solviolin/util/data_source.dart';
 import 'package:solviolin/util/network.dart';
 import 'package:solviolin/widget/dialog.dart';
 
@@ -132,15 +131,12 @@ class _LoginPageState extends State<LoginPage> {
 
                     showLoading(() async {
                       try {
-                        await getInitialData(false, _id.text, _pw.text,
-                            _autoLogin); //TODO: re-code
-                        Get.offAllNamed("/menu");
-
-                        await showMySnackbar(
-                          title: "${_data.profile.userID}님",
-                          message: !_data.isRegularScheduleExisting
-                              ? "정기수업이 시작되지 않아 예약가능한 시간대가 표시되지 않습니다. 관리자에게 문의하세요."
-                              : "환영합니다!",
+                        await _data.getInitialData(
+                          atLoggingIn: true,
+                          isLoggedIn: false,
+                          userID: _id.text,
+                          userPassword: _pw.text,
+                          autoLogin: _autoLogin,
                         );
                       } catch (e) {
                         try {

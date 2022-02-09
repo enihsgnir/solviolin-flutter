@@ -187,6 +187,9 @@ class Client {
     );
   }
 
+  // TODO: check if it is affected by time zone
+
+  /// Regardless of hour and minute, only the `date` of `startDate` matters.
   Future<List<DateTime>> getAvailableSpots({
     required String branchName,
     required String teacherID,
@@ -209,6 +212,8 @@ class Client {
     );
   }
 
+  /// Regardless of time zone of `startDate` and `endDate`,
+  /// normalized datetime matters.
   Future<List<Reservation>> getReservations({
     required String branchName,
     String? teacherID,
@@ -249,31 +254,16 @@ class Client {
         response.data.length,
         (index) => Change.fromJson(response.data[index]),
       )..sort((a, b) {
-          var primary = a.fromDate.compareTo(b.fromDate);
+          var primary = a.fromStartDate.compareTo(b.fromStartDate);
           return primary != 0
               ? primary
-              : a.toDate == null || b.toDate == null
+              : a.toStartDate == null || b.toStartDate == null
                   ? 0
-                  : a.toDate!.compareTo(b.toDate!);
+                  : a.toStartDate!.compareTo(b.toStartDate!);
         });
     }
     throw NetworkException._(
       message: "변경 내역을 불러올 수 없습니다.",
-      options: response.requestOptions,
-    );
-  }
-
-  /// Returns the first two upcoming terms sorted in ascending order.
-  Future<List<Term>> getCurrentTerm() async {
-    var response = await dio.get("/term");
-    if (response.statusCode == 200) {
-      return List.generate(
-        response.data.length,
-        (index) => Term.fromJson(response.data[index]),
-      )..sort((a, b) => a.termStart.compareTo(b.termStart));
-    }
-    throw NetworkException._(
-      message: "현재 학기 정보를 불러올 수 없습니다.",
       options: response.requestOptions,
     );
   }
@@ -295,7 +285,9 @@ class Client {
     );
   }
 
-  Future<void> makeUpReservation({
+  // TODO: It works well 'yet' with normalized local datetime.
+  //  makeUp -> _showReserve -> availableSpots -> parseDateTime
+  Future<void> makeUp({
     required String teacherID,
     required String branchName,
     required DateTime startDate,
@@ -325,7 +317,7 @@ class Client {
     );
   }
 
-  Future<void> cancelReservation(int id) async {
+  Future<void> cancel(int id) async {
     await dio.patch(
       "/reservation/user/cancel/$id",
       options: Options(
@@ -339,7 +331,7 @@ class Client {
     );
   }
 
-  Future<void> extendReservation(int id) async {
+  Future<void> extend(int id) async {
     await dio.patch(
       "/reservation/user/extend/$id",
       options: Options(

@@ -10,17 +10,17 @@ class RegularSchedule {
   String branchName;
 
   RegularSchedule({
-    required this.startTime,
-    required this.endTime,
-    required this.dow,
-    required this.teacherID,
+    this.startTime = const Duration(),
+    this.endTime = const Duration(),
+    this.dow = -1,
+    this.teacherID = "Null",
     required this.branchName,
   });
 
   factory RegularSchedule.fromJson(Map<String, dynamic> json) {
     return RegularSchedule(
-      startTime: parseTimeOnly(json["startTime"]),
-      endTime: parseTimeOnly(json["endTime"]),
+      startTime: parseTime(json["startTime"]),
+      endTime: parseTime(json["endTime"]),
       dow: json["dow"],
       teacherID: json["teacherID"].trim(),
       branchName: json["branchName"],
@@ -30,9 +30,9 @@ class RegularSchedule {
   @override
   String toString() =>
       "$teacherID / $branchName" +
-      "\n${dowToString()} / ${timeToString(startTime)} ~ ${timeToString(endTime)}";
+      "\n$dowToString / ${timeToString(startTime)} ~ ${timeToString(endTime)}";
 
-  String dowToString() =>
+  String get dowToString =>
       {
         0: "SUN",
         1: "MON",

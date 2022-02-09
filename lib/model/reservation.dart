@@ -34,7 +34,7 @@ class Reservation {
   String toString() =>
       "$teacherID / $branchName\n" + formatDateTimeRange(startDate, endDate);
 
-  String statusToString() =>
+  String get statusToString =>
       {
         0: "정기",
         1: "보강",

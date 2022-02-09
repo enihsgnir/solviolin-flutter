@@ -1,10 +1,8 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:solviolin/model/reservation.dart';
 import 'package:solviolin/util/constant.dart';
 import 'package:solviolin/util/controller.dart';
-import 'package:solviolin/util/data_source.dart';
 import 'package:solviolin/util/format.dart';
 import 'package:solviolin/util/network.dart';
 import 'package:solviolin/widget/dialog.dart';
@@ -50,26 +48,21 @@ class _MyReservationState extends State<MyReservation> {
                                 reservation.toString(),
                                 textAlign: TextAlign.center,
                               ),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.end,
-                                children: [
-                                  Container(
-                                    padding: EdgeInsets.only(right: 16.r),
-                                    child: ElevatedButton(
-                                      onPressed: () async {
-                                        reservation.startDate
-                                                .isBefore(DateTime.now())
-                                            ? await showError(
-                                                "지난 수업은 취소할 수 없습니다.")
-                                            : await _showModalCancel(
-                                                context, reservation);
-                                      },
-                                      style: ElevatedButton.styleFrom(
-                                          primary: symbolColor),
-                                      child: Text("취소", style: contentStyle),
-                                    ),
-                                  ),
-                                ],
+                              Container(
+                                alignment: Alignment.centerRight,
+                                padding: EdgeInsets.only(right: 12.r),
+                                width: double.infinity,
+                                child: ElevatedButton(
+                                  onPressed: () async {
+                                    reservation.startDate
+                                            .isBefore(DateTime.now())
+                                        ? await showError("지난 수업은 취소할 수 없습니다.")
+                                        : await _showCancel(reservation);
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                      primary: symbolColor),
+                                  child: Text("취소", style: contentStyle),
+                                ),
                               ),
                             ],
                           ),
@@ -84,47 +77,29 @@ class _MyReservationState extends State<MyReservation> {
     );
   }
 
-  Future _showModalCancel(BuildContext context, Reservation reservation) {
-    return showCupertinoModalPopup(
+  Future _showCancel(Reservation reservation) {
+    return showMyModal(
       context: context,
-      builder: (context) {
-        return CupertinoActionSheet(
-          title: Text(
-            formatDateTimeRange(reservation.startDate, reservation.endDate),
-            style: TextStyle(fontSize: 24.r),
-          ),
-          message: Text("수업을 취소 하시겠습니까?", style: TextStyle(fontSize: 24.r)),
-          actions: [
-            CupertinoActionSheetAction(
-              onPressed: () => showLoading(() async {
-                try {
-                  await _client.cancelReservation(reservation.id);
+      title: formatDateTimeRange(reservation.startDate, reservation.endDate),
+      message: "수업을 취소 하시겠습니까?",
+      child: "수업 취소",
+      isDestructiveAction: true,
+      onPressed: () => showLoading(() async {
+        try {
+          await _client.cancel(reservation.id);
 
-                  await getUserBasedData();
-                  await getSelectedDayData(_data.selectedDay);
-                  await getChangedPageData(_data.focusedDay);
-                  await getReservedHistoryData();
+          await _data.getInitialData();
+          await _data.getSelectedDayData(_data.selectedDay);
+          await _data.getChangedPageData(_data.focusedDay);
+          await _data.getReservedHistoryData();
 
-                  Get.back();
+          Get.back();
 
-                  await showMySnackbar(
-                    message: "수업 취소에 성공했습니다.",
-                  );
-                } catch (e) {
-                  showError(e);
-                }
-              }),
-              isDestructiveAction: true,
-              child: Text("수업 취소", style: TextStyle(fontSize: 24.r)),
-            ),
-          ],
-          cancelButton: CupertinoActionSheetAction(
-            onPressed: Get.back,
-            isDefaultAction: true,
-            child: Text("닫기", style: TextStyle(fontSize: 24.r)),
-          ),
-        );
-      },
+          await showMySnackbar(message: "수업 취소에 성공했습니다.");
+        } catch (e) {
+          showError(e);
+        }
+      }),
     );
   }
 }

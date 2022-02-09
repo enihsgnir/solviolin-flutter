@@ -1,9 +1,7 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:solviolin/util/constant.dart';
 import 'package:solviolin/util/controller.dart';
-import 'package:solviolin/util/data_source.dart';
 import 'package:solviolin/util/format.dart';
 import 'package:solviolin/util/network.dart';
 import 'package:solviolin/widget/dialog.dart';
@@ -56,10 +54,7 @@ class _GridAvailableState extends State<GridAvailable> {
                     ),
                   ),
                   onTap: () async {
-                    await _showReserve(
-                      context,
-                      controller.availabaleSpots[index],
-                    );
+                    await _showReserve(controller.availabaleSpots[index]);
                   },
                   enableFeedback: false,
                 ),
@@ -85,54 +80,36 @@ class _GridAvailableState extends State<GridAvailable> {
     );
   }
 
-  Future _showReserve(BuildContext context, DateTime time) {
-    var _duration =
-        _data.regularSchedules[0].endTime - _data.regularSchedules[0].startTime;
+  Future _showReserve(DateTime time) {
+    var _regular = _data.regularSchedules[0];
+    var _duration = _regular.endTime - _regular.startTime;
 
-    return showCupertinoModalPopup(
+    return showMyModal(
       context: context,
-      builder: (context) {
-        return CupertinoActionSheet(
-          title: Text(
-            formatDateTimeRange(time, time.add(_duration)),
-            style: TextStyle(fontSize: 24.r),
-          ),
-          message: Text("예약 하시겠습니까?", style: TextStyle(fontSize: 24.r)),
-          actions: [
-            CupertinoActionSheetAction(
-              onPressed: () => showLoading(() async {
-                try {
-                  await _client.makeUpReservation(
-                    teacherID: _data.regularSchedules[0].teacherID,
-                    branchName: _data.profile.branchName,
-                    startDate: time,
-                    endDate: time.add(_duration),
-                    userID: _data.profile.userID,
-                  );
+      title: formatDateTimeRange(time, time.add(_duration)),
+      message: "예약 하시겠습니까?",
+      child: "예약",
+      onPressed: () => showLoading(() async {
+        try {
+          await _client.makeUp(
+            teacherID: _data.regularSchedules[0].teacherID,
+            branchName: _data.profile.branchName,
+            startDate: time,
+            endDate: time.add(_duration),
+            userID: _data.profile.userID,
+          );
 
-                  await getUserBasedData();
-                  await getSelectedDayData(_data.selectedDay);
-                  await getChangedPageData(_data.focusedDay);
+          await _data.getInitialData();
+          await _data.getSelectedDayData(_data.selectedDay);
+          await _data.getChangedPageData(_data.focusedDay);
 
-                  Get.back();
+          Get.back();
 
-                  await showMySnackbar(
-                    message: "수업 예약에 성공했습니다.",
-                  );
-                } catch (e) {
-                  showError(e);
-                }
-              }),
-              child: Text("예약", style: TextStyle(fontSize: 24.r)),
-            ),
-          ],
-          cancelButton: CupertinoActionSheetAction(
-            onPressed: Get.back,
-            isDefaultAction: true,
-            child: Text("닫기", style: TextStyle(fontSize: 24.r)),
-          ),
-        );
-      },
+          await showMySnackbar(message: "수업 예약에 성공했습니다.");
+        } catch (e) {
+          showError(e);
+        }
+      }),
     );
   }
 }

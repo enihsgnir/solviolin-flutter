@@ -1,9 +1,11 @@
+import 'dart:collection';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:solviolin/model/reservation.dart';
 import 'package:solviolin/util/constant.dart';
 import 'package:solviolin/util/controller.dart';
-import 'package:solviolin/util/data_source.dart';
 import 'package:solviolin/widget/dialog.dart';
 import 'package:table_calendar/table_calendar.dart';
 
@@ -37,8 +39,7 @@ class _CalendarReservedState extends State<CalendarReserved> {
         return TableCalendar(
           focusedDay: _focusedDay,
           firstDay: DateTime(today.year, today.month - 5, 1),
-          lastDay: controller.currentTerm[0].termEnd
-              .add(const Duration(hours: 23, minutes: 59, seconds: 59)),
+          lastDay: controller.currentTerm[0].termEnd, // normalized date
           currentDay: today,
           locale: "en_US", // not timezone
           weekendDays: const [DateTime.sunday],
@@ -120,7 +121,7 @@ class _CalendarReservedState extends State<CalendarReserved> {
             if (selectedDay.isAfter(today) || isSameDay(selectedDay, today)) {
               showLoading(() async {
                 try {
-                  await getSelectedDayData(selectedDay);
+                  await controller.getSelectedDayData(selectedDay);
 
                   setState(() {
                     events = getEvents();
@@ -141,8 +142,8 @@ class _CalendarReservedState extends State<CalendarReserved> {
 
             showLoading(() async {
               try {
-                await getSelectedDayData(focusedDay);
-                await getChangedPageData(focusedDay);
+                await controller.getSelectedDayData(focusedDay);
+                await controller.getChangedPageData(focusedDay);
 
                 setState(() {
                   events = getEvents();
@@ -180,3 +181,25 @@ class _CalendarReservedState extends State<CalendarReserved> {
     return const Color.fromRGBO(227, 214, 208, 0.15);
   }
 }
+
+extension _Iterables<E> on Iterable<E> {
+  Map<K, List<E>> groupBy<K>(K Function(E) keyFunction) => fold(
+      <K, List<E>>{},
+      (map, element) =>
+          map..putIfAbsent(keyFunction(element), () => <E>[]).add(element));
+}
+
+Map<DateTime, List<Reservation>> getEventSource() {
+  final _data = Get.find<DataController>();
+
+  return _data.myValidReservations.groupBy((reservation) {
+    var date = reservation.startDate;
+
+    return DateTime(date.year, date.month, date.day);
+  });
+}
+
+LinkedHashMap<DateTime, List<Reservation>> getEvents() => LinkedHashMap(
+      equals: isSameDay,
+      hashCode: (key) => key.day * 1000000 + key.month * 10000 + key.year,
+    )..addAll(getEventSource());

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:solviolin/util/constant.dart';
 import 'package:solviolin/util/controller.dart';
-import 'package:solviolin/util/data_source.dart';
 import 'package:solviolin/util/network.dart';
 import 'package:solviolin/widget/dialog.dart';
 import 'package:solviolin/widget/single.dart';
@@ -29,14 +28,24 @@ class _MenuPageState extends State<MenuPage> {
               menu("나의 예약", () {
                 showLoading(() async {
                   try {
-                    await getReservedHistoryData();
+                    await _data.getReservedHistoryData();
                     Get.toNamed("/history");
                   } catch (e) {
                     showError(e);
                   }
                 });
               }),
-              menu("수업변경", () => Get.toNamed("/main")),
+              menu("수업변경", () {
+                showLoading(() async {
+                  try {
+                    await _data.getSelectedDayData(DateTime.now());
+                    await _data.getChangedPageData(DateTime.now());
+                    Get.toNamed("/main");
+                  } catch (e) {
+                    showError(e);
+                  }
+                });
+              }),
               menu("QR 체크인", () => Get.toNamed("/check-in")),
               menu("메트로놈", () => Get.toNamed("/metronome")),
               menu("로그아웃", _showLogout, true),
@@ -53,8 +62,11 @@ class _MenuPageState extends State<MenuPage> {
   }
 
   Future _showLogout() {
-    return showMyDialog(
-      contents: [Text("로그아웃 하시겠습니까?")],
+    return showMyModal(
+      context: context,
+      message: "로그아웃 하시겠습니까?",
+      child: "로그아웃",
+      isDestructiveAction: true,
       onPressed: () => showLoading(() async {
         try {
           _data.reset();

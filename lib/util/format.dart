@@ -1,14 +1,15 @@
-import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
-DateTime parseDateOnly(String date) => DateUtils.dateOnly(DateTime.parse(date));
-
-Duration parseTimeOnly(String time) {
+Duration parseTime(String time) {
   var times = time.split(":");
 
   return Duration(hours: int.parse(times[0]), minutes: int.parse(times[1]));
 }
 
+/// Returns local [DateTime] with the same properties of the parameter,
+/// regardless of time zone.
+///
+/// It can be compared to `DateTime.now()` in the same time zone.
 DateTime parseDateTime(String dateTime) {
   var _dateTime = DateTime.parse(dateTime);
 

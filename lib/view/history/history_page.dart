@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:solviolin/util/constant.dart';
@@ -94,6 +95,14 @@ class _HistoryPageState extends State<HistoryPage>
             ? Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
+                  Container(
+                    padding: EdgeInsets.all(16.r),
+                    child: Icon(
+                      CupertinoIcons.text_badge_xmark,
+                      size: 48.r,
+                      color: Colors.red,
+                    ),
+                  ),
                   Text(
                     "변경내역을 조회할 수 없습니다.",
                     style: TextStyle(color: Colors.red, fontSize: 22.r),

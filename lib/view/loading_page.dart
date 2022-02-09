@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:solviolin/util/constant.dart';
 import 'package:solviolin/util/controller.dart';
-import 'package:solviolin/util/data_source.dart';
 import 'package:solviolin/util/network.dart';
 import 'package:solviolin/widget/dialog.dart';
 
@@ -20,8 +19,10 @@ class _LoadingPageState extends State<LoadingPage> {
   @override
   void initState() {
     super.initState();
-    Future.delayed(const Duration(seconds: 1), () async {
-      await _checkProfile();
+    Future.delayed(const Duration(seconds: 1), () {
+      showLoading(() async {
+        await _checkProfile();
+      });
     });
   }
 
@@ -61,15 +62,7 @@ class _LoadingPageState extends State<LoadingPage> {
   Future<void> _checkProfile() async {
     if (await _client.isLoggedIn()) {
       try {
-        await getInitialData(); //TODO: re-code
-        Get.offAllNamed("/menu"); //TODO: getInitialData 안에 다 넣어버리기
-
-        await showMySnackbar(
-          title: "${_data.profile.userID}님",
-          message: !_data.isRegularScheduleExisting
-              ? "정기수업이 시작되지 않아 예약가능한 시간대가 표시되지 않습니다. 관리자에게 문의하세요."
-              : "환영합니다!",
-        );
+        await _data.getInitialData(atLoggingIn: true);
       } catch (e) {
         try {
           await _client.logout();

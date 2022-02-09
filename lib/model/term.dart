@@ -11,8 +11,8 @@ class Term {
 
   factory Term.fromJson(Map<String, dynamic> json) {
     return Term(
-      termStart: parseDateOnly(json["termStart"]),
-      termEnd: parseDateOnly(json["termEnd"]),
+      termStart: parseDateTime(json["termStart"]),
+      termEnd: parseDateTime(json["termEnd"]),
     );
   }
 }
