@@ -3,20 +3,19 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:solviolin/util/constant.dart';
 import 'package:solviolin/util/controller.dart';
-import 'package:solviolin/view/history/history_reserved.dart';
+import 'package:solviolin/view/my/history_reserved.dart';
 import 'package:solviolin/widget/item_list.dart';
 import 'package:solviolin/widget/single.dart';
 import 'package:solviolin/widget/swipeable_list.dart';
 
-class HistoryPage extends StatefulWidget {
-  const HistoryPage({Key? key}) : super(key: key);
+class ManagePage extends StatefulWidget {
+  const ManagePage({Key? key}) : super(key: key);
 
   @override
-  _HistoryPageState createState() => _HistoryPageState();
+  _ManagePageState createState() => _ManagePageState();
 }
 
-class _HistoryPageState extends State<HistoryPage>
-    with TickerProviderStateMixin {
+class _ManagePageState extends State<ManagePage> with TickerProviderStateMixin {
   late TabController tabController;
 
   @override

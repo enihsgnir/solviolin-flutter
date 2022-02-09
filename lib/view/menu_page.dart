@@ -29,7 +29,7 @@ class _MenuPageState extends State<MenuPage> {
                 showLoading(() async {
                   try {
                     await _data.getReservedHistoryData();
-                    Get.toNamed("/history");
+                    Get.toNamed("/manage");
                   } catch (e) {
                     showError(e);
                   }
@@ -40,7 +40,7 @@ class _MenuPageState extends State<MenuPage> {
                   try {
                     await _data.getSelectedDayData(DateTime.now());
                     await _data.getChangedPageData(DateTime.now());
-                    Get.toNamed("/main");
+                    Get.toNamed("/make-up");
                   } catch (e) {
                     showError(e);
                   }

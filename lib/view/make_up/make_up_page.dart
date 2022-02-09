@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:solviolin/util/constant.dart';
-import 'package:solviolin/view/main/calendar_reserved.dart';
-import 'package:solviolin/view/main/grid_available.dart';
-import 'package:solviolin/view/main/my_reservation.dart';
+import 'package:solviolin/view/make_up/calendar_reserved.dart';
+import 'package:solviolin/view/make_up/grid_available.dart';
+import 'package:solviolin/view/make_up/reservation_card.dart';
 import 'package:solviolin/widget/single.dart';
 
-class MainPage extends StatefulWidget {
-  const MainPage({Key? key}) : super(key: key);
+class MakeUpPage extends StatefulWidget {
+  const MakeUpPage({Key? key}) : super(key: key);
 
   @override
-  _MainPageState createState() => _MainPageState();
+  _MakeUpPageState createState() => _MakeUpPageState();
 }
 
-class _MainPageState extends State<MainPage> {
+class _MakeUpPageState extends State<MakeUpPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -25,7 +25,7 @@ class _MainPageState extends State<MainPage> {
               child: CalendarReserved(),
             ),
             myDivider(),
-            MyReservation(),
+            ReservationCard(),
             GridAvailable(),
           ],
         ),

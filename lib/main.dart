@@ -10,10 +10,10 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:solviolin/util/controller.dart';
 import 'package:solviolin/util/network.dart';
 import 'package:solviolin/view/check_in_page.dart';
-import 'package:solviolin/view/history/history_page.dart';
 import 'package:solviolin/view/loading_page.dart';
 import 'package:solviolin/view/login_page.dart';
-import 'package:solviolin/view/main/main_page.dart';
+import 'package:solviolin/view/make_up/make_up_page.dart';
+import 'package:solviolin/view/manage/manage_page.dart';
 import 'package:solviolin/view/menu_page.dart';
 import 'package:solviolin/view/metronome_page.dart';
 
@@ -79,8 +79,8 @@ class _MyAppState extends State<MyApp> {
         GetPage(name: "/loading", page: () => LoadingPage()),
         GetPage(name: "/login", page: () => LoginPage()),
         GetPage(name: "/menu", page: () => MenuPage()),
-        GetPage(name: "/main", page: () => MainPage()),
-        GetPage(name: "/history", page: () => HistoryPage()),
+        GetPage(name: "/manage", page: () => ManagePage()),
+        GetPage(name: "/make-up", page: () => MakeUpPage()),
         GetPage(name: "/check-in", page: () => CheckInPage()),
         GetPage(name: "/metronome", page: () => MetronomePage()),
       ],

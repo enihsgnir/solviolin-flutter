@@ -10,14 +10,14 @@ import 'package:solviolin/widget/single.dart';
 import 'package:solviolin/widget/swipeable_list.dart';
 import 'package:table_calendar/table_calendar.dart';
 
-class MyReservation extends StatefulWidget {
-  const MyReservation({Key? key}) : super(key: key);
+class ReservationCard extends StatefulWidget {
+  const ReservationCard({Key? key}) : super(key: key);
 
   @override
-  _MyReservationState createState() => _MyReservationState();
+  _ReservationCardState createState() => _ReservationCardState();
 }
 
-class _MyReservationState extends State<MyReservation> {
+class _ReservationCardState extends State<ReservationCard> {
   var _client = Get.find<Client>();
   var _data = Get.find<DataController>();
 
