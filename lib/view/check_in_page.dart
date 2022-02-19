@@ -50,17 +50,16 @@ class _CheckInPageState extends State<CheckInPage> {
             onQRViewCreated: (controller) {
               qrController = controller;
               controller.scannedDataStream.listen((scanData) {
-                setState(() {
+                setState(() async {
                   result = scanData;
-                  controller.pauseCamera();
+                  await controller.pauseCamera();
 
-                  showLoading(() async {
+                  await showLoading(() async {
                     try {
                       await _client.checkIn(result!.code!);
 
-                      controller.stopCamera();
+                      await controller.stopCamera();
                       Get.back();
-
                       await showMySnackbar(message: "체크인에 성공했습니다.");
                     } catch (e) {
                       Get.snackbar(
@@ -76,8 +75,8 @@ class _CheckInPageState extends State<CheckInPage> {
                           style: TextStyle(color: Colors.red, fontSize: 24.r),
                         ),
                       );
-                      Future.delayed(const Duration(seconds: 2), () {
-                        controller.resumeCamera();
+                      Future.delayed(const Duration(seconds: 2), () async {
+                        await controller.resumeCamera();
                       });
                     }
                   });
