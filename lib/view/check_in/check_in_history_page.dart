@@ -101,11 +101,11 @@ class _CheckInHistoryPageState extends State<CheckInHistoryPage> {
     return GetBuilder<DataController>(
       builder: (controller) {
         return ListView.builder(
-          itemCount: controller.checkInHistories.length,
+          itemCount: _data.checkInHistories.length,
           itemBuilder: (context, index) {
             return myNormalCard(
               children: [
-                Text(controller.checkInHistories[index].toString()),
+                Text(_data.checkInHistories[index].toString()),
               ],
             );
           },

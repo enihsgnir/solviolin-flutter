@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:solviolin_admin/util/constant.dart';
 import 'package:solviolin_admin/util/controller.dart';
-import 'package:solviolin_admin/util/data_source.dart';
 import 'package:solviolin_admin/util/format.dart';
 import 'package:solviolin_admin/util/network.dart';
 import 'package:solviolin_admin/widget/dialog.dart';
@@ -88,7 +87,7 @@ class _LedgerPageState extends State<LedgerPage> {
               context: context,
               onPressed: () => showLoading(() async {
                 try {
-                  await getLedgersData(
+                  await _data.getLedgersData(
                     branchName: search.branchName,
                     termID: search.termID,
                     userID: textEdit(search.edit1),
@@ -128,7 +127,7 @@ class _LedgerPageState extends State<LedgerPage> {
   Widget _ledgerList() {
     return GetBuilder<DataController>(
       builder: (controller) {
-        return controller.ledgers.isEmpty
+        return _data.ledgers.isEmpty
             ? DefaultTextStyle(
                 style: TextStyle(color: Colors.red, fontSize: 20.r),
                 textAlign: TextAlign.center,
@@ -146,9 +145,9 @@ class _LedgerPageState extends State<LedgerPage> {
                 ),
               )
             : ListView.builder(
-                itemCount: controller.ledgers.length,
+                itemCount: _data.ledgers.length,
                 itemBuilder: (context, index) {
-                  var ledger = controller.ledgers[index];
+                  var ledger = _data.ledgers[index];
 
                   return mySlidableCard(
                     slideActions: [
@@ -165,7 +164,7 @@ class _LedgerPageState extends State<LedgerPage> {
                             try {
                               await _client.deleteLedger(ledger.id);
 
-                              await getLedgersData(
+                              await _data.getLedgersData(
                                 branchName: search.branchName,
                                 termID: search.termID,
                                 userID: textEdit(search.edit1),
@@ -223,7 +222,7 @@ class _LedgerPageState extends State<LedgerPage> {
             branchName: expend.branchName!,
           );
 
-          await getLedgersData(
+          await _data.getLedgersData(
             branchName: search.branchName,
             termID: search.termID,
             userID: textEdit(search.edit1),

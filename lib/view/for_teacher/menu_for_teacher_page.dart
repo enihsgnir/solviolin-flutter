@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:solviolin_admin/util/constant.dart';
 import 'package:solviolin_admin/util/controller.dart';
-import 'package:solviolin_admin/util/data_source.dart';
 import 'package:solviolin_admin/util/network.dart';
 import 'package:solviolin_admin/widget/dialog.dart';
 import 'package:solviolin_admin/widget/single.dart';
@@ -31,7 +30,7 @@ class _MenuForTeacherPageState extends State<MenuForTeacherPage> {
               menu("메인", () {
                 showLoading(() async {
                   try {
-                    await getReservationForTeacherData();
+                    await _data.getReservationForTeacherData();
 
                     Get.toNamed("/main-teacher");
 
@@ -57,7 +56,7 @@ class _MenuForTeacherPageState extends State<MenuForTeacherPage> {
                           DateTime(today.year, today.month, today.day + 7);
                     }
 
-                    await getControlsForTeacherData(
+                    await _data.getControlsForTeacherData(
                       controlStart: control.date[0],
                       controlEnd: control.date[1],
                     );

@@ -46,7 +46,7 @@ class _TimeSlotForTeacherState extends State<TimeSlotForTeacher> {
 
               showLoading(() async {
                 try {
-                  await getReservationForTeacherData();
+                  await _data.getReservationForTeacherData();
 
                   if (_data.reservations.isEmpty) {
                     await showMySnackbar(

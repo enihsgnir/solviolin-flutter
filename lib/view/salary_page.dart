@@ -100,11 +100,11 @@ class _SalaryPageState extends State<SalaryPage> {
     return GetBuilder<DataController>(
       builder: (controller) {
         return ListView.builder(
-          itemCount: controller.salaries.length,
+          itemCount: _data.salaries.length,
           itemBuilder: (context, index) {
             return myNormalCard(
               children: [
-                Text(controller.salaries[index].toString()),
+                Text(_data.salaries[index].toString()),
               ],
             );
           },

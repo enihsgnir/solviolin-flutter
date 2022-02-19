@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:solviolin_admin/util/constant.dart';
 import 'package:solviolin_admin/util/controller.dart';
-import 'package:solviolin_admin/util/data_source.dart';
 import 'package:solviolin_admin/widget/dialog.dart';
 import 'package:solviolin_admin/widget/item_list.dart';
 import 'package:solviolin_admin/widget/picker.dart';
@@ -66,7 +65,7 @@ class _ControlForTeacherPageState extends State<ControlForTeacherPage> {
               context: context,
               onPressed: () => showLoading(() async {
                 try {
-                  await getControlsForTeacherData(
+                  await _data.getControlsForTeacherData(
                     controlStart: search.date[0],
                     controlEnd: search.date[1],
                   );

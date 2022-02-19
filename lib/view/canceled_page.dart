@@ -84,11 +84,11 @@ class _CanceledPageState extends State<CanceledPage> {
     return GetBuilder<DataController>(
       builder: (controller) {
         return ListView.builder(
-          itemCount: controller.canceledReservations.length,
+          itemCount: _data.canceledReservations.length,
           itemBuilder: (context, index) {
             return myNormalCard(
               children: [
-                Text(controller.canceledReservations[index].toString()),
+                Text(_data.canceledReservations[index].toString()),
               ],
             );
           },

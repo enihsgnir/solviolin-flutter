@@ -4,7 +4,6 @@ import 'package:get/get.dart';
 import 'package:solviolin_admin/model/control.dart';
 import 'package:solviolin_admin/util/constant.dart';
 import 'package:solviolin_admin/util/controller.dart';
-import 'package:solviolin_admin/util/data_source.dart';
 import 'package:solviolin_admin/util/format.dart';
 import 'package:solviolin_admin/util/network.dart';
 import 'package:solviolin_admin/widget/dialog.dart';
@@ -91,7 +90,7 @@ class _ControlPageState extends State<ControlPage> {
               context: context,
               onPressed: () => showLoading(() async {
                 try {
-                  await getControlsData(
+                  await _data.getControlsData(
                     branchName: search.branchName!,
                     teacherID: textEdit(search.edit1),
                     controlStart: search.date[0],
@@ -120,14 +119,12 @@ class _ControlPageState extends State<ControlPage> {
   }
 
   Widget _controlList() {
-    Get.find<DataController>();
-
     return GetBuilder<DataController>(
       builder: (controller) {
         return ListView.builder(
-          itemCount: controller.controls.length,
+          itemCount: _data.controls.length,
           itemBuilder: (context, index) {
-            var control = controller.controls[index];
+            var control = _data.controls[index];
 
             return mySlidableCard(
               slideActions: [
@@ -144,7 +141,7 @@ class _ControlPageState extends State<ControlPage> {
                       try {
                         await _client.deleteControl(control.id);
 
-                        await getControlsData(
+                        await _data.getControlsData(
                           branchName: search.branchName!,
                           teacherID: textEdit(search.edit1),
                           controlStart: search.dateTime[0],
@@ -218,7 +215,7 @@ class _ControlPageState extends State<ControlPage> {
                 );
 
                 if (search.isSearched) {
-                  await getControlsData(
+                  await _data.getControlsData(
                     branchName: search.branchName!,
                     teacherID: textEdit(search.edit1),
                     controlStart: search.dateTime[0],

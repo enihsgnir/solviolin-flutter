@@ -5,7 +5,6 @@ import 'package:get/get.dart';
 import 'package:solviolin_admin/model/user.dart';
 import 'package:solviolin_admin/util/constant.dart';
 import 'package:solviolin_admin/util/controller.dart';
-import 'package:solviolin_admin/util/data_source.dart';
 import 'package:solviolin_admin/util/format.dart';
 import 'package:solviolin_admin/util/network.dart';
 import 'package:solviolin_admin/widget/dialog.dart';
@@ -91,7 +90,7 @@ class _UserPageState extends State<UserPage> {
               context: context,
               onPressed: () => showLoading(() async {
                 try {
-                  await saveUsersData(
+                  await _data.saveUsersData(
                     branchName: search.branchName,
                     userID: textEdit(search.edit1),
                     isPaid: search.check[0],
@@ -120,7 +119,7 @@ class _UserPageState extends State<UserPage> {
               context: context,
               onPressed: () => showLoading(() async {
                 try {
-                  await getUsersData(
+                  await _data.getUsersData(
                     branchName: search.branchName,
                     userID: textEdit(search.edit1),
                     isPaid: search.check[0],
@@ -152,7 +151,7 @@ class _UserPageState extends State<UserPage> {
   Widget _userList() {
     return GetBuilder<DataController>(
       builder: (controller) {
-        return controller.users.isEmpty
+        return _data.users.isEmpty
             ? DefaultTextStyle(
                 style: TextStyle(color: Colors.red, fontSize: 20.r),
                 textAlign: TextAlign.center,
@@ -171,9 +170,9 @@ class _UserPageState extends State<UserPage> {
                 ),
               )
             : ListView.builder(
-                itemCount: controller.users.length,
+                itemCount: _data.users.length,
                 itemBuilder: (context, index) {
-                  var user = controller.users[index];
+                  var user = _data.users[index];
 
                   return InkWell(
                     child: myNormalCard(
@@ -188,7 +187,7 @@ class _UserPageState extends State<UserPage> {
                       showLoading(() async {
                         try {
                           search.userDetail = user;
-                          await getUserDetailData(user);
+                          await _data.getUserDetailData(user);
 
                           Get.toNamed("/user/detail");
                         } catch (e) {
@@ -260,7 +259,7 @@ class _UserPageState extends State<UserPage> {
               );
 
               if (search.isSearched) {
-                await getUsersData(
+                await _data.getUsersData(
                   branchName: search.branchName,
                   userID: textEdit(search.edit1),
                   isPaid: search.check[0],

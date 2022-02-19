@@ -35,8 +35,8 @@ class _TimeSlotState extends State<TimeSlot> {
         return SfCalendar(
           view: CalendarView.week,
           timeZone: "Korea Standard Time",
-          dataSource: controller.reservationDataSource,
-          specialRegions: controller.timeRegions,
+          dataSource: _data.reservationDataSource,
+          specialRegions: _data.timeRegions,
           controller: _calendar,
           onTap: (details) async {
             if (!search.isSearched && !search.hasBeenShown) {
@@ -55,7 +55,7 @@ class _TimeSlotState extends State<TimeSlot> {
               }
 
               _calendar.displayDate = details.date!;
-              controller.updateDisplayDate(_calendar.displayDate!);
+              _data.updateDisplayDate(_calendar.displayDate!);
             } else if (details.targetElement == CalendarElement.calendarCell) {
               if (_calendar.view == CalendarView.timelineDay) {
                 _showEmpty(details);
@@ -65,8 +65,8 @@ class _TimeSlotState extends State<TimeSlot> {
             }
           },
           onViewChanged: (details) {
-            if (!isSameWeek(_calendar.displayDate!, controller.displayDate)) {
-              controller.updateDisplayDate(_calendar.displayDate!);
+            if (!isSameWeek(_calendar.displayDate!, _data.displayDate)) {
+              _data.updateDisplayDate(_calendar.displayDate!);
 
               showLoading(() async {
                 try {
@@ -99,7 +99,7 @@ class _TimeSlotState extends State<TimeSlot> {
             showAvatar: false,
             displayNameTextStyle: TextStyle(fontSize: 20.r),
           ),
-          initialDisplayDate: controller.displayDate,
+          initialDisplayDate: _data.displayDate,
           showCurrentTimeIndicator: false,
           showNavigationArrow: true,
           allowedViews: [CalendarView.week, CalendarView.timelineDay],
@@ -430,8 +430,7 @@ class _TimeSlotState extends State<TimeSlot> {
 
   Future<void> _getSearchedReservationsData() async {
     if (search.isSearched) {
-      await getReservationData(
-        displayDate: _data.displayDate,
+      await _data.getReservationData(
         branchName: search.branchName!,
         userID: textEdit(search.edit1),
         teacherID: textEdit(search.edit2),

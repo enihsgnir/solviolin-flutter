@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:solviolin_admin/util/constant.dart';
 import 'package:solviolin_admin/util/controller.dart';
-import 'package:solviolin_admin/util/data_source.dart';
 import 'package:solviolin_admin/util/format.dart';
 import 'package:solviolin_admin/util/network.dart';
 import 'package:solviolin_admin/widget/dialog.dart';
@@ -38,7 +37,7 @@ class _TermPageState extends State<TermPage> {
           actions: [
             IconButton(
               onPressed: () => showLoading(() async {
-                await setTerms();
+                await _data.setTerms();
               }),
               icon: Icon(Icons.refresh_outlined, size: 28.r),
             ),
@@ -74,9 +73,9 @@ class _TermPageState extends State<TermPage> {
     return GetBuilder<DataController>(
       builder: (controller) {
         return ListView.builder(
-          itemCount: controller.terms.length,
+          itemCount: _data.terms.length,
           itemBuilder: (context, index) {
-            var term = controller.terms[index];
+            var term = _data.terms[index];
 
             return mySlidableCard(
               slideActions: [
@@ -113,7 +112,7 @@ class _TermPageState extends State<TermPage> {
                               termEnd: update.date[1]!,
                             );
 
-                            await setTerms();
+                            await _data.setTerms();
                             _data.update();
 
                             Get.back();
@@ -167,7 +166,7 @@ class _TermPageState extends State<TermPage> {
             termEnd: register.date[1]!,
           );
 
-          await setTerms();
+          await _data.setTerms();
           _data.update();
 
           Get.back();

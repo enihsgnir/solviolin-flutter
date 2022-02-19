@@ -79,7 +79,6 @@ class _MyAppState extends State<MyApp> {
       ],
       initialRoute: "/loading",
       getPages: [
-        // TODO: rename views and commit seperately
         GetPage(name: "/loading", page: () => LoadingPage()),
         GetPage(name: "/login", page: () => LoginPage()),
         GetPage(name: "/menu", page: () => MenuPage()),

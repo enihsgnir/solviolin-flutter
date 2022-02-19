@@ -4,7 +4,6 @@ import 'package:get/get.dart';
 import 'package:solviolin_admin/model/reservation.dart';
 import 'package:solviolin_admin/util/constant.dart';
 import 'package:solviolin_admin/util/controller.dart';
-import 'package:solviolin_admin/util/data_source.dart';
 import 'package:solviolin_admin/util/format.dart';
 import 'package:solviolin_admin/util/network.dart';
 import 'package:solviolin_admin/widget/dialog.dart';
@@ -25,6 +24,7 @@ class HistoryReserved extends StatefulWidget {
 
 class _HistoryReservedState extends State<HistoryReserved> {
   var _client = Get.find<Client>();
+  var _data = Get.find<DataController>();
 
   var search = Get.find<CacheController>(tag: "/search/user");
 
@@ -243,7 +243,7 @@ class _HistoryReservedState extends State<HistoryReserved> {
   }
 
   Future<void> _getSearchedUsersData() async {
-    await getUsersData(
+    await _data.getUsersData(
       branchName: search.branchName,
       userID: textEdit(search.edit1),
       isPaid: search.check[0],
@@ -251,6 +251,6 @@ class _HistoryReservedState extends State<HistoryReserved> {
       status: search.check[1],
       termID: search.termID,
     );
-    await getUserDetailData(search.userDetail!);
+    await _data.getUserDetailData(search.userDetail!);
   }
 }

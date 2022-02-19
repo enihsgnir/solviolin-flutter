@@ -48,7 +48,7 @@ class _MainForTeacherPageState extends State<MainForTeacherPage> {
             IconButton(
               onPressed: () => showLoading(() async {
                 try {
-                  await getReservationForTeacherData();
+                  await _data.getReservationForTeacherData();
 
                   await showMySnackbar(
                     message: "예약 목록을 불러왔습니다.",
@@ -91,7 +91,7 @@ class _MainForTeacherPageState extends State<MainForTeacherPage> {
                   if (!isSameWeek(newDate, _temp)) {
                     showLoading(() async {
                       try {
-                        await getReservationForTeacherData();
+                        await _data.getReservationForTeacherData();
 
                         if (_data.reservations.isEmpty) {
                           await showMySnackbar(

@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:solviolin_admin/util/constant.dart';
 import 'package:solviolin_admin/util/controller.dart';
-import 'package:solviolin_admin/util/data_source.dart';
 import 'package:solviolin_admin/util/format.dart';
 import 'package:solviolin_admin/util/network.dart';
 import 'package:solviolin_admin/widget/dialog.dart';
@@ -138,12 +137,12 @@ class _LoginPageState extends State<LoginPage> {
                           autoLogin: _autoLogin,
                         );
                         _data.branches = await _client.getBranches();
-                        await setTerms();
+                        await _data.setTerms();
 
                         if (_data.profile.userType == 2) {
                           Get.offAllNamed("/menu");
                         } else if (_data.profile.userType == 1) {
-                          await getInitialForTeacherData();
+                          await _data.getInitialForTeacherData();
                           Get.offAllNamed("/menu-teacher");
                         }
 

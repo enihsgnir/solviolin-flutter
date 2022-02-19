@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:solviolin_admin/util/controller.dart';
-import 'package:solviolin_admin/util/data_source.dart';
 import 'package:solviolin_admin/util/format.dart';
 import 'package:solviolin_admin/util/network.dart';
 import 'package:solviolin_admin/widget/dialog.dart';
@@ -56,8 +55,7 @@ class _MenuPageState extends State<MenuPage> {
                         if (!main.isSearched) {
                           main.branchName = _data.profile.branchName;
 
-                          await getReservationData(
-                            displayDate: _data.displayDate,
+                          await _data.getReservationData(
                             branchName: main.branchName!,
                           );
 

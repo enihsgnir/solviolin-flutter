@@ -129,8 +129,7 @@ class _MainPageState extends State<MainPage> {
       ],
       onPressed: () => showLoading(() async {
         try {
-          await getReservationData(
-            displayDate: _data.displayDate,
+          await _data.getReservationData(
             branchName: search.branchName!,
             userID: textEdit(search.edit1),
             teacherID: textEdit(search.edit2),
@@ -156,8 +155,7 @@ class _MainPageState extends State<MainPage> {
 
   Future<void> _getSearchedReservationsData() async {
     if (search.isSearched) {
-      await getReservationData(
-        displayDate: _data.displayDate,
+      await _data.getReservationData(
         branchName: search.branchName!,
         userID: textEdit(search.edit1),
         teacherID: textEdit(search.edit2),

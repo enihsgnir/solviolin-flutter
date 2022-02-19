@@ -4,7 +4,6 @@ import 'package:get/get.dart';
 import 'package:solviolin_admin/model/regular_schedule.dart';
 import 'package:solviolin_admin/util/constant.dart';
 import 'package:solviolin_admin/util/controller.dart';
-import 'package:solviolin_admin/util/data_source.dart';
 import 'package:solviolin_admin/util/format.dart';
 import 'package:solviolin_admin/util/network.dart';
 import 'package:solviolin_admin/view/user_detail/history_reserved.dart';
@@ -29,6 +28,7 @@ class _UserDetailPageState extends State<UserDetailPage>
   late TabController tabController;
 
   var _client = Get.find<Client>();
+  var _data = Get.find<DataController>();
 
   var search = Get.find<CacheController>(tag: "/search/user");
   var delete = Get.put(CacheController(), tag: "/delete");
@@ -53,9 +53,9 @@ class _UserDetailPageState extends State<UserDetailPage>
             return Column(
               children: [
                 SwipeableList(
-                  itemCount: controller.regularSchedules.length,
+                  itemCount: _data.regularSchedules.length,
                   itemBuilder: (context, index) {
-                    var regular = controller.regularSchedules[index];
+                    var regular = _data.regularSchedules[index];
 
                     return mySwipeableCard(
                       children: [
@@ -154,8 +154,8 @@ class _UserDetailPageState extends State<UserDetailPage>
                   child: TabBarView(
                     controller: tabController,
                     children: [
-                      HistoryReserved(controller.lastMonthReservations),
-                      HistoryReserved(controller.thisMonthReservations),
+                      HistoryReserved(_data.lastMonthReservations),
+                      HistoryReserved(_data.thisMonthReservations),
                       _changedList(),
                       _paidList(),
                     ],
@@ -172,7 +172,7 @@ class _UserDetailPageState extends State<UserDetailPage>
   Widget _changedList() {
     return GetBuilder<DataController>(
       builder: (controller) {
-        return controller.changes.isEmpty
+        return _data.changes.isEmpty
             ? DefaultTextStyle(
                 style: TextStyle(color: Colors.red, fontSize: 20.r),
                 textAlign: TextAlign.center,
@@ -184,11 +184,11 @@ class _UserDetailPageState extends State<UserDetailPage>
                 ),
               )
             : ListView.builder(
-                itemCount: controller.changes.length,
+                itemCount: _data.changes.length,
                 itemBuilder: (context, index) {
                   return myNormalCard(
                     children: [
-                      Text(controller.changes[index].toString()),
+                      Text(_data.changes[index].toString()),
                     ],
                   );
                 },
@@ -200,7 +200,7 @@ class _UserDetailPageState extends State<UserDetailPage>
   Widget _paidList() {
     return GetBuilder<DataController>(
       builder: (controller) {
-        return controller.myLedgers.isEmpty
+        return _data.myLedgers.isEmpty
             ? DefaultTextStyle(
                 style: TextStyle(color: Colors.red, fontSize: 20.r),
                 textAlign: TextAlign.center,
@@ -212,9 +212,9 @@ class _UserDetailPageState extends State<UserDetailPage>
                 ),
               )
             : ListView.builder(
-                itemCount: controller.myLedgers.length,
+                itemCount: _data.myLedgers.length,
                 itemBuilder: (context, index) {
-                  var ledger = controller.myLedgers[index];
+                  var ledger = _data.myLedgers[index];
 
                   return mySlidableCard(
                     slideActions: [
@@ -231,7 +231,7 @@ class _UserDetailPageState extends State<UserDetailPage>
                             try {
                               await _client.deleteLedger(ledger.id);
 
-                              await getUsersData(
+                              await _data.getUsersData(
                                 branchName: search.branchName,
                                 userID: textEdit(search.edit1),
                                 isPaid: search.check[0],
@@ -239,7 +239,7 @@ class _UserDetailPageState extends State<UserDetailPage>
                                 status: search.check[1],
                                 termID: search.termID,
                               );
-                              await getUserDetailData(search.userDetail!);
+                              await _data.getUserDetailData(search.userDetail!);
 
                               Get.back();
 
@@ -312,7 +312,7 @@ class _UserDetailPageState extends State<UserDetailPage>
             try {
               await _client.deleteRegularSchedule(regular.id);
 
-              await getUsersData(
+              await _data.getUsersData(
                 branchName: search.branchName,
                 userID: textEdit(search.edit1),
                 isPaid: search.check[0],
@@ -320,7 +320,7 @@ class _UserDetailPageState extends State<UserDetailPage>
                 status: search.check[1],
                 termID: search.termID,
               );
-              await getUserDetailData(search.userDetail!);
+              await _data.getUserDetailData(search.userDetail!);
               Get.until(ModalRoute.withName("/user/detail"));
               await showMySnackbar(message: "정기 스케줄을 삭제했습니다.");
             } catch (e) {
@@ -364,7 +364,7 @@ class _UserDetailPageState extends State<UserDetailPage>
                   endDate: delete.dateTime[0]!,
                 );
 
-                await getUsersData(
+                await _data.getUsersData(
                   branchName: search.branchName,
                   userID: textEdit(search.edit1),
                   isPaid: search.check[0],
@@ -372,7 +372,7 @@ class _UserDetailPageState extends State<UserDetailPage>
                   status: search.check[1],
                   termID: search.termID,
                 );
-                await getUserDetailData(search.userDetail!);
+                await _data.getUserDetailData(search.userDetail!);
                 Get.until(ModalRoute.withName("/user/detail"));
                 await showMySnackbar(
                   message: "정기 스케줄을 종료하고 이후 모든 수업을 취소했습니다.",
@@ -441,7 +441,7 @@ class _UserDetailPageState extends State<UserDetailPage>
             termID: expend.termID!,
             branchName: expend.branchName!,
           );
-          await getUsersData(
+          await _data.getUsersData(
             branchName: search.branchName,
             userID: textEdit(search.edit1),
             isPaid: search.check[0],
@@ -449,7 +449,7 @@ class _UserDetailPageState extends State<UserDetailPage>
             status: search.check[1],
             termID: search.termID,
           );
-          await getUserDetailData(search.userDetail!);
+          await _data.getUserDetailData(search.userDetail!);
 
           Get.back();
 
@@ -555,7 +555,7 @@ class _UserDetailPageState extends State<UserDetailPage>
             color: color,
           );
 
-          await getUsersData(
+          await _data.getUsersData(
             branchName: search.branchName,
             userID: textEdit(search.edit1),
             isPaid: search.check[0],
@@ -563,7 +563,7 @@ class _UserDetailPageState extends State<UserDetailPage>
             status: search.check[1],
             termID: search.termID,
           );
-          await getUserDetailData(search.userDetail!);
+          await _data.getUserDetailData(search.userDetail!);
 
           Get.back();
 
@@ -592,7 +592,7 @@ class _UserDetailPageState extends State<UserDetailPage>
             userPassword: textEdit(reset.edit1)!,
           );
 
-          await getUsersData(
+          await _data.getUsersData(
             branchName: search.branchName,
             userID: textEdit(search.edit1),
             isPaid: search.check[0],
@@ -600,7 +600,7 @@ class _UserDetailPageState extends State<UserDetailPage>
             status: search.check[1],
             termID: search.termID,
           );
-          await getUserDetailData(search.userDetail!);
+          await _data.getUserDetailData(search.userDetail!);
 
           Get.back();
 
