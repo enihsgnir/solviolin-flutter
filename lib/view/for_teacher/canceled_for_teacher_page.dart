@@ -1,6 +1,6 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:intl/intl.dart';
 import 'package:solviolin_admin/util/constant.dart';
 import 'package:solviolin_admin/util/controller.dart';
 import 'package:solviolin_admin/widget/item_list.dart';
@@ -14,6 +14,8 @@ class CanceledForTeacherPage extends StatefulWidget {
 }
 
 class _CanceledForTeacherPageState extends State<CanceledForTeacherPage> {
+  var _data = Get.find<DataController>();
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -34,43 +36,36 @@ class _CanceledForTeacherPageState extends State<CanceledForTeacherPage> {
   }
 
   Widget _canceledList() {
-    //TODO: without Get.find?
-    return GetBuilder<DataController>(
-      builder: (controller) {
-        return controller.canceledReservations.length == 0
-            ? DefaultTextStyle(
-                style: TextStyle(color: Colors.red, fontSize: 20.r),
-                textAlign: TextAlign.center,
-                child: Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text("취소 내역을 조회할 수 없습니다."),
-                    ],
+    return _data.canceledReservations.isEmpty
+        ? Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Container(
+                  padding: EdgeInsets.all(16.r),
+                  child: Icon(
+                    CupertinoIcons.text_badge_xmark,
+                    size: 48.r,
+                    color: Colors.red,
                   ),
                 ),
-              )
-            : ListView.builder(
-                itemCount: controller.canceledReservations.length,
-                itemBuilder: (context, index) {
-                  var canceled = controller.canceledReservations[index];
-
-                  return myNormalCard(
-                    children: [
-                      Text(
-                          "${canceled.teacherID} / ${canceled.userID} / ${canceled.branchName}"),
-                      Text(DateFormat("yy/MM/dd HH:mm")
-                              .format(canceled.startDate) +
-                          " ~ " +
-                          DateFormat("HH:mm").format(canceled.endDate)),
-                      Text(canceled.toID.length == 0
-                          ? "보강 미예약"
-                          : "보강 ID: " + canceled.toID.toString()),
-                    ],
-                  );
-                },
+                Text(
+                  "계정 정보에 해당하는 취소 내역이 없습니다.",
+                  style: TextStyle(color: Colors.red, fontSize: 22.r),
+                  textAlign: TextAlign.center,
+                ),
+              ],
+            ),
+          )
+        : ListView.builder(
+            itemCount: _data.canceledReservations.length,
+            itemBuilder: (context, index) {
+              return myNormalCard(
+                children: [
+                  Text(_data.canceledReservations[index].toString()),
+                ],
               );
-      },
-    );
+            },
+          );
   }
 }

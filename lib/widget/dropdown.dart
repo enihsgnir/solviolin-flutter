@@ -1,27 +1,23 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:intl/intl.dart';
+import 'package:solviolin_admin/model/control.dart';
+import 'package:solviolin_admin/model/user.dart';
 import 'package:solviolin_admin/util/constant.dart';
 import 'package:solviolin_admin/util/controller.dart';
 import 'package:solviolin_admin/util/format.dart';
 import 'package:solviolin_admin/widget/input.dart';
 
-DataController _data = Get.find<DataController>();
-
 Widget _myDropdown<T>({
   required String title,
   T? value,
   required bool isMandatory,
-  void Function(T?)? onChanged,
+  ValueChanged<T?>? onChanged,
   required List<DropdownMenuItem<T>> items,
 }) {
   return Row(
     children: [
-      Container(
-        width: 110.r,
-        child: label(title, isMandatory),
-      ),
+      label(title, isMandatory),
       Container(
         width: 220.r,
         child: DropdownButtonFormField<T>(
@@ -32,8 +28,9 @@ Widget _myDropdown<T>({
           elevation: 16,
           style: contentStyle,
           onChanged: onChanged,
-          onTap: () =>
-              FocusScope.of(Get.overlayContext!).requestFocus(FocusNode()),
+          onTap: () {
+            FocusScope.of(Get.overlayContext!).requestFocus(FocusNode());
+          },
           items: items,
         ),
       ),
@@ -45,20 +42,21 @@ Widget branchDropdown([
   String? tag,
   bool isMandatory = false,
 ]) {
+  var _data = Get.find<DataController>();
   var _cache = Get.find<CacheController>(tag: tag);
 
-  var items = _data.branches
-      .map<DropdownMenuItem<String>>((e) => DropdownMenuItem(
+  var _items = _data.branches
+      .map((e) => DropdownMenuItem(
             value: e,
             child: Text(e),
           ))
-      .toList();
-  if (!isMandatory) {
-    items.add(DropdownMenuItem(
-      value: null,
-      child: Text("선택"),
-    ));
-  }
+      .toList()
+    ..addIf(
+        !isMandatory,
+        DropdownMenuItem(
+          value: null,
+          child: Text("선택"),
+        ));
 
   return StatefulBuilder(
     builder: (context, setState) {
@@ -69,7 +67,7 @@ Widget branchDropdown([
         onChanged: (value) => setState(() {
           _cache.branchName = value;
         }),
-        items: items,
+        items: _items,
       );
     },
   );
@@ -81,18 +79,18 @@ Widget workDowDropdown([
 ]) {
   var _cache = Get.find<CacheController>(tag: tag);
 
-  var items = [for (int i = 0; i < 7; i++) i]
-      .map<DropdownMenuItem<int>>((e) => DropdownMenuItem(
+  var _items = [0, 1, 2, 3, 4, 5, 6]
+      .map((e) => DropdownMenuItem(
             value: e,
-            child: Text(dowToString(e)),
+            child: Text(e.dowToString),
           ))
-      .toList();
-  if (!isMandatory) {
-    items.add(DropdownMenuItem(
-      value: null,
-      child: Text("선택"),
-    ));
-  }
+      .toList()
+    ..addIf(
+        !isMandatory,
+        DropdownMenuItem(
+          value: null,
+          child: Text("선택"),
+        ));
 
   return StatefulBuilder(
     builder: (context, setState) {
@@ -103,7 +101,7 @@ Widget workDowDropdown([
         onChanged: (value) => setState(() {
           _cache.workDow = value;
         }),
-        items: items,
+        items: _items,
       );
     },
   );
@@ -113,22 +111,21 @@ Widget termDropdown([
   String? tag,
   bool isMandatory = false,
 ]) {
+  var _data = Get.find<DataController>();
   var _cache = Get.find<CacheController>(tag: tag);
 
-  var items = _data.terms
-      .map<DropdownMenuItem<int>>((e) => DropdownMenuItem(
+  var _items = _data.terms
+      .map((e) => DropdownMenuItem(
             value: e.id,
-            child: Text(DateFormat("yy/MM/dd").format(e.termStart) +
-                " ~ " +
-                DateFormat("yy/MM/dd").format(e.termEnd)),
+            child: Text(formatDateRange(e.termStart, e.termEnd)),
           ))
-      .toList();
-  if (!isMandatory) {
-    items.add(DropdownMenuItem(
-      value: null,
-      child: Text("선택"),
-    ));
-  }
+      .toList()
+    ..addIf(
+        !isMandatory,
+        DropdownMenuItem(
+          value: null,
+          child: Text("선택"),
+        ));
 
   return StatefulBuilder(
     builder: (context, setState) {
@@ -139,7 +136,7 @@ Widget termDropdown([
         onChanged: (value) => setState(() {
           _cache.termID = value;
         }),
-        items: items,
+        items: _items,
       );
     },
   );
@@ -151,18 +148,18 @@ Widget durationDropdown([
 ]) {
   var _cache = Get.find<CacheController>(tag: tag);
 
-  var items = [30, 45, 60]
-      .map<DropdownMenuItem<Duration>>((e) => DropdownMenuItem(
+  var _items = [30, 45, 60]
+      .map((e) => DropdownMenuItem(
             value: Duration(minutes: e),
             child: Text("$e분"),
           ))
-      .toList();
-  if (!isMandatory) {
-    items.add(DropdownMenuItem(
-      value: null,
-      child: Text("선택"),
-    ));
-  }
+      .toList()
+    ..addIf(
+        !isMandatory,
+        DropdownMenuItem(
+          value: null,
+          child: Text("선택"),
+        ));
 
   return StatefulBuilder(
     builder: (context, setState) {
@@ -173,7 +170,106 @@ Widget durationDropdown([
         onChanged: (value) => setState(() {
           _cache.duration = value;
         }),
-        items: items,
+        items: _items,
+      );
+    },
+  );
+}
+
+Widget userTypeDropdown([
+  String? tag,
+  bool isMandatory = false,
+]) {
+  var _cache = Get.find<CacheController>(tag: tag);
+
+  var _items = UserType.values
+      .map((e) => DropdownMenuItem(
+            value: e,
+            child: Text(e.name),
+          ))
+      .toList()
+    ..addIf(
+        !isMandatory,
+        DropdownMenuItem(
+          value: null,
+          child: Text("선택"),
+        ));
+
+  return StatefulBuilder(
+    builder: (context, setState) {
+      return _myDropdown<UserType>(
+        title: "구분",
+        value: _cache.userType,
+        isMandatory: isMandatory,
+        onChanged: (value) => setState(() {
+          _cache.userType = value;
+        }),
+        items: _items,
+      );
+    },
+  );
+}
+
+/// This dropdown works with `cancelInCloseDropdown` of the same `tag`.
+Widget controlStatusDropdown([String? tag]) {
+  var _cache = Get.find<CacheController>(tag: tag);
+
+  var _items = ControlStatus.values
+      .map((e) => DropdownMenuItem(
+            value: e,
+            child: Text(e.name),
+          ))
+      .toList();
+
+  return StatefulBuilder(
+    builder: (context, setState) {
+      return _myDropdown<ControlStatus>(
+        title: "오픈/클로즈",
+        value: _cache.controlStatus,
+        isMandatory: true,
+        onChanged: (value) {
+          setState(() {
+            _cache.controlStatus = value;
+            if (value == ControlStatus.open) {
+              _cache.cancelInClose = CancelInClose.none;
+            }
+          });
+          _cache.update();
+        },
+        items: _items,
+      );
+    },
+  );
+}
+
+/// This dropdown works with `controlStatusDropdown` of the same `tag`.
+Widget cancelInCloseDropdown([String? tag]) {
+  var _cache = Get.find<CacheController>(tag: tag);
+
+  var _items = CancelInClose.values
+      .map((e) => DropdownMenuItem(
+            value: e,
+            child: Text(e.name),
+          ))
+      .toList();
+
+  return GetBuilder<CacheController>(
+    tag: tag,
+    builder: (controller) {
+      return StatefulBuilder(
+        builder: (context, setState) {
+          return _myDropdown<CancelInClose>(
+            title: "클로즈 시",
+            value: _cache.cancelInClose,
+            isMandatory: false,
+            onChanged: _cache.controlStatus == ControlStatus.open
+                ? null
+                : (value) => setState(() {
+                      _cache.cancelInClose = value;
+                    }),
+            items: _items,
+          );
+        },
       );
     },
   );

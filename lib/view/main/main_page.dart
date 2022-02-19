@@ -139,7 +139,7 @@ class _MainPageState extends State<MainPage> {
           search.isSearched = true;
           Get.back();
 
-          if (_data.reservations.length == 0) {
+          if (_data.reservations.isEmpty) {
             await showMySnackbar(
               title: "알림",
               message: "검색 조건에 해당하는 목록이 없습니다.",
@@ -166,7 +166,7 @@ class _MainPageState extends State<MainPage> {
       await showMySnackbar(
         title: "알림",
         message: "검색값이 없습니다.",
-      ); //TODO: hasBeenShown
+      );
     }
   }
 }

@@ -18,6 +18,8 @@ class _MenuForTeacherPageState extends State<MenuForTeacherPage> {
   var _client = Get.find<Client>();
   var _data = Get.find<DataController>();
 
+  var control = Get.put(CacheController(), tag: "/search/control");
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -29,14 +31,11 @@ class _MenuForTeacherPageState extends State<MenuForTeacherPage> {
               menu("메인", () {
                 showLoading(() async {
                   try {
-                    await getReservationDataForTeacher(
-                      displayDate: _data.displayDate,
-                      teacherID: _data.profile.userID,
-                    );
+                    await getReservationForTeacherData();
 
                     Get.toNamed("/main-teacher");
 
-                    if (_data.reservations.length == 0) {
+                    if (_data.reservations.isEmpty) {
                       await showMySnackbar(
                         title: "알림",
                         message: "계정 정보에 해당하는 목록이 없습니다.",
@@ -50,19 +49,20 @@ class _MenuForTeacherPageState extends State<MenuForTeacherPage> {
               menu("오픈/클로즈", () {
                 showLoading(() async {
                   try {
-                    await getControlsDataForTeacher(
-                      teacherID: _data.profile.userID,
+                    if (!control.isSearched) {
+                      var today = DateTime.now();
+                      control.date[0] =
+                          DateTime(today.year, today.month, today.day - 2);
+                      control.date[1] =
+                          DateTime(today.year, today.month, today.day + 7);
+                    }
+
+                    await getControlsForTeacherData(
+                      controlStart: control.date[0],
+                      controlEnd: control.date[1],
                     );
-                    _data.update();
 
                     Get.toNamed("/control-teacher");
-
-                    if (_data.controls.length == 0) {
-                      await showMySnackbar(
-                        title: "알림",
-                        message: "계정 정보에 해당하는 목록이 없습니다.",
-                      );
-                    }
                   } catch (e) {
                     showError(e);
                   }
@@ -73,16 +73,8 @@ class _MenuForTeacherPageState extends State<MenuForTeacherPage> {
                   try {
                     _data.canceledReservations = await _client
                         .getCanceledReservations(_data.profile.userID);
-                    _data.update();
 
                     Get.toNamed("/canceled-teacher");
-
-                    if (_data.canceledReservations.length == 0) {
-                      await showMySnackbar(
-                        title: "알림",
-                        message: "계정 정보에 해당하는 목록이 없습니다.",
-                      );
-                    }
                   } catch (e) {
                     showError(e);
                   }
@@ -103,23 +95,31 @@ class _MenuForTeacherPageState extends State<MenuForTeacherPage> {
   }
 
   Future _showLogout() {
-    return showMyDialog(
-      contents: [
-        Text("로그아웃 하시겠습니까?"),
+    return showMyModal(
+      context: context,
+      message: "로그아웃 하시겠습니까?",
+      children: ["로그아웃"],
+      isDestructiveAction: [true],
+      onPressed: [
+        () => showLoading(() async {
+              try {
+                try {
+                  _data.reset();
+                  await _client.logout();
+                } catch (_) {
+                  rethrow;
+                } finally {
+                  Get.offAllNamed("/login");
+                }
+              } catch (e) {
+                if (e is NetworkException && e.isTimeout) {
+                  showError(e);
+                }
+              } finally {
+                await showMySnackbar(message: "안전하게 로그아웃 되었습니다.");
+              }
+            }),
       ],
-      onPressed: () => showLoading(() async {
-        try {
-          _data.reset();
-          await _client.logout();
-        } catch (_) {
-        } finally {
-          Get.offAllNamed("/login");
-
-          await showMySnackbar(
-            message: "안전하게 로그아웃 되었습니다.",
-          );
-        }
-      }),
     );
   }
 }

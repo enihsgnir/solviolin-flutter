@@ -1,7 +1,8 @@
-import 'package:flutter/cupertino.dart';
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:intl/intl.dart';
+import 'package:solviolin_admin/model/user.dart';
 import 'package:solviolin_admin/util/constant.dart';
 import 'package:solviolin_admin/util/controller.dart';
 import 'package:solviolin_admin/util/data_source.dart';
@@ -33,6 +34,7 @@ class _UserPageState extends State<UserPage> {
     return GestureDetector(
       onTap: () => FocusScope.of(context).requestFocus(FocusNode()),
       child: Scaffold(
+        resizeToAvoidBottomInset: false,
         appBar: myAppBar("유저 검색"),
         body: SafeArea(
           child: Column(
@@ -70,17 +72,12 @@ class _UserPageState extends State<UserPage> {
 
   Widget _userSearch() {
     return mySearch(
+      controller: search.expandable,
       contents: [
         myTextInput("이름", search.edit1),
         branchDropdown("/search/user"),
         termDropdown("/search/user"),
-        myRadio<UserType>(
-          tag: "/search/user",
-          item: "구분",
-          names: ["수강생", "강사", "관리자"],
-          values: UserType.values,
-          groupValue: UserType.values[0],
-        ),
+        userTypeDropdown("/search/user"),
         Row(
           children: [
             myCheckBox(
@@ -98,7 +95,7 @@ class _UserPageState extends State<UserPage> {
                     branchName: search.branchName,
                     userID: textEdit(search.edit1),
                     isPaid: search.check[0],
-                    userType: UserType.values.indexOf(search.type[UserType]),
+                    userType: search.userType?.index,
                     status: search.check[1],
                     termID: search.termID,
                   );
@@ -127,14 +124,15 @@ class _UserPageState extends State<UserPage> {
                     branchName: search.branchName,
                     userID: textEdit(search.edit1),
                     isPaid: search.check[0],
-                    userType: UserType.values.indexOf(search.type[UserType]),
+                    userType: search.userType?.index,
                     status: search.check[1],
                     termID: search.termID,
                   );
 
                   search.isSearched = true;
+                  search.expandable.expanded = false;
 
-                  if (_data.users.length == 0) {
+                  if (_data.users.isEmpty) {
                     await showMySnackbar(
                       title: "알림",
                       message: "검색 조건에 해당하는 목록이 없습니다.",
@@ -152,23 +150,23 @@ class _UserPageState extends State<UserPage> {
   }
 
   Widget _userList() {
-    Get.find<DataController>();
-
     return GetBuilder<DataController>(
       builder: (controller) {
-        return controller.users.length == 0
+        return controller.users.isEmpty
             ? DefaultTextStyle(
                 style: TextStyle(color: Colors.red, fontSize: 20.r),
                 textAlign: TextAlign.center,
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text("목록은 검색 입력값을 기반으로 저장됩니다."),
-                    Text("저장하기 전 검색을 통해 목록을 확인하세요."),
-                    Text("\n유저 목록 파일(*.xlsx) 저장 경로"),
                     Text(
-                        "Android: 내장 메모리/Android/data/com.solviolin.solviolin_admin/files/"),
-                    Text("iOS: 파일/나의 iPhone(iPad)/솔바이올린(관리자)/"),
+                      "목록은 검색 입력값을 기반으로 저장됩니다." +
+                          "\n저장하기 전 검색을 통해 목록을 확인하세요." +
+                          "\n\n유저 목록 파일(*.xlsx) 저장 경로:" +
+                          (Platform.isIOS
+                              ? "\n파일/나의 iPhone(iPad)/솔바이올린(관리자)/"
+                              : "\n내장 메모리/Android/data/com.solviolin.solviolin_admin/files/"),
+                    )
                   ],
                 ),
               )
@@ -181,11 +179,7 @@ class _UserPageState extends State<UserPage> {
                     child: myNormalCard(
                       padding: EdgeInsets.symmetric(vertical: 8.r),
                       children: [
-                        Text("${user.userID} / ${user.branchName}"),
-                        Text(_parsePhoneNumber(user.userPhone)),
-                        Text("${user.status == 0 ? "미등록" : "등록"}" +
-                            " / 크레딧: ${user.userCredit}"),
-                        Text(_ledgerToString(user.paidAt)),
+                        Text(user.toString()),
                       ],
                     ),
                     onTap: () {
@@ -193,8 +187,9 @@ class _UserPageState extends State<UserPage> {
 
                       showLoading(() async {
                         try {
-                          await getUserDetailData(user);
                           search.userDetail = user;
+                          await getUserDetailData(user);
+
                           Get.toNamed("/user/detail");
                         } catch (e) {
                           showError(e);
@@ -216,31 +211,29 @@ class _UserPageState extends State<UserPage> {
     return showMyDialog(
       title: "유저 신규 등록",
       contents: [
-        myTextInput("아이디", register.edit1, true),
-        myTextInput("비밀번호", register.edit2, true),
-        myTextInput("이름", register.edit3, true),
-        myTextInput("전화번호", register.edit4, true, TextInputType.number),
-        branchDropdown("/register", true),
-        myRadio<UserType>(
-          tag: "/register",
-          item: "구분",
-          names: ["수강생", "강사", "관리자"],
-          values: UserType.values,
-          groupValue: UserType.values[0],
+        myTextInput("아이디", register.edit1, isMandatory: true),
+        myTextInput("비밀번호", register.edit2, isMandatory: true),
+        myTextInput("이름", register.edit3, isMandatory: true),
+        myTextInput(
+          "전화번호",
+          register.edit4,
+          isMandatory: true,
+          keyboardType: TextInputType.number,
+          hintText: "01012345678",
         ),
+        branchDropdown("/register", true),
+        userTypeDropdown("/register", true),
       ],
       onPressed: () {
-        FocusScope.of(context).requestFocus(FocusNode());
-
         showMyDialog(
           title: "입력하신 정보가 맞습니까?",
           contents: [
-            Text("아이디: " + register.edit1.text),
-            Text("비밀번호: " + register.edit2.text),
-            Text("이름: " + register.edit3.text),
-            Text("전화번호: " + register.edit4.text),
-            Text("구분: " + register.type[UserType].toString()),
-            Text("지점: " + (register.branchName ?? "")),
+            Text("아이디: ${register.edit1.text}" +
+                "\n비밀번호: ${register.edit2.text}" +
+                "\n이름: ${register.edit3.text}" +
+                "\n전화번호: ${formatPhone(register.edit4.text)}" +
+                "\n지점: ${register.branchName!}" +
+                "\n구분: ${register.userType?.name}"),
             Text(
               "\n아이디는 등록 후 변경할 수 없습니다.",
               style: TextStyle(color: Colors.red, fontSize: 16.r),
@@ -248,12 +241,21 @@ class _UserPageState extends State<UserPage> {
           ],
           onPressed: () => showLoading(() async {
             try {
+              var phone = textEdit(register.edit4);
+              if (phone != null) {
+                if (!checkPhone(phone)) {
+                  throw "올바르지 않은 전화번호 형식입니다.";
+                } else {
+                  phone = trimPhone(phone);
+                }
+              }
+
               await _client.registerUser(
                 userID: textEdit(register.edit1)!,
                 userPassword: textEdit(register.edit2)!,
                 userName: textEdit(register.edit3)!,
-                userPhone: textEdit(register.edit4)!,
-                userType: UserType.values.indexOf(register.type[UserType]),
+                userPhone: phone!,
+                userType: register.userType!.index,
                 userBranch: register.branchName!,
               );
 
@@ -262,17 +264,13 @@ class _UserPageState extends State<UserPage> {
                   branchName: search.branchName,
                   userID: textEdit(search.edit1),
                   isPaid: search.check[0],
-                  userType: UserType.values.indexOf(search.type[UserType]),
+                  userType: search.userType?.index,
                   status: search.check[1],
+                  termID: search.termID,
                 );
               }
-
-              Get.back();
-              Get.back();
-
-              await showMySnackbar(
-                message: "유저 신규 등록에 성공했습니다.",
-              );
+              Get.until(ModalRoute.withName("/user"));
+              await showMySnackbar(message: "유저 신규 등록에 성공했습니다.");
             } catch (e) {
               showError(e);
             }
@@ -287,49 +285,36 @@ class _UserPageState extends State<UserPage> {
   Future _showMenu() {
     FocusScope.of(context).requestFocus(FocusNode());
 
-    return showCupertinoModalPopup(
+    return showMyModal(
       context: context,
-      builder: (context) {
-        return CupertinoActionSheet(
-          actions: [
-            CupertinoActionSheetAction(
-              onPressed: _showInitializeCredit,
-              child: Text("크레딧 초기화", style: TextStyle(fontSize: 24.r)),
-            ),
-          ],
-          cancelButton: CupertinoActionSheetAction(
-            onPressed: Get.back,
-            isDefaultAction: true,
-            child: Text("닫기", style: TextStyle(fontSize: 24.r)),
-          ),
-        );
-      },
+      message: "...", // TODO: better message
+      children: ["크레딧 초기화"],
+      isDestructiveAction: [true],
+      onPressed: [_showInitializeCredit],
     );
   }
 
   Future _showInitializeCredit() {
     return showMyDialog(
       contents: [
-        Text("전 지점의 등록된 모든 수강생의"),
-        Text("크레딧을 초기화 하시겠습니까?"),
+        Text("전 지점 등록 수강생의 크레딧을\n모두 초기화 하시겠습니까?"),
       ],
       onPressed: () {
         showMyDialog(
+          title: "경고",
           contents: [
-            Text("\n\n크레딧 초기화를 진행합니다."),
-            Text("\n*되돌릴 수 없습니다.*\n\n", style: TextStyle(color: Colors.red)),
+            Text("크레딧 초기화를 진행합니다."),
+            Text(
+              "\n*되돌릴 수 없습니다.*",
+              style: TextStyle(color: Colors.red),
+            ),
           ],
           onPressed: () => showLoading(() async {
             try {
               await _client.initializeCredit();
 
-              Get.back();
-              Get.back();
-              Get.back();
-
-              await showMySnackbar(
-                message: "모든 수강생의 크레딧을 초기화 했습니다.",
-              );
+              Get.until(ModalRoute.withName("/user"));
+              await showMySnackbar(message: "모든 수강생의 크레딧을 초기화 했습니다.");
             } catch (e) {
               showError(e);
             }
@@ -339,28 +324,3 @@ class _UserPageState extends State<UserPage> {
     );
   }
 }
-
-String _parsePhoneNumber(String phone) {
-  if (phone.length == 11) {
-    return phone.replaceAllMapped(
-      RegExp(r"(\d{3})(\d{4})(\d+)"),
-      (match) => "${match[1]}-${match[2]}-${match[3]}",
-    );
-  } else if (phone.length == 10) {
-    return phone.replaceAllMapped(
-      RegExp(r"(\d{3})(\d{3})(\d+)"),
-      (match) => "${match[1]}-${match[2]}-${match[3]}",
-    );
-  } else if (phone.length > 3) {
-    return phone.replaceAllMapped(
-      RegExp(r"(\d{3})(\d+)"),
-      (match) => "${match[1]}-${match[2]}",
-    );
-  } else {
-    return phone;
-  }
-}
-
-String _ledgerToString(List<DateTime> paidAt) => paidAt.length == 0
-    ? "이번 학기 결제 미완료"
-    : "결제일: " + DateFormat("yy/MM/dd HH:mm").format(paidAt[0]);

@@ -55,6 +55,7 @@ class _TeacherPageState extends State<TeacherPage> {
 
   Widget _teacherSearch() {
     return mySearch(
+      controller: search.expandable,
       padding: EdgeInsets.symmetric(vertical: 16.r),
       contents: [
         myTextInput("강사", search.edit1),
@@ -71,8 +72,9 @@ class _TeacherPageState extends State<TeacherPage> {
                   );
 
                   search.isSearched = true;
+                  search.expandable.expanded = false;
 
-                  if (_data.teachers.length == 0) {
+                  if (_data.teachers.isEmpty) {
                     await showMySnackbar(
                       title: "알림",
                       message: "검색 조건에 해당하는 목록이 없습니다.",
@@ -132,12 +134,8 @@ class _TeacherPageState extends State<TeacherPage> {
                 ),
               ],
               children: [
-                Text("ID: ${teacher.id}"),
-                Text("${teacher.teacherID} / ${teacher.branchName}"),
-                Text("${dowToString(teacher.workDow)}" +
-                    " / ${timeToString(teacher.startTime)}" +
-                    " ~ ${timeToString(teacher.endTime)}"),
-              ], //TODO: toString()
+                Text(teacher.toString()),
+              ],
             );
           },
         );
@@ -153,7 +151,7 @@ class _TeacherPageState extends State<TeacherPage> {
     return showMyDialog(
       title: "강사 스케줄 등록",
       contents: [
-        myTextInput("강사", register.edit1, true),
+        myTextInput("강사", register.edit1, isMandatory: true),
         branchDropdown("/register", true),
         workDowDropdown("/register", true),
         pickTime(
@@ -190,9 +188,7 @@ class _TeacherPageState extends State<TeacherPage> {
 
           Get.back();
 
-          await showMySnackbar(
-            message: "신규 강사 스케줄 등록에 성공했습니다.",
-          );
+          await showMySnackbar(message: "신규 강사 스케줄 등록에 성공했습니다.");
         } catch (e) {
           showError(e);
         }

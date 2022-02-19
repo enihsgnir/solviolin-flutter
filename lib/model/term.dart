@@ -14,8 +14,16 @@ class Term {
   factory Term.fromJson(Map<String, dynamic> json) {
     return Term(
       id: json["id"],
-      termStart: parseDateOnly(json["termStart"]),
-      termEnd: parseDateOnly(json["termEnd"]),
+      termStart: parseDateTime(json["termStart"]),
+      termEnd: parseDateTime(json["termEnd"]),
     );
   }
+
+  @override
+  String toString() =>
+      "시작: " +
+      formatDate(termStart) +
+      "\n종료: " +
+      formatDate(termEnd) +
+      "\nID: $id";
 }

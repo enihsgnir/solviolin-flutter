@@ -23,8 +23,7 @@ Widget myDivider() {
   );
 }
 
-Widget menu(String name, void Function() onPressed,
-    [bool isDestructive = false]) {
+Widget menu(String name, VoidCallback onPressed, [bool isDestructive = false]) {
   return ElevatedButton(
     onPressed: onPressed,
     style: ElevatedButton.styleFrom(

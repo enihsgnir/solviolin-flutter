@@ -1,7 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:intl/intl.dart';
 import 'package:solviolin_admin/util/constant.dart';
 import 'package:solviolin_admin/util/controller.dart';
 import 'package:solviolin_admin/util/data_source.dart';
@@ -33,6 +32,7 @@ class _LedgerPageState extends State<LedgerPage> {
     return GestureDetector(
       onTap: () => FocusScope.of(context).requestFocus(FocusNode()),
       child: Scaffold(
+        resizeToAvoidBottomInset: false,
         appBar: myAppBar("매출"),
         body: SafeArea(
           child: Column(
@@ -55,6 +55,7 @@ class _LedgerPageState extends State<LedgerPage> {
 
   Widget _ledgerSearch() {
     return mySearch(
+      controller: search.expandable,
       contents: [
         myTextInput("수강생", search.edit1),
         Row(
@@ -72,7 +73,7 @@ class _LedgerPageState extends State<LedgerPage> {
                   _showTotal();
                 } catch (e) {
                   e is CastError
-                      ? showError("지점/학기는 필수 입력 항목입니다.")
+                      ? showError("합계 조회 시 지점/학기는 필수 입력 항목입니다.")
                       : showError(e);
                 }
               }),
@@ -94,8 +95,9 @@ class _LedgerPageState extends State<LedgerPage> {
                   );
 
                   search.isSearched = true;
+                  search.expandable.expanded = false;
 
-                  if (_data.ledgers.length == 0) {
+                  if (_data.ledgers.isEmpty) {
                     await showMySnackbar(
                       title: "알림",
                       message: "검색 조건에 해당하는 목록이 없습니다.",
@@ -108,7 +110,7 @@ class _LedgerPageState extends State<LedgerPage> {
             ),
           ],
         ),
-        myTextInput("금액", search.edit2, false, TextInputType.number),
+        myTextInput("금액", search.edit2, keyboardType: TextInputType.number),
       ],
     );
   }
@@ -126,19 +128,20 @@ class _LedgerPageState extends State<LedgerPage> {
   Widget _ledgerList() {
     return GetBuilder<DataController>(
       builder: (controller) {
-        return controller.ledgers.length == 0
+        return controller.ledgers.isEmpty
             ? DefaultTextStyle(
                 style: TextStyle(color: Colors.red, fontSize: 20.r),
                 textAlign: TextAlign.center,
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text("합계 조회 시 지점/학기는"),
-                    Text("필수 입력 항목입니다."),
-                    Text("\n검색란에 값을 미리 지정해두면"),
-                    Text("우측 하단의 버튼을 통해 연결되는"),
-                    Text("원비납부 화면에서 자동으로 연동됩니다."),
-                    Text("('금액'은 검색 조건에 해당하지 않습니다.)"),
+                    Text(
+                      "검색란에 값을 미리 지정해두면 우측 하단의" +
+                          "\n버튼을 통해 연결되는 원비납부 화면에서" +
+                          "\n자동으로 연동됩니다." +
+                          "\n\n합계 조회 시 지점/학기는 필수 입력 항목입니다." +
+                          "\n\n금액은 매출 목록 검색 조건에 해당하지 않습니다.",
+                    ),
                   ],
                 ),
               )
@@ -146,18 +149,6 @@ class _LedgerPageState extends State<LedgerPage> {
                 itemCount: controller.ledgers.length,
                 itemBuilder: (context, index) {
                   var ledger = controller.ledgers[index];
-
-                  var _termIndex = controller.terms
-                      .indexWhere((element) => ledger.termID == element.id);
-                  var _termString = _termIndex < 0
-                      ? DateFormat("yy/MM/dd")
-                              .format(controller.terms.last.termStart) +
-                          " 이전"
-                      : DateFormat("yy/MM/dd")
-                              .format(controller.terms[_termIndex].termStart) +
-                          " ~ " +
-                          DateFormat("yy/MM/dd")
-                              .format(controller.terms[_termIndex].termEnd);
 
                   return mySlidableCard(
                     slideActions: [
@@ -193,11 +184,7 @@ class _LedgerPageState extends State<LedgerPage> {
                       ),
                     ],
                     children: [
-                      Text("${ledger.userID} / ${ledger.branchName} / " +
-                          NumberFormat("#,###원").format(ledger.amount)),
-                      Text("학기: " + _termString),
-                      Text("결제일자: " +
-                          DateFormat("yy/MM/dd HH:mm").format(ledger.paidAt)),
+                      Text(ledger.toString()),
                     ],
                   );
                 },
@@ -217,10 +204,15 @@ class _LedgerPageState extends State<LedgerPage> {
     return showMyDialog(
       title: "원비납부",
       contents: [
-        myTextInput("수강생", expend.edit1, true),
+        myTextInput("수강생", expend.edit1, isMandatory: true),
         branchDropdown("/expend", true),
         termDropdown("/expend", true),
-        myTextInput("금액", expend.edit2, true, TextInputType.number),
+        myTextInput(
+          "금액",
+          expend.edit2,
+          isMandatory: true,
+          keyboardType: TextInputType.number,
+        ),
       ],
       onPressed: () => showLoading(() async {
         try {
@@ -239,9 +231,7 @@ class _LedgerPageState extends State<LedgerPage> {
 
           Get.back();
 
-          await showMySnackbar(
-            message: "원비 납부 내역을 생성했습니다.",
-          );
+          await showMySnackbar(message: "원비 납부 내역을 생성했습니다.");
         } catch (e) {
           showError(e);
         }

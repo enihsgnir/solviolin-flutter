@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:intl/intl.dart';
 import 'package:solviolin_admin/util/controller.dart';
 import 'package:solviolin_admin/util/network.dart';
 import 'package:solviolin_admin/widget/dialog.dart';
@@ -49,6 +48,7 @@ class _CheckInHistoryPageState extends State<CheckInHistoryPage> {
     }
 
     return mySearch(
+      controller: search.expandable,
       contents: [
         branchDropdown("/search/check-in", true),
         pickDate(
@@ -78,8 +78,9 @@ class _CheckInHistoryPageState extends State<CheckInHistoryPage> {
                   _data.update();
 
                   search.isSearched = true;
+                  search.expandable.expanded = false;
 
-                  if (_data.checkInHistories.length == 0) {
+                  if (_data.checkInHistories.isEmpty) {
                     await showMySnackbar(
                       title: "알림",
                       message: "검색 조건에 해당하는 목록이 없습니다.",
@@ -102,14 +103,9 @@ class _CheckInHistoryPageState extends State<CheckInHistoryPage> {
         return ListView.builder(
           itemCount: controller.checkInHistories.length,
           itemBuilder: (context, index) {
-            var checkIn = controller.checkInHistories[index];
-
             return myNormalCard(
               children: [
-                Text("번호: ${checkIn.id}"),
-                Text(checkIn.userID + " / " + checkIn.branchName),
-                Text("체크인 시각: " +
-                    DateFormat("yy/MM/dd HH:mm").format(checkIn.createdAt)),
+                Text(controller.checkInHistories[index].toString()),
               ],
             );
           },

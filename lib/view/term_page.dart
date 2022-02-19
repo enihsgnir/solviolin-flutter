@@ -1,9 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:intl/intl.dart';
 import 'package:solviolin_admin/util/constant.dart';
 import 'package:solviolin_admin/util/controller.dart';
+import 'package:solviolin_admin/util/data_source.dart';
 import 'package:solviolin_admin/util/format.dart';
 import 'package:solviolin_admin/util/network.dart';
 import 'package:solviolin_admin/widget/dialog.dart';
@@ -37,11 +37,9 @@ class _TermPageState extends State<TermPage> {
           "학기",
           actions: [
             IconButton(
-              onPressed: () async {
-                _data.currentTerm = await _client.getCurrentTerm();
-
-                _data.terms = await _client.getTerms(10);
-              },
+              onPressed: () => showLoading(() async {
+                await setTerms();
+              }),
               icon: Icon(Icons.refresh_outlined, size: 28.r),
             ),
           ],
@@ -115,7 +113,7 @@ class _TermPageState extends State<TermPage> {
                               termEnd: update.date[1]!,
                             );
 
-                            _data.terms = await _client.getTerms(10);
+                            await setTerms();
                             _data.update();
 
                             Get.back();
@@ -131,9 +129,7 @@ class _TermPageState extends State<TermPage> {
                     }),
               ],
               children: [
-                Text("시작: " + DateFormat("yy/MM/dd").format(term.termStart)),
-                Text("종료: " + DateFormat("yy/MM/dd").format(term.termEnd)),
-                Text("ID: ${term.id}"),
+                Text(term.toString()),
               ],
             );
           },
@@ -171,7 +167,7 @@ class _TermPageState extends State<TermPage> {
             termEnd: register.date[1]!,
           );
 
-          _data.terms = await _client.getTerms(10);
+          await setTerms();
           _data.update();
 
           Get.back();
@@ -190,27 +186,12 @@ class _TermPageState extends State<TermPage> {
   Future _showMenu() {
     FocusScope.of(context).requestFocus(FocusNode());
 
-    return showCupertinoModalPopup(
+    return showMyModal(
       context: context,
-      builder: (context) {
-        return CupertinoActionSheet(
-          actions: [
-            CupertinoActionSheetAction(
-              onPressed: _showExtendOfBranch,
-              child: Text("정기 연장 (지점)", style: TextStyle(fontSize: 24.r)),
-            ),
-            CupertinoActionSheetAction(
-              onPressed: _showExtendOfUser,
-              child: Text("정기 연장 (수강생)", style: TextStyle(fontSize: 24.r)),
-            ),
-          ],
-          cancelButton: CupertinoActionSheetAction(
-            onPressed: Get.back,
-            isDefaultAction: true,
-            child: Text("닫기", style: TextStyle(fontSize: 24.r)),
-          ),
-        );
-      },
+      message: "수업을 다음 학기로 연장하시겠습니까?",
+      children: ["정기 연장 (지점)", "정기 연장 (수강생)"],
+      isDestructiveAction: [false, false],
+      onPressed: [_showExtendOfBranch, _showExtendOfUser],
     );
   }
 
@@ -246,7 +227,7 @@ class _TermPageState extends State<TermPage> {
     return showMyDialog(
       title: "정기 연장 (수강생)",
       contents: [
-        myTextInput("이름", extend.edit1, true),
+        myTextInput("이름", extend.edit1, isMandatory: true),
       ],
       onPressed: () => showLoading(() async {
         try {

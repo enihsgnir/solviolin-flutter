@@ -1,5 +1,7 @@
 class Profile {
   String userID;
+
+  /// `0`: Student, `1`: Teacher, `2`: Admin
   int userType;
   String branchName;
 

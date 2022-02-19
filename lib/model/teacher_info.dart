@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:solviolin_admin/util/format.dart';
 
 class TeacherInfo {
   String teacherID;
+
+  /// `RegExp(r"^#[0-9A-Fa-f]{6}$")`
   Color? color;
 
   TeacherInfo({
@@ -12,12 +15,7 @@ class TeacherInfo {
   factory TeacherInfo.fromJson(Map<String, dynamic> json) {
     return TeacherInfo(
       teacherID: json["teacherID"].trim(),
-      color: json["teacher"]["color"] == null
-          ? null
-          : Color(int.parse(
-              "FF" + json["teacher"]["color"].substring(1),
-              radix: 16,
-            )),
+      color: parseColor(json["teacher"]["color"]),
     );
   }
 }

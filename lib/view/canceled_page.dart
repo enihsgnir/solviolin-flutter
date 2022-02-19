@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:intl/intl.dart';
 import 'package:solviolin_admin/util/constant.dart';
 import 'package:solviolin_admin/util/controller.dart';
 import 'package:solviolin_admin/util/format.dart';
@@ -47,11 +46,12 @@ class _CanceledPageState extends State<CanceledPage> {
 
   Widget _canceledSearch() {
     return mySearch(
+      controller: search.expandable,
       padding: EdgeInsets.symmetric(vertical: 16.r),
       contents: [
         Row(
           children: [
-            myTextInput("강사", search.edit1, true),
+            myTextInput("강사", search.edit1, isMandatory: true),
             myActionButton(
               context: context,
               onPressed: () => showLoading(() async {
@@ -61,8 +61,9 @@ class _CanceledPageState extends State<CanceledPage> {
                   _data.update();
 
                   search.isSearched = true;
+                  search.expandable.expanded = false;
 
-                  if (_data.canceledReservations.length == 0) {
+                  if (_data.canceledReservations.isEmpty) {
                     await showMySnackbar(
                       title: "알림",
                       message: "검색 조건에 해당하는 목록이 없습니다.",
@@ -85,18 +86,9 @@ class _CanceledPageState extends State<CanceledPage> {
         return ListView.builder(
           itemCount: controller.canceledReservations.length,
           itemBuilder: (context, index) {
-            var canceled = controller.canceledReservations[index];
-
             return myNormalCard(
               children: [
-                Text(
-                    "${canceled.teacherID} / ${canceled.userID} / ${canceled.branchName}"),
-                Text(DateFormat("yy/MM/dd HH:mm").format(canceled.startDate) +
-                    " ~ " +
-                    DateFormat("HH:mm").format(canceled.endDate)),
-                Text(canceled.toID.length == 0
-                    ? "보강 미예약"
-                    : "보강 ID: " + canceled.toID.toString()),
+                Text(controller.canceledReservations[index].toString()),
               ],
             );
           },

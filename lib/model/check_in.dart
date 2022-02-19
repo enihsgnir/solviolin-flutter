@@ -18,7 +18,14 @@ class CheckIn {
       id: json["id"],
       userID: json["userID"].trim(),
       branchName: json["branchName"],
-      createdAt: parseDateTime(json["createdAt"]).add(const Duration(hours: 9)),
+      createdAt: DateTime.parse(json["createdAt"]).toLocal(),
     );
   }
+
+  @override
+  String toString() =>
+      "번호: $id" +
+      "\n$userID / $branchName" +
+      "\n체크인 시각: " +
+      formatDateTime(createdAt);
 }

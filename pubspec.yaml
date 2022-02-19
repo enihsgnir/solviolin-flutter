@@ -31,10 +31,11 @@ dependencies:
   flutter_secure_storage: ^5.0.2
   dio: ^4.0.4
   pretty_dio_logger: ^1.1.1
+  expandable: ^5.0.1
   flutter_slidable: ^0.6.0
-  syncfusion_flutter_calendar: ^19.4.48
-  excel: ^2.0.0-null-safety-3
-  path_provider: ^2.0.8
+  syncfusion_flutter_calendar: ^19.4.52
+  syncfusion_flutter_xlsio: ^19.4.52-beta
+  path_provider: ^2.0.9
   qr_code_scanner: ^0.6.1
 
   # The following adds the Cupertino Icons font to your application.

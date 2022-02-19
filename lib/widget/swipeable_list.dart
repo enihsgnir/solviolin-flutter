@@ -3,7 +3,7 @@ import 'package:solviolin_admin/util/constant.dart';
 
 class SwipeableList extends StatefulWidget {
   final int itemCount;
-  final Widget Function(BuildContext, int) itemBuilder;
+  final IndexedWidgetBuilder itemBuilder;
 
   const SwipeableList({
     Key? key,

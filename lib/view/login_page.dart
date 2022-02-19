@@ -1,8 +1,10 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:solviolin_admin/util/constant.dart';
 import 'package:solviolin_admin/util/controller.dart';
 import 'package:solviolin_admin/util/data_source.dart';
+import 'package:solviolin_admin/util/format.dart';
 import 'package:solviolin_admin/util/network.dart';
 import 'package:solviolin_admin/widget/dialog.dart';
 
@@ -17,13 +19,14 @@ class _LoginPageState extends State<LoginPage> {
   var _client = Get.find<Client>();
   var _data = Get.find<DataController>();
 
-  var id = TextEditingController();
-  var pw = TextEditingController();
+  var _id = TextEditingController();
+  var _pw = TextEditingController();
+  var _autoLogin = true;
 
   @override
   void dispose() {
-    id.dispose();
-    pw.dispose();
+    _id.dispose();
+    _pw.dispose();
     super.dispose();
   }
 
@@ -57,7 +60,7 @@ class _LoginPageState extends State<LoginPage> {
               Padding(
                 padding: EdgeInsets.fromLTRB(8.r, 30.r, 8.r, 8.r),
                 child: TextField(
-                  controller: id,
+                  controller: _id,
                   decoration: InputDecoration(
                     labelText: "아이디",
                     labelStyle: const TextStyle(color: Colors.white),
@@ -68,7 +71,7 @@ class _LoginPageState extends State<LoginPage> {
                       borderSide: const BorderSide(color: Colors.white),
                     ),
                     suffixIcon: IconButton(
-                      onPressed: id.clear,
+                      onPressed: _id.clear,
                       icon: Icon(Icons.clear, size: 20.r),
                       splashRadius: 20.r,
                     ),
@@ -79,7 +82,7 @@ class _LoginPageState extends State<LoginPage> {
               Padding(
                 padding: EdgeInsets.all(8.r),
                 child: TextField(
-                  controller: pw,
+                  controller: _pw,
                   decoration: InputDecoration(
                     labelText: "비밀번호",
                     labelStyle: const TextStyle(color: Colors.white),
@@ -90,7 +93,7 @@ class _LoginPageState extends State<LoginPage> {
                       borderSide: const BorderSide(color: Colors.white),
                     ),
                     suffixIcon: IconButton(
-                      onPressed: pw.clear,
+                      onPressed: _pw.clear,
                       icon: Icon(Icons.clear, size: 20.r),
                       splashRadius: 20.r,
                     ),
@@ -98,6 +101,26 @@ class _LoginPageState extends State<LoginPage> {
                   style: contentStyle,
                   obscureText: true,
                 ),
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  Text(
+                    "자동로그인",
+                    style: TextStyle(color: Colors.white, fontSize: 20.r),
+                  ),
+                  Container(
+                    padding: EdgeInsets.symmetric(horizontal: 16.r),
+                    child: CupertinoSwitch(
+                      value: _autoLogin,
+                      onChanged: (value) {
+                        setState(() {
+                          _autoLogin = value;
+                        });
+                      },
+                    ),
+                  ),
+                ],
               ),
               Container(
                 width: double.infinity,
@@ -109,10 +132,18 @@ class _LoginPageState extends State<LoginPage> {
 
                     showLoading(() async {
                       try {
-                        await getInitialData(false, id.text, pw.text);
+                        _data.profile = await _client.login(
+                          userID: textEdit(_id, trimText: false)!,
+                          userPassword: textEdit(_pw, trimText: false)!,
+                          autoLogin: _autoLogin,
+                        );
+                        _data.branches = await _client.getBranches();
+                        await setTerms();
+
                         if (_data.profile.userType == 2) {
                           Get.offAllNamed("/menu");
                         } else if (_data.profile.userType == 1) {
+                          await getInitialForTeacherData();
                           Get.offAllNamed("/menu-teacher");
                         }
 
@@ -121,13 +152,8 @@ class _LoginPageState extends State<LoginPage> {
                           message: "환영합니다!",
                         );
                       } catch (e) {
-                        try {
-                          await _client.logout();
-                        } catch (_) {
-                        } finally {
-                          showError(e);
-                          pw.clear();
-                        }
+                        showError(e);
+                        _pw.clear();
                       }
                     });
                   },

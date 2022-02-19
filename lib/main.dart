@@ -55,15 +55,7 @@ class _MyAppState extends State<MyApp> {
 
     return GetMaterialApp(
       builder: (context, child) {
-        if (!_data.isRatioUpdated) {
-          var _ratio = min(MediaQuery.of(context).size.width / 540,
-              MediaQuery.of(context).size.height / 1152);
-          if (_ratio != 0.0) {
-            _data.ratio = _ratio;
-            _data.isRatioUpdated = true;
-            _data.update();
-          }
-        }
+        _data.size = MediaQuery.of(context).size;
 
         return MediaQuery(
           data: MediaQuery.of(context).copyWith(
@@ -87,6 +79,7 @@ class _MyAppState extends State<MyApp> {
       ],
       initialRoute: "/loading",
       getPages: [
+        // TODO: rename views and commit seperately
         GetPage(name: "/loading", page: () => LoadingPage()),
         GetPage(name: "/login", page: () => LoginPage()),
         GetPage(name: "/menu", page: () => MenuPage()),

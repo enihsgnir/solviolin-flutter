@@ -1,9 +1,13 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:intl/intl.dart';
 import 'package:solviolin_admin/util/constant.dart';
 import 'package:solviolin_admin/util/controller.dart';
+import 'package:solviolin_admin/util/data_source.dart';
+import 'package:solviolin_admin/widget/dialog.dart';
 import 'package:solviolin_admin/widget/item_list.dart';
+import 'package:solviolin_admin/widget/picker.dart';
+import 'package:solviolin_admin/widget/search.dart';
 import 'package:solviolin_admin/widget/single.dart';
 
 class ControlForTeacherPage extends StatefulWidget {
@@ -14,15 +18,22 @@ class ControlForTeacherPage extends StatefulWidget {
 }
 
 class _ControlForTeacherPageState extends State<ControlForTeacherPage> {
+  var _data = Get.find<DataController>();
+
+  var search = Get.find<CacheController>(tag: "/search/control");
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () => FocusScope.of(context).requestFocus(FocusNode()),
       child: Scaffold(
+        resizeToAvoidBottomInset: false,
         appBar: myAppBar("오픈/클로즈"),
         body: SafeArea(
           child: Column(
             children: [
+              _controlSearch(),
+              myDivider(),
               Expanded(
                 child: _controlList(),
               ),
@@ -33,39 +44,82 @@ class _ControlForTeacherPageState extends State<ControlForTeacherPage> {
     );
   }
 
-  Widget _controlList() {
-    Get.find<DataController>();
+  Widget _controlSearch() {
+    return mySearch(
+      controller: search.expandable,
+      contents: [
+        pickDate(
+          context: context,
+          item: "부터",
+          tag: "/search/control",
+          index: 0,
+        ),
+        Row(
+          children: [
+            pickDate(
+              context: context,
+              item: "까지",
+              tag: "/search/control",
+              index: 1,
+            ),
+            myActionButton(
+              context: context,
+              onPressed: () => showLoading(() async {
+                try {
+                  await getControlsForTeacherData(
+                    controlStart: search.date[0],
+                    controlEnd: search.date[1],
+                  );
 
+                  search.isSearched = true;
+                  search.expandable.expanded = false;
+
+                  if (_data.controls.isEmpty) {
+                    await showMySnackbar(
+                      title: "알림",
+                      message: "검색 조건에 해당하는 목록이 없습니다.",
+                    );
+                  }
+                } catch (e) {
+                  showError(e);
+                }
+              }),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _controlList() {
     return GetBuilder<DataController>(
       builder: (controller) {
-        return controller.controls.length == 0
-            ? DefaultTextStyle(
-                style: TextStyle(color: Colors.red, fontSize: 20.r),
-                textAlign: TextAlign.center,
-                child: Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text("오픈/클로즈 목록을 조회할 수 없습니다."),
-                    ],
-                  ),
+        return _data.controls.isEmpty
+            ? Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Container(
+                      padding: EdgeInsets.all(16.r),
+                      child: Icon(
+                        CupertinoIcons.text_badge_xmark,
+                        size: 48.r,
+                        color: Colors.red,
+                      ),
+                    ),
+                    Text(
+                      "계정 정보에 해당하는 오픈/클로즈 목록이 없습니다.",
+                      style: TextStyle(color: Colors.red, fontSize: 22.r),
+                    ),
+                  ],
                 ),
               )
             : ListView.builder(
-                itemCount: controller.controls.length,
+                itemCount: _data.controls.length,
                 itemBuilder: (context, index) {
-                  var control = controller.controls[index];
-
                   return myNormalCard(
                     children: [
-                      Text("${control.teacherID} / ${control.branchName}" +
-                          " / ${control.status == 0 ? "오픈" : "클로즈"}"),
-                      Text("시작: " +
-                          DateFormat("yy/MM/dd HH:mm")
-                              .format(control.controlStart)),
-                      Text("종료: " +
-                          DateFormat("yy/MM/dd HH:mm")
-                              .format(control.controlEnd)),
+                      Text(_data.controls[index].toString()),
                     ],
                   );
                 },

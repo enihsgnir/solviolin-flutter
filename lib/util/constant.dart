@@ -2,9 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:solviolin_admin/util/controller.dart';
 
-/// Responsible Font Size
-extension RFS on num {
-  /// 'r'esponsible font size
+extension ResponsibleFontSize on num {
+  /// `r`esponsible font size
   double get r {
     var _data = Get.find<DataController>();
 

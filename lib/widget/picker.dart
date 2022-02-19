@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:intl/intl.dart';
 import 'package:solviolin_admin/util/constant.dart';
 import 'package:solviolin_admin/util/controller.dart';
 import 'package:solviolin_admin/util/format.dart';
@@ -25,10 +24,7 @@ Widget pickDateTime({
     builder: (controller) {
       return Row(
         children: [
-          Container(
-            width: 110.r,
-            child: label(item, isMandatory),
-          ),
+          label(item, isMandatory),
           Container(
             width: 220.r,
             child: InputDecorator(
@@ -46,9 +42,9 @@ Widget pickDateTime({
                 child: Text(
                   controller.dateTime[index] == null
                       ? "선택"
-                      : DateFormat("yy/MM/dd HH:mm")
-                          .format(controller.dateTime[index]!),
+                      : formatDateTime(controller.dateTime[index]!),
                   style: contentStyle,
+                  textAlign: TextAlign.left,
                 ),
                 onTap: () async {
                   FocusScope.of(Get.overlayContext!).requestFocus(FocusNode());
@@ -111,10 +107,7 @@ Widget pickDate({
     builder: (controller) {
       return Row(
         children: [
-          Container(
-            width: 110.r,
-            child: label(item, isMandatory),
-          ),
+          label(item, isMandatory),
           Container(
             width: 220.r,
             child: InputDecorator(
@@ -132,8 +125,9 @@ Widget pickDate({
                 child: Text(
                   controller.date[index] == null
                       ? "선택"
-                      : DateFormat("yy/MM/dd").format(controller.date[index]!),
+                      : formatDate(controller.date[index]!),
                   style: contentStyle,
+                  textAlign: TextAlign.left,
                 ),
                 onTap: () async {
                   FocusScope.of(Get.overlayContext!).requestFocus(FocusNode());
@@ -188,10 +182,7 @@ Widget pickTime({
     builder: (controller) {
       return Row(
         children: [
-          Container(
-            width: 110.r,
-            child: label(item, isMandatory),
-          ),
+          label(item, isMandatory),
           Container(
             width: 220.r,
             child: InputDecorator(
@@ -214,6 +205,7 @@ Widget pickTime({
                           minutes: controller.time[index]!.minute,
                         )),
                   style: contentStyle,
+                  textAlign: TextAlign.left,
                 ),
                 onTap: () async {
                   FocusScope.of(Get.overlayContext!).requestFocus(FocusNode());

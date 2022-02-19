@@ -61,10 +61,14 @@ class _LoadingPageState extends State<LoadingPage> {
   Future<void> _checkProfile() async {
     if (await _client.isLoggedIn()) {
       try {
-        await getInitialData();
+        _data.profile = await _client.getProfile();
+        _data.branches = await _client.getBranches();
+        await setTerms();
+
         if (_data.profile.userType == 2) {
           Get.offAllNamed("/menu");
         } else if (_data.profile.userType == 1) {
+          await getInitialForTeacherData();
           Get.offAllNamed("/menu-teacher");
         }
 
@@ -74,20 +78,17 @@ class _LoadingPageState extends State<LoadingPage> {
         );
       } catch (e) {
         try {
-          await _client.logout();
-        } catch (_) {
-        } finally {
-          Get.offAllNamed("/login");
-          showError(e);
-        }
+          if (!(e is NetworkException && e.isTimeout)) {
+            await _client.logout();
+          }
+        } catch (_) {}
+
+        Get.offAllNamed("/login");
+        showError(e);
       }
     } else {
-      try {
-        await _client.logout();
-      } catch (_) {
-      } finally {
-        Get.offAllNamed("/login");
-      }
+      await _client.logout();
+      Get.offAllNamed("/login");
     }
   }
 }

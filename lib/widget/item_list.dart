@@ -52,7 +52,7 @@ Widget mySlideAction({
   required BuildContext context,
   required IconData icon,
   required String item,
-  required void Function() onTap,
+  required VoidCallback onTap,
   bool borderLeft = false,
   bool borderRight = false,
 }) {

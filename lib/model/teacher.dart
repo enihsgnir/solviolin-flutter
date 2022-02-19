@@ -5,7 +5,7 @@ class Teacher {
   String teacherID;
   String branchName;
 
-  /// 0: SUN
+  /// `0`: SUN
   int workDow;
   Duration startTime;
   Duration endTime;
@@ -25,8 +25,8 @@ class Teacher {
       teacherID: json["teacherID"].trim(),
       branchName: json["branchName"],
       workDow: json["workDow"],
-      startTime: parseTimeOnly(json["startTime"]),
-      endTime: parseTimeOnly(json["endTime"]),
+      startTime: parseTime(json["startTime"]),
+      endTime: parseTime(json["endTime"]),
     );
   }
 
@@ -34,5 +34,18 @@ class Teacher {
   String toString() =>
       "ID: $id" +
       "\n$teacherID / $branchName" +
-      "\n${dowToString(workDow)} / ${timeToString(startTime)} ~ ${timeToString(endTime)}";
+      "\n$workDowToString / ${timeToString(startTime)} ~ ${timeToString(endTime)}";
+
+  String get workDowToString =>
+      {
+        0: "SUN",
+        1: "MON",
+        2: "TUE",
+        3: "WED",
+        4: "THU",
+        5: "FRI",
+        6: "SAT",
+        7: "SUN",
+      }[workDow] ??
+      "Null";
 }

@@ -48,10 +48,7 @@ class _MainForTeacherPageState extends State<MainForTeacherPage> {
             IconButton(
               onPressed: () => showLoading(() async {
                 try {
-                  await getReservationDataForTeacher(
-                    displayDate: _data.displayDate,
-                    teacherID: _data.profile.userID,
-                  );
+                  await getReservationForTeacherData();
 
                   await showMySnackbar(
                     message: "예약 목록을 불러왔습니다.",
@@ -94,12 +91,9 @@ class _MainForTeacherPageState extends State<MainForTeacherPage> {
                   if (!isSameWeek(newDate, _temp)) {
                     showLoading(() async {
                       try {
-                        await getReservationDataForTeacher(
-                          displayDate: _data.displayDate,
-                          teacherID: _data.profile.userID,
-                        );
+                        await getReservationForTeacherData();
 
-                        if (_data.reservations.length == 0) {
+                        if (_data.reservations.isEmpty) {
                           await showMySnackbar(
                             title: "알림",
                             message: "검색 조건에 해당하는 목록이 없습니다.",

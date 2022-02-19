@@ -1,3 +1,5 @@
+import 'package:solviolin_admin/util/format.dart';
+
 class Salary {
   String teacherID;
   num dayTime;
@@ -19,4 +21,14 @@ class Salary {
       income: list[1]["income"],
     );
   }
+
+  @override
+  String toString() =>
+      "$teacherID" +
+      "\n주간근로시간: 30분 * " +
+      formatWorkNumber(dayTime / 30) +
+      "\n야간근로시간: 30분 * " +
+      formatWorkNumber(nightTime / 30) +
+      "\n급여: " +
+      formatCurrency(income);
 }

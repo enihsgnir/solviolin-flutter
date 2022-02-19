@@ -1,3 +1,6 @@
+import 'dart:math';
+
+import 'package:expandable/expandable.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:solviolin_admin/model/canceled.dart';
@@ -14,11 +17,27 @@ import 'package:solviolin_admin/model/teacher_info.dart';
 import 'package:solviolin_admin/model/term.dart';
 import 'package:solviolin_admin/model/user.dart';
 import 'package:solviolin_admin/util/data_source.dart';
+import 'package:solviolin_admin/util/format.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
 
 class DataController extends GetxController {
-  double ratio = 1.0;
-  bool isRatioUpdated = false;
+  double _ratio = 1.0;
+  bool _isRatioUpdated = false;
+
+  static const double _kTestEnvWidth = 540;
+  static const double _kTestEnvHeight = 1152;
+
+  double get ratio => _ratio;
+
+  /// set `_ratio`
+  set size(Size size) {
+    final _r = min(size.width / _kTestEnvWidth, size.height / _kTestEnvHeight);
+    if (!_isRatioUpdated && _r != 0.0) {
+      _ratio = _r;
+      _isRatioUpdated = true;
+      update();
+    }
+  }
 
   late Profile profile;
 
@@ -26,9 +45,7 @@ class DataController extends GetxController {
   List<Term> terms = [];
   List<String> branches = [];
 
-  DateTime displayDate =
-      DateUtils.dateOnly(DateTime.now()).add(DateTime.now().timeZoneOffset);
-  //TODO: set again with timezone
+  DateTime displayDate = DateTime.now().midnight;
 
   List<TeacherInfo> teacherInfos = [];
   List<Reservation> reservations = [];
@@ -47,7 +64,7 @@ class DataController extends GetxController {
   List<Canceled> canceledReservations = [];
   List<Salary> salaries = [];
   List<Ledger> ledgers = [];
-  late String totalLeger;
+  String totalLeger = "";
   List<CheckIn> checkInHistories = [];
 
   void updateDisplayDate(DateTime data) {
@@ -72,13 +89,16 @@ class DataController extends GetxController {
     canceledReservations = [];
     salaries = [];
     ledgers = [];
+    totalLeger = "";
     checkInHistories = [];
   }
 }
 
 class CacheController extends GetxController {
-  var isSearched = false;
-  var hasBeenShown = false;
+  bool isSearched = false;
+  var expandable = ExpandableController(initialExpanded: true);
+
+  bool hasBeenShown = false;
 
   Map<int, DateTime?> dateTime = {};
   Map<int, DateTime?> date = {};
@@ -86,14 +106,17 @@ class CacheController extends GetxController {
 
   Map<int, int?> check = {};
 
-  Map<Type, dynamic> type = {};
-
   User? userDetail;
+  Color? teacherColor;
 
+  // for dropdown
   String? branchName;
   int? workDow;
   int? termID;
   Duration? duration;
+  UserType? userType = UserType.student;
+  ControlStatus? controlStatus = ControlStatus.open;
+  CancelInClose? cancelInClose = CancelInClose.none;
 
   var edit1 = TextEditingController();
   var edit2 = TextEditingController();
@@ -107,12 +130,14 @@ class CacheController extends GetxController {
     date = {};
     time = {};
     check = {};
-    type = {};
 
     branchName = null;
     workDow = null;
     termID = null;
     duration = null;
+    userType = UserType.student;
+    controlStatus = ControlStatus.open;
+    cancelInClose = CancelInClose.none;
 
     edit1.clear();
     edit2.clear();
@@ -128,21 +153,4 @@ class CacheController extends GetxController {
     edit4.dispose();
     super.onClose();
   }
-}
-
-enum UserType {
-  student,
-  teacher,
-  admin,
-}
-
-enum ControlStatus {
-  open,
-  close,
-}
-
-enum CancelInClose {
-  none,
-  cancel,
-  delete,
 }

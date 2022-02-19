@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:intl/intl.dart';
 import 'package:solviolin_admin/util/controller.dart';
 import 'package:solviolin_admin/util/format.dart';
 import 'package:solviolin_admin/util/network.dart';
@@ -47,13 +46,24 @@ class _SalaryPageState extends State<SalaryPage> {
 
   Widget _salarySearch() {
     return mySearch(
+      controller: search.expandable,
       contents: [
         branchDropdown("/search/salary", true),
         termDropdown("/search/salary", true),
-        myTextInput("주간시급", search.edit1, true, TextInputType.number),
+        myTextInput(
+          "주간시급",
+          search.edit1,
+          isMandatory: true,
+          keyboardType: TextInputType.number,
+        ),
         Row(
           children: [
-            myTextInput("야간시급", search.edit2, true, TextInputType.number),
+            myTextInput(
+              "야간시급",
+              search.edit2,
+              isMandatory: true,
+              keyboardType: TextInputType.number,
+            ),
             myActionButton(
               context: context,
               onPressed: () => showLoading(() async {
@@ -67,8 +77,9 @@ class _SalaryPageState extends State<SalaryPage> {
                   _data.update();
 
                   search.isSearched = true;
+                  search.expandable.expanded = false;
 
-                  if (_data.salaries.length == 0) {
+                  if (_data.salaries.isEmpty) {
                     await showMySnackbar(
                       title: "알림",
                       message: "검색 조건에 해당하는 목록이 없습니다.",
@@ -91,16 +102,9 @@ class _SalaryPageState extends State<SalaryPage> {
         return ListView.builder(
           itemCount: controller.salaries.length,
           itemBuilder: (context, index) {
-            var salary = controller.salaries[index];
-
             return myNormalCard(
               children: [
-                Text(salary.teacherID),
-                Text("주간근로시간: 30분 * " +
-                    NumberFormat("#,###.#회").format(salary.dayTime / 30)),
-                Text("야간근로시간: 30분 * " +
-                    NumberFormat("#,###.#회").format(salary.nightTime / 30)),
-                Text("급여: " + NumberFormat("#,###원").format(salary.income)),
+                Text(controller.salaries[index].toString()),
               ],
             );
           },

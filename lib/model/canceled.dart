@@ -30,4 +30,10 @@ class Canceled {
       ),
     );
   }
+
+  @override
+  String toString() =>
+      "$teacherID / $userID / $branchName\n" +
+      formatDateTimeRange(startDate, endDate) +
+      (toID.isEmpty ? "\n보강 미예약" : "\n보강 ID: " + toID.toString());
 }

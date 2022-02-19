@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:excel/excel.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
@@ -15,24 +14,33 @@ import 'package:solviolin_admin/util/controller.dart';
 import 'package:solviolin_admin/util/format.dart';
 import 'package:solviolin_admin/util/network.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
+import 'package:syncfusion_flutter_xlsio/xlsio.dart';
 
 Client _client = Get.find<Client>();
 DataController _data = Get.find<DataController>();
 
-Future<void> getInitialData([
-  bool isLoggedIn = true,
-  String? userID,
-  String? userPassword,
-]) async {
-  isLoggedIn
-      ? _data.profile = await _client.getProfile()
-      : _data.profile = await _client.login(userID!, userPassword!);
+// TODO: data_source -> controller 통합
 
-  _data.currentTerm = await _client.getCurrentTerm();
+Future<void> setTerms() async {
+  final _today = DateTime.now();
+  final _terms = await _client.getTerms(0);
 
+  _data.currentTerm = []
+    // this term
+    ..add(_terms.lastWhere(
+      (element) => element.termEnd.isAfter(_today),
+      orElse: () => _terms.first,
+    ))
+    // last term
+    ..add(_terms.firstWhere((element) => element.termEnd.isBefore(_today)));
   _data.terms = await _client.getTerms(10);
+}
 
-  _data.branches = await _client.getBranches();
+Future<void> getInitialForTeacherData() async {
+  _data.teachers = await _client.getTeachers(
+    teacherID: _data.profile.userID,
+  );
+  _data.branches = _data.teachers.map((e) => e.branchName).toSet().toList();
 
   _data.update();
 }
@@ -43,9 +51,8 @@ Future<void> getReservationData({
   String? userID,
   String? teacherID,
 }) async {
-  final weekday = displayDate.weekday % 7;
-  final first =
-      DateTime(displayDate.year, displayDate.month, displayDate.day - weekday);
+  final first = DateTime(displayDate.year, displayDate.month,
+      displayDate.day - displayDate.weekday % 7);
   final last =
       first.add(const Duration(days: 6, hours: 23, minutes: 59, seconds: 59));
 
@@ -58,37 +65,17 @@ Future<void> getReservationData({
     bookingStatus: [-3, -1, 0, 1, 3],
   );
 
-  // var _teacherInfoSet = LinkedHashSet<TeacherInfo>(
-  //   equals: (a, b) => a.teacherID == b.teacherID && a.color == b.color,
-  //   hashCode: (element) => element.color?.value ?? -1,
-  // );
-  // await Future.forEach<Reservation>(_data.reservations, (element) async {
-  //   _teacherInfoSet.add(TeacherInfo(
-  //     teacherID: element.teacherID,
-  //     color: element.color,
-  //   ));
-  // });
-  // _data.teacherInfos = _teacherInfoSet.toList()
-  //   ..sort((a, b) => a.teacherID.compareTo(b.teacherID));
-
-  //TODO:
-
   _data.teacherInfos = await _client.getTeacherInfos(
     branchName: branchName,
   );
 
-  var teacherIds = List.generate(
-    _data.teacherInfos.length,
-    (index) => _data.teacherInfos[index].teacherID,
-  );
-  var teacherColors = Map<String, Color?>.fromIterable(
+  var _teacherColors = Map<String, Color?>.fromIterable(
     _data.teacherInfos,
     key: (item) => item.teacherID,
     value: (item) => item.color,
   );
 
-  //TODO: declare seperately. 강사스케줄 데이터와 겹침
-  _data.teachers = await _client.getTeachers(
+  var _teachers = await _client.getTeachers(
     teacherID: teacherID,
     branchName: branchName,
   );
@@ -96,15 +83,15 @@ Future<void> getReservationData({
   _data.reservationDataSource = ReservationDataSource();
 
   _data.timeRegions = [];
-  await Future.forEach<Teacher>(_data.teachers, (element) async {
+  await Future.forEach<Teacher>(_teachers, (element) async {
     _data.timeRegions.add(TimeRegion(
       startTime: first.subtract(Duration(days: 7)).add(element.startTime),
       endTime: first.subtract(Duration(days: 7)).add(element.endTime),
       recurrenceRule:
-          "FREQ=WEEKLY;INTERVAL=1;BYDAY=${dowToString(element.workDow).substring(0, 2)};COUNT=3",
-      color: teacherColors[element.teacherID]?.withOpacity(0.2) ??
+          "FREQ=WEEKLY;INTERVAL=1;BYDAY=${element.workDowToString.substring(0, 2)};COUNT=3",
+      color: _teacherColors[element.teacherID]?.withOpacity(0.2) ??
           symbolColor.withOpacity(0.2),
-      resourceIds: [teacherIds.indexOf(element.teacherID)],
+      resourceIds: [_teacherColors.keys.toList().indexOf(element.teacherID)],
     ));
   });
 
@@ -119,22 +106,21 @@ Future<void> getReservationData({
     _data.timeRegions.add(TimeRegion(
       startTime: element.controlStart,
       endTime: element.controlEnd,
-      color: teacherColors[element.teacherID]?.withOpacity(0.2) ??
+      color: _teacherColors[element.teacherID]?.withOpacity(0.2) ??
           symbolColor.withOpacity(0.2),
-      resourceIds: [teacherIds.indexOf(element.teacherID)],
+      resourceIds: [_teacherColors.keys.toList().indexOf(element.teacherID)],
     ));
   });
 
   _data.update();
 }
 
-Future<void> getReservationDataForTeacher({
-  required DateTime displayDate,
-  required String teacherID,
-}) async {
-  final weekday = displayDate.weekday % 7;
-  final first =
-      DateTime(displayDate.year, displayDate.month, displayDate.day - weekday);
+Future<void> getReservationForTeacherData() async {
+  final displayDate = _data.displayDate;
+  final teacherID = _data.profile.userID;
+
+  final first = DateTime(displayDate.year, displayDate.month,
+      displayDate.day - displayDate.weekday % 7);
   final last =
       first.add(const Duration(days: 6, hours: 23, minutes: 59, seconds: 59));
 
@@ -142,17 +128,8 @@ Future<void> getReservationDataForTeacher({
     TeacherInfo(teacherID: teacherID, color: symbolColor),
   ];
 
-  _data.teachers = await _client.getTeachers(
-    teacherID: teacherID,
-  );
-
-  var _branches = List.generate(
-    _data.teachers.length,
-    (index) => _data.teachers[index].branchName,
-  ).toSet().toList();
-
   _data.reservations = [];
-  await Future.forEach<String>(_branches, (element) async {
+  await Future.forEach<String>(_data.branches, (element) async {
     _data.reservations.addAll(await _client.getReservations(
       branchName: element,
       teacherID: teacherID,
@@ -170,14 +147,14 @@ Future<void> getReservationDataForTeacher({
       startTime: first.subtract(Duration(days: 7)).add(element.startTime),
       endTime: first.subtract(Duration(days: 7)).add(element.endTime),
       recurrenceRule:
-          "FREQ=WEEKLY;INTERVAL=1;BYDAY=${dowToString(element.workDow).substring(0, 2)};COUNT=3",
+          "FREQ=WEEKLY;INTERVAL=1;BYDAY=${element.workDowToString.substring(0, 2)};COUNT=3",
       color: symbolColor.withOpacity(0.2),
       resourceIds: [0],
     ));
   });
 
   List<Control> _controls = [];
-  await Future.forEach<String>(_branches, (element) async {
+  await Future.forEach<String>(_data.branches, (element) async {
     _controls.addAll(await _client.getControls(
       branchName: element,
       teacherID: teacherID,
@@ -234,22 +211,17 @@ class ReservationDataSource extends CalendarDataSource {
   DateTime getEndTime(int index) => appointments![index].endDate;
 
   @override
-  String getSubject(int index) {
-    final start = DateFormat("HH:mm").format(appointments![index].startDate);
-    final end = DateFormat("HH:mm").format(appointments![index].endDate);
-
-    return appointments![index].userID + "\n$start ~ $end";
-  }
+  String getSubject(int index) =>
+      appointments![index].userID +
+      "\n" +
+      formatTimeRange(getStartTime(index), getEndTime(index));
 
   @override
   Color getColor(int index) => appointments![index].color;
 
   @override
   List<Object> getResourceIds(int index) {
-    var teacherIds = List.generate(
-      _data.teacherInfos.length,
-      (index) => _data.teacherInfos[index].teacherID,
-    );
+    var teacherIds = _data.teacherInfos.map((e) => e.teacherID).toList();
 
     return [teacherIds.indexOf(appointments![index].teacherID)];
   }
@@ -282,7 +254,7 @@ Future<void> saveUsersData({
   int? status,
   int? termID,
 }) async {
-  final jsonList = await _client.getJsonUsers(
+  final userList = await _client.getUsers(
     branchName: branchName,
     userID: userID,
     isPaid: isPaid,
@@ -290,42 +262,30 @@ Future<void> saveUsersData({
     status: status,
     termID: termID,
   )
-    ..sort((a, b) => a["userName"].compareTo(b["userName"]));
+    ..sort((a, b) => a.userName.compareTo(b.userName));
 
-  var excel = Excel.createExcel();
-  var sheetObject = excel["Sheet1"];
-  for (int i = 0; i < jsonList.length; i++) {
-    sheetObject
-        .cell(CellIndex.indexByColumnRow(columnIndex: 0, rowIndex: i))
-        .value = jsonList[i]["userName"];
-
-    String phone = jsonList[i]["userPhone"];
-    if (phone.length == 11) {
-      phone = phone.replaceAllMapped(
-        RegExp(r"(\d{3})(\d{4})(\d+)"),
-        (match) => "${match[1]}-${match[2]}-${match[3]}",
-      );
-    } else if (phone.length == 10) {
-      phone = phone.replaceAllMapped(
-        RegExp(r"(\d{3})(\d{3})(\d+)"),
-        (match) => "${match[1]}-${match[2]}-${match[3]}",
-      );
-    }
-    sheetObject
-        .cell(CellIndex.indexByColumnRow(columnIndex: 1, rowIndex: i))
-        .value = phone;
+  final workbook = Workbook();
+  final workSheet = workbook.worksheets[0];
+  for (int i = 0; i < userList.length; i++) {
+    workSheet.getRangeByName("A${i + 1}").setText(userList[i].userName);
+    workSheet
+        .getRangeByName("B${i + 1}")
+        .setText(formatPhone(userList[i].userPhone));
   }
+  workSheet.autoFitColumn(1);
+  workSheet.autoFitColumn(2);
 
   final directory = Platform.isIOS
       ? await getApplicationDocumentsDirectory()
       : await getExternalStorageDirectory();
   final path = directory?.path;
-  final file = File("$path/user_list_" +
-      "${DateFormat("yyMMdd_HHmmss").format(DateTime.now())}.xlsx")
-    ..writeAsBytesSync(excel.encode()!);
-  File("$path/user_list_" +
-          "${DateFormat("yyMMdd_HHmmss").format(DateTime.now())}.xls")
-      .writeAsBytesSync(excel.encode()!);
+  final fileName =
+      "user_list_" + DateFormat("yyMMdd_HHmmss").format(DateTime.now());
+
+  final bytes = workbook.saveAsStream();
+  File("$path/$fileName.xlsx").writeAsBytesSync(bytes);
+  File("$path/$fileName.xls").writeAsBytesSync(bytes);
+  workbook.dispose();
 
   Get.snackbar(
     "",
@@ -335,7 +295,12 @@ Future<void> saveUsersData({
       "유저 정보 목록 저장",
       style: TextStyle(color: Colors.white, fontSize: 24.r),
     ),
-    messageText: Text(file.path, style: contentStyle),
+    messageText: Text(
+      Platform.isIOS
+          ? "파일/나의 iPhone(iPad)/솔바이올린(관리자)/$fileName.xlsx"
+          : "내장 메모리/Android/data/com.solviolin.solviolin_admin/files/$fileName.xlsx",
+      style: contentStyle,
+    ),
   );
 }
 
@@ -345,41 +310,59 @@ Future<void> getUserDetailData(User user) async {
   try {
     _data.regularSchedules =
         await _client.getRegularSchedulesByAdmin(user.userID);
-  } catch (_) {
-    _data.regularSchedules = [
-      RegularSchedule(
-        id: -1,
-        startTime: const Duration(hours: 0, minutes: 0),
-        endTime: const Duration(hours: 0, minutes: 0),
-        dow: -1,
-        userID: user.userID,
-        teacherID: "Null",
-        branchName: user.branchName,
-      )
-    ];
+  } on NetworkException catch (e) {
+    // regular schedule not found
+    if (e.response?.statusCode == 404) {
+      _data.regularSchedules = [
+        RegularSchedule(
+          userID: user.userID,
+          branchName: user.branchName,
+        ),
+      ];
+    } else {
+      rethrow;
+    }
   }
 
-  _data.thisMonthReservations = await _client.getReservations(
-    branchName: user.branchName,
-    startDate: DateTime(today.year, today.month, 1),
-    endDate: DateTime(today.year, today.month + 1, 0, 23, 59, 59),
-    userID: user.userID,
-    bookingStatus: [-3, -2, -1, 0, 1, 2, 3],
-  );
+  if (user.userType == 0) {
+    _data.thisMonthReservations = await _client.getReservations(
+      branchName: user.branchName,
+      startDate: DateTime(today.year, today.month, 1),
+      endDate: DateTime(today.year, today.month + 1, 0, 23, 59, 59),
+      userID: user.userID,
+      bookingStatus: [-3, -2, -1, 0, 1, 2, 3],
+    );
 
-  _data.lastMonthReservations = await _client.getReservations(
-    branchName: user.branchName,
-    startDate: DateTime(today.year, today.month - 1, 1),
-    endDate: DateTime(today.year, today.month, 0, 23, 59, 59),
-    userID: user.userID,
-    bookingStatus: [-3, -2, -1, 0, 1, 2, 3],
-  );
+    _data.lastMonthReservations = await _client.getReservations(
+      branchName: user.branchName,
+      startDate: DateTime(today.year, today.month - 1, 1),
+      endDate: DateTime(today.year, today.month, 0, 23, 59, 59),
+      userID: user.userID,
+      bookingStatus: [-3, -2, -1, 0, 1, 2, 3],
+    );
 
-  _data.changes = await _client.getChangesWithID(user.userID);
+    _data.changes = await _client.getChangesWithID(user.userID);
 
-  _data.myLedgers = await _client.getLedgers(
-    userID: user.userID,
-  );
+    _data.myLedgers = await _client.getLedgers(
+      userID: user.userID,
+    );
+  } else {
+    _data.thisMonthReservations = [];
+    _data.lastMonthReservations = [];
+    _data.changes = [];
+    _data.myLedgers = [];
+
+    if (user.userType == 1) {
+      var _teacherInfos = await _client.getTeacherInfos(
+        branchName: user.branchName,
+      );
+      var _teacherIds = _teacherInfos.map((e) => e.teacherID).toList();
+      var _index = _teacherIds.indexOf(user.userID);
+
+      var _search = Get.find<CacheController>(tag: "/search/user");
+      _search.teacherColor = _index == -1 ? null : _teacherInfos[_index].color;
+    }
+  }
 
   _data.update();
 }
@@ -403,23 +386,17 @@ Future<void> getControlsData({
   _data.update();
 }
 
-Future<void> getControlsDataForTeacher({
-  String? teacherID,
+Future<void> getControlsForTeacherData({
+  DateTime? controlStart,
+  DateTime? controlEnd,
 }) async {
-  _data.teachers = await _client.getTeachers(
-    teacherID: teacherID,
-  );
-
-  var _branches = List.generate(
-    _data.teachers.length,
-    (index) => _data.teachers[index].branchName,
-  ).toSet().toList();
-
-  _data.controls = []; //TODO: set contolStart and controlEnd
-  await Future.forEach<String>(_branches, (element) async {
+  _data.controls = [];
+  await Future.forEach<String>(_data.branches, (element) async {
     _data.controls.addAll(await _client.getControls(
       branchName: element,
-      teacherID: teacherID,
+      teacherID: _data.profile.userID,
+      controlStart: controlStart,
+      controlEnd: controlEnd,
     ));
   });
   _data.controls.sort((a, b) => b.controlStart.compareTo(a.controlStart));

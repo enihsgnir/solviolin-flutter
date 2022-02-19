@@ -6,12 +6,14 @@ class Reservation {
   DateTime startDate;
   DateTime endDate;
 
-  /// 0: Regular, 1: MadeUp, 2: Canceled, 3: Extended, Negative: By Admin
+  /// `0`: Regular, `1`: MadeUp, `2`: Canceled, `3`: Extended, Negative: By Admin
   int bookingStatus;
   String userID;
   String teacherID;
   String branchName;
   int? regularID;
+
+  /// `RegExp(r"^#[0-9A-Fa-f]{6}$")`
   Color? color;
 
   Reservation({
@@ -36,12 +38,23 @@ class Reservation {
       teacherID: json["teacherID"].trim(),
       branchName: json["branchName"],
       regularID: json["regularID"],
-      color: json["teacher"]["color"] == null
-          ? null
-          : Color(int.parse(
-              "FF" + json["teacher"]["color"].substring(1),
-              radix: 16,
-            )),
+      color: parseColor(json["teacher"]["color"]),
     );
   }
+
+  @override
+  String toString() =>
+      "$teacherID / $branchName\n" + formatDateTimeRange(startDate, endDate);
+
+  String get statusToString =>
+      {
+        0: "정기",
+        1: "보강",
+        2: "취소",
+        3: "연장",
+        -1: "보강(관리자)",
+        -2: "취소(관리자)",
+        -3: "연장(관리자)",
+      }[bookingStatus] ??
+      "Null";
 }

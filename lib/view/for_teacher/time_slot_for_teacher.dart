@@ -20,15 +20,13 @@ class _TimeSlotForTeacherState extends State<TimeSlotForTeacher> {
 
   @override
   Widget build(BuildContext context) {
-    Get.find<DataController>();
-
     return GetBuilder<DataController>(
       builder: (controller) {
         return SfCalendar(
           view: CalendarView.week,
           timeZone: "Korea Standard Time",
-          dataSource: controller.reservationDataSource,
-          specialRegions: controller.timeRegions,
+          dataSource: _data.reservationDataSource,
+          specialRegions: _data.timeRegions,
           controller: _calendar,
           onTap: (details) {
             if (details.targetElement == CalendarElement.viewHeader) {
@@ -39,21 +37,18 @@ class _TimeSlotForTeacherState extends State<TimeSlotForTeacher> {
               }
 
               _calendar.displayDate = details.date!;
-              controller.updateDisplayDate(_calendar.displayDate!);
+              _data.updateDisplayDate(_calendar.displayDate!);
             }
           },
           onViewChanged: (details) {
-            if (!isSameWeek(_calendar.displayDate!, controller.displayDate)) {
-              controller.updateDisplayDate(_calendar.displayDate!);
+            if (!isSameWeek(_calendar.displayDate!, _data.displayDate)) {
+              _data.updateDisplayDate(_calendar.displayDate!);
 
               showLoading(() async {
                 try {
-                  await getReservationDataForTeacher(
-                    displayDate: controller.displayDate,
-                    teacherID: controller.profile.userID,
-                  );
+                  await getReservationForTeacherData();
 
-                  if (_data.reservations.length == 0) {
+                  if (_data.reservations.isEmpty) {
                     await showMySnackbar(
                       title: "알림",
                       message: "검색 조건에 해당하는 목록이 없습니다.",
@@ -87,7 +82,7 @@ class _TimeSlotForTeacherState extends State<TimeSlotForTeacher> {
             showAvatar: false,
             displayNameTextStyle: TextStyle(fontSize: 20.r),
           ),
-          initialDisplayDate: controller.displayDate,
+          initialDisplayDate: _data.displayDate,
           showCurrentTimeIndicator: false,
           showNavigationArrow: true,
           allowedViews: [CalendarView.week, CalendarView.timelineDay],

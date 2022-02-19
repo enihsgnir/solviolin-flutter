@@ -1,7 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:intl/intl.dart';
 import 'package:solviolin_admin/model/reservation.dart';
 import 'package:solviolin_admin/util/constant.dart';
 import 'package:solviolin_admin/util/controller.dart';
@@ -9,6 +8,7 @@ import 'package:solviolin_admin/util/data_source.dart';
 import 'package:solviolin_admin/util/format.dart';
 import 'package:solviolin_admin/util/network.dart';
 import 'package:solviolin_admin/widget/dialog.dart';
+import 'package:solviolin_admin/widget/input.dart';
 import 'package:solviolin_admin/widget/item_list.dart';
 
 class HistoryReserved extends StatefulWidget {
@@ -30,7 +30,7 @@ class _HistoryReservedState extends State<HistoryReserved> {
 
   @override
   Widget build(BuildContext context) {
-    return widget.reservations.length == 0
+    return widget.reservations.isEmpty
         ? DefaultTextStyle(
             style: TextStyle(color: Colors.red, fontSize: 20.r),
             textAlign: TextAlign.center,
@@ -57,7 +57,7 @@ class _HistoryReservedState extends State<HistoryReserved> {
                           ? await showError("지난 수업은 취소할 수 없습니다.")
                           : reservation.bookingStatus.abs() == 2
                               ? await showError("이미 취소된 수업입니다.")
-                              : await _showModalCancel(context, reservation);
+                              : await _showCancelByAdmin(reservation);
                     },
                     borderRight: true,
                   ),
@@ -72,8 +72,7 @@ class _HistoryReservedState extends State<HistoryReserved> {
                               ? await showError("이미 연장된 수업입니다.")
                               : reservation.bookingStatus.abs() == 2
                                   ? await showError("취소된 수업은 연장할 수 없습니다.")
-                                  : await _showModalExtend(
-                                      context, reservation);
+                                  : await _showExtendByAdmin(reservation);
                     },
                     borderLeft: true,
                     borderRight: true,
@@ -83,29 +82,15 @@ class _HistoryReservedState extends State<HistoryReserved> {
                     icon: Icons.delete_forever,
                     item: "삭제",
                     onTap: () async {
-                      await _showModalDelete(context, reservation);
+                      await _showDelete(reservation);
                     },
                     borderLeft: true,
                   ),
                 ],
                 children: [
                   Text(
-                    "${reservation.teacherID} / ${reservation.branchName}",
+                    reservation.toString(),
                     style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 24.r,
-                      decoration: reservation.bookingStatus.abs() == 2
-                          ? TextDecoration.lineThrough
-                          : null,
-                    ),
-                  ),
-                  Text(
-                    DateFormat("yy/MM/dd HH:mm").format(reservation.startDate) +
-                        " ~ " +
-                        DateFormat("HH:mm").format(reservation.endDate),
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 24.r,
                       decoration: reservation.bookingStatus.abs() == 2
                           ? TextDecoration.lineThrough
                           : null,
@@ -116,7 +101,7 @@ class _HistoryReservedState extends State<HistoryReserved> {
                     padding: EdgeInsets.only(right: 24.r),
                     width: double.infinity,
                     child: Text(
-                      _statusToString(reservation.bookingStatus),
+                      reservation.statusToString,
                       style: TextStyle(color: Colors.red, fontSize: 20.r),
                     ),
                   ),
@@ -126,206 +111,134 @@ class _HistoryReservedState extends State<HistoryReserved> {
           );
   }
 
-  Future _showModalCancel(BuildContext context, Reservation reservation) {
-    return showCupertinoModalPopup(
-      context: context,
-      builder: (context) {
-        return CupertinoActionSheet(
-          title: Text(
-            DateFormat("yy/MM/dd HH:mm").format(reservation.startDate) +
-                " ~ " +
-                DateFormat("HH:mm").format(reservation.endDate),
-            style: TextStyle(fontSize: 24.r),
-          ),
-          message: Text("수업을 취소 하시겠습니까?", style: TextStyle(fontSize: 24.r)),
-          actions: [
-            CupertinoActionSheetAction(
-              onPressed: () => showLoading(() async {
-                try {
-                  await _client.cancelReservationByAdmin(
-                    reservation.id,
-                    count: 1,
-                  );
+  Future _showCancelByAdmin(Reservation reservation) {
+    var deductCredit = false;
 
-                  await _getSearchedUsersData();
-                  Get.back();
-
-                  await showMySnackbar(
-                    message: "관리자의 권한으로 크레딧을 차감하여 수업을 취소했습니다.",
-                  );
-                } catch (e) {
-                  showError(e);
-                }
-              }),
-              child: Text("취소 (관리자, 크레딧 차감)", style: TextStyle(fontSize: 24.r)),
-            ),
-            CupertinoActionSheetAction(
-              onPressed: () => showLoading(() async {
-                try {
-                  await _client.cancelReservationByAdmin(
-                    reservation.id,
-                    count: 0,
-                  );
-
-                  await _getSearchedUsersData();
-                  Get.back();
-
-                  await showMySnackbar(
-                    message: "관리자의 권한으로 크레딧을 미차감하여 수업을 취소했습니다.",
-                  );
-                } catch (e) {
-                  showError(e);
-                }
-              }),
-              child:
-                  Text("취소 (관리자, 크레딧 미차감)", style: TextStyle(fontSize: 24.r)),
-            ),
-          ],
-          cancelButton: CupertinoActionSheetAction(
-            onPressed: Get.back,
-            isDefaultAction: true,
-            child: Text("닫기", style: TextStyle(fontSize: 24.r)),
-          ),
-        );
-      },
-    );
-  }
-
-  Future _showModalExtend(BuildContext context, Reservation reservation) {
-    return showCupertinoModalPopup(
-      context: context,
-      builder: (context) {
-        return CupertinoActionSheet(
-          title: Text(
-            DateFormat("yy/MM/dd HH:mm").format(reservation.startDate) +
-                " ~ " +
-                DateFormat("HH:mm").format(
-                    reservation.endDate.add(const Duration(minutes: 15))),
-            style: TextStyle(fontSize: 24.r),
-          ),
-          message: Text("수업을 15분 연장 하시겠습니까?", style: TextStyle(fontSize: 24.r)),
-          actions: [
-            CupertinoActionSheetAction(
-              onPressed: () => showLoading(() async {
-                try {
-                  await _client.extendReservationByAdmin(
-                    reservation.id,
-                    count: 1,
-                  );
-
-                  await _getSearchedUsersData();
-                  Get.back();
-
-                  await showMySnackbar(
-                    message: "관리자의 권한으로 크레딧을 차감하여 수업을 연장했습니다.",
-                  );
-                } catch (e) {
-                  showError(e);
-                }
-              }),
-              child: Text("연장 (관리자, 크레딧 차감)", style: TextStyle(fontSize: 24.r)),
-            ),
-            CupertinoActionSheetAction(
-              onPressed: () => showLoading(() async {
-                try {
-                  await _client.extendReservationByAdmin(
-                    reservation.id,
-                    count: 0,
-                  );
-
-                  await _getSearchedUsersData();
-                  Get.back();
-
-                  await showMySnackbar(
-                    message: "관리자의 권한으로 크레딧을 미차감하여 수업을 연장했습니다.",
-                  );
-                } catch (e) {
-                  showError(e);
-                }
-              }),
-              child:
-                  Text("연장 (관리자, 크레딧 미차감)", style: TextStyle(fontSize: 24.r)),
-            ),
-          ],
-          cancelButton: CupertinoActionSheetAction(
-            onPressed: Get.back,
-            isDefaultAction: true,
-            child: Text("닫기", style: TextStyle(fontSize: 24.r)),
-          ),
-        );
-      },
-    );
-  }
-
-  Future _showModalDelete(BuildContext context, Reservation reservation) {
-    return showCupertinoModalPopup(
-      context: context,
-      builder: (context) {
-        return CupertinoActionSheet(
-          title: Text(
-            DateFormat("yy/MM/dd HH:mm").format(reservation.startDate) +
-                " ~ " +
-                DateFormat("HH:mm").format(reservation.endDate),
-            style: TextStyle(fontSize: 24.r),
-          ),
-          message: Text("예약을 삭제 하시겠습니까?", style: TextStyle(fontSize: 24.r)),
-          actions: [
-            CupertinoActionSheetAction(
-              onPressed: () {
-                showMyDialog(
-                  contents: [
-                    Text("예약을 삭제합니다."),
-                    Text("취소 내역에 기록되지 않습니다."),
-                    Text("\n*되돌릴 수 없습니다.*",
-                        style: TextStyle(color: Colors.red)),
-                    Text("\n*취소와는 다른 기능입니다.*",
-                        style: TextStyle(color: Colors.red)),
-                    Text("\n*강제로 예약 데이터를 삭제합니다.",
-                        style: TextStyle(color: Colors.red)),
-                    Text("예상치 못한 오류가 발생할 수 있습니다.*",
-                        style: TextStyle(color: Colors.red)),
-                    Text("\n*잘못 예약했을 경우 즉시 철회하는",
-                        style: TextStyle(color: Colors.red)),
-                    Text("용도로만 사용하는 것을 권장합니다.*",
-                        style: TextStyle(color: Colors.red)),
-                  ],
-                  onPressed: () {
-                    showMyDialog(
-                      contents: [
-                        Text("정말로 삭제하시겠습니까?",
-                            style: TextStyle(color: Colors.red)),
-                      ],
-                      onPressed: () => showLoading(() async {
-                        try {
-                          await _client.deleteReservation(reservation.id);
-
-                          await _getSearchedUsersData();
-
-                          Get.back();
-                          Get.back();
-                          Get.back();
-
-                          await showMySnackbar(
-                            message: "예약을 삭제했습니다.",
-                          );
-                        } catch (e) {
-                          showError(e);
-                        }
-                      }),
-                    );
+    return showMyDialog(
+      title: "취소 (관리자)",
+      contents: [
+        Text(formatDateTime(reservation.startDate) + " ~\n수업을 취소 하시겠습니까?"),
+        Row(
+          children: [
+            label("크레딧 차감", true),
+            StatefulBuilder(
+              builder: (context, setState) {
+                return Checkbox(
+                  value: deductCredit,
+                  onChanged: (value) {
+                    setState(() {
+                      deductCredit = value!;
+                    });
                   },
                 );
               },
-              child: Text("삭제", style: TextStyle(fontSize: 24.r)),
             ),
           ],
-          cancelButton: CupertinoActionSheetAction(
-            onPressed: Get.back,
-            isDefaultAction: true,
-            child: Text("닫기", style: TextStyle(fontSize: 24.r)),
-          ),
+        ),
+      ],
+      onPressed: () => showLoading(() async {
+        try {
+          await _client.cancelReservationByAdmin(
+            reservation.id,
+            deductCredit: deductCredit,
+          );
+
+          await _getSearchedUsersData();
+          Get.back();
+
+          await showMySnackbar(
+            message:
+                "관리자의 권한으로 크레딧을 ${deductCredit ? "차감" : "미차감"}하여 수업을 취소했습니다.",
+          );
+        } catch (e) {
+          showError(e);
+        }
+      }),
+    );
+  }
+
+  Future _showExtendByAdmin(Reservation reservation) {
+    var deductCredit = false;
+
+    return showMyDialog(
+      title: "연장 (관리자)",
+      contents: [
+        Text(formatDateTime(reservation.startDate) + " ~\n수업을 15분 연장 하시겠습니까?"),
+        Row(
+          children: [
+            label("크레딧 차감", true),
+            StatefulBuilder(
+              builder: (context, setState) {
+                return Checkbox(
+                  value: deductCredit,
+                  onChanged: (value) {
+                    setState(() {
+                      deductCredit = value!;
+                    });
+                  },
+                );
+              },
+            ),
+          ],
+        ),
+      ],
+      onPressed: () => showLoading(() async {
+        try {
+          await _client.extendReservationByAdmin(
+            reservation.id,
+            deductCredit: deductCredit,
+          );
+
+          await _getSearchedUsersData();
+          Get.back();
+
+          await showMySnackbar(
+            message:
+                "관리자의 권한으로 크레딧을 ${deductCredit ? "차감" : "미차감"}하여 수업을 연장했습니다.",
+          );
+        } catch (e) {
+          showError(e);
+        }
+      }),
+    );
+  }
+
+  Future _showDelete(Reservation reservation) {
+    return showMyDialog(
+      contents: [
+        Text(formatDateTime(reservation.startDate) +
+            " ~\n예약을 삭제하시겠습니까?" +
+            "\n취소 내역에 기록되지 않습니다."),
+        Text(
+          "\n*되돌릴 수 없습니다.*" +
+              "\n\n*취소와는 다른 기능입니다.*" +
+              "\n\n*강제로 예약 데이터를 삭제합니다.\n예상치 못한 오류가 발생할 수 있습니다.*" +
+              "\n\n*잘못 예약했을 경우 즉시 철회하는\n용도로만 사용하는 것을 권장합니다.*",
+          style: TextStyle(color: Colors.red),
+        ),
+      ],
+      onPressed: () {
+        showMyDialog(
+          contents: [
+            Text(
+              "정말로 삭제하시겠습니까?",
+              style: TextStyle(color: Colors.red),
+            ),
+          ],
+          onPressed: () => showLoading(() async {
+            try {
+              await _client.deleteReservation(reservation.id);
+
+              await _getSearchedUsersData();
+              Get.until(ModalRoute.withName("/user/detail"));
+              await showMySnackbar(message: "예약을 삭제했습니다.");
+            } catch (e) {
+              showError(e);
+            }
+          }),
         );
       },
+      isScrollable: true,
     );
   }
 
@@ -334,23 +247,10 @@ class _HistoryReservedState extends State<HistoryReserved> {
       branchName: search.branchName,
       userID: textEdit(search.edit1),
       isPaid: search.check[0],
-      userType: UserType.values.indexOf(search.type[UserType]),
+      userType: search.userType?.index,
       status: search.check[1],
+      termID: search.termID,
     );
     await getUserDetailData(search.userDetail!);
   }
-}
-
-String _statusToString(int bookingStatus) {
-  Map<int, String> status = {
-    0: "정기",
-    1: "보강",
-    2: "취소",
-    3: "연장",
-    -1: "보강(관리자)",
-    -2: "취소(관리자)",
-    -3: "연장(관리자)",
-  };
-
-  return status[bookingStatus]!;
 }

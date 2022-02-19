@@ -1,6 +1,5 @@
 import 'package:dio/dio.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart'
-    hide Options;
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get/get.dart' hide Response;
 import 'package:intl/intl.dart';
 import 'package:pretty_dio_logger/pretty_dio_logger.dart';
@@ -25,6 +24,8 @@ class Client {
 
   Client() {
     dio.options.connectTimeout = 75 * 1000;
+    // dio.options.connectTimeout = 1;
+
     dio.options.receiveTimeout = 40 * 1000;
     dio.options.baseUrl = "https://xn--sy2bt7bxwhpof3wb.com";
 
@@ -55,31 +56,26 @@ class Client {
         } else if (response.statusCode == 401 && !accessible && refreshable) {
           Get.offAllNamed("/login");
           await logout();
-
           return handler.reject(NetworkException._(
             message: "인증이 만료되어 자동으로 로그아웃 합니다.",
             options: response.requestOptions,
           ));
         } else if (response.statusCode != 200 && response.statusCode != 201) {
           var message = response.data["message"];
-          if (message is List<dynamic>) {
-            message = message.join("\n");
-          } else {
-            message = message.toString();
-          }
-
+          message = message is List<dynamic>
+              ? message.join("\n")
+              : message.toString();
           return handler.reject(NetworkException._(
             message: message,
             options: response.requestOptions,
             response: response,
           ));
         }
-
         return handler.next(response);
       },
       onError: (error, handler) {
         return handler.reject(NetworkException._(
-          message: "아래 메시지와 함께 관리자에게 문의하세요!\n" + "DioError: ${error.message}",
+          message: "아래 메시지와 함께 관리자에게 문의하세요!\nDioError: ${error.message}",
           options: error.requestOptions,
           errorType: error.type,
         ));
@@ -131,7 +127,11 @@ class Client {
     }
   }
 
-  Future<Profile> login(String userID, String userPassword) async {
+  Future<Profile> login({
+    required String userID,
+    required String userPassword,
+    required bool autoLogin,
+  }) async {
     var response = await dio.post(
       "/auth/login",
       data: {
@@ -147,10 +147,12 @@ class Client {
     );
     if (response.statusCode == 201) {
       if (response.data["userType"] != 0) {
-        await storage.write(
-            key: "accessToken", value: response.data["access_token"]);
-        await storage.write(
-            key: "refreshToken", value: response.data["refresh_token"]);
+        if (autoLogin) {
+          await storage.write(
+              key: "accessToken", value: response.data["access_token"]);
+          await storage.write(
+              key: "refreshToken", value: response.data["refresh_token"]);
+        }
         return Profile.fromJson(response.data);
       } else {
         throw NetworkException._(
@@ -175,14 +177,7 @@ class Client {
       ),
     );
     if (response.statusCode == 200) {
-      if (response.data["userType"] != 0) {
-        return Profile.fromJson(response.data);
-      } else {
-        throw NetworkException._(
-          message: "수강생은 로그인할 수 없습니다.",
-          options: response.requestOptions,
-        );
-      }
+      return Profile.fromJson(response.data);
     }
     throw NetworkException._(
       message: "내 정보를 불러올 수 없습니다.",
@@ -197,7 +192,6 @@ class Client {
     required String userPhone,
     required int userType,
     required String userBranch,
-    String? token,
   }) async {
     await dio.post(
       "/user",
@@ -208,8 +202,7 @@ class Client {
         "userPhone": userPhone,
         "userType": userType,
         "userBranch": userBranch,
-        "token": token,
-      }..removeWhere((key, value) => value == null),
+      },
       options: Options(
         extra: {
           "409": "중복된 아이디 또는 전화번호가 이미 등록되어 있습니다. 다시 확인해주세요.",
@@ -242,34 +235,6 @@ class Client {
         response.data.length,
         (index) => User.fromJson(response.data[index]),
       )..sort((a, b) => a.userID.compareTo(b.userID));
-    }
-    throw NetworkException._(
-      message: "유저 목록을 불러올 수 없습니다.",
-      options: response.requestOptions,
-    );
-  }
-
-  Future<List<dynamic>> getJsonUsers({
-    String? branchName,
-    String? userID,
-    int? isPaid,
-    int? userType,
-    int? status,
-    int? termID,
-  }) async {
-    var response = await dio.get(
-      "/user",
-      queryParameters: {
-        "branchName": branchName,
-        "userID": userID,
-        "isPaid": isPaid,
-        "userType": userType,
-        "status": status,
-        "termID": termID,
-      }..removeWhere((key, value) => value == null),
-    );
-    if (response.statusCode == 200) {
-      return response.data;
     }
     throw NetworkException._(
       message: "유저 목록을 불러올 수 없습니다.",
@@ -352,20 +317,9 @@ class Client {
     );
   }
 
-  Future<List<Term>> getCurrentTerm() async {
-    var response = await dio.get("/term");
-    if (response.statusCode == 200) {
-      return List.generate(
-        response.data.length,
-        (index) => Term.fromJson(response.data[index]),
-      )..sort((a, b) => a.termStart.compareTo(b.termStart));
-    }
-    throw NetworkException._(
-      message: "현재 학기 목록을 불러올 수 없습니다.",
-      options: response.requestOptions,
-    );
-  }
-
+  /// Returns terms sorted in descending order by the number of `take`.
+  ///
+  /// If `take` is zero, it returns all terms.
   Future<List<Term>> getTerms(int take) async {
     var response = await dio.get("/term/$take");
     if (response.statusCode == 200) {
@@ -433,13 +387,11 @@ class Client {
 
   Future<List<TeacherInfo>> getTeacherInfos({
     String? branchName,
-    int? workDow,
   }) async {
     var response = await dio.get(
       "/teacher/search/name",
       queryParameters: {
         "branchName": branchName,
-        "workDow": workDow,
       }..removeWhere((key, value) => value == null),
     );
     if (response.statusCode == 200) {
@@ -478,7 +430,7 @@ class Client {
       )..sort((a, b) => b.controlStart.compareTo(a.controlStart));
     }
     throw NetworkException._(
-      message: "컨트롤 정보를 불러올 수 없습니다.",
+      message: "오픈/클로즈 정보를 불러올 수 없습니다.",
       options: response.requestOptions,
     );
   }
@@ -507,10 +459,10 @@ class Client {
 
   Future<void> cancelReservationByAdmin(
     int id, {
-    required int count,
+    required bool deductCredit,
   }) async {
     await dio.patch(
-      "/reservation/admin/cancel/$id/$count",
+      "/reservation/admin/cancel/$id/${deductCredit ? 1 : 0}",
       options: Options(
         extra: {
           "404": "해당 수업을 찾을 수 없습니다. 재검색을 시도하세요.",
@@ -574,10 +526,10 @@ class Client {
 
   Future<void> extendReservationByAdmin(
     int id, {
-    required int count,
+    required bool deductCredit,
   }) async {
     await dio.patch(
-      "/reservation/admin/extend/$id/$count",
+      "/reservation/admin/extend/$id/${deductCredit ? 1 : 0}",
       options: Options(
         extra: {
           "400": "수업 시작 4시간 전부터는 수업을 연장할 수 없습니다.",
@@ -633,12 +585,12 @@ class Client {
         response.data.length,
         (index) => Change.fromJson(response.data[index]),
       )..sort((a, b) {
-          var primary = a.fromDate.compareTo(b.fromDate);
+          var primary = a.fromStartDate.compareTo(b.fromStartDate);
           return primary != 0
               ? primary
-              : a.toDate == null || b.toDate == null
+              : a.toStartDate == null || b.toStartDate == null
                   ? 0
-                  : a.toDate!.compareTo(b.toDate!);
+                  : a.toStartDate!.compareTo(b.toStartDate!);
         });
     }
     throw NetworkException._(
@@ -770,7 +722,9 @@ class Client {
       },
       options: Options(
         extra: {
-          "400": "다음 학기만 수정할 수 있습니다.",
+          "400": "잘못된 요청입니다. 다음의 경우에 해당합니다." +
+              "\n1) 다음 학기만 수정할 수 있습니다. 올바른 학기인지 확인하세요." +
+              "\n2) 시작일이 종료일보다 클 수 없습니다. 올바르게 입력했는지 확인하세요.",
         },
       ),
     );
@@ -789,7 +743,14 @@ class Client {
 
   Future<List<RegularSchedule>> getRegularSchedulesByAdmin(
       String userID) async {
-    var response = await dio.get("/regular-schedule/$userID");
+    var response = await dio.get(
+      "/regular-schedule/$userID",
+      options: Options(
+        extra: {
+          "404": "해당 정기 스케줄을 찾을 수 없습니다. 정기 스케줄을 확인하세요.",
+        },
+      ),
+    );
     if (response.statusCode == 200) {
       return List.generate(
         response.data.length,
@@ -800,7 +761,7 @@ class Client {
         });
     }
     throw NetworkException._(
-      message: "해당 유저의 정기 예약 정보를 불러올 수 없습니다.",
+      message: "해당 유저의 정기 스케줄을 불러올 수 없습니다.",
       options: response.requestOptions,
     );
   }
@@ -958,35 +919,38 @@ class NetworkException extends DioError {
     );
   }
 
+  bool get isTimeout =>
+      errorType == DioErrorType.connectTimeout ||
+      errorType == DioErrorType.sendTimeout ||
+      errorType == DioErrorType.receiveTimeout;
+
   @override
   String toString() {
-    if (errorType == DioErrorType.connectTimeout ||
-        errorType == DioErrorType.sendTimeout ||
-        errorType == DioErrorType.receiveTimeout) {
+    if (isTimeout) {
       return "연결 시간이 초과했습니다. 다시 시도해주세요.";
     }
 
     if (response != null) {
-      if (response!.requestOptions.extra[response!.statusCode.toString()] !=
-          null) {
-        return response!.requestOptions.extra[response!.statusCode.toString()];
+      var status = response!.statusCode;
+      if (options.extra[status.toString()] != null) {
+        return options.extra[status.toString()];
       } else {
-        if (response!.statusCode == 400) {
+        if (status == 400) {
           message = "잘못된 요청입니다. 관리자에게 문의하세요.\n" + message;
-        } else if (response!.statusCode == 401) {
+        } else if (status == 401) {
           message = "인증이 필요합니다. 관리자에게 문의하세요.\n" + message;
-        } else if (response!.statusCode == 403) {
+        } else if (status == 403) {
           message = "요청한 데이터에 대해 권한을 갖고 있지 않습니다. 관리자에게 문의하세요.\n" + message;
-        } else if (response!.statusCode == 404) {
+        } else if (status == 404) {
           message = "요청한 데이터를 찾을 수 없습니다. 관리자에게 문의하세요.\n" + message;
-        } else if (response!.statusCode == 405) {
+        } else if (status == 405) {
           message = "승인되지 않은 행동입니다. 관리자에게 문의하세요.\n" + message;
-        } else if (response!.statusCode == 409) {
+        } else if (status == 409) {
           message = "중복된 데이터가 존재합니다. 관리자에게 문의하세요.\n" + message;
-        } else if (response!.statusCode == 412) {
+        } else if (status == 412) {
           message = "조건을 충족하지 않은 요청입니다. 관리자에게 문의하세요.\n" + message;
         } else {
-          message += "\nStatus: ${response!.statusCode}";
+          message += "\nStatus: $status";
         }
       }
     }

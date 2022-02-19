@@ -4,41 +4,42 @@ import 'package:solviolin_admin/util/constant.dart';
 import 'package:solviolin_admin/util/controller.dart';
 
 Widget label(String item, bool isMandatory) {
-  return RichText(
-    text: TextSpan(
-      children: [
-        TextSpan(text: item, style: contentStyle),
-        TextSpan(
-          text: isMandatory ? " *" : "",
-          style: TextStyle(
-            color: Colors.red,
-            fontSize: 16.r,
-            fontWeight: FontWeight.bold,
+  return Container(
+    width: 120.r,
+    child: RichText(
+      text: TextSpan(
+        children: [
+          TextSpan(text: item, style: contentStyle),
+          TextSpan(
+            text: isMandatory ? " *" : "",
+            style: TextStyle(
+              color: Colors.red,
+              fontSize: 16.r,
+              fontWeight: FontWeight.bold,
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     ),
   );
 }
 
 Widget myTextInput(
   String item,
-  TextEditingController controller, [
+  TextEditingController controller, {
   bool isMandatory = false,
   TextInputType? keyboardType,
-]) {
+  String? hintText,
+}) {
   return Row(
     children: [
-      Container(
-        width: 110.r,
-        child: label(item, isMandatory),
-      ),
+      label(item, isMandatory),
       Container(
         width: 220.r,
-        // height: 35.r, //TODO: set height of TextField
         child: TextField(
           controller: controller,
           decoration: InputDecoration(
+            hintText: hintText,
             suffixIcon: IconButton(
               onPressed: controller.clear,
               icon: Icon(Icons.clear, size: 20.r),
@@ -80,10 +81,7 @@ Widget myCheckBox({
     builder: (context, setState) {
       return Row(
         children: [
-          Container(
-            width: 120.r,
-            child: label(item, isMandatory),
-          ),
+          label(item, isMandatory),
           Checkbox(
             value: _trueValue,
             onChanged: (value) {
@@ -127,62 +125,6 @@ Widget myCheckBox({
           ),
           Text(falseName, style: contentStyle),
         ],
-      );
-    },
-  );
-}
-
-Widget myRadio<T>({
-  String? tag,
-  required String item,
-  required List<String> names,
-  required List<T> values,
-  required T groupValue,
-  bool isMandatory = true,
-}) {
-  var _cache = Get.find<CacheController>(tag: tag);
-  _cache.type[T] == null
-      ? _cache.type[T] = groupValue
-      : groupValue = _cache.type[T];
-
-  return StatefulBuilder(
-    builder: (context, setState) {
-      return DefaultTextStyle(
-        style: contentStyle,
-        child: Row(
-          children: [
-            Container(
-              width: 120.r,
-              child: label(item, isMandatory),
-            ),
-            Row(
-              mainAxisSize: MainAxisSize.min,
-              children: List.generate(
-                names.length,
-                (index) => Container(
-                  padding: EdgeInsets.symmetric(horizontal: 2.r),
-                  width: 65.r,
-                  child: Column(
-                    children: [
-                      Text(names[index]),
-                      Radio<T>(
-                        value: values[index],
-                        groupValue: groupValue,
-                        onChanged: (value) {
-                          setState(() {
-                            groupValue = value!;
-                          });
-
-                          _cache.type[T] = value!;
-                        },
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
       );
     },
   );
