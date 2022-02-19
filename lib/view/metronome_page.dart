@@ -19,7 +19,7 @@ class _MetronomePageState extends State<MetronomePage> {
   late Metronome metronome;
   StreamSubscription<DateTime>? subscription;
 
-  final player = Get.put(AudioCache());
+  var player = Get.put(AudioCache());
 
   var _index = 21;
   List<int> tempos = []

@@ -160,7 +160,7 @@ class _CalendarReservedState extends State<CalendarReserved> {
     );
   }
 
-  //TODO: color details later
+  // TODO: color details later
   Color _getSelectedTextColor() {
     if (isSameDay(_selectedDay, today)) {
       return Colors.black87;
@@ -190,7 +190,7 @@ extension _Iterables<E> on Iterable<E> {
 }
 
 Map<DateTime, List<Reservation>> getEventSource() {
-  final _data = Get.find<DataController>();
+  var _data = Get.find<DataController>();
 
   return _data.myValidReservations.groupBy((reservation) {
     var date = reservation.startDate;

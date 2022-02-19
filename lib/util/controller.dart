@@ -12,7 +12,7 @@ import 'package:solviolin/util/network.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 class DataController extends GetxController {
-  final _client = Get.find<Client>();
+  var _client = Get.find<Client>();
 
   double _ratio = 1.0;
   bool _isRatioUpdated = false;
@@ -24,7 +24,7 @@ class DataController extends GetxController {
 
   /// set `_ratio`
   set size(Size size) {
-    final _r = min(size.width / _kTestEnvWidth, size.height / _kTestEnvHeight);
+    var _r = min(size.width / _kTestEnvWidth, size.height / _kTestEnvHeight);
     if (!_isRatioUpdated && _r != 0.0) {
       _ratio = _r;
       _isRatioUpdated = true;
@@ -63,8 +63,8 @@ class DataController extends GetxController {
   }
 
   Future<void> setTerms() async {
-    final _today = DateTime.now();
-    final _terms = await _client.getTerms(0);
+    var _today = DateTime.now();
+    var _terms = await _client.getTerms(0);
 
     currentTerm = []
       // this term
@@ -103,7 +103,7 @@ class DataController extends GetxController {
 
   /// `selected`: by UTC
   Future<void> getSelectedDayData(DateTime selected) async {
-    final _today = DateTime.now();
+    var _today = DateTime.now();
 
     availabaleSpots = !_isRegularScheduleExisting
         ? []
@@ -128,9 +128,9 @@ class DataController extends GetxController {
   }
 
   Future<void> getChangedPageData(DateTime focused) async {
-    final _firstDay = DateTime(focused.year, focused.month);
-    final _start = _firstDay.subtract(Duration(days: _firstDay.weekday % 7));
-    final _end = _start.add(Duration(days: 42)).subtract(Duration(seconds: 1));
+    var _firstDay = DateTime(focused.year, focused.month);
+    var _start = _firstDay.subtract(Duration(days: _firstDay.weekday % 7));
+    var _end = _start.add(Duration(days: 42)).subtract(Duration(seconds: 1));
 
     myValidReservations = await _client.getReservations(
       branchName: profile.branchName,

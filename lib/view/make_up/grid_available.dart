@@ -63,7 +63,6 @@ class _GridAvailableState extends State<GridAvailable> {
     );
   }
 
-  // TODO: rename function
   Widget _warning(String text) {
     return Center(
       child: Container(

@@ -43,10 +43,11 @@ class Client {
             return handler.reject(e);
           }
         } else if (response.statusCode == 401 && !accessible && refreshable) {
-          // run this if block when the refresh token has been expired
-          // or the user has logged in/out in the other device
-          // and the function refresh do delete the access token only not update
-          // so the function retry is intercepted by this block
+          // TODO:
+          //  run this if block when the refresh token has been expired
+          //  or the user has logged in/out in the other device
+          //  and the function refresh do delete the access token only not update
+          //  so the function retry is intercepted by this block
           Get.offAllNamed("/login");
           await logout();
           return handler.reject(NetworkException._(
