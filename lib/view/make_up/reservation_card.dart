@@ -30,7 +30,7 @@ class _ReservationCardState extends State<ReservationCard> {
                 isSameDay(element.startDate, controller.selectedDay))
             .toList();
 
-        return reservations.length == 0
+        return reservations.isEmpty
             ? Container()
             : Column(
                 children: [
@@ -44,10 +44,7 @@ class _ReservationCardState extends State<ReservationCard> {
                           Stack(
                             alignment: AlignmentDirectional.topCenter,
                             children: [
-                              Text(
-                                reservation.toString(),
-                                textAlign: TextAlign.center,
-                              ),
+                              Text(reservation.toString()),
                               Container(
                                 alignment: Alignment.centerRight,
                                 padding: EdgeInsets.only(right: 12.r),

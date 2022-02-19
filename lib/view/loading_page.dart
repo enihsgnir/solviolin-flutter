@@ -63,7 +63,16 @@ class _LoadingPageState extends State<LoadingPage> {
     if (await _client.isLoggedIn()) {
       try {
         _data.profile = await _client.getProfile();
-        await _data.getInitialData(atLoggingIn: true);
+        await _data.getInitialData();
+        await _data.setTerms();
+
+        Get.offAllNamed("/menu");
+        await showMySnackbar(
+          title: "${_data.profile.userID}님",
+          message: !_data.isRegularScheduleExisting
+              ? "정기수업이 시작되지 않아 예약가능한 시간대가 표시되지 않습니다. 관리자에게 문의하세요."
+              : "환영합니다!",
+        );
       } catch (e) {
         try {
           if (!(e is NetworkException && e.isTimeout)) {

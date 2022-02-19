@@ -7,8 +7,8 @@ import 'package:solviolin/model/profile.dart';
 import 'package:solviolin/model/regular_schedule.dart';
 import 'package:solviolin/model/reservation.dart';
 import 'package:solviolin/model/term.dart';
+import 'package:solviolin/util/format.dart';
 import 'package:solviolin/util/network.dart';
-import 'package:solviolin/widget/dialog.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 class DataController extends GetxController {
@@ -17,8 +17,8 @@ class DataController extends GetxController {
   double _ratio = 1.0;
   bool _isRatioUpdated = false;
 
-  double _kTestEnvWidth = 540;
-  double _kTestEnvHeight = 1152;
+  static const double _kTestEnvWidth = 540;
+  static const double _kTestEnvHeight = 1152;
 
   double get ratio => _ratio;
 
@@ -41,10 +41,8 @@ class DataController extends GetxController {
   /// `[0]`: this term, `[1]`: last term
   List<Term> currentTerm = [];
 
-  DateTime selectedDay =
-      DateUtils.dateOnly(DateTime.now()).add(DateTime.now().timeZoneOffset);
-  DateTime focusedDay =
-      DateUtils.dateOnly(DateTime.now()).add(DateTime.now().timeZoneOffset);
+  DateTime selectedDay = DateTime.now().midnight;
+  DateTime focusedDay = DateTime.now().midnight;
 
   List<Reservation> thisMonthReservations = [];
   List<Reservation> lastMonthReservations = [];
@@ -70,7 +68,10 @@ class DataController extends GetxController {
 
     currentTerm = []
       // this term
-      ..add(_terms.lastWhere((element) => element.termEnd.isAfter(_today)))
+      ..add(_terms.lastWhere(
+        (element) => element.termEnd.isAfter(_today),
+        orElse: () => _terms.first,
+      ))
       // last term
       ..add(_terms.firstWhere((element) => element.termEnd.isBefore(_today)));
   }
@@ -81,27 +82,20 @@ class DataController extends GetxController {
     update();
   }
 
-  Future<void> getInitialData({bool atLoggingIn = false}) async {
+  Future<void> getInitialData() async {
     try {
       regularSchedules = await _client.getRegularSchedules();
       _isRegularScheduleExisting = true;
-    } catch (e) {
-      regularSchedules = [
-        RegularSchedule(branchName: profile.branchName),
-      ];
-      _isRegularScheduleExisting = false;
-    }
-
-    if (atLoggingIn) {
-      await setTerms();
-
-      Get.offAllNamed("/menu");
-      await showMySnackbar(
-        title: "${profile.userID}님",
-        message: !_isRegularScheduleExisting
-            ? "정기수업이 시작되지 않아 예약가능한 시간대가 표시되지 않습니다. 관리자에게 문의하세요."
-            : "환영합니다!",
-      );
+    } on NetworkException catch (e) {
+      // regular schedule not found
+      if (e.response?.statusCode == 404) {
+        regularSchedules = [
+          RegularSchedule(branchName: profile.branchName),
+        ];
+        _isRegularScheduleExisting = false;
+      } else {
+        rethrow;
+      }
     }
 
     update();

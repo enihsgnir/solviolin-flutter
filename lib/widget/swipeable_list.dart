@@ -3,7 +3,7 @@ import 'package:solviolin/util/constant.dart';
 
 class SwipeableList extends StatefulWidget {
   final int itemCount;
-  final Widget Function(BuildContext, int) itemBuilder;
+  final IndexedWidgetBuilder itemBuilder;
 
   const SwipeableList({
     Key? key,
@@ -87,6 +87,7 @@ Widget mySwipeableCard({
     margin: EdgeInsets.all(8.r),
     child: DefaultTextStyle(
       style: TextStyle(fontSize: 28.r),
+      textAlign: TextAlign.center,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.start,
         children: children,

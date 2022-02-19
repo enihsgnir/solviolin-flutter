@@ -1,7 +1,8 @@
+import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 Duration parseTime(String time) {
-  var times = time.split(":");
+  final times = time.split(":");
 
   return Duration(hours: int.parse(times[0]), minutes: int.parse(times[1]));
 }
@@ -11,20 +12,28 @@ Duration parseTime(String time) {
 ///
 /// It can be compared to `DateTime.now()` in the same time zone.
 DateTime parseDateTime(String dateTime) {
-  var _dateTime = DateTime.parse(dateTime);
+  final _d = DateTime.parse(dateTime);
 
-  return DateTime(_dateTime.year, _dateTime.month, _dateTime.day,
-      _dateTime.hour, _dateTime.minute);
+  return DateTime(_d.year, _d.month, _d.day, _d.hour, _d.minute);
 }
 
-String _twoDigits(int n) => n < 10 ? "0$n" : "$n";
+extension Midnight on DateTime {
+  /// local [DateTime] of UTC-midnight
+  DateTime get midnight =>
+      DateTime.utc(this.year, this.month, this.day).toLocal();
+}
 
 String timeToString(Duration time) {
-  var _twoDigitMinutes =
+  String Function(int n) _twoDigits = (n) => n.toString().padLeft(2, "0");
+
+  final _twoDigitMinutes =
       _twoDigits(time.inMinutes.remainder(Duration.minutesPerHour));
 
   return "${_twoDigits(time.inHours)}:$_twoDigitMinutes";
 }
+
+String? textEdit(TextEditingController edit) =>
+    edit.text.isEmpty ? null : edit.text;
 
 /// yy/MM/dd HH:mm
 String formatDateTime(DateTime dateTime) =>

@@ -1,11 +1,17 @@
 class Profile {
-  String userID;
-  String branchName;
+  // TODO: make members private? getter only?
+
+  String _userID;
+  String get userID => _userID;
+
+  String _branchName;
+  String get branchName => _branchName;
 
   Profile({
-    required this.userID,
-    required this.branchName,
-  });
+    required String userID,
+    required String branchName,
+  })  : _userID = userID,
+        _branchName = branchName;
 
   factory Profile.fromJson(Map<String, dynamic> json) {
     return Profile(

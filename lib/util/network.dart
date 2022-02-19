@@ -43,6 +43,10 @@ class Client {
             return handler.reject(e);
           }
         } else if (response.statusCode == 401 && !accessible && refreshable) {
+          // run this if block when the refresh token has been expired
+          // or the user has logged in/out in the other device
+          // and the function refresh do delete the access token only not update
+          // so the function retry is intercepted by this block
           Get.offAllNamed("/login");
           await logout();
           return handler.reject(NetworkException._(
@@ -66,6 +70,7 @@ class Client {
         return handler.reject(NetworkException._(
           message: "아래 메시지와 함께 관리자에게 문의하세요!\nDioError: ${error.message}",
           options: error.requestOptions,
+          errorType: error.type,
         ));
       },
     ));
@@ -115,8 +120,11 @@ class Client {
     }
   }
 
-  Future<Profile> login(
-      String userID, String userPassword, bool autoLogin) async {
+  Future<Profile> login({
+    required String userID,
+    required String userPassword,
+    required bool autoLogin,
+  }) async {
     var response = await dio.post(
       "/auth/login",
       data: {
@@ -171,7 +179,14 @@ class Client {
   }
 
   Future<List<RegularSchedule>> getRegularSchedules() async {
-    var response = await dio.get("/regular-schedule");
+    var response = await dio.get(
+      "/regular-schedule",
+      options: Options(
+        extra: {
+          "404": "정기 스케줄을 찾을 수 없습니다. 관리자에게 문의하세요.",
+        },
+      ),
+    );
     if (response.statusCode == 200) {
       return List.generate(
         response.data.length,
@@ -395,26 +410,26 @@ class NetworkException extends DioError {
     }
 
     if (response != null) {
-      if (response!.requestOptions.extra[response!.statusCode.toString()] !=
-          null) {
-        return response!.requestOptions.extra[response!.statusCode.toString()];
+      var status = response!.statusCode;
+      if (options.extra[status.toString()] != null) {
+        return options.extra[status.toString()];
       } else {
-        if (response!.statusCode == 400) {
+        if (status == 400) {
           message = "잘못된 요청입니다. 관리자에게 문의하세요.\n" + message;
-        } else if (response!.statusCode == 401) {
+        } else if (status == 401) {
           message = "인증이 필요합니다. 관리자에게 문의하세요.\n" + message;
-        } else if (response!.statusCode == 403) {
+        } else if (status == 403) {
           message = "요청한 데이터에 대해 권한을 갖고 있지 않습니다. 관리자에게 문의하세요.\n" + message;
-        } else if (response!.statusCode == 404) {
+        } else if (status == 404) {
           message = "요청한 데이터를 찾을 수 없습니다. 관리자에게 문의하세요.\n" + message;
-        } else if (response!.statusCode == 405) {
+        } else if (status == 405) {
           message = "승인되지 않은 행동입니다. 관리자에게 문의하세요.\n" + message;
-        } else if (response!.statusCode == 409) {
+        } else if (status == 409) {
           message = "중복된 데이터가 존재합니다. 관리자에게 문의하세요.\n" + message;
-        } else if (response!.statusCode == 412) {
+        } else if (status == 412) {
           message = "조건을 충족하지 않은 요청입니다. 관리자에게 문의하세요.\n" + message;
         } else {
-          message += "\nStatus: ${response!.statusCode}";
+          message += "\nStatus: $status";
         }
       }
     }

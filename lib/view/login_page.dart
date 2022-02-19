@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:solviolin/util/constant.dart';
 import 'package:solviolin/util/controller.dart';
+import 'package:solviolin/util/format.dart';
 import 'package:solviolin/util/network.dart';
 import 'package:solviolin/widget/dialog.dart';
 
@@ -19,7 +20,6 @@ class _LoginPageState extends State<LoginPage> {
 
   var _id = TextEditingController();
   var _pw = TextEditingController();
-
   var _autoLogin = true;
 
   @override
@@ -131,12 +131,24 @@ class _LoginPageState extends State<LoginPage> {
 
                     showLoading(() async {
                       try {
-                        _data.profile =
-                            await _client.login(_id.text, _pw.text, _autoLogin);
-                        await _data.getInitialData(atLoggingIn: true);
+                        _data.profile = await _client.login(
+                          userID: textEdit(_id)!,
+                          userPassword: textEdit(_pw)!,
+                          autoLogin: _autoLogin,
+                        );
+                        await _data.getInitialData();
+                        await _data.setTerms();
+
+                        Get.offAllNamed("/menu");
+                        await showMySnackbar(
+                          title: "${_data.profile.userID}님",
+                          message: !_data.isRegularScheduleExisting
+                              ? "정기수업이 시작되지 않아 예약가능한 시간대가 표시되지 않습니다. 관리자에게 문의하세요."
+                              : "환영합니다!",
+                        );
                       } catch (e) {
                         showError(e);
-                        _pw.text = "";
+                        _pw.clear();
                       }
                     });
                   },

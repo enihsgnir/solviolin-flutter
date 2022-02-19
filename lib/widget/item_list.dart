@@ -12,7 +12,8 @@ Widget myNormalCard({
     width: double.infinity,
     margin: EdgeInsets.symmetric(vertical: 4.r, horizontal: 8.r),
     child: DefaultTextStyle(
-      style: TextStyle(color: Colors.white, fontSize: 24.r),
+      style: TextStyle(fontSize: 24.r),
+      textAlign: TextAlign.center,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: children,
@@ -36,7 +37,8 @@ Widget mySlidableCard({
       width: double.infinity,
       margin: EdgeInsets.symmetric(vertical: 4.r, horizontal: 8.r),
       child: DefaultTextStyle(
-        style: TextStyle(color: Colors.white, fontSize: 24.r),
+        style: TextStyle(fontSize: 24.r),
+        textAlign: TextAlign.center,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: children,
@@ -50,7 +52,7 @@ Widget mySlideAction({
   required BuildContext context,
   required IconData icon,
   required String item,
-  required void Function() onTap,
+  required VoidCallback onTap,
   bool borderLeft = false,
   bool borderRight = false,
 }) {

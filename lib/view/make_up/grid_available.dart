@@ -21,14 +21,11 @@ class _GridAvailableState extends State<GridAvailable> {
   Widget build(BuildContext context) {
     return GetBuilder<DataController>(
       builder: (controller) {
-        var now = DateTime.now();
-        var today = DateUtils.dateOnly(now).add(now.timeZoneOffset);
-
         if (!controller.isRegularScheduleExisting) {
           return _warning("수업시간 변경이 필요하시면\n010-6684-8224로 문의바랍니다.");
-        } else if (controller.selectedDay.isBefore(today)) {
+        } else if (controller.selectedDay.isBefore(DateTime.now().midnight)) {
           return _warning("오늘보다 이전 날짜에는 예약할 수 없습니다!");
-        } else if (controller.availabaleSpots.length == 0) {
+        } else if (controller.availabaleSpots.isEmpty) {
           return _warning("예약가능한 시간대가 없습니다!");
         } else {
           return Expanded(

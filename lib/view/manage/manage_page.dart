@@ -49,10 +49,7 @@ class _ManagePageState extends State<ManagePage> with TickerProviderStateMixin {
                           child: const Text("나의 수업"),
                         ),
                       ]..add(regular.dow != -1
-                          ? Text(
-                              regular.toString(),
-                              textAlign: TextAlign.center,
-                            )
+                          ? Text(regular.toString())
                           : Text("\nWelcome to SOLVIOLIN :)")),
                     );
                   },
@@ -90,7 +87,7 @@ class _ManagePageState extends State<ManagePage> with TickerProviderStateMixin {
 
     return GetBuilder<DataController>(
       builder: (controller) {
-        return controller.changes.length == 0
+        return controller.changes.isEmpty
             ? Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -113,10 +110,7 @@ class _ManagePageState extends State<ManagePage> with TickerProviderStateMixin {
                 itemBuilder: (context, index) {
                   return myNormalCard(
                     children: [
-                      Text(
-                        controller.changes[index].toString(),
-                        textAlign: TextAlign.center,
-                      ),
+                      Text(controller.changes[index].toString()),
                     ],
                   );
                 },

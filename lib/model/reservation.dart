@@ -5,7 +5,7 @@ class Reservation {
   DateTime startDate;
   DateTime endDate;
 
-  /// 0: Regular, 1: MadeUp, 2: Canceled, 3: Extended, Negative: By Admin
+  /// `0`: Regular, `1`: MadeUp, `2`: Canceled, `3`: Extended, Negative: By Admin
   int bookingStatus;
   String teacherID;
   String branchName;

@@ -63,7 +63,7 @@ Future showMyModal({
   required String message,
   required String child,
   bool isDestructiveAction = false,
-  required void Function() onPressed,
+  required VoidCallback onPressed,
 }) {
   return showCupertinoModalPopup(
     context: context,

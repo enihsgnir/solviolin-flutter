@@ -4,11 +4,12 @@ class RegularSchedule {
   Duration startTime;
   Duration endTime;
 
-  /// 0: SUN
+  /// `0`: SUN
   int dow;
   String teacherID;
   String branchName;
 
+  // default: empty regular schedule
   RegularSchedule({
     this.startTime = const Duration(),
     this.endTime = const Duration(),

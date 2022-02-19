@@ -27,7 +27,7 @@ class _HistoryReservedState extends State<HistoryReserved> {
 
   @override
   Widget build(BuildContext context) {
-    return widget.reservations.length == 0
+    return widget.reservations.isEmpty
         ? Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -51,8 +51,6 @@ class _HistoryReservedState extends State<HistoryReserved> {
               var reservation = widget.reservations[index];
 
               return mySlidableCard(
-                // TODO: addIfAll isAfter(DateTime.now())
-                //  or addIfAll in thisMonth // not sure
                 slideActions: [
                   mySlideAction(
                     context: context,
@@ -87,13 +85,10 @@ class _HistoryReservedState extends State<HistoryReserved> {
                   Text(
                     reservation.toString(),
                     style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 24.r,
                       decoration: reservation.bookingStatus.abs() == 2
                           ? TextDecoration.lineThrough
                           : null,
                     ),
-                    textAlign: TextAlign.center,
                   ),
                   Container(
                     alignment: Alignment.centerRight,

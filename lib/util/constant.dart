@@ -5,9 +5,8 @@ import 'package:solviolin/util/controller.dart';
 // TODO: turn global constants into class methods.
 //  Not supported with auto import for extension methods yet.
 
-/// Responsible Font Size
-extension RFS on num {
-  /// 'r'esponsible font size
+extension ResponsibleFontSize on num {
+  /// `r`esponsible font size
   double get r {
     var _data = Get.find<DataController>();
 
