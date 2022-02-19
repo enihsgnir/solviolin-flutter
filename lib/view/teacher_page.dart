@@ -65,10 +65,11 @@ class _TeacherPageState extends State<TeacherPage> {
               context: context,
               onPressed: () => showLoading(() async {
                 try {
-                  await _data.getTeachersData(
+                  _data.teachers = await _client.getTeachers(
                     teacherID: textEdit(search.edit1),
                     branchName: search.branchName,
                   );
+                  _data.update();
 
                   search.isSearched = true;
                   search.expandable.expanded = false;
@@ -113,10 +114,11 @@ class _TeacherPageState extends State<TeacherPage> {
                       try {
                         await _client.deleteTeacher(teacher.id);
 
-                        await _data.getTeachersData(
+                        _data.teachers = await _client.getTeachers(
                           teacherID: textEdit(search.edit1),
                           branchName: search.branchName,
                         );
+                        _data.update();
 
                         Get.back();
 
@@ -177,10 +179,11 @@ class _TeacherPageState extends State<TeacherPage> {
           );
 
           if (search.isSearched) {
-            await _data.getTeachersData(
+            _data.teachers = await _client.getTeachers(
               teacherID: textEdit(search.edit1),
               branchName: search.branchName,
             );
+            _data.update();
           }
 
           Get.back();

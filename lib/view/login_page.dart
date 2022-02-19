@@ -136,10 +136,10 @@ class _LoginPageState extends State<LoginPage> {
                           userPassword: textEdit(_pw, trimText: false)!,
                           autoLogin: _autoLogin,
                         );
-                        _data.branches = await _client.getBranches();
                         await _data.setTerms();
 
                         if (_data.profile.userType == 2) {
+                          _data.branches = await _client.getBranches();
                           Get.offAllNamed("/menu");
                         } else if (_data.profile.userType == 1) {
                           await _data.getInitialForTeacherData();

@@ -61,10 +61,10 @@ class _LoadingPageState extends State<LoadingPage> {
     if (await _client.isLoggedIn()) {
       try {
         _data.profile = await _client.getProfile();
-        _data.branches = await _client.getBranches();
         await _data.setTerms();
 
         if (_data.profile.userType == 2) {
+          _data.branches = await _client.getBranches();
           Get.offAllNamed("/menu");
         } else if (_data.profile.userType == 1) {
           await _data.getInitialForTeacherData();

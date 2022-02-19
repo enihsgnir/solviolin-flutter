@@ -24,8 +24,6 @@ class Client {
 
   Client() {
     dio.options.connectTimeout = 75 * 1000;
-    // dio.options.connectTimeout = 1;
-
     dio.options.receiveTimeout = 40 * 1000;
     dio.options.baseUrl = "https://xn--sy2bt7bxwhpof3wb.com";
 

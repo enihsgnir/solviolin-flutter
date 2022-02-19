@@ -38,6 +38,7 @@ class _TermPageState extends State<TermPage> {
             IconButton(
               onPressed: () => showLoading(() async {
                 await _data.setTerms();
+                _data.update();
               }),
               icon: Icon(Icons.refresh_outlined, size: 28.r),
             ),
@@ -207,8 +208,7 @@ class _TermPageState extends State<TermPage> {
         try {
           await _client.extendAllCoursesOfBranch(extend.branchName!);
 
-          Get.back();
-
+          Get.until(ModalRoute.withName("/term"));
           await showMySnackbar(
             message: "해당 지점의 모든 수업을 다음 학기로 연장했습니다.",
           );
@@ -232,8 +232,7 @@ class _TermPageState extends State<TermPage> {
         try {
           await _client.extendAllCoursesOfUser(textEdit(extend.edit1)!);
 
-          Get.back();
-
+          Get.until(ModalRoute.withName("/term"));
           await showMySnackbar(
             message: "해당 수강생의 모든 수업을 다음 학기로 연장했습니다.",
           );

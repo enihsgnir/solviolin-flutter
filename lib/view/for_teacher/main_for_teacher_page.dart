@@ -61,7 +61,7 @@ class _MainForTeacherPageState extends State<MainForTeacherPage> {
             ),
             IconButton(
               onPressed: () async {
-                final initialDate = DateTime.now();
+                var initialDate = DateTime.now();
                 DateTime? newDate;
 
                 newDate = await showDatePicker(
@@ -84,7 +84,7 @@ class _MainForTeacherPageState extends State<MainForTeacherPage> {
                 );
 
                 if (newDate != null) {
-                  final _temp = _data.displayDate;
+                  var _temp = _data.displayDate;
                   _data.updateDisplayDate(newDate);
                   _calendar.displayDate = newDate;
 

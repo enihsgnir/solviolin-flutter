@@ -27,7 +27,7 @@ import 'package:syncfusion_flutter_calendar/calendar.dart';
 import 'package:syncfusion_flutter_xlsio/xlsio.dart';
 
 class DataController extends GetxController {
-  final _client = Get.find<Client>();
+  var _client = Get.find<Client>();
 
   double _ratio = 1.0;
   bool _isRatioUpdated = false;
@@ -39,7 +39,7 @@ class DataController extends GetxController {
 
   /// set `_ratio`
   set size(Size size) {
-    final _r = min(size.width / _kTestEnvWidth, size.height / _kTestEnvHeight);
+    var _r = min(size.width / _kTestEnvWidth, size.height / _kTestEnvHeight);
     if (!_isRatioUpdated && _r != 0.0) {
       _ratio = _r;
       _isRatioUpdated = true;
@@ -102,8 +102,8 @@ class DataController extends GetxController {
   }
 
   Future<void> setTerms() async {
-    final _today = DateTime.now();
-    final _terms = await _client.getTerms(0);
+    var _today = DateTime.now();
+    var _terms = await _client.getTerms(0);
 
     currentTerm = []
       // this term
@@ -130,9 +130,9 @@ class DataController extends GetxController {
     String? userID,
     String? teacherID,
   }) async {
-    final first = DateTime(displayDate.year, displayDate.month,
+    var first = DateTime(displayDate.year, displayDate.month,
         displayDate.day - displayDate.weekday % 7);
-    final last =
+    var last =
         first.add(const Duration(days: 6, hours: 23, minutes: 59, seconds: 59));
 
     reservations = await _client.getReservations(
@@ -195,11 +195,11 @@ class DataController extends GetxController {
   }
 
   Future<void> getReservationForTeacherData() async {
-    final teacherID = profile.userID;
+    var teacherID = profile.userID;
 
-    final first = DateTime(displayDate.year, displayDate.month,
+    var first = DateTime(displayDate.year, displayDate.month,
         displayDate.day - displayDate.weekday % 7);
-    final last =
+    var last =
         first.add(const Duration(days: 6, hours: 23, minutes: 59, seconds: 59));
 
     teacherInfos = [
@@ -331,7 +331,7 @@ class DataController extends GetxController {
   }
 
   Future<void> getUserDetailData(User user) async {
-    final today = DateTime.now();
+    var today = DateTime.now();
 
     try {
       regularSchedules = await _client.getRegularSchedulesByAdmin(user.userID);
@@ -427,31 +427,6 @@ class DataController extends GetxController {
     });
     controls.sort((a, b) => b.controlStart.compareTo(a.controlStart));
 
-    update();
-  }
-
-  Future<void> getTeachersData({
-    String? teacherID,
-    String? branchName,
-  }) async {
-    teachers = await _client.getTeachers(
-      teacherID: teacherID,
-      branchName: branchName,
-    );
-
-    update();
-  }
-
-  Future<void> getLedgersData({
-    String? branchName,
-    int? termID,
-    String? userID,
-  }) async {
-    ledgers = await _client.getLedgers(
-      branchName: branchName,
-      termID: termID,
-      userID: userID,
-    );
     update();
   }
 }

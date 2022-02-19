@@ -5,9 +5,9 @@ import 'package:solviolin_admin/util/format.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
 
 bool isSameWeek(DateTime newDate, DateTime oldDate) {
-  final weekday = oldDate.weekday % 7;
-  final first = DateTime(oldDate.year, oldDate.month, oldDate.day - weekday);
-  final last =
+  var first =
+      DateTime(oldDate.year, oldDate.month, oldDate.day - oldDate.weekday % 7);
+  var last =
       first.add(const Duration(days: 6, hours: 23, minutes: 59, seconds: 59));
 
   return DateUtils.isSameDay(newDate, first) ||

@@ -39,13 +39,13 @@ class Ledger {
       formatDateTime(paidAt);
 
   String get termIdToString {
-    final _data = Get.find<DataController>();
+    var _data = Get.find<DataController>();
 
-    final _index = _data.terms.indexWhere((element) => termID == element.id);
+    var _index = _data.terms.indexWhere((element) => termID == element.id);
     return _index == -1
         ? formatDate(_data.terms.last.termStart) + " 이전"
         : () {
-            final _term = _data.terms[_index];
+            var _term = _data.terms[_index];
             return formatDateRange(_term.termStart, _term.termEnd);
           }();
   }

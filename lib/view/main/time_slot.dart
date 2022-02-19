@@ -158,8 +158,7 @@ class _TimeSlotState extends State<TimeSlot> {
           );
 
           await _getSearchedReservationsData();
-          Get.back();
-
+          Get.until(ModalRoute.withName("/main"));
           await showMySnackbar(
             message:
                 "관리자의 권한으로 크레딧을 ${deductCredit ? "차감" : "미차감"}하여 예약을 취소했습니다.",
@@ -204,8 +203,7 @@ class _TimeSlotState extends State<TimeSlot> {
           );
 
           await _getSearchedReservationsData();
-          Get.back();
-
+          Get.until(ModalRoute.withName("/main"));
           await showMySnackbar(
             message:
                 "관리자의 권한으로 크레딧을 ${deductCredit ? "차감" : "미차감"}하여 예약을 연장했습니다.",
@@ -336,8 +334,7 @@ class _TimeSlotState extends State<TimeSlot> {
           );
 
           await _getSearchedReservationsData();
-          Get.back();
-
+          Get.until(ModalRoute.withName("/main"));
           await showMySnackbar(
             message: "정기 스케줄을 생성하고 수업을 예약했습니다.",
           );
@@ -376,8 +373,7 @@ class _TimeSlotState extends State<TimeSlot> {
           );
 
           await _getSearchedReservationsData();
-          Get.back();
-
+          Get.until(ModalRoute.withName("/main"));
           await showMySnackbar(
             message: "관리자의 권한으로 보강을 예약했습니다.",
           );
@@ -416,8 +412,7 @@ class _TimeSlotState extends State<TimeSlot> {
           );
 
           await _getSearchedReservationsData();
-          Get.back();
-
+          Get.until(ModalRoute.withName("/main"));
           await showMySnackbar(message: "무료 보강을 예약했습니다.");
         } catch (e) {
           showError(e);

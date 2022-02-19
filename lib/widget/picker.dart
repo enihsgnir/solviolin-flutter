@@ -12,9 +12,9 @@ Widget pickDateTime({
   int index = 0,
   bool isMandatory = false,
 }) {
-  final initialDate = DateTime.now();
+  var initialDate = DateTime.now();
   DateTime? newDate;
-  final initialTime = TimeOfDay.now();
+  var initialTime = TimeOfDay.now();
   TimeOfDay? newTime;
 
   Get.find<CacheController>(tag: tag);
@@ -97,7 +97,7 @@ Widget pickDate({
   int index = 0,
   bool isMandatory = false,
 }) {
-  final initialDate = DateTime.now();
+  var initialDate = DateTime.now();
   DateTime? newDate;
 
   Get.find<CacheController>(tag: tag);
@@ -172,7 +172,7 @@ Widget pickTime({
   int index = 0,
   bool isMandatory = false,
 }) {
-  final initialTime = TimeOfDay.now();
+  var initialTime = TimeOfDay.now();
   TimeOfDay? newTime;
 
   Get.find<CacheController>(tag: tag);

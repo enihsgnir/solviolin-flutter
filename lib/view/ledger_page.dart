@@ -87,11 +87,12 @@ class _LedgerPageState extends State<LedgerPage> {
               context: context,
               onPressed: () => showLoading(() async {
                 try {
-                  await _data.getLedgersData(
+                  _data.ledgers = await _client.getLedgers(
                     branchName: search.branchName,
                     termID: search.termID,
                     userID: textEdit(search.edit1),
                   );
+                  _data.update();
 
                   search.isSearched = true;
                   search.expandable.expanded = false;
@@ -164,11 +165,12 @@ class _LedgerPageState extends State<LedgerPage> {
                             try {
                               await _client.deleteLedger(ledger.id);
 
-                              await _data.getLedgersData(
+                              _data.ledgers = await _client.getLedgers(
                                 branchName: search.branchName,
                                 termID: search.termID,
                                 userID: textEdit(search.edit1),
                               );
+                              _data.update();
 
                               Get.back();
 
@@ -222,11 +224,12 @@ class _LedgerPageState extends State<LedgerPage> {
             branchName: expend.branchName!,
           );
 
-          await _data.getLedgersData(
+          _data.ledgers = await _client.getLedgers(
             branchName: search.branchName,
             termID: search.termID,
             userID: textEdit(search.edit1),
           );
+          _data.update();
 
           Get.back();
 
