@@ -45,7 +45,6 @@ class _ControlForTeacherPageState extends State<ControlForTeacherPage> {
 
   Widget _controlSearch() {
     return mySearch(
-      controller: search.expandable,
       contents: [
         pickDate(
           context: context,
@@ -71,7 +70,6 @@ class _ControlForTeacherPageState extends State<ControlForTeacherPage> {
                   );
 
                   search.isSearched = true;
-                  search.expandable.expanded = false;
 
                   if (_data.controls.isEmpty) {
                     await showMySnackbar(

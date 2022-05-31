@@ -1,7 +1,6 @@
 import 'dart:io';
 import 'dart:math';
 
-import 'package:expandable/expandable.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
@@ -433,7 +432,6 @@ class DataController extends GetxController {
 
 class CacheController extends GetxController {
   bool isSearched = false;
-  var expandable = ExpandableController(initialExpanded: true);
 
   bool hasBeenShown = false;
 

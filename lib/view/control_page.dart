@@ -61,7 +61,6 @@ class _ControlPageState extends State<ControlPage> {
     }
 
     return mySearch(
-      controller: search.expandable,
       contents: [
         branchDropdown("/search/control", true),
         myTextInput("강사", search.edit1),
@@ -99,7 +98,6 @@ class _ControlPageState extends State<ControlPage> {
                   );
 
                   search.isSearched = true;
-                  search.expandable.expanded = false;
 
                   if (_data.controls.isEmpty) {
                     await showMySnackbar(

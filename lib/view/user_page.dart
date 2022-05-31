@@ -71,7 +71,6 @@ class _UserPageState extends State<UserPage> {
 
   Widget _userSearch() {
     return mySearch(
-      controller: search.expandable,
       contents: [
         myTextInput("이름", search.edit1),
         branchDropdown("/search/user"),
@@ -129,7 +128,6 @@ class _UserPageState extends State<UserPage> {
                   );
 
                   search.isSearched = true;
-                  search.expandable.expanded = false;
 
                   if (_data.users.isEmpty) {
                     await showMySnackbar(

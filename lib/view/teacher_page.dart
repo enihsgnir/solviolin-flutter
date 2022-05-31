@@ -54,7 +54,6 @@ class _TeacherPageState extends State<TeacherPage> {
 
   Widget _teacherSearch() {
     return mySearch(
-      controller: search.expandable,
       padding: EdgeInsets.symmetric(vertical: 16.r),
       contents: [
         myTextInput("강사", search.edit1),
@@ -72,7 +71,6 @@ class _TeacherPageState extends State<TeacherPage> {
                   _data.update();
 
                   search.isSearched = true;
-                  search.expandable.expanded = false;
 
                   if (_data.teachers.isEmpty) {
                     await showMySnackbar(

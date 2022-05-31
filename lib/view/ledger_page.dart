@@ -54,7 +54,6 @@ class _LedgerPageState extends State<LedgerPage> {
 
   Widget _ledgerSearch() {
     return mySearch(
-      controller: search.expandable,
       contents: [
         myTextInput("수강생", search.edit1),
         Row(
@@ -95,7 +94,6 @@ class _LedgerPageState extends State<LedgerPage> {
                   _data.update();
 
                   search.isSearched = true;
-                  search.expandable.expanded = false;
 
                   if (_data.ledgers.isEmpty) {
                     await showMySnackbar(

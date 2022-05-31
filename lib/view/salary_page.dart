@@ -46,7 +46,6 @@ class _SalaryPageState extends State<SalaryPage> {
 
   Widget _salarySearch() {
     return mySearch(
-      controller: search.expandable,
       contents: [
         branchDropdown("/search/salary", true),
         termDropdown("/search/salary", true),
@@ -77,7 +76,6 @@ class _SalaryPageState extends State<SalaryPage> {
                   _data.update();
 
                   search.isSearched = true;
-                  search.expandable.expanded = false;
 
                   if (_data.salaries.isEmpty) {
                     await showMySnackbar(

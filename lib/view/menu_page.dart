@@ -74,7 +74,6 @@ class _MenuPageState extends State<MenuPage> {
                     });
                   }),
                   menu("유저 검색", () {
-                    user.expandable.expanded = true;
                     Get.toNamed("/user");
 
                     if (!user.isSearched) {
@@ -88,7 +87,6 @@ class _MenuPageState extends State<MenuPage> {
                 children: [
                   menu("학기", () => Get.toNamed("/term")),
                   menu("매출", () {
-                    ledger.expandable.expanded = true;
                     Get.toNamed("/ledger");
 
                     if (!ledger.isSearched) {
@@ -102,7 +100,6 @@ class _MenuPageState extends State<MenuPage> {
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   menu("강사 스케줄", () {
-                    teacher.expandable.expanded = true;
                     Get.toNamed("/teacher");
 
                     if (!teacher.isSearched) {
@@ -110,7 +107,6 @@ class _MenuPageState extends State<MenuPage> {
                     }
                   }),
                   menu("오픈/클로즈", () {
-                    control.expandable.expanded = true;
                     Get.toNamed("/control");
 
                     if (!control.isSearched) {
@@ -123,11 +119,9 @@ class _MenuPageState extends State<MenuPage> {
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   menu("취소 내역", () {
-                    canceled.expandable.expanded = true;
                     Get.toNamed("/teacher/canceled");
                   }),
                   menu("급여 계산", () {
-                    salary.expandable.expanded = true;
                     Get.toNamed("/teacher/salary");
 
                     if (!salary.isSearched) {
@@ -142,7 +136,6 @@ class _MenuPageState extends State<MenuPage> {
                 children: [
                   menu("QR 체크인", () => Get.toNamed("/check-in")),
                   menu("체크인 이력", () {
-                    checkIn.expandable.expanded = true;
                     Get.toNamed("/check-in/history");
 
                     if (!checkIn.isSearched) {

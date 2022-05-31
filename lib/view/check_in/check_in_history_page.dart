@@ -48,7 +48,6 @@ class _CheckInHistoryPageState extends State<CheckInHistoryPage> {
     }
 
     return mySearch(
-      controller: search.expandable,
       contents: [
         branchDropdown("/search/check-in", true),
         pickDate(
@@ -78,7 +77,6 @@ class _CheckInHistoryPageState extends State<CheckInHistoryPage> {
                   _data.update();
 
                   search.isSearched = true;
-                  search.expandable.expanded = false;
 
                   if (_data.checkInHistories.isEmpty) {
                     await showMySnackbar(

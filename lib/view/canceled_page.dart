@@ -46,7 +46,6 @@ class _CanceledPageState extends State<CanceledPage> {
 
   Widget _canceledSearch() {
     return mySearch(
-      controller: search.expandable,
       padding: EdgeInsets.symmetric(vertical: 16.r),
       contents: [
         Row(
@@ -61,7 +60,6 @@ class _CanceledPageState extends State<CanceledPage> {
                   _data.update();
 
                   search.isSearched = true;
-                  search.expandable.expanded = false;
 
                   if (_data.canceledReservations.isEmpty) {
                     await showMySnackbar(
