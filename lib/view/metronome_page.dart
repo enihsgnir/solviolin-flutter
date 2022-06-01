@@ -1,12 +1,13 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:quiver/async.dart';
 import 'package:solviolin/util/constant.dart';
 import 'package:solviolin/widget/single.dart';
+import 'package:wakelock/wakelock.dart';
 
 class MetronomePage extends StatefulWidget {
   const MetronomePage({Key? key}) : super(key: key);
@@ -16,12 +17,11 @@ class MetronomePage extends StatefulWidget {
 }
 
 class _MetronomePageState extends State<MetronomePage> {
-  late Metronome metronome;
-  StreamSubscription<DateTime>? subscription;
-
   var player = Get.put(AudioCache());
 
-  var _index = 21;
+  Timer? timer;
+
+  var _index = 21; // 100
   List<int> tempos = []
     ..addAll(List.generate(10, (index) => 40 + 2 * index))
     ..addAll(List.generate(4, (index) => 60 + 3 * index))
@@ -34,15 +34,13 @@ class _MetronomePageState extends State<MetronomePage> {
   @override
   void initState() {
     super.initState();
-    metronome = Metronome.epoch(
-        Duration(microseconds: (60 * 1000 * 1000 / tempos[_index]).round()));
     player.load("metronome_sound_sample.mp3");
   }
 
   @override
   void dispose() {
-    subscription?.cancel();
     player.clearAll();
+    _stop();
     super.dispose();
   }
 
@@ -129,11 +127,18 @@ class _MetronomePageState extends State<MetronomePage> {
   void _play() {
     setState(() {
       if (_isPlaying) {
-        subscription?.cancel();
-        _isPlaying = false;
+        _stop();
       } else {
-        subscription = metronome
-            .listen((event) => player.play("metronome_sound_sample.mp3"));
+        timer = Timer.periodic(
+          Duration(microseconds: (60 * 1000 * 1000 / tempos[_index]).round()),
+          (timer) {
+            player.play(
+              "metronome_sound_sample.mp3",
+              mode: PlayerMode.LOW_LATENCY,
+            );
+          },
+        );
+        Wakelock.enable();
         _isPlaying = true;
       }
     });
@@ -142,17 +147,12 @@ class _MetronomePageState extends State<MetronomePage> {
   void _count(CountType type) {
     setState(() {
       if (_isPlaying) {
-        subscription?.cancel();
-        _isPlaying = false;
+        _stop();
       }
 
-      if (type == CountType.increase && _index < tempos.length - 1) {
-        _index++;
-      } else if (type == CountType.decrease && _index > 0) {
-        _index--;
-      }
-      metronome = Metronome.epoch(
-          Duration(microseconds: (60 * 1000 * 1000 / tempos[_index]).round()));
+      _index = type == CountType.increase
+          ? min(_index + 1, tempos.length - 1)
+          : max(_index - 1, 0);
     });
   }
 
@@ -168,13 +168,10 @@ class _MetronomePageState extends State<MetronomePage> {
             onSelectedItemChanged: (index) {
               setState(() {
                 if (_isPlaying) {
-                  subscription?.cancel();
-                  _isPlaying = false;
+                  _stop();
                 }
 
                 _index = index;
-                metronome = Metronome.epoch(Duration(
-                    microseconds: (60 * 1000 * 1000 / tempos[_index]).round()));
               });
             },
             children: List.generate(
@@ -191,6 +188,12 @@ class _MetronomePageState extends State<MetronomePage> {
         );
       },
     );
+  }
+
+  void _stop() {
+    timer?.cancel();
+    Wakelock.disable();
+    _isPlaying = false;
   }
 }
 

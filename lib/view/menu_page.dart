@@ -17,6 +17,8 @@ class _MenuPageState extends State<MenuPage> {
   var _client = Get.find<Client>();
   var _data = Get.find<DataController>();
 
+  bool hasShownMetronomeNotice = false;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -47,7 +49,16 @@ class _MenuPageState extends State<MenuPage> {
                 });
               }),
               menu("QR 체크인", () => Get.toNamed("/check-in")),
-              menu("메트로놈", () => Get.toNamed("/metronome")),
+              menu("메트로놈", () async {
+                Get.toNamed("/metronome");
+                if (!hasShownMetronomeNotice) {
+                  await showMySnackbar(
+                    title: "안내",
+                    message: "메트로놈 작동 후 처음 3초 동안은 재생이 원활하지 않을 수 있습니다.",
+                  );
+                  hasShownMetronomeNotice = true;
+                }
+              }),
               menu("로그아웃", _showLogout, true),
             ]
                 .map((e) => Padding(
