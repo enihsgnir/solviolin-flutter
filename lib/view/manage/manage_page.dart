@@ -57,7 +57,7 @@ class _ManagePageState extends State<ManagePage> with TickerProviderStateMixin {
                 myDivider(),
                 TabBar(
                   controller: tabController,
-                  tabs: ["지난 달", "이번 달", "변경 내역"]
+                  tabs: ["지난 학기", "이번 학기", "변경 내역"]
                       .map((e) => Tab(
                             child: Text(e, style: TextStyle(fontSize: 28.r)),
                           ))
@@ -68,8 +68,8 @@ class _ManagePageState extends State<ManagePage> with TickerProviderStateMixin {
                   child: TabBarView(
                     controller: tabController,
                     children: [
-                      HistoryReserved(controller.lastMonthReservations),
-                      HistoryReserved(controller.thisMonthReservations),
+                      HistoryReserved(controller.lastTermReservations),
+                      HistoryReserved(controller.thisTermReservations),
                       _changedList(),
                     ],
                   ),

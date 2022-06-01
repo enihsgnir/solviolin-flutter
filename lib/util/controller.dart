@@ -38,14 +38,14 @@ class DataController extends GetxController {
   List<DateTime> availabaleSpots = [];
   List<Reservation> myValidReservations = [];
 
-  /// `[0]`: this term, `[1]`: last term
+  /// `[0]`: next term, `[1]`: this term, `[2]`: last term
   List<Term> currentTerm = [];
 
   DateTime selectedDay = DateTime.now().midnight;
   DateTime focusedDay = DateTime.now().midnight;
 
-  List<Reservation> thisMonthReservations = [];
-  List<Reservation> lastMonthReservations = [];
+  List<Reservation> thisTermReservations = [];
+  List<Reservation> lastTermReservations = [];
   List<Change> changes = [];
 
   bool _isRegularScheduleExisting = true;
@@ -57,8 +57,8 @@ class DataController extends GetxController {
     myValidReservations = [];
     currentTerm = [];
 
-    thisMonthReservations = [];
-    lastMonthReservations = [];
+    thisTermReservations = [];
+    lastTermReservations = [];
     changes = [];
   }
 
@@ -66,14 +66,14 @@ class DataController extends GetxController {
     var _today = DateTime.now();
     var _terms = await _client.getTerms(0);
 
+    final _lastTerm =
+        _terms.firstWhere((element) => element.termEnd.isBefore(_today));
+    final _lastTermIndex = _terms.indexOf(_lastTerm);
+
     currentTerm = []
-      // this term
-      ..add(_terms.lastWhere(
-        (element) => element.termEnd.isAfter(_today),
-        orElse: () => _terms.first,
-      ))
-      // last term
-      ..add(_terms.firstWhere((element) => element.termEnd.isBefore(_today)));
+      ..add(_terms[max(_lastTermIndex - 2, 0)]) // next term
+      ..add(_terms[max(_lastTermIndex - 1, 0)]) // this term
+      ..add(_lastTerm);
   }
 
   void setDays(DateTime selected, DateTime focused) {
@@ -144,18 +144,18 @@ class DataController extends GetxController {
   }
 
   Future<void> getReservedHistoryData() async {
-    thisMonthReservations = await _client.getReservations(
+    thisTermReservations = await _client.getReservations(
       branchName: profile.branchName,
-      startDate: currentTerm[0].termStart,
-      endDate: currentTerm[0].termEnd,
+      startDate: currentTerm[1].termStart,
+      endDate: currentTerm[1].termEnd,
       userID: profile.userID,
       bookingStatus: [-3, -2, -1, 0, 1, 2, 3],
     );
 
-    lastMonthReservations = await _client.getReservations(
+    lastTermReservations = await _client.getReservations(
       branchName: profile.branchName,
-      startDate: currentTerm[1].termStart,
-      endDate: currentTerm[1].termEnd,
+      startDate: currentTerm[2].termStart,
+      endDate: currentTerm[2].termEnd,
       userID: profile.userID,
       bookingStatus: [-3, -2, -1, 0, 1, 2, 3],
     );
