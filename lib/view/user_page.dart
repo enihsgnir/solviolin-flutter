@@ -284,7 +284,7 @@ class _UserPageState extends State<UserPage> {
 
     return showMyModal(
       context: context,
-      message: "...", // TODO: better message
+      message: "...",
       children: ["크레딧 초기화"],
       isDestructiveAction: [true],
       onPressed: [_showInitializeCredit],
