@@ -48,7 +48,9 @@ class DataController extends GetxController {
 
   late Profile profile;
 
+  /// `[0]`: next term, `[1]`: this term, `[2]`: last term
   List<Term> currentTerm = [];
+
   List<Term> terms = [];
   List<String> branches = [];
 
@@ -61,8 +63,8 @@ class DataController extends GetxController {
 
   List<User> users = [];
   List<RegularSchedule> regularSchedules = [];
-  List<Reservation> thisMonthReservations = [];
-  List<Reservation> lastMonthReservations = [];
+  List<Reservation> thisTermReservations = [];
+  List<Reservation> lastTermReservations = [];
   List<Change> changes = [];
   List<Ledger> myLedgers = [];
 
@@ -81,8 +83,8 @@ class DataController extends GetxController {
 
     users = [];
     regularSchedules = [];
-    thisMonthReservations = [];
-    lastMonthReservations = [];
+    thisTermReservations = [];
+    lastTermReservations = [];
     changes = [];
     myLedgers = [];
 
@@ -104,15 +106,16 @@ class DataController extends GetxController {
     var _today = DateTime.now();
     var _terms = await _client.getTerms(0);
 
+    final _lastTerm =
+        _terms.firstWhere((element) => element.termEnd.isBefore(_today));
+    final _lastTermIndex = _terms.indexOf(_lastTerm);
+
     currentTerm = []
-      // this term
-      ..add(_terms.lastWhere(
-        (element) => element.termEnd.isAfter(_today),
-        orElse: () => _terms.first,
-      ))
-      // last term
-      ..add(_terms.firstWhere((element) => element.termEnd.isBefore(_today)));
-    terms = await _client.getTerms(10);
+      ..add(_terms[max(_lastTermIndex - 2, 0)]) // next term
+      ..add(_terms[max(_lastTermIndex - 1, 0)]) // this term
+      ..add(_lastTerm);
+
+    terms = _terms.take(max(_lastTermIndex, 10)).toList();
   }
 
   Future<void> getInitialForTeacherData() async {
@@ -330,8 +333,6 @@ class DataController extends GetxController {
   }
 
   Future<void> getUserDetailData(User user) async {
-    var today = DateTime.now();
-
     try {
       regularSchedules = await _client.getRegularSchedulesByAdmin(user.userID);
     } on NetworkException catch (e) {
@@ -349,18 +350,18 @@ class DataController extends GetxController {
     }
 
     if (user.userType == 0) {
-      thisMonthReservations = await _client.getReservations(
+      thisTermReservations = await _client.getReservations(
         branchName: user.branchName,
-        startDate: DateTime(today.year, today.month, 1),
-        endDate: DateTime(today.year, today.month + 1, 0, 23, 59, 59),
+        startDate: currentTerm[1].termStart,
+        endDate: currentTerm[1].termEnd,
         userID: user.userID,
         bookingStatus: [-3, -2, -1, 0, 1, 2, 3],
       );
 
-      lastMonthReservations = await _client.getReservations(
+      lastTermReservations = await _client.getReservations(
         branchName: user.branchName,
-        startDate: DateTime(today.year, today.month - 1, 1),
-        endDate: DateTime(today.year, today.month, 0, 23, 59, 59),
+        startDate: currentTerm[2].termStart,
+        endDate: currentTerm[2].termEnd,
         userID: user.userID,
         bookingStatus: [-3, -2, -1, 0, 1, 2, 3],
       );
@@ -371,8 +372,8 @@ class DataController extends GetxController {
         userID: user.userID,
       );
     } else {
-      thisMonthReservations = [];
-      lastMonthReservations = [];
+      thisTermReservations = [];
+      lastTermReservations = [];
       changes = [];
       myLedgers = [];
 

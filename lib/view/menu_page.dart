@@ -91,7 +91,7 @@ class _MenuPageState extends State<MenuPage> {
 
                     if (!ledger.isSearched) {
                       ledger.branchName = _data.profile.branchName;
-                      ledger.termID = _data.currentTerm[0].id;
+                      ledger.termID = _data.currentTerm[1].id;
                     }
                   }),
                 ],
@@ -126,7 +126,7 @@ class _MenuPageState extends State<MenuPage> {
 
                     if (!salary.isSearched) {
                       salary.branchName = _data.profile.branchName;
-                      salary.termID = _data.currentTerm[0].id;
+                      salary.termID = _data.currentTerm[1].id;
                     }
                   }),
                 ],

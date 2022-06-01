@@ -143,7 +143,7 @@ class _UserDetailPageState extends State<UserDetailPage>
                 myDivider(),
                 TabBar(
                   controller: tabController,
-                  tabs: ["지난 달", "이번 달", "변경내역", "납부내역"]
+                  tabs: ["지난 학기", "이번 학기", "변경내역", "납부내역"]
                       .map((e) => Tab(
                             child: Text(e, style: TextStyle(fontSize: 22.r)),
                           ))
@@ -154,8 +154,8 @@ class _UserDetailPageState extends State<UserDetailPage>
                   child: TabBarView(
                     controller: tabController,
                     children: [
-                      HistoryReserved(_data.lastMonthReservations),
-                      HistoryReserved(_data.thisMonthReservations),
+                      HistoryReserved(_data.lastTermReservations),
+                      HistoryReserved(_data.thisTermReservations),
                       _changedList(),
                       _paidList(),
                     ],
