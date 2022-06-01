@@ -297,7 +297,8 @@ class _UserDetailPageState extends State<UserDetailPage>
     return showMyDialog(
       title: "정기 삭제",
       contents: [
-        Text("정기 스케줄을 삭제합니다.\n아직 시작되지 않은 정기 스케줄만\n삭제할 수 있습니다."),
+        Text("정기 스케줄을 삭제합니다.\n아직 시작하지 않은 정기 스케줄만\n삭제할 수 있습니다." +
+            "\n\n*이미 시작한 정기 스케줄은\n'정기 종료' 기능을 이용하기 바랍니다.*"),
       ],
       onPressed: () {
         showMyDialog(
@@ -338,7 +339,8 @@ class _UserDetailPageState extends State<UserDetailPage>
     return showMyDialog(
       title: "정기 종료",
       contents: [
-        Text("정기 스케줄의 종료일을 갱신하고\n종료일 이후의 해당 정기 수업들을\n모두 삭제합니다."),
+        Text("정기 스케줄의 종료일을 갱신하고\n종료일 이후의 해당 정기 수업들을\n모두 삭제합니다." +
+            "\n\n*시작하지 않은 정기 스케줄은\n'정기 삭제' 기능을 이용하기 바랍니다.*"),
         pickDateTime(
           context: context,
           item: "종료일",

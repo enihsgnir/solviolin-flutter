@@ -114,13 +114,14 @@ class _TimeSlotState extends State<TimeSlot> {
     return showMyModal(
       context: context,
       message: info.userID + " | " + formatDateTime(info.startDate),
-      children: ["취소 (관리자)", "연장 (관리자)", "삭제", "정기 종료"],
-      isDestructiveAction: [false, false, true, true],
+      children: ["취소 (관리자)", "연장 (관리자)", "예약 삭제", "정기 종료", "정기 삭제"],
+      isDestructiveAction: [false, false, true, true, true],
       onPressed: [
         () => _showCancelByAdmin(details),
         () => _showExtendByAdmin(details),
         () => _showDeleteReservation(details),
         () => _showDeleteLaterCourse(details),
+        () => _showDeleteRegular(details),
       ],
     );
   }
@@ -217,6 +218,7 @@ class _TimeSlotState extends State<TimeSlot> {
 
   Future _showDeleteReservation(CalendarTapDetails details) {
     return showMyDialog(
+      title: "예약 삭제",
       contents: [
         Text("예약을 삭제하시겠습니까?\n취소 내역에 기록되지 않습니다."),
         Text(
@@ -260,7 +262,8 @@ class _TimeSlotState extends State<TimeSlot> {
             formatDateTime(details.appointments![0].startDate) +
             "\n\n정기 스케줄의 종료일을 갱신하시겠습니까?" +
             "\n선택한 수업을 포함하여 종료일 이후의" +
-            "\n해당 정기 수업들을 모두 삭제합니다."),
+            "\n해당 정기 수업들을 모두 삭제합니다." +
+            "\n\n*시작하지 않은 정기 스케줄은\n'정기 삭제' 기능을 이용하기 바랍니다.*"),
       ],
       onPressed: () {
         showMyDialog(
@@ -284,6 +287,42 @@ class _TimeSlotState extends State<TimeSlot> {
               // whether regularID is null
               e is CastError
                   ? showError("정기 스케줄을 따르는 예약인 경우에만 정기 종료 할 수 있습니다.")
+                  : showError(e);
+            }
+          }),
+        );
+      },
+    );
+  }
+
+  Future _showDeleteRegular(CalendarTapDetails details) {
+    return showMyDialog(
+      title: "정기 삭제",
+      contents: [
+        Text("아직 시작하지 않은 정기 스케줄을 삭제하고" +
+            "\n해당하는 정기 수업들을 모두 삭제합니다." +
+            "\n\n*이미 시작한 정기 스케줄은\n'정기 종료' 기능을 이용하기 바랍니다.*"),
+      ],
+      onPressed: () {
+        showMyDialog(
+          contents: [
+            Text(
+              "정말로 정기 스케줄을 삭제하시겠습니까?",
+              style: TextStyle(color: Colors.red),
+            ),
+          ],
+          onPressed: () => showLoading(() async {
+            try {
+              await _client
+                  .deleteRegularSchedule(details.appointments![0].regularID);
+
+              await _getSearchedReservationsData();
+              Get.until(ModalRoute.withName("/main"));
+              await showMySnackbar(message: "정기 삭제에 성공했습니다.");
+            } catch (e) {
+              // whether regularID is null
+              e is CastError
+                  ? showError("정기 스케줄을 따르는 예약인 경우에만 정기 삭제 할 수 있습니다.")
                   : showError(e);
             }
           }),
