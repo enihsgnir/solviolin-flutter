@@ -51,7 +51,12 @@ class _GridAvailableState extends State<GridAvailable> {
                     ),
                   ),
                   onTap: () async {
-                    await _showReserve(controller.availabaleSpots[index]);
+                    if (controller.availabaleSpots[index]
+                        .isAfter(controller.currentTerm[1].termEnd)) {
+                      await showError("다음 학기의 수업 예약은 해당 학기에 가능합니다.");
+                    } else {
+                      await _showReserve(controller.availabaleSpots[index]);
+                    }
                   },
                   enableFeedback: false,
                 ),

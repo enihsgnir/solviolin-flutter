@@ -51,10 +51,16 @@ class _ReservationCardState extends State<ReservationCard> {
                                 width: double.infinity,
                                 child: ElevatedButton(
                                   onPressed: () async {
-                                    reservation.startDate
-                                            .isBefore(DateTime.now())
-                                        ? await showError("지난 수업은 취소할 수 없습니다.")
-                                        : await _showCancel(reservation);
+                                    if (reservation.startDate
+                                        .isBefore(DateTime.now())) {
+                                      await showError("지난 수업은 취소할 수 없습니다.");
+                                    } else if (reservation.startDate.isAfter(
+                                        controller.currentTerm[1].termEnd)) {
+                                      await showError(
+                                          "다음 학기의 수업 취소는 해당 학기에 가능합니다.");
+                                    } else {
+                                      await _showCancel(reservation);
+                                    }
                                   },
                                   style: ElevatedButton.styleFrom(
                                       primary: symbolColor),
