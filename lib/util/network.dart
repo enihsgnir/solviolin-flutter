@@ -44,11 +44,6 @@ class Client {
             return handler.reject(e);
           }
         } else if (response.statusCode == 401 && !accessible && refreshable) {
-          // TODO:
-          //  run this if block when the refresh token has been expired
-          //  or the user has logged in/out in the other device
-          //  and the function refresh do delete the access token only not update
-          //  so the function retry is intercepted by this block
           Get.offAllNamed("/login");
           await logout();
           return handler.reject(NetworkException._(
@@ -204,8 +199,6 @@ class Client {
     );
   }
 
-  // TODO: check if it is affected by time zone
-
   /// Regardless of hour and minute, only the `date` of `startDate` matters.
   Future<List<DateTime>> getAvailableSpots({
     required String branchName,
@@ -302,8 +295,6 @@ class Client {
     );
   }
 
-  // TODO: It works well 'yet' with normalized local datetime.
-  //  makeUp -> _showReserve -> availableSpots -> parseDateTime
   Future<void> makeUp({
     required String teacherID,
     required String branchName,

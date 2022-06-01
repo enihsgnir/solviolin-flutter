@@ -1,6 +1,4 @@
 class Profile {
-  // TODO: make members private? getter only?
-
   String _userID;
   String get userID => _userID;
 

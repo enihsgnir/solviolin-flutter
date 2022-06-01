@@ -160,7 +160,6 @@ class _CalendarReservedState extends State<CalendarReserved> {
     );
   }
 
-  // TODO: color details later
   Color _getSelectedTextColor() {
     if (isSameDay(_selectedDay, today)) {
       return Colors.black87;
