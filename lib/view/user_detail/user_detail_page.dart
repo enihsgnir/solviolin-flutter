@@ -298,6 +298,7 @@ class _UserDetailPageState extends State<UserDetailPage>
       title: "정기 삭제",
       contents: [
         Text("정기 스케줄을 삭제합니다.\n아직 시작하지 않은 정기 스케줄만\n삭제할 수 있습니다." +
+            "\n\n*정기수업 시작 전인 경우\n이번 학기의 예약 목록 중\n첫 번째 정기 예약에 해당하는\n정기 스케줄을 삭제합니다.*" +
             "\n\n*이미 시작한 정기 스케줄은\n'정기 종료' 기능을 이용하기 바랍니다.*"),
       ],
       onPressed: () {
@@ -311,7 +312,20 @@ class _UserDetailPageState extends State<UserDetailPage>
           ],
           onPressed: () => showLoading(() async {
             try {
-              await _client.deleteRegularSchedule(regular.id);
+              int? _regularID = regular.id > -1
+                  ? regular.id
+                  : _data.thisTermReservations.firstWhere(
+                      (element) => element.bookingStatus == 0,
+                      orElse: () {
+                        throw "이번 학기에 해당하는 정기 예약 목록이 없습니다. 관리자에게 문의하세요.";
+                      },
+                    ).regularID;
+
+              if (_regularID == null) {
+                throw "정기 스케줄을 따르는 예약인 경우에만 정기 삭제 할 수 있습니다.";
+              }
+
+              await _client.deleteRegularSchedule(_regularID);
 
               await _data.getUsersData(
                 branchName: search.branchName,
