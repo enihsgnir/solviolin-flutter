@@ -49,37 +49,38 @@ class _CheckInPageState extends State<CheckInPage> {
             key: qrKey,
             onQRViewCreated: (controller) {
               qrController = controller;
-              controller.scannedDataStream.listen((scanData) {
-                setState(() async {
+              controller.scannedDataStream.listen((scanData) async {
+                setState(() {
                   result = scanData;
-                  await controller.pauseCamera();
+                });
 
-                  await showLoading(() async {
-                    try {
-                      await _client.checkIn(result!.code!);
+                await controller.pauseCamera();
 
-                      await controller.stopCamera();
-                      Get.back();
-                      await showMySnackbar(message: "체크인에 성공했습니다.");
-                    } catch (e) {
-                      Get.snackbar(
-                        "",
-                        "",
-                        snackPosition: SnackPosition.BOTTOM,
-                        titleText: Text(
-                          "Error",
-                          style: TextStyle(color: Colors.white, fontSize: 28.r),
-                        ),
-                        messageText: Text(
-                          e.toString(),
-                          style: TextStyle(color: Colors.red, fontSize: 24.r),
-                        ),
-                      );
-                      Future.delayed(const Duration(seconds: 2), () async {
-                        await controller.resumeCamera();
-                      });
-                    }
-                  });
+                await showLoading(() async {
+                  try {
+                    await _client.checkIn(result!.code!);
+
+                    await controller.stopCamera();
+                    Get.back();
+                    await showMySnackbar(message: "체크인에 성공했습니다.");
+                  } catch (e) {
+                    Get.snackbar(
+                      "",
+                      "",
+                      snackPosition: SnackPosition.BOTTOM,
+                      titleText: Text(
+                        "Error",
+                        style: TextStyle(color: Colors.white, fontSize: 28.r),
+                      ),
+                      messageText: Text(
+                        e.toString(),
+                        style: TextStyle(color: Colors.red, fontSize: 24.r),
+                      ),
+                    );
+                    Future.delayed(const Duration(seconds: 2), () async {
+                      await controller.resumeCamera();
+                    });
+                  }
                 });
               });
             },
