@@ -27,7 +27,7 @@ Widget menu(String name, VoidCallback onPressed, [bool isDestructive = false]) {
   return ElevatedButton(
     onPressed: onPressed,
     style: ElevatedButton.styleFrom(
-      primary: isDestructive ? Colors.red : symbolColor,
+      backgroundColor: isDestructive ? Colors.red : symbolColor,
       textStyle: TextStyle(color: Colors.white, fontSize: 22.r),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(15.r),

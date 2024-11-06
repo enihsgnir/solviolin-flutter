@@ -38,7 +38,7 @@ Widget myActionButton({
         FocusScope.of(context).requestFocus(FocusNode());
         onPressed();
       },
-      style: ElevatedButton.styleFrom(primary: symbolColor),
+      style: ElevatedButton.styleFrom(backgroundColor: symbolColor),
       child: Text(action, style: contentStyle),
     ),
   );

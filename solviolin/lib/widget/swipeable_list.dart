@@ -23,7 +23,7 @@ class _SwipeableListState extends State<SwipeableList> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance?.addPostFrameCallback((timeStamp) {
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
       var _renderBox = _key.currentContext?.findRenderObject() as RenderBox;
       setState(() {
         _height = _renderBox.size.height;

@@ -71,13 +71,7 @@ class _MainForTeacherPageState extends State<MainForTeacherPage> {
                   lastDate: DateTime(initialDate.year + 1),
                   builder: (context, child) {
                     return Theme(
-                      data: ThemeData.dark().copyWith(
-                        textTheme: TextTheme(
-                          headline5: TextStyle(fontSize: 24.r),
-                          subtitle2: TextStyle(fontSize: 16.r),
-                          caption: TextStyle(fontSize: 16.r),
-                        ),
-                      ),
+                      data: ThemeData.dark(),
                       child: child!,
                     );
                   },

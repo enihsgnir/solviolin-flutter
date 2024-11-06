@@ -67,7 +67,7 @@ class _MetronomePageState extends State<MetronomePage> {
               ElevatedButton(
                 onPressed: () => _count(CountType.decrease),
                 style: ElevatedButton.styleFrom(
-                  primary: symbolColor,
+                  backgroundColor: symbolColor,
                   shape: CircleBorder(),
                 ),
                 child: Padding(
@@ -92,7 +92,7 @@ class _MetronomePageState extends State<MetronomePage> {
               ElevatedButton(
                 onPressed: () => _count(CountType.increase),
                 style: ElevatedButton.styleFrom(
-                  primary: symbolColor,
+                  backgroundColor: symbolColor,
                   shape: CircleBorder(),
                 ),
                 child: Padding(
@@ -107,7 +107,7 @@ class _MetronomePageState extends State<MetronomePage> {
             child: OutlinedButton(
               onPressed: _play,
               style: OutlinedButton.styleFrom(
-                primary: Colors.white,
+                foregroundColor: Colors.white,
                 shape: CircleBorder(),
                 enableFeedback: false,
               ),

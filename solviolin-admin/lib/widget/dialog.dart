@@ -5,9 +5,7 @@ import 'package:solviolin_admin/util/constant.dart';
 
 Future showError(dynamic error) {
   var message = error.toString();
-  if (error is CastError) {
-    message = "필수 항목을 입력하세요.";
-  } else if (error is FormatException) {
+  if (error is FormatException) {
     message = "입력값의 형식이 올바르지 않습니다.";
   } else if (error is StateError) {
     message = "조건에 해당하는 값이 존재하지 않습니다.";
@@ -72,7 +70,7 @@ Widget myDialog({
           onPressed();
         },
         style: ElevatedButton.styleFrom(
-          primary: symbolColor,
+          backgroundColor: symbolColor,
           padding: EdgeInsets.symmetric(vertical: 12.r, horizontal: 16.r),
         ),
         child: Text(action, style: contentStyle),

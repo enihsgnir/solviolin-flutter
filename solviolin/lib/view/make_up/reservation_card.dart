@@ -63,7 +63,7 @@ class _ReservationCardState extends State<ReservationCard> {
                                     }
                                   },
                                   style: ElevatedButton.styleFrom(
-                                      primary: symbolColor),
+                                      backgroundColor: symbolColor),
                                   child: Text("취소", style: contentStyle),
                                 ),
                               ),

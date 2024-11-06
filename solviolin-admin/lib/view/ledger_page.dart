@@ -63,16 +63,21 @@ class _LedgerPageState extends State<LedgerPage> {
               context: context,
               onPressed: () => showLoading(() async {
                 try {
+                  final branchName = search.branchName;
+                  final termID = search.termID;
+                  if (branchName == null || termID == null) {
+                    showError("합계 조회 시 지점/학기는 필수 입력 항목입니다.");
+                    return;
+                  }
+
                   _data.totalLeger = await _client.getTotalLedger(
-                    branchName: search.branchName!,
-                    termID: search.termID!,
+                    branchName: branchName,
+                    termID: termID,
                   );
 
                   _showTotal();
                 } catch (e) {
-                  e is CastError
-                      ? showError("합계 조회 시 지점/학기는 필수 입력 항목입니다.")
-                      : showError(e);
+                  showError(e);
                 }
               }),
               action: "합계",

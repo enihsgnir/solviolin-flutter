@@ -36,6 +36,8 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
+  final theme = ThemeData();
+
   @override
   Widget build(BuildContext context) {
     Get.put(FlutterSecureStorage());
@@ -54,12 +56,11 @@ class _MyAppState extends State<MyApp> {
         );
       },
       title: "SolViolin",
-      theme: ThemeData(
+      theme: theme.copyWith(
         brightness: Brightness.dark,
         primaryColor: Colors.black,
-        accentColor: Colors.white,
-        textTheme:
-            GoogleFonts.nanumGothicTextTheme(Theme.of(context).textTheme),
+        colorScheme: theme.colorScheme.copyWith(secondary: Colors.white),
+        textTheme: GoogleFonts.nanumGothicTextTheme(theme.textTheme),
       ),
       localizationsDelegates: [
         GlobalMaterialLocalizations.delegate,

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:solviolin_admin/model/reservation.dart';
 import 'package:solviolin_admin/util/constant.dart';
 import 'package:solviolin_admin/util/controller.dart';
 import 'package:solviolin_admin/util/data_source.dart';
@@ -255,11 +256,14 @@ class _TimeSlotState extends State<TimeSlot> {
   }
 
   Future _showDeleteLaterCourse(CalendarTapDetails details) {
+    final appointments = details.appointments! as List<Reservation>;
+    final reservation = appointments.first;
+
     return showMyDialog(
       title: "정기 종료",
       contents: [
         Text("종료일: " +
-            formatDateTime(details.appointments![0].startDate) +
+            formatDateTime(reservation.startDate) +
             "\n\n정기 스케줄의 종료일을 갱신하시겠습니까?" +
             "\n선택한 수업을 포함하여 종료일 이후의" +
             "\n해당 정기 수업들을 모두 삭제합니다." +
@@ -275,19 +279,22 @@ class _TimeSlotState extends State<TimeSlot> {
           ],
           onPressed: () => showLoading(() async {
             try {
+              final regularID = reservation.regularID;
+              if (regularID == null) {
+                showError("정기 스케줄을 따르는 예약인 경우에만 정기 종료 할 수 있습니다.");
+                return;
+              }
+
               await _client.updateEndDateAndDeleteLaterCourse(
-                details.appointments![0].regularID,
-                endDate: details.appointments![0].startDate,
+                regularID,
+                endDate: reservation.startDate,
               );
 
               await _getSearchedReservationsData();
               Get.until(ModalRoute.withName("/main"));
               await showMySnackbar(message: "정기 종료에 성공했습니다.");
             } catch (e) {
-              // whether regularID is null
-              e is CastError
-                  ? showError("정기 스케줄을 따르는 예약인 경우에만 정기 종료 할 수 있습니다.")
-                  : showError(e);
+              showError(e);
             }
           }),
         );
@@ -296,6 +303,9 @@ class _TimeSlotState extends State<TimeSlot> {
   }
 
   Future _showDeleteRegular(CalendarTapDetails details) {
+    final appointments = details.appointments! as List<Reservation>;
+    final reservation = appointments.first;
+
     return showMyDialog(
       title: "정기 삭제",
       contents: [
@@ -313,17 +323,19 @@ class _TimeSlotState extends State<TimeSlot> {
           ],
           onPressed: () => showLoading(() async {
             try {
-              await _client
-                  .deleteRegularSchedule(details.appointments![0].regularID);
+              final regularID = reservation.regularID;
+              if (regularID == null) {
+                showError("정기 스케줄을 따르는 예약인 경우에만 정기 삭제 할 수 있습니다.");
+                return;
+              }
+
+              await _client.deleteRegularSchedule(regularID);
 
               await _getSearchedReservationsData();
               Get.until(ModalRoute.withName("/main"));
               await showMySnackbar(message: "정기 삭제에 성공했습니다.");
             } catch (e) {
-              // whether regularID is null
-              e is CastError
-                  ? showError("정기 스케줄을 따르는 예약인 경우에만 정기 삭제 할 수 있습니다.")
-                  : showError(e);
+              showError(e);
             }
           }),
         );
