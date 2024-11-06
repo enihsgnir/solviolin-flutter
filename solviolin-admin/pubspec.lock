@@ -9,14 +9,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.2.0"
-  async:
-    dependency: transitive
-    description:
-      name: async
-      sha256: db4766341bd8ecb66556f31ab891a5d596ef829221993531bd64a8e6342f0cda
-      url: "https://pub.dev"
-    source: hosted
-    version: "2.8.2"
   characters:
     dependency: transitive
     description:
@@ -128,22 +120,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "4.6.1"
-  google_fonts:
-    dependency: "direct main"
-    description:
-      name: google_fonts
-      sha256: b2d15ed94b96591df902c4b201c0692c7557cf33b086857ff93d0b4485f05d2e
-      url: "https://pub.dev"
-    source: hosted
-    version: "2.3.1"
-  http:
-    dependency: transitive
-    description:
-      name: http
-      sha256: "2ed163531e071c2c6b7c659635112f24cb64ecbebf6af46b550d536c0b1aa112"
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.13.4"
   http_parser:
     dependency: transitive
     description:
