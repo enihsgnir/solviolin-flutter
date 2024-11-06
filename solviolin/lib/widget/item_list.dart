@@ -28,9 +28,13 @@ Widget mySlidableCard({
   required List<Widget> children,
 }) {
   return Slidable(
-    actionPane: const SlidableScrollActionPane(),
-    actionExtentRatio: 1 / 5,
-    secondaryActions: slideActions,
+    endActionPane: slideActions == null
+        ? null
+        : ActionPane(
+            motion: const ScrollMotion(),
+            extentRatio: slideActions.length / 5,
+            children: slideActions,
+          ),
     child: Container(
       padding: padding ?? EdgeInsets.symmetric(vertical: 16.r),
       decoration: myDecoration,
@@ -56,7 +60,8 @@ Widget mySlideAction({
   bool borderLeft = false,
   bool borderRight = false,
 }) {
-  return SlideAction(
+  return CustomSlidableAction(
+    onPressed: (context) => onTap(),
     child: Row(
       children: [
         borderLeft
@@ -87,6 +92,5 @@ Widget mySlideAction({
             : Container(),
       ],
     ),
-    onTap: onTap,
   );
 }
