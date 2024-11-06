@@ -1,74 +1,26 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:get/get.dart';
-import 'package:solviolin/util/controller.dart';
-import 'package:solviolin/util/network.dart';
-import 'package:solviolin/view/check_in_page.dart';
-import 'package:solviolin/view/loading_page.dart';
-import 'package:solviolin/view/login_page.dart';
-import 'package:solviolin/view/make_up/make_up_page.dart';
-import 'package:solviolin/view/manage/manage_page.dart';
-import 'package:solviolin/view/menu_page.dart';
-import 'package:solviolin/view/metronome_page.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:solviolin_common/providers/router_provider.dart';
+import 'package:solviolin_common/utils/theme.dart';
 
 void main() {
-  WidgetsFlutterBinding.ensureInitialized();
-  SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp])
-      .then((value) => runApp(MyApp()));
+  runApp(
+    const ProviderScope(
+      child: MyApp(),
+    ),
+  );
 }
 
-class MyApp extends StatefulWidget {
-  const MyApp({Key? key}) : super(key: key);
+class MyApp extends ConsumerWidget {
+  const MyApp({super.key});
 
   @override
-  _MyAppState createState() => _MyAppState();
-}
+  Widget build(BuildContext context, WidgetRef ref) {
+    final router = ref.watch(routerProvider);
 
-class _MyAppState extends State<MyApp> {
-  final theme = ThemeData();
-
-  @override
-  Widget build(BuildContext context) {
-    Get.put(FlutterSecureStorage());
-    Get.put(Client());
-    var _data = Get.put(DataController());
-
-    return GetMaterialApp(
-      builder: (context, child) {
-        _data.size = MediaQuery.of(context).size;
-
-        return MediaQuery(
-          data: MediaQuery.of(context).copyWith(
-            textScaleFactor: min(MediaQuery.of(context).textScaleFactor, 1.0),
-          ),
-          child: child!,
-        );
-      },
-      title: "SolViolin",
-      theme: theme.copyWith(
-        brightness: Brightness.dark,
-        primaryColor: Colors.black,
-        colorScheme: theme.colorScheme.copyWith(secondary: Colors.white),
-      ),
-      localizationsDelegates: [
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      initialRoute: "/loading",
-      getPages: [
-        GetPage(name: "/loading", page: () => LoadingPage()),
-        GetPage(name: "/login", page: () => LoginPage()),
-        GetPage(name: "/menu", page: () => MenuPage()),
-        GetPage(name: "/manage", page: () => ManagePage()),
-        GetPage(name: "/make-up", page: () => MakeUpPage()),
-        GetPage(name: "/check-in", page: () => CheckInPage()),
-        GetPage(name: "/metronome", page: () => MetronomePage()),
-      ],
+    return MaterialApp.router(
+      routerConfig: router,
+      theme: theme,
     );
   }
 }
