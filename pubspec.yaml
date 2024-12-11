@@ -1,7 +1,7 @@
 name: solviolin
 description: "A new Flutter project."
 publish_to: 'none'
-version: 3.1.8+29
+version: 4.0.0+30
 
 environment:
   sdk: ^3.5.2
