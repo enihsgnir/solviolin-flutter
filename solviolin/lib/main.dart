@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:solviolin_common/providers/router_provider.dart';
-import 'package:solviolin_common/utils/theme.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:solviolin/providers/router_provider.dart';
+import 'package:solviolin/utils/theme.dart';
 
 void main() {
   runApp(
