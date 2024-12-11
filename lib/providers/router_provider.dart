@@ -21,7 +21,6 @@ import 'package:solviolin/pages/ledger_create_page.dart';
 import 'package:solviolin/pages/ledger_list_page.dart';
 import 'package:solviolin/pages/ledger_search_page.dart';
 import 'package:solviolin/pages/ledger_total_page.dart';
-import 'package:solviolin/pages/metronome_page.dart';
 import 'package:solviolin/pages/reservation_create_page.dart';
 import 'package:solviolin/pages/reservation_detail_page.dart';
 import 'package:solviolin/pages/reservation_search_page.dart';
@@ -92,10 +91,6 @@ GoRouter router(Ref ref) {
       GoRoute(
         path: "/check-in",
         builder: (context, state) => const CheckInPage(),
-      ),
-      GoRoute(
-        path: "/metronome",
-        builder: (context, state) => const MetronomePage(),
       ),
       GoRoute(
         path: "/student",

@@ -110,11 +110,6 @@ class AdminMenuPage extends StatelessWidget {
             label: "체크인 이력 검색",
             onTap: () => context.push("/admin/check-in/search"),
           ),
-          const MenuSectionTitle("기타"),
-          MenuButton(
-            label: "메트로놈",
-            onTap: () => context.push("/metronome"),
-          ),
         ],
       ),
     );

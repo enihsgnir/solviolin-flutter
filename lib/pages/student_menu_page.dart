@@ -28,10 +28,6 @@ class StudentMenuPage extends StatelessWidget {
             label: "QR 체크인",
             onTap: () => context.push("/check-in"),
           ),
-          MenuButton(
-            label: "메트로놈",
-            onTap: () => context.push("/metronome"),
-          ),
         ],
       ),
     );
